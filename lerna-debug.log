@@ -1,0 +1,115 @@
+0 silly input [ 'build' ]
+1 silly flags { _: [ 'run' ],
+1 silly flags   'reject-cycles': false,
+1 silly flags   rejectCycles: false,
+1 silly flags   script: 'build',
+1 silly flags   args: [] }
+2 verbose rootPath /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda
+3 info version 2.10.2
+4 silly existsSync /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/VERSION
+5 silly initialize attempt
+6 silly initialize success
+7 silly execute attempt
+8 silly runScriptInDir build [] backupMongoDB
+9 silly getExecOpts { cwd: '/Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/packages/backupMongoDB' }
+10 silly runScriptInDir build [] migrateAggregatorPrivateKey
+11 silly getExecOpts { cwd: '/Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/packages/migrateAggregatorPrivateKey' }
+12 error build Errored while running script in 'aggregator-migrate'
+13 error execute callback with error
+14 error Error: Command failed: npm run build
+14 error npm WARN aggregator-migrate@1.0.0 No description
+14 error npm WARN aggregator-migrate@1.0.0 No repository field.
+14 error
+14 error npm ERR! code ELIFECYCLE
+14 error npm ERR! errno 1
+14 error npm ERR! aggregator-migrate@1.0.0 build: `serverless package`
+14 error npm ERR! Exit status 1
+14 error npm ERR!
+14 error npm ERR! Failed at the aggregator-migrate@1.0.0 build script.
+14 error npm ERR! This is probably not a problem with npm. There is likely additional logging output above.
+14 error
+14 error npm ERR! A complete log of this run can be found in:
+14 error npm ERR!     /Users/wayne.smith/.npm/_logs/2018-04-20T23_44_50_389Z-debug.log
+14 error
+14 error > aggregator-migrate@1.0.0 prebuild /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/packages/migrateAggregatorPrivateKey
+14 error > npm install --only=production
+14 error
+14 error added 22 packages from 71 contributors in 4.048s
+14 error
+14 error > aggregator-migrate@1.0.0 build /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/packages/migrateAggregatorPrivateKey
+14 error > serverless package
+14 error
+14 error _____CONFIG { entry: { handler: './handler.js' },
+14 error   target: 'node',
+14 error   node: { __dirname: false },
+14 error   externals: [ 'aws-sdk' ],
+14 error   module: {},
+14 error   plugins: [] }
+14 error Serverless: Bundling with Webpack...
+14 error Time: [1m3540[39m[22mms
+14 error      [1mAsset[39m[22m     [1mSize[39m[22m  [1mChunks[39m[22m  [1m[39m[22m           [1m[39m[22m       [1mChunk Names[39m[22m
+14 error [1m[33mhandler.js[39m[22m  [1m[33m1.59 MB[39m[22m       [1m0[39m[22m  [1m[32m[emitted][39m[22m  [1m[33m[big][39m[22m  handler
+14 error    [3] [1m./node_modules/bluebird/js/release/util.js[39m[22m 10.3 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+14 error   [10] [1mexternal "crypto"[39m[22m 42 bytes {[1m[33m0[39m[22m}[1m[31m [not cacheable][39m[22m
+14 error   [11] [1m./node_modules/bluebird/js/release/errors.js[39m[22m 3.72 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+14 error   [52] [1m/Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/bluebird/js/release/bluebird.js[39m[22m 291 bytes {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+14 error   [69] [1m./handler.js[39m[22m 7.32 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+14 error   [70] [1m./node_modules/bluebird/js/release/bluebird.js[39m[22m 291 bytes {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+14 error   [71] [1m./node_modules/bluebird/js/release/promise.js[39m[22m 25.8 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+14 error  [100] [1m./node_modules/bluebird/js/release/any.js[39m[22m 421 bytes {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+14 error  [101] [1m../internal.parameterStoreStaticLoader/index.js[39m[22m 121 bytes {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+14 error  [102] [1m../internal.parameterStoreStaticLoader/ParameterStoreStaticLoader.js[39m[22m 2.08 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+14 error  [134] [1m../internal.services.db/index.js[39m[22m 1.87 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+14 error  [135] [1m/Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/mongodb/index.js[39m[22m 2.1 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+14 error  [162] [1m/Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/mongodb/lib/apm.js[39m[22m 1.02 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+14 error  [170] [1m/Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/mongodb/lib/gridfs/grid_store.js[39m[22m 65.8 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+14 error  [174] [1m../internal.services.encryption/index.js[39m[22m 2.88 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+14 error     + 160 hidden modules
+14 error
+14 error [1m[33mWARNING in /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/require_optional/index.js
+14 error 82:18-42 Critical dependency: the request of a dependency is an expression
+14 error  @ /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/require_optional/index.js
+14 error  @ /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/mongodb-core/index.js
+14 error  @ /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/mongodb/index.js
+14 error  @ ../internal.services.db/index.js
+14 error  @ ./handler.js[39m[22m
+14 error
+14 error [1m[33mWARNING in /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/require_optional/index.js
+14 error 90:20-44 Critical dependency: the request of a dependency is an expression
+14 error  @ /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/require_optional/index.js
+14 error  @ /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/mongodb-core/index.js
+14 error  @ /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/mongodb/index.js
+14 error  @ ../internal.services.db/index.js
+14 error  @ ./handler.js[39m[22m
+14 error
+14 error [1m[33mWARNING in /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/require_optional/index.js
+14 error 97:35-67 Critical dependency: the request of a dependency is an expression
+14 error  @ /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/require_optional/index.js
+14 error  @ /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/mongodb-core/index.js
+14 error  @ /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/mongodb/index.js
+14 error  @ ../internal.services.db/index.js
+14 error  @ ./handler.js[39m[22m
+14 error
+14 error [1m[31mERROR in ./handler.js
+14 error Module not found: Error: Can't resolve 'internal-serviceskey' in '/Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/packages/migrateAggregatorPrivateKey'
+14 error  @ ./handler.js 9:9-40[39m[22m
+14 error
+14 error   Error --------------------------------------------------
+14 error
+14 error   Webpack compilation error, see above
+14 error
+14 error      For debugging logs, run again after setting the "SLS_DEBUG=*" environment variable.
+14 error
+14 error   Get Support --------------------------------------------
+14 error      Docs:          docs.serverless.com
+14 error      Bugs:          github.com/serverless/serverless/issues
+14 error      Forums:        forum.serverless.com
+14 error      Chat:          gitter.im/serverless/serverless
+14 error
+14 error   Your Environment Information -----------------------------
+14 error      OS:                     darwin
+14 error      Node Version:           6.11.5
+14 error      Serverless Version:     1.24.1
+14 error
+14 error
+14 error     at Promise.all.then.arr (/Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/execa/index.js:236:11)

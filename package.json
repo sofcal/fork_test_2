@@ -1,0 +1,16 @@
+{
+  "name": "bankingcloud-lsm-lambda",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "scripts": {
+    "clean": "rm -rf ./build && rm -rf node_modules && lerna run clean",
+    "prebuild": "npm run clean && lerna bootstrap --hoist --nohoist=internal-* --nohoist mongodb-backup",
+    "build": "lerna run build"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "lerna": "^2.9.0"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "name": "mongo-backup",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "scripts": {
+    "prebuild": "npm install --only=production",
+    "build": "serverless package",
+    "postbuild": "mkdir -p ../../build && mv ./.serverless/backupMongoDB.zip ../../build/backupMongoDB.zip",
+    "clean": "rm -rf ./coverage/ && rm -rf ./.nyc_output/ && rm -rf ./.serverless/ && rm -rf ./node_modules/",
+    "test": "NODE_ENV=test nyc --cache false --x test/ mocha -b --colors \"./test/unit/**/*.spec.js\"",
+    "cover": "NODE_ENV=test npm run test && nyc report --reporter=lcov",
+    "report": "open coverage/lcov-report/index.html",
+    "int": "NODE_ENV=test nyc --x lib/_legacy --x test/ mocha -b --colors --reporter spec \"./test/integration/**/*.spec.js\"",
+    "lint": "eslint ./src"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.220.1",
+    "bluebird": "^3.5.1",
+    "emitter": "0.0.5",
+    "internal-parameterstorestaticloader": "file:../internal.parameterStoreStaticLoader",
+    "internal-services-db": "file:../internal.services.db",
+    "internal-services-encryption": "file:../internal.services.encryption",
+    "internal-services-key": "file:../internal.services.key",
+    "internal-services-s3": "file:../internal.services.s3",
+    "mongodb": "^3.0.5",
+    "mongodump-stream": "^1.1.1",
+    "stream-to-buffer": "^0.1.0",
+    "tar-stream": "^1.5.5"
+  }
+}
