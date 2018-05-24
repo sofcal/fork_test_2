@@ -1,0 +1,28 @@
+{
+  "name": "scheduled-key-rotation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "prebuild": "npm install --only=production",
+    "build": "serverless package",
+    "postbuild": "mkdir -p ../../build && mv ./.serverless/scheduled.keyRotation.zip ../../build/scheduled.keyRotation.zip",
+    "clean": "rm -rf ./coverage/ && rm -rf ./.nyc_output/ && rm -rf ./.serverless/ && rm -rf ./node_modules/",
+    "test": "NODE_ENV=test nyc --cache false --x test/ mocha -b --colors \"./test/unit/**/*.spec.js\"",
+    "cover": "NODE_ENV=test npm run test && nyc report --reporter=lcov",
+    "report": "open coverage/lcov-report/index.html",
+    "int": "NODE_ENV=test nyc --x lib/_legacy --x test/ mocha -b --colors --reporter spec \"./test/integration/**/*.spec.js\"",
+    "lint": "eslint ./src"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.220.1",
+    "bluebird": "^3.5.1",
+    "emitter": "0.0.5",
+    "internal-parameterstorestaticloader": "file:../internal.parameterStoreStaticLoader",
+    "internal-services-db": "file:../internal.services.db",
+    "mongodb": "^3.0.5",
+    "underscore": "^1.9.0"
+  }
+}
