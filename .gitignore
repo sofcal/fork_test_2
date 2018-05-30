@@ -9,4 +9,4 @@ build
 .nyc_output
 coverage
 
-lerna-debug
+lerna-debug.log
