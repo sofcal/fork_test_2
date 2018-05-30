@@ -22,6 +22,8 @@
     "bluebird": "^3.5.1"
   },
   "devDependencies": {
-    "nyc": "^11.8.0"
+    "nyc": "^11.8.0",
+    "should": "^13.2.1",
+    "sinon": "^5.0.10"
   }
 }

@@ -23,6 +23,8 @@
     "mongodb": "^3.0.5"
   },
   "devDependencies": {
-    "nyc": "^11.8.0"
+    "nyc": "^11.8.0",
+    "should": "^13.2.1",
+    "sinon": "^5.0.10"
   }
 }
