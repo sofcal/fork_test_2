@@ -1,0 +1,30 @@
+{
+  "name": "incident-verify-bank-files",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "scripts": {
+    "clean": "rimraf ./coverage/ && rimraf ./.nyc_output/ && rimraf ./.serverless/ && rimraf ./node_modules/",
+    "test": "NODE_ENV=test nyc --cache false --x test/ mocha -b --colors \"./test/unit/**/*.spec.js\"",
+    "cover": "NODE_ENV=test npm run test && nyc report --reporter=lcov",
+    "report": "open coverage/lcov-report/index.html",
+    "int": "NODE_ENV=test nyc --x test/ mocha -b --colors --reporter spec \"./test/int/**/*.spec.js\"",
+    "lint": "eslint ./src",
+    "build": "serverless package",
+    "postbuild": "mkdir -p ../../build && mv ./.serverless/${PWD##*/}.zip ../../build/${PWD##*/}.zip",
+    "unlock": "rimraf package-lock.json"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.220.1",
+    "bluebird": "^3.5.1",
+    "emitter": "0.0.5",
+    "internal-parameterstorestaticloader": "^1.0.0",
+    "internal-services-db": "^1.0.0",
+    "internal-services-encryption": "^1.0.0",
+    "internal-services-key": "^1.0.0",
+    "internal-services-s3": "^1.0.0",
+    "mongodb": "^3.0.5"
+  }
+}

@@ -1,16 +1,40 @@
 {
-  "name": "bankingcloud-lsm-lambda",
-  "version": "1.0.0",
-  "description": "",
-  "main": "handler.js",
-  "scripts": {
-    "clean": "rm -rf ./build && rm -rf node_modules && lerna run clean",
-    "prebuild": "npm run clean && lerna bootstrap --hoist --nohoist=internal-* --nohoist mongodb-backup",
-    "build": "lerna run build"
-  },
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "lerna": "^2.9.0"
-  }
+	"name": "bankingcloud-lsm-lambda",
+	"version": "1.0.0",
+	"description": "",
+	"main": "handler.js",
+	"scripts": {
+		"prepenv": "npm install -g lerna && npm install -g serverless && npm install -g rimraf",
+		"clean": "rimraf ./build && rimraf node_modules && lerna run clean",
+		"rebuild": "npm run clean && npm run build",
+		"prebuild": "lerna bootstrap --hoist --no-hoist=internal-*",
+		"build": "lerna run build",
+		"unlock": "rimraf package-lock.json && lerna run unlock"
+	},
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"aws-sdk": "^2.220.1",
+		"babel-cli": "^6.26.0",
+		"babel-core": "^6.26.0",
+		"babel-eslint": "^8.0.3",
+		"babel-plugin-add-module-exports": "^0.2.1",
+		"babel-plugin-istanbul": "^4.1.5",
+		"babel-plugin-tcomb": "^0.3.26",
+		"babel-plugin-transform-class-properties": "^6.24.1",
+		"babel-preset-env": "^1.6.1",
+		"babel-preset-flow": "^6.23.0",
+		"bluebird": "^3.5.1",
+		"emitter": "0.0.5",
+		"istanbul": "^1.1.0-alpha.1",
+		"lerna": "^2.9.0",
+		"mocha": "^4.0.1",
+		"mongodb": "^3.0.5",
+		"serverless-webpack": "^4.2.0",
+		"should": "^13.2.1",
+		"sinon": "^4.1.3",
+		"underscore": "^1.9.0",
+		"webpack": "^3.10.0",
+		"webpack-node-externals": "^1.6.0"
+	}
 }

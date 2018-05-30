@@ -3,4 +3,8 @@ node_modules
 jspm_packages
 
 # Serverless directories
+build
 .serverless
+.webpack
+.nyc_output
+coverage
