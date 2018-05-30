@@ -8,3 +8,5 @@ build
 .webpack
 .nyc_output
 coverage
+
+lerna-debug
