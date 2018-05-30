@@ -6,7 +6,7 @@ const aws = require('aws-sdk');
 const sinon = require('sinon');
 const should = require('should');
 
-describe('parameter-cache.loaders.ParameterStoreStaticLoader', function(){
+describe('internal.parameterStoreStaticLoader.ParameterStoreStaticLoader', function(){
     let sandbox;
 
     const errorFunc = () => { throw new Error('should be stubbed') };

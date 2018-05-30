@@ -4,7 +4,7 @@ const _ = require('underscore');
 const DB =  require('internal-services-db');
 const DbQueries = require('../../lib/DbQueries');
 
-describe('DbQueries',()=>{
+describe('scheduled.keyRotation.DbQueries',()=>{
     let db;
     let dbConnection;
     let queries;

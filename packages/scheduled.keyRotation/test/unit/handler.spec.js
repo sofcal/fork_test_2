@@ -1,6 +1,6 @@
 const handler = require('../../lib/handler');
 
-describe('handler', function(){
+describe('scheduled.keyRotation.handler', function(){
     it('should do nothing', () => {
 
     });
