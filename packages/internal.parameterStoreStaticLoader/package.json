@@ -2,7 +2,11 @@
   "name": "internal-parameterstorestaticloader",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "private": true,
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib"
+  },
   "scripts": {
     "clean": "rimraf ./coverage/ && rimraf ./.nyc_output/ && rimraf ./node_modules/",
     "test": "NODE_ENV=test nyc --cache false --x test/ mocha -b --colors \"./test/unit/**/*.spec.js\"",
@@ -13,5 +17,12 @@
     "unlock": "rimraf package-lock.json"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "istanbul": "^1.1.0-alpha.1",
+    "mocha": "^4.0.1",
+    "nyc": "^11.8.0",
+    "should": "^13.2.1",
+    "sinon": "^4.1.3"
+  }
 }

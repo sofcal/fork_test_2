@@ -2,7 +2,7 @@ const should = require('should');
 const sinon = require('sinon');
 const _ = require('underscore');
 const DB =  require('internal-services-db');
-const DbQueries = require('../../DbQueries')
+const DbQueries = require('../../lib/DbQueries');
 
 describe('DbQueries',()=>{
     let db;

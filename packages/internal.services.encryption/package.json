@@ -2,7 +2,11 @@
   "name": "internal-services-encryption",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "private": true,
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib"
+  },
   "scripts": {
     "clean": "rimraf ./coverage/ && rimraf ./.nyc_output/ && rimraf ./node_modules/",
     "test": "NODE_ENV=test nyc --cache false --x test/ mocha -b --colors \"./test/unit/**/*.spec.js\"",
@@ -16,5 +20,8 @@
   "license": "ISC",
   "dependencies": {
     "bluebird": "^3.5.1"
+  },
+  "devDependencies": {
+    "nyc": "^11.8.0"
   }
 }
