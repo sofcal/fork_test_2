@@ -2,114 +2,93 @@
 1 silly flags { _: [ 'run' ],
 1 silly flags   'reject-cycles': false,
 1 silly flags   rejectCycles: false,
+1 silly flags   scope: 'checkuniquetransactions',
 1 silly flags   script: 'build',
 1 silly flags   args: [] }
-2 verbose rootPath /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda
-3 info version 2.10.2
-4 silly existsSync /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/VERSION
-5 silly initialize attempt
-6 silly initialize success
-7 silly execute attempt
-8 silly runScriptInDir build [] backupMongoDB
-9 silly getExecOpts { cwd: '/Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/packages/backupMongoDB' }
-10 silly runScriptInDir build [] migrateAggregatorPrivateKey
-11 silly getExecOpts { cwd: '/Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/packages/migrateAggregatorPrivateKey' }
-12 error build Errored while running script in 'aggregator-migrate'
-13 error execute callback with error
-14 error Error: Command failed: npm run build
-14 error npm WARN aggregator-migrate@1.0.0 No description
-14 error npm WARN aggregator-migrate@1.0.0 No repository field.
-14 error
-14 error npm ERR! code ELIFECYCLE
-14 error npm ERR! errno 1
-14 error npm ERR! aggregator-migrate@1.0.0 build: `serverless package`
-14 error npm ERR! Exit status 1
-14 error npm ERR!
-14 error npm ERR! Failed at the aggregator-migrate@1.0.0 build script.
-14 error npm ERR! This is probably not a problem with npm. There is likely additional logging output above.
-14 error
-14 error npm ERR! A complete log of this run can be found in:
-14 error npm ERR!     /Users/wayne.smith/.npm/_logs/2018-04-20T23_44_50_389Z-debug.log
-14 error
-14 error > aggregator-migrate@1.0.0 prebuild /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/packages/migrateAggregatorPrivateKey
-14 error > npm install --only=production
-14 error
-14 error added 22 packages from 71 contributors in 4.048s
-14 error
-14 error > aggregator-migrate@1.0.0 build /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/packages/migrateAggregatorPrivateKey
-14 error > serverless package
-14 error
-14 error _____CONFIG { entry: { handler: './handler.js' },
-14 error   target: 'node',
-14 error   node: { __dirname: false },
-14 error   externals: [ 'aws-sdk' ],
-14 error   module: {},
-14 error   plugins: [] }
-14 error Serverless: Bundling with Webpack...
-14 error Time: [1m3540[39m[22mms
-14 error      [1mAsset[39m[22m     [1mSize[39m[22m  [1mChunks[39m[22m  [1m[39m[22m           [1m[39m[22m       [1mChunk Names[39m[22m
-14 error [1m[33mhandler.js[39m[22m  [1m[33m1.59 MB[39m[22m       [1m0[39m[22m  [1m[32m[emitted][39m[22m  [1m[33m[big][39m[22m  handler
-14 error    [3] [1m./node_modules/bluebird/js/release/util.js[39m[22m 10.3 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
-14 error   [10] [1mexternal "crypto"[39m[22m 42 bytes {[1m[33m0[39m[22m}[1m[31m [not cacheable][39m[22m
-14 error   [11] [1m./node_modules/bluebird/js/release/errors.js[39m[22m 3.72 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
-14 error   [52] [1m/Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/bluebird/js/release/bluebird.js[39m[22m 291 bytes {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
-14 error   [69] [1m./handler.js[39m[22m 7.32 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
-14 error   [70] [1m./node_modules/bluebird/js/release/bluebird.js[39m[22m 291 bytes {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
-14 error   [71] [1m./node_modules/bluebird/js/release/promise.js[39m[22m 25.8 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
-14 error  [100] [1m./node_modules/bluebird/js/release/any.js[39m[22m 421 bytes {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
-14 error  [101] [1m../internal.parameterStoreStaticLoader/index.js[39m[22m 121 bytes {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
-14 error  [102] [1m../internal.parameterStoreStaticLoader/ParameterStoreStaticLoader.js[39m[22m 2.08 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
-14 error  [134] [1m../internal.services.db/index.js[39m[22m 1.87 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
-14 error  [135] [1m/Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/mongodb/index.js[39m[22m 2.1 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
-14 error  [162] [1m/Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/mongodb/lib/apm.js[39m[22m 1.02 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
-14 error  [170] [1m/Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/mongodb/lib/gridfs/grid_store.js[39m[22m 65.8 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
-14 error  [174] [1m../internal.services.encryption/index.js[39m[22m 2.88 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
-14 error     + 160 hidden modules
-14 error
-14 error [1m[33mWARNING in /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/require_optional/index.js
-14 error 82:18-42 Critical dependency: the request of a dependency is an expression
-14 error  @ /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/require_optional/index.js
-14 error  @ /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/mongodb-core/index.js
-14 error  @ /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/mongodb/index.js
-14 error  @ ../internal.services.db/index.js
-14 error  @ ./handler.js[39m[22m
-14 error
-14 error [1m[33mWARNING in /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/require_optional/index.js
-14 error 90:20-44 Critical dependency: the request of a dependency is an expression
-14 error  @ /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/require_optional/index.js
-14 error  @ /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/mongodb-core/index.js
-14 error  @ /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/mongodb/index.js
-14 error  @ ../internal.services.db/index.js
-14 error  @ ./handler.js[39m[22m
-14 error
-14 error [1m[33mWARNING in /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/require_optional/index.js
-14 error 97:35-67 Critical dependency: the request of a dependency is an expression
-14 error  @ /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/require_optional/index.js
-14 error  @ /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/mongodb-core/index.js
-14 error  @ /Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/mongodb/index.js
-14 error  @ ../internal.services.db/index.js
-14 error  @ ./handler.js[39m[22m
-14 error
-14 error [1m[31mERROR in ./handler.js
-14 error Module not found: Error: Can't resolve 'internal-serviceskey' in '/Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/packages/migrateAggregatorPrivateKey'
-14 error  @ ./handler.js 9:9-40[39m[22m
-14 error
-14 error   Error --------------------------------------------------
-14 error
-14 error   Webpack compilation error, see above
-14 error
-14 error      For debugging logs, run again after setting the "SLS_DEBUG=*" environment variable.
-14 error
-14 error   Get Support --------------------------------------------
-14 error      Docs:          docs.serverless.com
-14 error      Bugs:          github.com/serverless/serverless/issues
-14 error      Forums:        forum.serverless.com
-14 error      Chat:          gitter.im/serverless/serverless
-14 error
-14 error   Your Environment Information -----------------------------
-14 error      OS:                     darwin
-14 error      Node Version:           6.11.5
-14 error      Serverless Version:     1.24.1
-14 error
-14 error
-14 error     at Promise.all.then.arr (/Users/wayne.smith/Dev/shared_services/BankingCloudLSMLambda/node_modules/execa/index.js:236:11)
+2 verbose rootPath /home/philmunro/Workspace/BankDriveLSMLambda
+3 info version 2.11.0
+4 silly existsSync /home/philmunro/Workspace/BankDriveLSMLambda/VERSION
+5 info scope checkuniquetransactions
+6 silly initialize attempt
+7 silly initialize success
+8 silly execute attempt
+9 silly runScriptInDir build [] checkUniqueTransactions
+10 silly getExecOpts { cwd: '/home/philmunro/Workspace/BankDriveLSMLambda/packages/checkUniqueTransactions' }
+11 error build Errored while running script in 'checkuniquetransactions'
+12 error execute callback with error
+13 error Error: Command failed: npm run build
+13 error npm WARN checkuniquetransactions@1.0.0 No description
+13 error npm WARN checkuniquetransactions@1.0.0 No repository field.
+13 error
+13 error npm ERR! Linux 4.13.0-43-generic
+13 error npm ERR! argv "/usr/bin/node" "/usr/bin/npm" "run" "build"
+13 error npm ERR! node v6.11.4
+13 error npm ERR! npm  v3.5.2
+13 error npm ERR! code ELIFECYCLE
+13 error npm ERR! checkuniquetransactions@1.0.0 build: `serverless package`
+13 error npm ERR! Exit status 1
+13 error npm ERR!
+13 error npm ERR! Failed at the checkuniquetransactions@1.0.0 build script 'serverless package'.
+13 error npm ERR! Make sure you have the latest version of node.js and npm installed.
+13 error npm ERR! If you do, this is most likely a problem with the checkuniquetransactions package,
+13 error npm ERR! not with npm itself.
+13 error npm ERR! Tell the author that this fails on your system:
+13 error npm ERR!     serverless package
+13 error npm ERR! You can get information on how to open an issue for this project with:
+13 error npm ERR!     npm bugs checkuniquetransactions
+13 error npm ERR! Or if that isn't available, you can get their info via:
+13 error npm ERR!     npm owner ls checkuniquetransactions
+13 error npm ERR! There is likely additional logging output above.
+13 error
+13 error npm ERR! Please include the following file with any support request:
+13 error npm ERR!     /home/philmunro/Workspace/BankDriveLSMLambda/packages/checkUniqueTransactions/npm-debug.log
+13 error
+13 error > checkuniquetransactions@1.0.0 prebuild /home/philmunro/Workspace/BankDriveLSMLambda/packages/checkUniqueTransactions
+13 error > npm install --only=production
+13 error
+13 error checkuniquetransactions@1.0.0 /home/philmunro/Workspace/BankDriveLSMLambda/packages/checkUniqueTransactions
+13 error └── underscore@1.9.0
+13 error
+13 error
+13 error > checkuniquetransactions@1.0.0 build /home/philmunro/Workspace/BankDriveLSMLambda/packages/checkUniqueTransactions
+13 error > serverless package
+13 error
+13 error _____CONFIG { entry: { handler: './handler.js' },
+13 error   target: 'node',
+13 error   node: { __dirname: false },
+13 error   externals: [ 'aws-sdk' ],
+13 error   module: {},
+13 error   plugins: [] }
+13 error Serverless: Bundling with Webpack...
+13 error Time: [1m365[39m[22mms
+13 error      [1mAsset[39m[22m     [1mSize[39m[22m  [1mChunks[39m[22m  [1m[39m[22m           [1m[39m[22m[1mChunk Names[39m[22m
+13 error [1m[32mhandler.js[39m[22m  2.79 kB       [1m0[39m[22m  [1m[32m[emitted][39m[22m  handler
+13 error    [0] [1m./handler.js[39m[22m 257 bytes {[1m[33m0[39m[22m}[1m[32m [built][39m[22m[1m[31m [failed][39m[22m[1m[31m [1 error][39m[22m
+13 error
+13 error [1m[31mERROR in ./handler.js
+13 error Module parse failed: Unexpected token (117:1)
+13 error You may need an appropriate loader to handle this file type.
+13 error |             return disconnectDB(services);
+13 error |         })
+13 error | };
+13 error |
+13 error | const getServices = (env, region, params, services) => {[39m[22m
+13 error
+13 error   Error --------------------------------------------------
+13 error
+13 error   Webpack compilation error, see above
+13 error
+13 error      For debugging logs, run again after setting the "SLS_DEBUG=*" environment variable.
+13 error
+13 error   Get Support --------------------------------------------
+13 error      Docs:          docs.serverless.com
+13 error      Bugs:          github.com/serverless/serverless/issues
+13 error      Issues:        forum.serverless.com
+13 error
+13 error   Your Environment Information -----------------------------
+13 error      OS:                     linux
+13 error      Node Version:           6.11.4
+13 error      Serverless Version:     1.27.3
+13 error
+13 error
+13 error     at Promise.all.then.arr (/usr/local/lib/node_modules/lerna/node_modules/execa/index.js:236:11)
