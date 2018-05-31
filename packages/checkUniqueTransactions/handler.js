@@ -8,7 +8,7 @@ const serviceImpls = {
     DB: require('internal-services-db')
 };
 
-let env, region, bankId, duplicates;
+let env, region, bankId, duplicates, quarantinedFile;
 
 module.exports.checkUniqueTransactions = (event, context, callback) => {
     const services = {};
@@ -26,7 +26,7 @@ module.exports.checkUniqueTransactions = (event, context, callback) => {
                 throw new Error(`invalid parameters - env: ${env}; region: ${region}; region: ${bankId}`);
             }
 
-            console.log(`starting request for - env: ${env}; region: ${region}; region: ${bankId}`);
+            console.log(`starting request for - env: ${env}; region: ${region}; region: ${bankId}; quarantine: ${quarantinedFile}`);
         })
         .then(() => getParams(env, region))
         .then((params) => getServices(env, region, params, services))
@@ -35,6 +35,7 @@ module.exports.checkUniqueTransactions = (event, context, callback) => {
             console.log(`starting process`);
             let cnBankAccount = db.collection('BankAccount');
             let cnTransaction= db.collection('Transaction');
+            let cnQuarantine= db.collection('Quarantine');
 
             return cnBankAccount.find({bankId},{'_id':1}).toArray()
                 .then((bankAccounts) => {
@@ -44,10 +45,11 @@ module.exports.checkUniqueTransactions = (event, context, callback) => {
                     return bankAccountIds;
                 })
                 .then((bankAccountIds) => {
-                    return Promise.each(bankAccountIds,((bankAccountId) => {
+                    return Promise.map(bankAccountIds,((bankAccountId) => {
 
                         let accountTrans = [];
                         console.log('looking for: ' + bankAccountId);
+                        //get the released transactions
                         return cnTransaction.find({'bankAccountId': bankAccountId}).toArray()
                             .then((buckets) => {
                                 console.log(`retrieved buckets: ${buckets.length}`);
@@ -56,9 +58,44 @@ module.exports.checkUniqueTransactions = (event, context, callback) => {
                                     accountTrans = accountTrans.concat(currentBucket.transactions);
                                 });
                             })
+                            //get the quarantined transactions
+                            .then(() => {
+                                if(event.quarantinedFile === undefined){
+                                    return;
+                                }
+                                let filter = {
+                                    'bankId':bankId,
+                                    's3FileName':event.quarantinedFile,
+                                    'transactions.bankAccountId':bankAccountId
+                                };
+
+                                if(event.findNotMatching === true) {
+                                    filter = {
+                                        'bankId': bankId,
+                                        'transactions.bankAccountId': bankAccountId,
+                                        's3FileName': {'$ne': event.quarantinedFile }
+                                    };
+
+                                    console.log(`Searching for NOT matching quarantine: ${event.quarantinedFile}`);
+                                }
+
+                                return cnQuarantine.find(filter).toArray()
+                                    .then((quarantineBuckets) => {
+                                        console.log(`retrieved quarantine buckets for ${bankAccountId}: ${quarantineBuckets.length}`);
+                                        return quarantineBuckets.forEach((currentBucket) => {
+                                            let bankAccountTransactions = _.filter(currentBucket.transactions,(transaction) => {
+                                                return transaction.bankAccountId === bankAccountId;
+                                            });
+                                            console.log(`quarantine matched transactions in ${currentBucket._id}: ${bankAccountTransactions.length}`);
+                                            accountTrans = accountTrans.concat(bankAccountTransactions);
+                                        });
+
+                                    })
+
+                            })
                             .then(() => {
 
-                                console.log(`Compiled Transactions: ${accountTrans.length}`);
+                                console.log(`Compiled Transactions of trans and quarantine: ${accountTrans.length}`);
                                 let grouped = _.groupBy(accountTrans, (transaction) => {
                                     return `${transaction.transactionNarrative}_${transaction.datePosted}_${transaction.transactionAmount}`;
                                 });
@@ -77,10 +114,9 @@ module.exports.checkUniqueTransactions = (event, context, callback) => {
                                     }
                                 }
                             })
-                    }))
+                    }),{concurrency:1})
                 })
                 .then(() => {
-                    console.log('duplicates', duplicates);
 
                     if (!event.wet) {
                         throw new Error('dry run, skipping update');
@@ -90,7 +126,10 @@ module.exports.checkUniqueTransactions = (event, context, callback) => {
                         statusCode: 200,
                         body: JSON.stringify({
                             message: 'query complete',
-                            duplicates: duplicates,
+                            duplicates: {
+                                qty: duplicates.length,
+                                data: duplicates
+                            },
                             input: event,
                         }),
                     };
