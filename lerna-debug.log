@@ -2,55 +2,64 @@
 1 silly flags { _: [ 'run' ],
 1 silly flags   'reject-cycles': false,
 1 silly flags   rejectCycles: false,
-1 silly flags   scope: 'checkuniquetransactions',
+1 silly flags   scope: 'checkquarantinetransactionsdontexist',
 1 silly flags   script: 'build',
 1 silly flags   args: [] }
 2 verbose rootPath /home/philmunro/Workspace/BankDriveLSMLambda
 3 info version 2.11.0
 4 silly existsSync /home/philmunro/Workspace/BankDriveLSMLambda/VERSION
-5 info scope checkuniquetransactions
+5 info scope checkquarantinetransactionsdontexist
 6 silly initialize attempt
 7 silly initialize success
 8 silly execute attempt
-9 silly runScriptInDir build [] checkUniqueTransactions
-10 silly getExecOpts { cwd: '/home/philmunro/Workspace/BankDriveLSMLambda/packages/checkUniqueTransactions' }
-11 error build Errored while running script in 'checkuniquetransactions'
+9 silly runScriptInDir build [] checkQuarantineTransactionsDontExist
+10 silly getExecOpts { cwd: '/home/philmunro/Workspace/BankDriveLSMLambda/packages/checkQuarantineTransactionsDontExist' }
+11 error build Errored while running script in 'checkquarantinetransactionsdontexist'
 12 error execute callback with error
 13 error Error: Command failed: npm run build
-13 error npm WARN checkuniquetransactions@1.0.0 No description
-13 error npm WARN checkuniquetransactions@1.0.0 No repository field.
+13 error npm WARN skippingAction Module is inside a symlinked module: not running remove bluebird@3.5.1 node_modules/internal-services-db/node_modules/bluebird
+13 error npm WARN skippingAction Module is inside a symlinked module: not running remove bson@1.0.6 node_modules/internal-services-db/node_modules/bson
+13 error npm WARN skippingAction Module is inside a symlinked module: not running remove resolve-from@2.0.0 node_modules/internal-services-db/node_modules/resolve-from
+13 error npm WARN skippingAction Module is inside a symlinked module: not running remove semver@5.5.0 node_modules/internal-services-db/node_modules/semver
+13 error npm WARN skippingAction Module is inside a symlinked module: not running remove require_optional@1.0.1 node_modules/internal-services-db/node_modules/require_optional
+13 error npm WARN skippingAction Module is inside a symlinked module: not running remove mongodb-core@3.0.8 node_modules/internal-services-db/node_modules/mongodb-core
+13 error npm WARN skippingAction Module is inside a symlinked module: not running remove mongodb@3.0.8 node_modules/internal-services-db/node_modules/mongodb
+13 error npm WARN update-linked node_modules/internal-parameterstorestaticloader needs updating to 1.0.0 from 1.0.0 but we can't, as it's a symlink
+13 error npm WARN update-linked node_modules/internal-services-db needs updating to 1.0.0 from 1.0.0 but we can't, as it's a symlink
+13 error npm WARN checkquarantinetransactionsdontexist@1.0.0 No description
+13 error npm WARN checkquarantinetransactionsdontexist@1.0.0 No repository field.
 13 error
 13 error npm ERR! Linux 4.13.0-43-generic
 13 error npm ERR! argv "/usr/bin/node" "/usr/bin/npm" "run" "build"
 13 error npm ERR! node v6.11.4
 13 error npm ERR! npm  v3.5.2
 13 error npm ERR! code ELIFECYCLE
-13 error npm ERR! checkuniquetransactions@1.0.0 build: `serverless package`
+13 error npm ERR! checkquarantinetransactionsdontexist@1.0.0 build: `serverless package`
 13 error npm ERR! Exit status 1
 13 error npm ERR!
-13 error npm ERR! Failed at the checkuniquetransactions@1.0.0 build script 'serverless package'.
+13 error npm ERR! Failed at the checkquarantinetransactionsdontexist@1.0.0 build script 'serverless package'.
 13 error npm ERR! Make sure you have the latest version of node.js and npm installed.
-13 error npm ERR! If you do, this is most likely a problem with the checkuniquetransactions package,
+13 error npm ERR! If you do, this is most likely a problem with the checkquarantinetransactionsdontexist package,
 13 error npm ERR! not with npm itself.
 13 error npm ERR! Tell the author that this fails on your system:
 13 error npm ERR!     serverless package
 13 error npm ERR! You can get information on how to open an issue for this project with:
-13 error npm ERR!     npm bugs checkuniquetransactions
+13 error npm ERR!     npm bugs checkquarantinetransactionsdontexist
 13 error npm ERR! Or if that isn't available, you can get their info via:
-13 error npm ERR!     npm owner ls checkuniquetransactions
+13 error npm ERR!     npm owner ls checkquarantinetransactionsdontexist
 13 error npm ERR! There is likely additional logging output above.
 13 error
 13 error npm ERR! Please include the following file with any support request:
-13 error npm ERR!     /home/philmunro/Workspace/BankDriveLSMLambda/packages/checkUniqueTransactions/npm-debug.log
+13 error npm ERR!     /home/philmunro/Workspace/BankDriveLSMLambda/packages/checkQuarantineTransactionsDontExist/npm-debug.log
 13 error
-13 error > checkuniquetransactions@1.0.0 prebuild /home/philmunro/Workspace/BankDriveLSMLambda/packages/checkUniqueTransactions
+13 error > checkquarantinetransactionsdontexist@1.0.0 prebuild /home/philmunro/Workspace/BankDriveLSMLambda/packages/checkQuarantineTransactionsDontExist
 13 error > npm install --only=production
 13 error
-13 error checkuniquetransactions@1.0.0 /home/philmunro/Workspace/BankDriveLSMLambda/packages/checkUniqueTransactions
+13 error checkquarantinetransactionsdontexist@1.0.0 /home/philmunro/Workspace/BankDriveLSMLambda/packages/checkQuarantineTransactionsDontExist
 13 error └── underscore@1.9.0
 13 error
 13 error
-13 error > checkuniquetransactions@1.0.0 build /home/philmunro/Workspace/BankDriveLSMLambda/packages/checkUniqueTransactions
+13 error > checkquarantinetransactionsdontexist@1.0.0 build /home/philmunro/Workspace/BankDriveLSMLambda/packages/checkQuarantineTransactionsDontExist
 13 error > serverless package
 13 error
 13 error _____CONFIG { entry: { handler: './handler.js' },
@@ -60,23 +69,56 @@
 13 error   module: {},
 13 error   plugins: [] }
 13 error Serverless: Bundling with Webpack...
-13 error Time: [1m365[39m[22mms
-13 error      [1mAsset[39m[22m     [1mSize[39m[22m  [1mChunks[39m[22m  [1m[39m[22m           [1m[39m[22m[1mChunk Names[39m[22m
-13 error [1m[32mhandler.js[39m[22m  2.79 kB       [1m0[39m[22m  [1m[32m[emitted][39m[22m  handler
-13 error    [0] [1m./handler.js[39m[22m 257 bytes {[1m[33m0[39m[22m}[1m[32m [built][39m[22m[1m[31m [failed][39m[22m[1m[31m [1 error][39m[22m
+13 error Time: [1m4587[39m[22mms
+13 error      [1mAsset[39m[22m     [1mSize[39m[22m  [1mChunks[39m[22m  [1m[39m[22m           [1m[39m[22m       [1mChunk Names[39m[22m
+13 error [1m[33mhandler.js[39m[22m  [1m[33m1.83 MB[39m[22m       [1m0[39m[22m  [1m[32m[emitted][39m[22m  [1m[33m[big][39m[22m  handler
+13 error   [11] [1m./node_modules/bluebird/js/release/errors.js[39m[22m 3.72 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+13 error   [55] [1m(webpack)/buildin/module.js[39m[22m 517 bytes {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+13 error   [66] [1m../internal.services.db/node_modules/mongodb/lib/mongo_client.js[39m[22m 36.3 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+13 error   [67] [1m../internal.services.db/node_modules/mongodb/lib/topologies/mongos.js[39m[22m 15 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+13 error   [74] [1m./handler.js[39m[22m 6.9 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+13 error   [75] [1m./node_modules/bluebird/js/release/bluebird.js[39m[22m 291 bytes {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+13 error   [76] [1m./node_modules/bluebird/js/release/promise.js[39m[22m 25.8 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+13 error   [87] [1m./node_modules/bluebird/js/release/cancel.js[39m[22m 3.71 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+13 error  [106] [1m./node_modules/underscore/underscore.js[39m[22m 58.2 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+13 error  [107] [1m../internal.parameterStoreStaticLoader/index.js[39m[22m 121 bytes {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+13 error  [108] [1m../internal.parameterStoreStaticLoader/ParameterStoreStaticLoader.js[39m[22m 2.08 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+13 error  [141] [1m../internal.services.db/index.js[39m[22m 1.87 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+13 error  [142] [1m../internal.services.db/node_modules/mongodb/index.js[39m[22m 2.1 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+13 error  [180] [1m../internal.services.db/node_modules/bluebird/js/release/bluebird.js[39m[22m 291 bytes {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+13 error  [181] [1m../internal.services.db/node_modules/bluebird/js/release/promise.js[39m[22m 25.8 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+13 error     + 196 hidden modules
 13 error
-13 error [1m[31mERROR in ./handler.js
-13 error Module parse failed: Unexpected token (117:1)
-13 error You may need an appropriate loader to handle this file type.
-13 error |             return disconnectDB(services);
-13 error |         })
-13 error | };
-13 error |
-13 error | const getServices = (env, region, params, services) => {[39m[22m
+13 error [1m[33mWARNING in ../internal.services.db/node_modules/require_optional/index.js
+13 error 82:18-42 Critical dependency: the request of a dependency is an expression
+13 error  @ ../internal.services.db/node_modules/require_optional/index.js
+13 error  @ ../internal.services.db/node_modules/mongodb-core/index.js
+13 error  @ ../internal.services.db/node_modules/mongodb/index.js
+13 error  @ ../internal.services.db/index.js
+13 error  @ ./handler.js[39m[22m
+13 error
+13 error [1m[33mWARNING in ../internal.services.db/node_modules/require_optional/index.js
+13 error 90:20-44 Critical dependency: the request of a dependency is an expression
+13 error  @ ../internal.services.db/node_modules/require_optional/index.js
+13 error  @ ../internal.services.db/node_modules/mongodb-core/index.js
+13 error  @ ../internal.services.db/node_modules/mongodb/index.js
+13 error  @ ../internal.services.db/index.js
+13 error  @ ./handler.js[39m[22m
+13 error
+13 error [1m[33mWARNING in ../internal.services.db/node_modules/require_optional/index.js
+13 error 97:35-67 Critical dependency: the request of a dependency is an expression
+13 error  @ ../internal.services.db/node_modules/require_optional/index.js
+13 error  @ ../internal.services.db/node_modules/mongodb-core/index.js
+13 error  @ ../internal.services.db/node_modules/mongodb/index.js
+13 error  @ ../internal.services.db/index.js
+13 error  @ ./handler.js[39m[22m
 13 error
 13 error   Error --------------------------------------------------
 13 error
-13 error   Webpack compilation error, see above
+13 error   Command failed: npm ls -prod -json -depth=1
+13 error npm ERR! invalid: internal-parameterstorestaticloader@1.0.0 /home/philmunro/Workspace/BankDriveLSMLambda/packages/checkQuarantineTransactionsDontExist/node_modules/internal-parameterstorestaticloader
+13 error npm ERR! invalid: internal-services-db@1.0.0 /home/philmunro/Workspace/BankDriveLSMLambda/packages/checkQuarantineTransactionsDontExist/node_modules/internal-services-db
+13 error
 13 error
 13 error      For debugging logs, run again after setting the "SLS_DEBUG=*" environment variable.
 13 error

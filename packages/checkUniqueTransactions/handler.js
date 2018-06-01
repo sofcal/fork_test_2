@@ -86,6 +86,7 @@ module.exports.checkUniqueTransactions = (event, context, callback) => {
                                             let bankAccountTransactions = _.filter(currentBucket.transactions,(transaction) => {
                                                 return transaction.bankAccountId === bankAccountId;
                                             });
+                                            console.log(`quarantine filtered transactions:  ${(currentBucket.transactions.length - bankAccountTransactions.length)}`);
                                             console.log(`quarantine matched transactions in ${currentBucket._id}: ${bankAccountTransactions.length}`);
                                             accountTrans = accountTrans.concat(bankAccountTransactions);
                                         });
