@@ -1,7 +1,6 @@
 'use strict';
 
 const Promise = require('bluebird');
-const _ = require('underscore');
 
 const ParameterStoreStaticLoader = require('internal-parameterstorestaticloader');
 const serviceImpls = {
@@ -33,7 +32,6 @@ module.exports.checkQuarantineTransactionsDontExist = (event, context, callback)
         .then(() => connectDB(services))
         .then((db) => {
             console.log(`starting process`);
-            let cnBankAccount = db.collection('BankAccount');
             let cnTransaction = db.collection('Transaction');
             let cnQuarantine = db.collection('Quarantine');
 
@@ -47,22 +45,23 @@ module.exports.checkQuarantineTransactionsDontExist = (event, context, callback)
                         console.log(`Looping transactions for ${bucket._id}`);
 
                         return Promise.each(bucket.transactions, (transaction) => {
-                            console.log(`quarantined transaction:\nDatePosted: ${transaction.datePosted}\nTransactionAmount: ${transaction.transactionAmount}\n${transaction.transactionNarrative}`);
+                            console.log(`quarantined transaction:\nDatePosted: ${transaction.datePosted.toISOString()}\nTransactionAmount: ${transaction.transactionAmount}\n${transaction.transactionNarrative}`);
 
                             //do the BDB lookup here
+
                             let transFilter = [
                                     {$match: {
-                                        'bankAccountId': `'${transaction.bankAccountId}'`,
-                                        'transactions.bankAccountId': `'${transaction.bankAccountId}'`,
-                                        'transactions.datePosted': `'${transaction.datePosted}'`,
-                                        'transactions.transactionNarrative': `'${transaction.transactionNarrative}'`,
+                                        'bankAccountId': transaction.bankAccountId,
+                                        'transactions.bankAccountId': transaction.bankAccountId,
+                                        'transactions.datePosted': new Date(transaction.datePosted),
+                                        'transactions.transactionNarrative': transaction.transactionNarrative,
                                         'transactions.transactionAmount': transaction.transactionAmount
                                     }},
                                 {$project: {
                                         releasedTransactions: {$filter: {
                                                 input: '$transactions',
                                                 as: 'transactions',
-                                                cond: {$eq: ['$$transactions.transactionNarrative', `'${transaction.transactionNarrative}'`]}
+                                                cond: {$eq: ['$$transactions.datePosted', new Date(transaction.datePosted)]}
                                             }},
                                         _id: 0
                                     }}];
@@ -78,11 +77,11 @@ module.exports.checkQuarantineTransactionsDontExist = (event, context, callback)
                                             bankAccountId: transaction.bankAccountId,
                                             datePosted: transaction.datePosted,
                                             transactionNarrative: transaction.transactionNarrative,
-                                            transactionAmount: transaction.transactionAmount
+                                            transactionAmount: transaction.transactionAmount,
+                                            originalFile: transaction.raw.filename
                                         });
                                     }
 
-                                    return;
                                 });
 
                         });
