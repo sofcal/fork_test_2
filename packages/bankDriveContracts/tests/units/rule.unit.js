@@ -1,7 +1,6 @@
 'use strict';
 
-const StatusCodeError = require('../../_bankDrive/StatusCodeError');
-const resources = require('../../_bankDrive/resources');
+const { StatusCodeError, resources } = require('../../_bankDrive');
 const Rule = require('../../Rule');
 const should = require('should');
 const sinon = require('sinon');

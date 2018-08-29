@@ -2,9 +2,7 @@ const should = require('should');
 const sinon = require('sinon');
 const _ = require('underscore');
 const Rule = require('../../Rule');
-const StatusCodeError = require('../../_bankDrive/StatusCodeError');
-const StatusCodeErrorItem = require('../../_bankDrive/StatusCodeErrorItem');
-const resources = require('../../_bankDrive/resources');
+const { StatusCodeError, resources } = require('../../_bankDrive');
 
 describe ('Rule', () => {
 

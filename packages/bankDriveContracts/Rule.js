@@ -1,14 +1,8 @@
 'use strict';
 
-const Promise = require('bluebird');
 const jsonschema = require('jsonschema');
 const ruleSchema = require('./schemas/ruleSchema');
-//const { StatusCodeError, StatusCodeErrorItem, serviceUtils, httpMethod } = require('./_bankDrive');
-const StatusCodeError  = require('./_bankDrive/StatusCodeError');
-const StatusCodeErrorItem  = require('./_bankDrive/StatusCodeErrorItem');
-const resources = require('./_bankDrive/resources');
-const utils = require('./_bankDrive/utils');
-const httpMethod = require('./_bankDrive/httpMethod');
+const { StatusCodeError, StatusCodeErrorItem, utils, httpMethod } = require('./_bankDrive');
 const access = require('safe-access');
 const _ = require('underscore');
 
