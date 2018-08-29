@@ -8,20 +8,19 @@ const _ = require('underscore');
 
 class Rule {
     constructor(data) {
-        const self = this;
 
         if (data) {
-            self.uuid = data.uuid;
-            self.ruleName = data.ruleName;                // Custom name for this rule, unique at bank account level
-            self.ruleRank = data.ruleRank || null;
-            self.ruleConditions = data.ruleConditions || [];    // Array of rule conditions, ALL of which need to be true to invoke the resulting rule action(s)
-            self.ruleActions = buildRuleActionsImpl(self, data.ruleActions);       // Array of rule actions which are applied if ALL rule conditions are true
-            self.status = data.status || Rule.statuses.active;
-            self.targetType = data.targetType;
-            self.ruleType = data.ruleType;
-            self.productId = data.productId;
-            self.globalRuleId = data.globalRuleId || undefined;
-            self.ruleCounts = data.ruleCounts || { success: 0, fail: 1, applied: 0 };
+            this.uuid = data.uuid;
+            this.ruleName = data.ruleName;                // Custom name for this rule, unique at bank account level
+            this.ruleRank = data.ruleRank || null;
+            this.ruleConditions = data.ruleConditions || [];    // Array of rule conditions, ALL of which need to be true to invoke the resulting rule action(s)
+            this.ruleActions = buildRuleActionsImpl(data.ruleActions);       // Array of rule actions which are applied if ALL rule conditions are true
+            this.status = data.status || Rule.statuses.active;
+            this.targetType = data.targetType;
+            this.ruleType = data.ruleType;
+            this.productId = data.productId;
+            this.globalRuleId = data.globalRuleId || undefined;
+            this.ruleCounts = data.ruleCounts || { success: 0, fail: 1, applied: 0 };
         }
     }
 
@@ -38,24 +37,24 @@ class Rule {
     }
 
     static extend(...args) {
-        return extendImpl(this, ...args);
+        return extendImpl(...args);
     }
 
     static GetRuleTypesToProcess(...args) {
-        return getRuleTypesToProcessImpl(this, ...args);
+        return getRuleTypesToProcessImpl(...args);
     }
 
     static filter(...args) {
-        return filterImpl(this, ...args);
+        return filterImpl(...args);
     }
 
     static sortRulesByRank(...args) {
-        return sortRulesByRankImpl(this, ...args);
+        return sortRulesByRankImpl(...args);
     }
 
 }
 
-const filterImpl = function(self, data) {
+const filterImpl = function(data) {
     /* eslint-disable no-param-reassign */
     delete (data.created);
     delete (data.updated);
@@ -68,7 +67,7 @@ const filterImpl = function(self, data) {
     return data;
 };
 
-const sortRulesByRankImpl = function(self, rules) {
+const sortRulesByRankImpl = function(rules) {
     return _.sortBy(rules, (item) => item.ruleRank || Number.MAX_SAFE_INTEGER);
 };
 
@@ -126,11 +125,11 @@ const buildDotSeparatedString = (dotSeparated) => {
     return dotSeparated;
 };
 
-const extendImpl = (self, destination, source, method) => {
+const extendImpl = (destination, source, method) => {
     return utils.extend(destination, source, method, (method === httpMethod.post ? postKeys : updateKeys), readOnlyKeys);
 };
 
-const buildRuleActionsImpl = function(self, actionsArray) {
+const buildRuleActionsImpl = function(actionsArray) {
     const arrayToReturn = [];
 
     if (actionsArray && actionsArray.length) {
@@ -154,7 +153,7 @@ const buildRuleActionsImpl = function(self, actionsArray) {
     return arrayToReturn;
 };
 
-const getRuleTypesToProcessImpl = (self, bankAccount) => {
+const getRuleTypesToProcessImpl = (bankAccount) => {
     const ruleTypesToProcess = [Rule.ruleTypes.user, Rule.ruleTypes.accountant];
     const processAutoRules = access(bankAccount, 'featureOptions.autoCreateRules');
     if (processAutoRules) {
