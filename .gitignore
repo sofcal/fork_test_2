@@ -7,6 +7,8 @@ build
 .serverless
 .webpack
 .nyc_output
+.idea
+lerna-debug.json
 coverage
 
 lerna-debug.log
