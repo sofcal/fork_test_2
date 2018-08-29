@@ -81,7 +81,7 @@ describe ('Rule', () => {
         }
     });
 
-    it.only('should throw an error if rule has no ruleName', (done) => {
+    it('should throw an error if rule has no ruleName', (done) => {
         try {
             const copyRule = JSON.parse(JSON.stringify(validRule));
             delete copyRule.ruleName;
@@ -90,10 +90,9 @@ describe ('Rule', () => {
             done(new Error('should have thrown'));
         } catch (err) {
             should(err).be.instanceOf(StatusCodeError);
-            should(err.StatusCode).eql(400);
-            should(err.items[0].applicationCode).eql('InvalidProperty');
-            should(err.items[0].message).eql('something here');
-            should(err.items[0].params).eql('something here');
+            should(err.statusCode).eql(400);
+            should(err.items[0].applicationCode).eql(resources.services.common.InvalidProperties);
+            should(err.items[0].message).eql('Rule.instance: undefined');
             done();
         }
     });

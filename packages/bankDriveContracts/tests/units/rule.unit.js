@@ -167,6 +167,39 @@ describe('services.ruleService', function () {
 
             });
 
+            it('should create an instance of Rule using Create', function (done) {
+                try {
+                    var newRule = Rule.Create(data);
+                    newRule.should.be.instanceof(Rule);
+
+                    done();
+                } catch (err) {
+                    done(err instanceof Error ? err : new Error(err));
+                }
+            });
+
+            it('should assign properties using Create', function (done) {
+                try {
+                    data.productId = 'dc8c78bc-cff2-43ea-9f5f-f0cc0f4df1dc';
+                    var newRule = Rule.Create(data);
+                    should(newRule.uuid).eql(data.uuid);
+                    should(newRule.ruleName).eql(data.ruleName);
+                    should(newRule.ruleRank).eql(data.ruleRank);
+                    should(newRule.ruleConditions).eql(data.ruleConditions);
+                    should(newRule.ruleActions).eql(data.ruleActions);
+                    should(newRule.status).eql(data.status);
+                    should(newRule.targetType).eql(data.targetType);
+                    should(newRule.ruleType).eql(data.ruleType);
+                    should(newRule.productId).eql(data.productId);
+                    should(newRule.globalRuleId).eql(data.globalRuleId);
+                    should(newRule.ruleCounts).eql(data.ruleCounts);
+
+                    done();
+                } catch (err) {
+                    done(err instanceof Error ? err : new Error(err));
+                }
+            });
+
             it('should create an instance of Rule', function (done) {
                 try {
                     var newRule = new Rule(data);
@@ -182,7 +215,17 @@ describe('services.ruleService', function () {
                 try {
                     data.productId = 'dc8c78bc-cff2-43ea-9f5f-f0cc0f4df1dc';
                     var newRule = new Rule(data);
-                    should(newRule).eql(data);
+                    should(newRule.uuid).eql(data.uuid);
+                    should(newRule.ruleName).eql(data.ruleName);
+                    should(newRule.ruleRank).eql(data.ruleRank);
+                    should(newRule.ruleConditions).eql(data.ruleConditions);
+                    should(newRule.ruleActions).eql(data.ruleActions);
+                    should(newRule.status).eql(data.status);
+                    should(newRule.targetType).eql(data.targetType);
+                    should(newRule.ruleType).eql(data.ruleType);
+                    should(newRule.productId).eql(data.productId);
+                    should(newRule.globalRuleId).eql(data.globalRuleId);
+                    should(newRule.ruleCounts).eql(data.ruleCounts);
 
                     done();
                 } catch (err) {
@@ -235,10 +278,38 @@ describe('services.ruleService', function () {
         });
 
         describe('Rule.validate', function () {
+
             let newRule;
 
             beforeEach(function () {
                 newRule = new Rule(data);
+            });
+
+            it('should validate and throw', (done) => {
+                try {
+                    delete newRule.ruleName;
+                    newRule.validate();
+
+                    done(new Error('should have thrown'));
+                } catch (err) {
+
+                    err.should.be.instanceOf(StatusCodeError);
+                    err.statusCode.should.eql(400);
+                    err.items[0].applicationCode.should.eql(resources.services.common.InvalidProperties);
+
+                    done();
+                }
+            });
+
+            it('should validate and not throw', (done) => {
+                try {
+                    delete newRule.ruleName;
+                    const response = newRule.validate(true);
+                    response[0].applicationCode.should.eql(resources.services.common.InvalidProperties);
+                    done();
+                } catch (err) {
+                    done(err instanceof Error ? err : new Error(err));
+                }
             });
 
             const tests = [{
@@ -970,7 +1041,20 @@ describe('services.ruleService', function () {
                     };
 
                     Rule.extend(oldRule, test, 'put');
-                    should(oldRule).eql(data);
+                    should(oldRule.uuid).eql(data.uuid);
+                    should(oldRule.ruleName).eql(data.ruleName);
+                    should(oldRule.ruleRank).eql(data.ruleRank);
+                    should(oldRule.ruleConditions).eql(data.ruleConditions);
+                    should(oldRule.ruleActions).eql(data.ruleActions);
+                    should(oldRule.status).eql(data.status);
+                    should(oldRule.targetType).eql(data.targetType);
+                    should(oldRule.ruleType).eql(data.ruleType);
+                    should(oldRule.productId).eql(data.productId);
+                    should(oldRule.globalRuleId).eql(data.globalRuleId);
+                    should(oldRule.ruleCounts).eql(data.ruleCounts);
+                    should(oldRule.additional1).eql(undefined);
+                    should(oldRule.ruleName2).eql(undefined);
+                    should(oldRule.ruleNamee).eql(undefined);
 
                     done();
                 } catch (err) {
