@@ -1,0 +1,81 @@
+{
+  "id": "/SageJsonRule",
+  "type": "object",
+  "properties": {
+    "uuid": { "type": "string", "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$" },
+    "ruleName": { "type": "string", "pattern": "^.{1,200}$" },
+    "ruleRank": { "type": ["integer", "null"], "minimum": 1 },
+    "targetType": { "type": "string", "pattern": "^Transaction$" },
+    "status": { "type": "string", "pattern": "^active|inactive$" },
+    "ruleType": { "type": "string", "pattern": "^User|Accountant|Feedback|Global$" },
+    "globalRuleID": { "type": ["string", "null" ], "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$" },
+    "ruleCounts": {
+      "type": "object",
+      "properties": {
+        "success": { "type": "integer", "minimum": 0 },
+        "fail": { "type": "integer", "minimum": 0 },
+        "applied": {"type": "integer", "minimum": 0 }
+      }
+    },
+    "ruleConditions": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "properties": {
+              "ruleField": { "enum": ["transactionNarrative"] },
+              "ruleOperation": { "type": "string", "pattern": "^containsWords|contains|notcontains|eq" },
+              "ruleCriteria": { "type": "string", "pattern": "^.{1,200}$" }
+            },
+            "required": ["ruleField", "ruleOperation", "ruleCriteria"]
+          },
+          {
+            "properties": {
+              "ruleField": { "enum": ["transactionAmount"] },
+              "ruleOperation": { "type": "string", "pattern": "eq|gt|lt|ge|le" },
+              "ruleCriteria": { "type": "string", "pattern": "^.{1,200}$" }
+            },
+            "required": ["ruleField", "ruleOperation", "ruleCriteria"]
+          },
+          {
+            "properties": {
+              "ruleField": { "enum": ["datePosted"] },
+              "ruleOperation": { "type": "string", "pattern": "gt|lt|ge|le" },
+              "ruleCriteria": { "type": "string", "pattern": "^.{1,200}$" }
+            },
+            "required": ["ruleField", "ruleOperation", "ruleCriteria"]
+          },
+          {
+            "properties": {
+              "ruleField": { "enum": ["transactionType", "checkNum", "currency", "payee.payeeBankId", "payee.payeeAccountId"] },
+              "ruleOperation": { "type": "string", "pattern": "eq" },
+              "ruleCriteria": { "type": "string", "pattern": "^.{1,200}$" }
+            },
+            "required": ["ruleField", "ruleOperation", "ruleCriteria"
+            ]
+          }
+        ]
+      }
+    },
+    "ruleActions": {
+      "type": "array",
+      "items": {
+        "properties": {
+          "splitAmount": { "type": "number", "minimum": 0 },
+          "splitPercentage": { "type": "integer", "minimum": 0, "maximum": 100 },
+          "accountantNarrative": { "type": ["string", "null"], "pattern": "^.{0,200}$" },
+          "accountsPostings": { "type": "array", "items": {
+            "properties": {
+              "type": { "type": "string", "pattern": "^.{1,200}$" },
+              "code": { "type": "string", "pattern": "^.{1,200}$" }
+            },
+            "required": ["type", "code"]
+          }
+          }
+        },
+        "required": ["accountsPostings"]
+      }
+    }
+  },
+  "required": ["ruleName", "targetType", "status", "ruleConditions", "ruleActions"]
+}
