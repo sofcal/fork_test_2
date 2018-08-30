@@ -12,7 +12,7 @@ const serviceImpls = {
 let env, region, keyAlias;
 const keySpec = 'AES_256';
 
-module.exports.migrateAggregatorPrivateKey = (event, context, callback) => {
+module.exports.run = (event, context, callback) => {
     const services = {};
 
     console.log('event', event);

@@ -1,6 +1,6 @@
 'use strict';
 
-const ParameterStoreStaticLoader = require('../../lib/ParameterStoreStaticLoader');
+const ParameterStoreStaticLoader = require('../../src/ParameterStoreStaticLoader');
 const aws = require('aws-sdk');
 
 const sinon = require('sinon');

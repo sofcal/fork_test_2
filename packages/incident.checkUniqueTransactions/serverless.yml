@@ -11,7 +11,7 @@
 #
 # Happy Coding!
 
-service: checkUniqueTransactions # NOTE: update this with your service name
+service: incident.checkUniqueTransactions # NOTE: update this with your service name
 
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details
@@ -61,8 +61,8 @@ custom:
       - aws-sdk
 
 functions:
-  checkUniqueTransactions:
-    handler: handler.checkUniqueTransactions
+  run:
+    handler: lib/handler.run
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events

@@ -1,5 +1,5 @@
-const index = require('../../lib/index');
-const ParameterStoreStaticLoader = require('../../lib/ParameterStoreStaticLoader');
+const index = require('../../src/index');
+const ParameterStoreStaticLoader = require('../../src/ParameterStoreStaticLoader');
 const should = require('should');
 
 describe('internal.parameterStoreStaticLoader.index', function(){

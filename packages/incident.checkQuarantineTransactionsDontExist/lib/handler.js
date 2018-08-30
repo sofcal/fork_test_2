@@ -9,7 +9,7 @@ const serviceImpls = {
 
 let env, region, bankId, duplicates, quarantinedFile;
 
-module.exports.checkQuarantineTransactionsDontExist = (event, context, callback) => {
+module.exports.run = (event, context, callback) => {
     const services = {};
 
     console.log('event', event);

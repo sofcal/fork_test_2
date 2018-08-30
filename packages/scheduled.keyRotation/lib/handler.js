@@ -10,7 +10,7 @@ const serviceImpls = {
 
 let env, region, database, params;
 
-module.exports.keyRotation = (event, context, callback) => {
+module.exports.run = (event, context, callback) => {
     const services = {};
     console.log('event', event);
 

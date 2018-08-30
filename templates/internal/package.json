@@ -1,0 +1,30 @@
+{
+  "name": "__package_name__",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "clean": "rimraf ./coverage/ && rimraf ./.nyc_output/ && rimraf ./node_modules/",
+    "test": "NODE_ENV=test nyc --cache false --x test/ mocha -b --colors \"./test/unit/**/*.spec.js\"",
+    "cover": "NODE_ENV=test npm run test && nyc report --reporter=lcov",
+    "report": "open coverage/lcov-report/index.html",
+    "int": "NODE_ENV=test nyc --x test/ mocha -b --colors --reporter spec \"./test/int/**/*.spec.js\"",
+    "lint": "eslint ./src",
+    "unlock": "rimraf package-lock.json"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bluebird": "^3.5.1",
+    "mongodb": "^3.0.5"
+  },
+  "devDependencies": {
+    "nyc": "^11.8.0",
+    "should": "^13.2.1",
+    "sinon": "^5.0.10"
+  }
+}
