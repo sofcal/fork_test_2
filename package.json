@@ -17,7 +17,8 @@
     "lint/byError": "eslint ./packages/** --format ./node_modules/eslint-stats/byError.js",
     "lint/byWarning": "eslint ./packages/** --format ./node_modules/eslint-stats/byWarning.js",
     "lint/byErrorAndWarning": "eslint ./packages/** --format ./node_modules/eslint-stats/byErrorAndWarningStacked.js",
-    "lint/byFolder": "eslint ./packages/** --format ./node_modules/eslint-stats/byFolder.js"
+    "lint/byFolder": "eslint ./packages/** --format ./node_modules/eslint-stats/byFolder.js",
+    "template": "./templates/generate.sh"
   },
   "author": "",
   "license": "ISC",
