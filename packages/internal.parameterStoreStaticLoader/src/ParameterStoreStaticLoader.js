@@ -19,6 +19,10 @@ class ParameterStoreStaticLoader {
         // loadImpl allows us to ensure the code is wrapped in a promise
         return loadImpl(this, params);
     }
+
+    static Create(...args) {
+        return new ParameterStoreStaticLoader(...args);
+    }
 }
 ParameterStoreStaticLoader.MaxResults = 10;
 

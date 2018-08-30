@@ -29,6 +29,10 @@ class ParameterStoreStaticLoader {
     return loadImpl(this, params);
   }
 
+  static Create(...args) {
+    return new ParameterStoreStaticLoader(...args);
+  }
+
 }
 
 ParameterStoreStaticLoader.MaxResults = 10;

@@ -5,6 +5,7 @@
 
 build/*
 reports/*
+templates/*
 jspm_packages/*
 .serverless/*
 .webpack/*

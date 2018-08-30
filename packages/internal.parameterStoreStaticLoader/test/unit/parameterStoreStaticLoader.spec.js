@@ -13,7 +13,7 @@ describe('internal.parameterStoreStaticLoader.ParameterStoreStaticLoader', funct
     const ssm = { getParametersAsync: errorFunc };
 
     before(() => {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
     });
 
     beforeEach(() => {

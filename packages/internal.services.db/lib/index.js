@@ -24,6 +24,10 @@ class DB {
     return disconnectImpl(this, ...args);
   }
 
+  static Create(...args) {
+    return new DB(...args);
+  }
+
 }
 
 const connectImpl = Promise.method((self, database) => {
