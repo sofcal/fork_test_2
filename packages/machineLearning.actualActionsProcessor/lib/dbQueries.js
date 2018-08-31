@@ -3,6 +3,7 @@ const Promise = require('bluebird');
 const _ = require('underscore');
 const DB =  require('internal-services-db');
 const mongodb = require('mongodb');
+const Rule = require('internal-contracts-rule').Rule;
 
 class DbQueries {
     constructor(db) {
@@ -62,6 +63,8 @@ const getRuleBucketImpl = Promise.method((self, organisationId, bankAccountId) =
 const addFeedbackRuleImpl = Promise.method((self, organisationId, bankAccountId, rule) => {
     // todo: Valdiate rule and construct 
     // todo: ensure its a feed back rule 
+
+    Rule.validate(rule);
 
     return self.getRuleBucket(organisationId, bankAccountId, rule)
         .then((bucket) => {

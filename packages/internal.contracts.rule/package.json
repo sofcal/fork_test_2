@@ -1,5 +1,5 @@
 {
-  "name": "schemas",
+  "name": "internal-contracts-rule",
   "version": "1.0.0",
   "description": "Banking Cloud schemas",
   "main": "index.js",

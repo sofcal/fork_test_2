@@ -24,9 +24,9 @@ describe('machineLearning-actualActionsProcessor',()=>{
     })
 
     afterEach(()=>{
-    /*    return dropCollection('Transaction').then(()=>{
+       return dropCollection('Transaction').then(()=>{
             return dropCollection('Rule');
-        })*/
+        })
     })
 
     beforeEach(()=>{
@@ -41,7 +41,7 @@ describe('machineLearning-actualActionsProcessor',()=>{
             return dbConnection.collection('Transaction').insertMany(testTransactions)
                 .then(()=>{
                     const bankAccountId = 'ee905d97-5922-6ddc-33b9-5a83ed280670';
-                    return queries.getTransactions(bankAccount,[1,5,6,7])
+                    return queries.getTransactions(bankAccountId,[1,5,6,7])
                         .then((result)=>{
                             should(result.length).eql(4);
                             should(result[0].transactionAmount).eql(100);
@@ -57,12 +57,19 @@ describe('machineLearning-actualActionsProcessor',()=>{
         it('Should return the requested bucket', () => {
             const testRules = require('./data/rules.json');
             return dbConnection.collection('Rule').insertMany(testRules).then(() => {
-                return queries.getRuleBucket('Z96616525-c5a3-4958-b1ee-fb856fd83403','5c94f4b7-bf84-418f-a6c6-a26349034a81').then((ruleBucket) => {
+                return queries.getRuleBucket('96616525-c5a3-4958-b1ee-fb856fd83403','5c94f4b7-bf84-418f-a6c6-a26349034a81').then((ruleBucket) => {
                     console.log('ruleBucket',ruleBucket);
                     should(ruleBucket.rules.length).eql(1);
                     should(ruleBucket.rules[0].uuid).eql('cb5e2c41-f3b8-4a8c-9d9c-12c8db9ab12c');
                 })    
             })
+        })
+    })
+
+    describe('addFeedbackRule', () => {
+        it.only('should add a feedback rule to an empty bucket.', () => {
+            // test rule validate
+            return queries.addFeedbackRule('96616525-c5a3-4958-b1ee-fb856fd83403','5c94f4b7-bf84-418f-a6c6-a26349034a81',{name:''});
         })
     })
 
