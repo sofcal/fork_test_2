@@ -4,7 +4,7 @@
   "description": "",
   "main": "handler.js",
   "scripts": {
-    "prepenv": "npm install -g lerna && npm install -g serverless && npm install -g rimraf",
+    "prepenv": "npm install -g npm@6.4.1 && npm install -g lerna@3.2.1 && npm install -g serverless@1.30.3 && npm install -g rimraf",
     "clean": "rimraf ./build && rimraf ./coverage && rimraf ./.nyc_output && rimraf node_modules && lerna run clean",
     "rebuild": "npm run clean && npm run build",
     "prebuild": "lerna bootstrap --hoist --no-hoist=internal-*",
