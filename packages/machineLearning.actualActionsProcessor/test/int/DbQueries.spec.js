@@ -2,9 +2,9 @@ const should = require('should');
 const sinon = require('sinon');
 const _ = require('underscore');
 const DB =  require('internal-services-db');
-const DbQueries = require('../../DbQueries')
+const DbQueries = require('../../lib/DbQueries')
 
-describe('DbQueries',()=>{
+describe('machineLearning-actualActionsProcessor',()=>{
     let db;
     let dbConnection;
     let queries;
@@ -13,7 +13,7 @@ describe('DbQueries',()=>{
         db = new DB({env:'', region:'', domain:'', username:'', password:'', replicaSet:''});
         db.connectionString = 'mongodb://localhost';
         return db.connect('bank_db')
-            .then((result) =>{
+            .then((result) => {
                 dbConnection = result;
                 queries = new DbQueries(dbConnection);
             })
@@ -37,7 +37,7 @@ describe('DbQueries',()=>{
 
     describe('getTransactions', () => {
         it('Should return relevant properties on transactions across multiple buckets', () => {
-            const testTransactions = require('./transactions.json');
+            const testTransactions = require('./data/transactions.json');
             return dbConnection.collection('Transaction').insertMany(testTransactions)
                 .then(()=>{
                     const bankAccountId = 'ee905d97-5922-6ddc-33b9-5a83ed280670';
@@ -54,8 +54,8 @@ describe('DbQueries',()=>{
     });
 
     describe('getRuleBucket', () => {
-        it.only('Should return the requested bucket', () => {
-            const testRules = require('./rules.json');
+        it('Should return the requested bucket', () => {
+            const testRules = require('./data/rules.json');
             return dbConnection.collection('Rule').insertMany(testRules).then(() => {
                 return queries.getRuleBucket('Z96616525-c5a3-4958-b1ee-fb856fd83403','5c94f4b7-bf84-418f-a6c6-a26349034a81').then((ruleBucket) => {
                     console.log('ruleBucket',ruleBucket);
