@@ -3,4 +3,12 @@ node_modules
 jspm_packages
 
 # Serverless directories
+build
 .serverless
+.webpack
+.nyc_output
+.idea
+lerna-debug.json
+coverage
+
+lerna-debug.log
