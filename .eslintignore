@@ -13,3 +13,4 @@ jspm_packages/*
 .idea/*
 .vscode/*
 coverage/*
+test/*
