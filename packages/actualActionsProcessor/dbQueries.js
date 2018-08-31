@@ -9,15 +9,83 @@ class DbQueries {
         this.db = db;
     }
 
-    getProducts(...args) {
-        return getProductsImpl(this, ...args);
+    getTransactions(...args) {
+        return getTransactionsImpl(this, ...args);
     }
 
+    addFeedbackRule(...args) {
+        return addFeedbackRuleImpl(this, ...args);
+    }
 
+    getRuleBucket(...args) {
+        return getRuleBucketImpl(this, ...args);
+    }
 }
 
-const getProductsImpl = Promise.method((self) => {
-    return self.db.collection('Product').find().toArray()
+const getTransactionsImpl = Promise.method((self, bankAccountId, transactionIds) => {
+    const sorted = _.sortBy(transactionIds, (n) => n);
+    const startId = _.first(sorted);
+    const endId = _.last(sorted);
+    const result = [];
+
+    const where = { bankAccountId, startIncrementedId: { $lte: endId }, endIncrementedId: { $gte: startId } };
+    
+    return self.db.collection('Transaction').find(where).toArray()
+        .then((buckets) => {
+            return Promise.each(buckets, (bucket) => {
+                _.each(bucket.transactions, (t) => {
+                    if (_.contains(sorted, t.incrementedId)) {
+                        result.push({incrementedId: t.incrementedId, transactionAmount: t.transactionAmount, actualAction: t.actualAction});
+                    }
+                });
+            });
+        })
+        .then(() => result);
+});
+
+const getRuleBucketImpl = Promise.method((self, organisationId, bankAccountId) => {
+    const where = { bankAccountId, organisationId };
+    return self.db.collection('Rule').find(where).toArray()
+        .then((buckets) => {
+            if (buckets.length === 0) {
+                // todo: return a new bucket
+                return { todo : 'todo'};
+            }
+
+            if (buckets.length > 1) {
+                throw new Error('expected to find at most one  bucket.  Found', buckets.length);
+            }         
+            return buckets[0];
+        });
+});
+
+const addFeedbackRuleImpl = Promise.method((self, organisationId, bankAccountId, rule) => {
+    // todo: Valdiate rule and construct 
+    // todo: ensure its a feed back rule 
+
+    return self.getRuleBucket(organisationId, bankAccountId, rule)
+        .then((bucket) => {
+            if (bucket.rules.length >= 300 ) { // todo: off the rule bucket
+                throw new Error('Rule bucket full');
+            }
+
+            // check for a feedback rule that already exists
+
+            buckets.Rules.push(rule);
+
+            // todo: maybe need to consider multiple bucket logic when size increases
+
+            // todo: check for duplicate rule names 
+
+
+            // set number of rules
+
+            // todo: upsert 
+
+            // throw if one record hasn't been updated
+
+    
+        })
 });
 
 module.exports = DbQueries;

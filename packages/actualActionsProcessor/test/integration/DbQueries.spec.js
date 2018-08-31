@@ -24,15 +24,19 @@ describe('DbQueries',()=>{
     })
 
     afterEach(()=>{
-     //   return dropCollection('Transaction')
+    /*    return dropCollection('Transaction').then(()=>{
+            return dropCollection('Rule');
+        })*/
     })
 
     beforeEach(()=>{
-        return dropCollection('Transaction')
+        return dropCollection('Transaction').then(()=>{
+            return dropCollection('Rule');
+        })
     })
 
-    describe('getTransactions', () =>{
-        it.only('Should return relevant properties on transactions across multiple buckets', () => {
+    describe('getTransactions', () => {
+        it('Should return relevant properties on transactions across multiple buckets', () => {
             const testTransactions = require('./transactions.json');
             return dbConnection.collection('Transaction').insertMany(testTransactions)
                 .then(()=>{
@@ -48,6 +52,19 @@ describe('DbQueries',()=>{
                 });
         })
     });
+
+    describe('getRuleBucket', () => {
+        it.only('Should return the requested bucket', () => {
+            const testRules = require('./rules.json');
+            return dbConnection.collection('Rule').insertMany(testRules).then(() => {
+                return queries.getRuleBucket('Z96616525-c5a3-4958-b1ee-fb856fd83403','5c94f4b7-bf84-418f-a6c6-a26349034a81').then((ruleBucket) => {
+                    console.log('ruleBucket',ruleBucket);
+                    should(ruleBucket.rules.length).eql(1);
+                    should(ruleBucket.rules[0].uuid).eql('cb5e2c41-f3b8-4a8c-9d9c-12c8db9ab12c');
+                })    
+            })
+        })
+    })
 
     const collectionExists = (name) =>{
         return dbConnection.listCollections().toArray()

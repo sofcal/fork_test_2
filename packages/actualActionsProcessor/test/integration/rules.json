@@ -1,0 +1,135 @@
+[
+    {
+    "region" : "GBR",
+    "organisationId" : "96616525-c5a3-4958-b1ee-fb856fd83403",
+    "bankAccountId" : "5c94f4b7-bf84-418f-a6c6-a26349034a81",
+    "numberOfRules" : 1,
+    "rules" : [ 
+        {
+            "uuid" : "cb5e2c41-f3b8-4a8c-9d9c-12c8db9ab12c",
+            "ruleName" : "fred",
+            "ruleRank" : 1,
+            "ruleConditions" : [ 
+                {
+                    "ruleField" : "transactionAmount",
+                    "ruleOperation" : "eq",
+                    "ruleCriteria" : "100.00"
+                }
+            ],
+            "ruleActions" : [ 
+                {
+                    "splitPercentage" : 100,
+                    "accountantNarrative" : "Cheque",
+                    "accountsPostings" : [ 
+                        {
+                            "type" : "contact_guid",
+                            "code" : "c38065e7f088ee0fe74fa3f1b63c71a2"
+                        }, 
+                        {
+                            "type" : "ledger_guid",
+                            "code" : "78d8439436a8ed427a3e204877ab076d"
+                        }, 
+                        {
+                            "type" : "transaction_type",
+                            "code" : "other_receipt"
+                        }, 
+                        {
+                            "type" : "reference",
+                            "code" : "My Reference"
+                        }, 
+                        {
+                            "type" : "description",
+                            "code" : "My Description"
+                        }, 
+                        {
+                            "type" : "tax_rate",
+                            "code" : "STANDARD"
+                        }, 
+                        {
+                            "type" : "payment_type",
+                            "code" : "CHEQUE"
+                        }, 
+                        {
+                            "type" : "analysis_type_1_guid",
+                            "code" : "181a60c3e0905ad16a6cbdd2a7fd53db"
+                        }, 
+                        {
+                            "type" : "analysis_type_2_guid",
+                            "code" : "ee9dd6ba95ad7c470873498bb85653a0"
+                        }, 
+                        {
+                            "type" : "analysis_type_3_guid",
+                            "code" : "9d6937eb630037783e1d58ca2eb02546"
+                        }
+                    ]
+                }
+            ],
+            "status" : "active",
+            "targetType" : "Transaction",
+            "ruleType" : "User",
+            "productId" : "ad3544e2-f959-42da-86c5-34e3a4db5a72",
+            "globalRuleId" : null,
+            "ruleCounts" : {
+                "success" : 0,
+                "fail" : 1,
+                "applied" : 1
+            }
+        }
+    ],
+    "isAccountOwnerRules" : false,
+    "created" : "2018-08-29T12:45:56.396Z",
+    "etag" : 1535546756592.0,
+    "updated" : "2018-08-29T12:45:56.592Z"
+}
+,
+{
+    "region" : "GBR",
+    "organisationId" : "51aa55c4-a3ba-4fd1-befe-c7a86c4c2a8f",
+    "bankAccountId" : "0b17a1fc-2a8c-4600-a2f3-63521f39a40d",
+    "numberOfRules" : 1,
+    "rules" : [ 
+        {
+            "uuid" : "2e0a9e33-a26d-4d9b-b46f-bcbbe54fcba5",
+            "ruleName" : "New Test Rule 1",
+            "ruleRank" : 1,
+            "ruleConditions" : [ 
+                {
+                    "ruleOperation" : "eq",
+                    "ruleField" : "transactionType",
+                    "ruleCriteria" : "CREDIT"
+                }, 
+                {
+                    "ruleOperation" : "eq",
+                    "ruleField" : "transactionAmount",
+                    "ruleCriteria" : "60.71"
+                }
+            ],
+            "ruleActions" : [ 
+                {
+                    "splitPercentage" : 100,
+                    "accountsPostings" : [ 
+                        {
+                            "code" : "SUPP1",
+                            "type" : "supplier"
+                        }
+                    ]
+                }
+            ],
+            "status" : "active",
+            "targetType" : "Transaction",
+            "ruleType" : "User",
+            "productId" : "2ac2a370-6f73-4be4-b138-08eb9f2e7992",
+            "globalRuleId" : null,
+            "ruleCounts" : {
+                "success" : 0,
+                "fail" : 1,
+                "applied" : 1
+            }
+        }
+    ],
+    "isAccountOwnerRules" : false,
+    "created" : "2018-08-29T13:47:56.795Z",
+    "etag" : 1535550479013.0,
+    "updated" : "2018-08-29T13:47:59.013Z"
+}
+]

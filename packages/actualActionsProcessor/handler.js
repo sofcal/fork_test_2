@@ -1,24 +1,22 @@
 'use strict';
 
 const Promise = require('bluebird');
-const DbQueries = require('./DbQueries');
 const _ = require('underscore');
+const access = require('safe-access');
+
 const ParameterStoreStaticLoader = require('internal-parameterstorestaticloader');
 const serviceImpls = {
     DB: require('internal-services-db')
 };
+
+const DbQueries = require('./DbQueries');
+const FeedbackRuleGenerator = require('./FeedbackRuleGenerator');
 
 let env, region, database, params;
 
 module.exports.actualActionsProcessor = (event, context, callback) => {
     const services = {};
     console.log('event', event);
-
-    // log out messages from SQS
-    event.Records.forEach((record)  => {
-        var body = record.body;
-        console.log(body);
-      });
 
     return Promise.resolve(undefined)
         .then(() => {
@@ -28,7 +26,6 @@ module.exports.actualActionsProcessor = (event, context, callback) => {
             if(!env || !region) {
                 throw new Error(`invalid parameters - env: ${env}; region: ${region};`);
             }
-
             console.log(`starting request for - env: ${env}; region: ${region}`);
         })
         .then(() => getParams(env, region))
@@ -39,6 +36,13 @@ module.exports.actualActionsProcessor = (event, context, callback) => {
         .then(() => connectDB(services))
         .then((db) => {
             console.log('Connected to the DB and read params succesfully');
+
+            const ruleGenerator = new FeedbackRuleGenerator()
+            return Promise.each(event.Records, (record) => {
+                let message = access(record, 'body.Message');
+                console.log('Processing message:', message);
+                return ruleGenerator.notificationMsg(message);
+            });
         })
         .then(()=>{
             return services.db.disconnect()
