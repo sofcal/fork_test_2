@@ -9,7 +9,7 @@ while getopts ":t:p:" opt; do
   esac
 done
 
-if [ $TYPE == "internal" ]; then
+if [[ $TYPE == "internal" ]]; then
     PACKAGE_NAME="internal-$PACKAGE_NAME"
 fi
 

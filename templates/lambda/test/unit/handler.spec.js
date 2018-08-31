@@ -10,7 +10,7 @@ const { ParameterStoreStaticLoader } = require('internal-parameterstorestaticloa
 const DB = require('internal-services-db');
 const { StatusCodeError, StatusCodeErrorItem } = require('internal-status-code-error');
 
-describe.only('__package_name__.handler', function() {
+describe('__package_name__.handler', function() {
     let sandbox;
     let config, context, event;
 
