@@ -321,13 +321,13 @@ describe('services.ruleService', function () {
                     {it: 'should throw if uuid is an object', value: {}, error: true}
                 ]
             }, {
-                target: 'ruleName', tests: [
-                    {it: 'should not throw if ruleName is a string', value: 'rule_name', error: false},
-                    {it: 'should throw if ruleName is undefined', value: undefined, error: true},
-                    {it: 'should throw if ruleName is null', value: null, error: true},
-                    {it: 'should throw if ruleName is an empty string', value: '', error: true},
-                    {it: 'should throw if ruleName is a number', value: 9, error: true},
-                    {it: 'should throw if ruleName is an object', value: {}, error: true}
+                target: 'region', tests: [
+                    {it: 'should not throw if region is a string', value: 'GBR', error: false},
+                    {it: 'should throw if region is undefined', value: undefined, error: true},
+                    {it: 'should throw if region is null', value: null, error: true},
+                    {it: 'should throw if region is an empty string', value: '', error: true},
+                    {it: 'should throw if region is a number', value: 9, error: true},
+                    {it: 'should throw if region is an object', value: {}, error: true}
                 ]
             }, {
                 target: 'ruleRank', tests: [

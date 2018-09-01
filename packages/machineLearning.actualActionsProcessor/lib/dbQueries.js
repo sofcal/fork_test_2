@@ -63,8 +63,6 @@ const getRuleBucketImpl = Promise.method((self, organisationId, bankAccountId) =
 
 const addFeedbackRuleImpl = Promise.method((self, organisationId, bankAccountId, rule) => {
 
-    console.log('*** Add a uuid:', uuid());
-
     Rule.validate(rule);
     rule.uuid = uuid();
 

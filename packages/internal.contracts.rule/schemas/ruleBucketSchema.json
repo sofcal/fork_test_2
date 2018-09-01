@@ -1,0 +1,21 @@
+{
+  "id": "/RuleBucket",
+  "type": "object",
+  "properties": {
+    "uuid": { "type": "string", "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$" },
+    "region": { "type": "string", "pattern": "^.{1,28}$" },
+    "organisationId": { "type": "string", "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$" },
+    "bankAccountId": { "type": "string", "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$" },
+    "numberOfRules": { "type": "integer"} ,
+    "rules": { 
+      "type": "array",
+      "items:" : {"$ref:" : "ruleSchema.json"}
+    } , 
+    "isAccountOwnerRules": { "type": "boolean"} 
+  },
+  "required": ["region", "organisationId", "bankAccountId", "numberOfRules","isAccountOwnerRules"]
+}
+
+
+
+
