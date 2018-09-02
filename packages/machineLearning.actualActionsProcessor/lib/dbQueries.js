@@ -7,6 +7,7 @@ const Rule = require('internal-contracts-rule').Rule;
 const RuleBucket = require('internal-contracts-rule').RuleBucket;
 const uuid = require('uuid/v4');
 const moment = require('moment');
+const access = require('safe-access');
 
 class DbQueries {
     constructor(db) {
@@ -54,13 +55,13 @@ const getRuleBucketImpl = Promise.method((self, organisationId, bankAccountId) =
 
     // create rule bucket if it doesn't exist
     return self.db.collection('Rule').findAndModify(query, null, update, options)
-        .then((result) => {        
+        .then((result) => {       
             let data = result.value;
             if (!data.rules) {
                 data.rules = [];
                 data.isAccountOwnerRules = false;
                 data.numberOfRules = 0;
-                data.region = 'GBR';
+                data.region = ' ';
             }
 
             if (result.ok !== 1) {
@@ -71,30 +72,46 @@ const getRuleBucketImpl = Promise.method((self, organisationId, bankAccountId) =
         });
 });
 
-const addFeedbackRuleImpl = Promise.method((self, organisationId, bankAccountId, rule) => {
-    Rule.validate(rule);
-    rule.uuid = uuid();
+// should it be called feedback rule - creation
+const addFeedbackRuleImpl = Promise.method((self, organisationId, bankAccountId, newRule) => {
+    Rule.validate(newRule);
+    newRule.uuid = uuid();
+    newRule.ruleType = Rule.ruleTypes.feedback;
 
-    return self.getRuleBucket(organisationId, bankAccountId, rule)
+    return self.getRuleBucket(organisationId, bankAccountId, newRule)
         .then((bucket) => {
-            if (bucket.rules.length >= RuleBucket.MaxBucketSize ) { 
+            if (bucket.rules.length >= RuleBucket.MaxBucketSize) {
                 throw new Error('Rule bucket full');
             }
 
-            // check for a feedback rule that already exists
+            let ruleAlreadyExists = false;
+            const newFeedbackRuleCriteria = access(newRule, 'ruleConditions[0]');
+            _.find(bucket.rules, (rule) => {
+                if (rule.ruleType === Rule.ruleTypes.feedback) {
+                    const exisitingRuleCriteris = access(rules, 'ruleConditions[0]');
+                    if (newFeedbackRuleCriteria === exisitingRuleCriteris) {
+                        ruleAlreadyExists = true;
+                    }
+                }
+            });
 
-            buckets.Rules.push(rule);
-            // todo: check for duplicate rule names 
+            if (ruleAlreadyExists) {
+                return;
+            }
 
+            bucket.rules = RuleBucket.addOrUpdateRuleByRank(bucket.rules, newRule);
+            RuleBucket.checkForDuplicateRuleNames(bucket);
+            bucket.numberOfRules++;
+          
+            const query = { _id: bucket._id, etag: bucket.etag};
+            const options = {upsert: false};
 
-            // set number of rules
-
-            // todo: upsert 
-
-            // throw if one record hasn't been updated
-
-            // tests
-    
+            return self.db.collection('Rule').updateOne(query, {$set: bucket},  options)
+        })
+        .then((result) => {       
+            if (result.modifiedCount !== 1){
+                throw new Error('Failed to update rule bucket for new rule.')
+            } 
         })
 });
 

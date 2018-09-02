@@ -33,6 +33,18 @@ class RuleBucket {
     }
 
     static MaxBucketSize() { return 300; }
+
+    static addOrUpdateRuleByRank(...args) {
+        return addOrUpdateRuleByRankImpl(...args);
+    }
+
+    static resetRuleRanks(...args) {
+        return resetRuleRanksImpl(...args);
+    }
+
+    static checkForDuplicateRuleNames(...args) {
+        return checkForDuplicateRuleNamesImpl(...args);
+    }
 }
 
 const validateImpl = function(ruleBucket, noThrow) {
@@ -87,6 +99,52 @@ const buildDotSeparatedString = (dotSeparated) => {
         dotSeparated = dotSeparated.substring(0, dotSeparated.indexOf('.'));
     }
     return dotSeparated;
+};
+
+// replace or insert rule into rules array based on its rank and recalculate rank for all rules
+const addOrUpdateRuleByRankImpl = (existingRules, rule) => {
+    let newRules = _.reject(existingRules, (existing) => existing.uuid === rule.uuid);
+
+    // remove this rule from the array if it exists
+    const newIndex = (rule.ruleRank > 0) ? rule.ruleRank - 1 : newRules.length;
+
+    // insert rule into array based on it's rank
+    newRules.splice(newIndex, 0, rule);
+    const reorderedRules = [];
+    reorderedRules.push(...orderTypedRules(newRules, Rule.ruleTypes.user));
+    reorderedRules.push(...orderTypedRules(newRules, Rule.ruleTypes.accountant));
+    reorderedRules.push(...orderTypedRules(newRules, Rule.ruleTypes.feedback));
+    reorderedRules.push(...orderTypedRules(newRules, Rule.ruleTypes.global));    
+    RuleBucket.resetRuleRanks(reorderedRules);
+
+    return reorderedRules;
+};
+
+const orderTypedRules = (rules, filter) => {
+    const typesRule = _.filter(rules, (r) => r.ruleType === filter);
+    RuleBucket.resetRuleRanks(typesRule);
+    return Rule.sortRulesByRank(typesRule);
+};
+
+// reset all rank values to match position in the array
+const resetRuleRanksImpl = (rules) => {
+    _.each(rules, (rule, index) => {
+        // eslint-disable-next-line no-param-reassign
+        rule.ruleRank = index + 1;
+    });
+};
+
+const checkForDuplicateRuleNamesImpl = (bucket) => {
+    const duplicates = [];
+    _.chain(bucket.rules)
+        .pluck('ruleName')
+        .each((rn) => {
+            if (_.contains(duplicates, rn)) {
+                throw new StatusCodeError([new StatusCodeErrorItem('AlreadyExists', `A rule with the given name already exists: ${rn}`)], 409);
+            }
+
+            duplicates.push(rn);
+        });
 };
 
 module.exports = RuleBucket;
