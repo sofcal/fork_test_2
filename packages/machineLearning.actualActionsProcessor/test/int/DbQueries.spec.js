@@ -3,6 +3,7 @@ const sinon = require('sinon');
 const _ = require('underscore');
 const DB =  require('internal-services-db');
 const DbQueries = require('../../lib/DbQueries')
+const RuleBucket = require('internal-contracts-rule').RuleBucket;
 
 describe('machineLearning-actualActionsProcessor',()=>{
     let db;
@@ -24,9 +25,9 @@ describe('machineLearning-actualActionsProcessor',()=>{
     })
 
     afterEach(()=>{
-       return dropCollection('Transaction').then(()=>{
+      /* return dropCollection('Transaction').then(()=>{
             return dropCollection('Rule');
-        })
+        })*/
     })
 
     beforeEach(()=>{
@@ -57,19 +58,40 @@ describe('machineLearning-actualActionsProcessor',()=>{
         it('Should return the requested bucket', () => {
             const testRules = require('./data/rules.json');
             return dbConnection.collection('Rule').insertMany(testRules).then(() => {
-                return queries.getRuleBucket('96616525-c5a3-4958-b1ee-fb856fd83403','5c94f4b7-bf84-418f-a6c6-a26349034a81').then((ruleBucket) => {
-                    console.log('ruleBucket',ruleBucket);
-                    should(ruleBucket.rules.length).eql(1);
-                    should(ruleBucket.rules[0].uuid).eql('cb5e2c41-f3b8-4a8c-9d9c-12c8db9ab12c');
+                return queries.getRuleBucket('96616525-c5a3-4958-b1ee-fb856fd83403','5c94f4b7-bf84-418f-a6c6-a26349034a81').then((result) => {
+                    should(result.rules.length).eql(1);
+                    should(result.rules[0].uuid).eql('cb5e2c41-f3b8-4a8c-9d9c-12c8db9ab12c');
+                    should(result.etag).exists;
+                    should(result.etag).not.eql(1535546756592.0);
+
+                    const bucket = new RuleBucket(result);
+                    bucket.validate();
                 })    
             })
+        })
+
+        it.only('Should create a new bucket if does not exist', () =>{
+            const testRules = require('./data/rules.json');
+            return dbConnection.collection('Rule').insertMany(testRules).then(() => {
+                return queries.getRuleBucket('d64c62df-2f23-49d1-aa35-d3b60a1945a5','8e286041-53bb-485a-9cc4-8178098e9252').then((result) => {
+                            
+                    should(result.organisationId).eql('d64c62df-2f23-49d1-aa35-d3b60a1945a5');
+                    should(result.bankAccountId).eql('8e286041-53bb-485a-9cc4-8178098e9252');
+                    should(result.rules.length).eql(0);
+                    should(result.etag).exists;
+                
+                    const bucket = new RuleBucket(result);
+                    bucket.validate();
+                })    
+            })
+
         })
     })
 
     describe('addFeedbackRule', () => {
-        it.only('should add a feedback rule to an empty bucket.', () => {
+        it('should add a feedback rule to an empty bucket.', () => {
             // test rule validate
-            return queries.addFeedbackRule('96616525-c5a3-4958-b1ee-fb856fd83403','5c94f4b7-bf84-418f-a6c6-a26349034a81',{name:''});
+            return queries.addFeedbackRule('96616525-c5a3-4958-b1ee-fb856fd83403','5c94f4b7-bf84-418f-a6c6-a26349034a81',{name:''})
         })
     })
 
