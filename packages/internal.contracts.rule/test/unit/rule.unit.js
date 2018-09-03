@@ -1,6 +1,7 @@
 'use strict';
 
-const { StatusCodeError, resources } = require('../../_bankDrive');
+const { resources } = require('../../_bankDrive');
+const { StatusCodeError } = require('internal-status-code-error');
 const Rule = require('../../Rule');
 const should = require('should');
 const sinon = require('sinon');
@@ -805,7 +806,9 @@ describe('services.ruleService', function () {
                                     err.should.be.instanceOf(StatusCodeError);
                                     err.statusCode.should.eql(400);
                                     err.items[0].applicationCode.should.eql(resources.services.common.InvalidProperties);
+                                    console.log(err.items[0].params);
                                     if (_.isArray(test.value)) {
+                                        console.log('____target', target);
                                         console.log('XXX Array', err.items[0].params[target]);
                                         console.log('XXX Array test val', test.value[0]);
                                     } else {

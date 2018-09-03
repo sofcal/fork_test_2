@@ -42,7 +42,8 @@
     "report": "open coverage/lcov-report/index.html",
     "int": "NODE_ENV=test nyc --x lib/_legacy --x test/ mocha -b --colors --reporter spec \"./test/integration/**/*.spec.js\"",
     "lint": "eslint ./src/**",
-    "build": "babel src -d lib",
+    "build": "babel src -d lib --copy-files",
+    "watch": "babel --watch src --out-dir lib --copy-files",
     "unlock": "rimraf package-lock.json"
   }
 }

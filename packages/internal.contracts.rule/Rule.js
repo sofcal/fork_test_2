@@ -2,7 +2,9 @@
 
 const jsonschema = require('jsonschema');
 const ruleSchema = require('./schemas/ruleSchema');
-const { StatusCodeError, StatusCodeErrorItem, utils, httpMethod } = require('./_bankDrive');
+const { utils, httpMethod } = require('./_bankDrive');
+const { StatusCodeError, StatusCodeErrorItem } = require('internal-status-code-error');
+const { toStatusCodeError, toStatusCodeErrorItems } = require('internal-jsonschema-to-statuscodeerror');
 const access = require('safe-access');
 const _ = require('underscore');
 
@@ -77,12 +79,16 @@ const validateImpl = function(rule, noThrow) {
     if(typeItem)
         throw new StatusCodeError([typeItem], 400);
 
-    let result = jsonschema.validate(rule, ruleSchema);
+    let result = jsonschema.validate(rule, ruleSchema, { propertyName: Rule.name });
     if (result.errors.length > 0) {
         if (noThrow) {
-            return createErrorItems(result.errors, rule)
+            return toStatusCodeErrorItems(result, Rule, rule)//createErrorItems(result.errors, rule)
         } else {
-            const error = createError(result.errors, rule);
+            console.log('_____RULE', rule);
+            const util = require('util');
+            console.log('_____RESULT', util.inspect(result, false, null, 1));
+            const error = toStatusCodeError(result, Rule, rule);//createError(result.errors, rule);
+            console.log('______ERROR', error);
             throw error;
         }
     }

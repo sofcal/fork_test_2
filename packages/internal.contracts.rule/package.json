@@ -14,11 +14,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "jsonschema": "^1.1.1",
     "bluebird": "^3.5.1",
     "emitter": "0.0.5",
-    "underscore": "^1.9.0",
-    "safe-access": "^0.1.0"
+    "internal-jsonschema-to-statuscodeerror": "^1.0.0",
+    "internal-status-code-error": "^1.0.0",
+    "jsonschema": "^1.1.1",
+    "safe-access": "^0.1.0",
+    "underscore": "^1.9.0"
   },
   "devDependencies": {
     "babel-eslint": "^8.0.2",
