@@ -106,13 +106,13 @@ const addFeedbackRuleImpl = Promise.method((self, organisationId, bankAccountId,
             const query = { _id: bucket._id, etag: bucket.etag};
             const options = {upsert: false};
 
-            return self.db.collection('Rule').updateOne(query, {$set: bucket},  options)
+            return self.db.collection('Rule').updateOne(query, {$set: bucket},  options);
         })
         .then((result) => {       
-            if (result.modifiedCount !== 1){
-                throw new Error('Failed to update rule bucket for new rule.')
-            } 
-        })
+            if (result.modifiedCount !== 1) {
+                throw new Error('Failed to update rule bucket for new rule.');
+            }
+        });
 });
 
 module.exports = DbQueries;
