@@ -1,7 +1,9 @@
 # /node_modules/* and /bower_components/* ignored by default
 
+**/*.json
 **/packages/**/test/*
 **/packages/internal.*/lib/*
+**/packages/**/node_modules/*
 
 build/*
 reports/*

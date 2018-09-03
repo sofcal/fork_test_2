@@ -6,11 +6,11 @@ const should = require('should');
 const sinon = require('sinon');
 const Promise = require('bluebird');
 
-const { ParameterStoreStaticLoader } = require('internal-parameterstorestaticloader');
+const { ParameterStoreStaticLoader } = require('internal-parameterstore-static-loader');
 const DB = require('internal-services-db');
 const { StatusCodeError, StatusCodeErrorItem } = require('internal-status-code-error');
 
-describe('machineLearning-actualActionsProcessor.handler', function() {
+describe.skip('machineLearning-actualActionsProcessor.handler', function() {
     let sandbox;
     let config, context, event;
 

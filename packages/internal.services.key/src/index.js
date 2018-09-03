@@ -4,9 +4,8 @@ const AWS = require('aws-sdk');
 const Promise = require('bluebird');
 
 class Key {
-    constructor({ region, signatureVersion }) {
+    constructor({ region }) {
         const kms = new AWS.KMS({
-            //signatureVersion,
             region
         });
         this._kms = Promise.promisifyAll(kms);

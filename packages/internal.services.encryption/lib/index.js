@@ -1,8 +1,6 @@
 'use strict';
 
 class Encryption {
-  constructor() {}
-
   envelopeEncrypt(...args) {
     return envelopeEncryptImpl(this, ...args);
   }
@@ -14,15 +12,16 @@ class Encryption {
 }
 
 const generateRandom = (deprecated, count) => {
-  count = count && count > 0 ? count : 12;
-  return require('crypto').randomBytes(count).toString('hex');
+  const size = count && count > 0 ? count : 12; // eslint-disable-next-line global-require
+
+  return require('crypto').randomBytes(size).toString('hex');
 };
 
 const envelopeEncryptImpl = (self, data, generateDataKey) => {
   const packEnvelope = (encryptedKey, iv, encryptedBuffer) => {
     const ivLength = iv.length;
     const encryptedKeyLength = encryptedKey.length;
-    let buffer = new Buffer(8);
+    let buffer = Buffer.alloc(8);
     buffer.writeInt32LE(encryptedKeyLength, 0);
     buffer.writeInt32LE(ivLength, 4, 4);
     buffer = Buffer.concat([buffer, encryptedKey, iv], 8 + encryptedKeyLength + ivLength);
@@ -31,13 +30,13 @@ const envelopeEncryptImpl = (self, data, generateDataKey) => {
 
   return generateDataKey().then(keyResponse => {
     const plainTextKey = keyResponse.plain;
-    const encryptedKey = keyResponse.encrypted;
+    const encryptedKey = keyResponse.encrypted; // eslint-disable-next-line global-require
 
     const crypto = require('crypto');
 
-    const iv = new Buffer(generateRandom(null, 16), 'hex');
+    const iv = Buffer.from(generateRandom(null, 16), 'hex');
     const cipher = crypto.createCipheriv('aes-256-cbc', plainTextKey, iv);
-    const encrypted = [cipher.update(new Buffer(data))];
+    const encrypted = [cipher.update(Buffer.from(data))];
     encrypted.push(cipher.final());
     const encryptedBuffer = Buffer.concat(encrypted);
     return packEnvelope(encryptedKey, iv, encryptedBuffer);
@@ -67,10 +66,11 @@ const envelopeDecryptImpl = (self, data, decryptDataKey) => {
 
   const unpacked = unpackEnvelope(data);
   return decryptDataKey(unpacked.encryptedKey).then(plainTextKey => {
+    // eslint-disable-next-line global-require
     const crypto = require('crypto');
 
     const decipher = crypto.createDecipheriv('aes-256-cbc', plainTextKey, unpacked.iv);
-    const decrypted = [decipher.update(new Buffer(unpacked.encryptedBuffer))];
+    const decrypted = [decipher.update(Buffer.from(unpacked.encryptedBuffer))];
     decrypted.push(decipher.final());
     return Buffer.concat(decrypted);
   });

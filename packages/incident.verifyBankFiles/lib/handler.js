@@ -2,13 +2,13 @@
 
 const Promise = require('bluebird');
 
-const ParameterStoreStaticLoader = require('internal-parameterstorestaticloader');
+const ParameterStoreStaticLoader = require('internal-parameterstore-static-loader');
 const serviceImpls = {
     DB: require('internal-services-db'),
     S3: require('internal-services-s3')
 };
 
-let env, region, database, bucket;
+let env, region, dbName, bucket;
 
 module.exports.run = (event, context, callback) => {
     const services = {};
@@ -42,7 +42,7 @@ module.exports.run = (event, context, callback) => {
         .then(() => {
             env = event.env;
             region = event.region;
-            database = event.database;
+            dbName = event.database;
             bucket = event.bucket;
 
             if(!env || !region) {
@@ -212,8 +212,8 @@ module.exports.run = (event, context, callback) => {
         .then(() => disconnectDB(services))
 };
 
-const connectDB = (services, database) => {
-    return services.db.connect(database)
+const connectDB = (services) => {
+    return services.db.connect()
         .then((db) => {
             console.log('db connected');
             return db;
@@ -232,7 +232,7 @@ const getServices = (env, region, params, services) => {
     const replicaSet = params['defaultMongo.replicaSet'];
     const domain = params['domain'];
 
-    services.db = new serviceImpls.DB({ env, region, domain, username, password, replicaSet });
+    services.db = new serviceImpls.DB({ env, region, domain, username, password, replicaSet, db: dbName });
     services.s3 = new serviceImpls.S3({bucket});
 
     return services;

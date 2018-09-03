@@ -14,7 +14,7 @@ const schema = require('./schema');
 
 const validator = new Validator();
 validator.addSchema(schema);
-const delim = ' ';
+const delimiter = ' ';
 
 class NarrativeDictionary {
   constructor(data) {
@@ -60,7 +60,7 @@ class NarrativeDictionary {
       }
     };
 
-    checkSplits(narrative.split(delim));
+    checkSplits(narrative.split(delimiter));
     return {
       matches,
       longest
@@ -87,7 +87,7 @@ class NarrativeDictionary {
       // keep track of the object we're modifying. We'll change this with each split
       let ref = data; // split the string by the delimiter, this will give us the words we'll create nested objects for
 
-      const splits = item.split(delim);
+      const splits = item.split(delimiter);
       const last = splits.length - 1;
 
       _.each(splits, (split, i) => {

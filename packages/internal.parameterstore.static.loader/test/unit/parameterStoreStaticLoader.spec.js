@@ -1,12 +1,12 @@
 'use strict';
 
-const ParameterStoreStaticLoader = require('../../src/ParameterStoreStaticLoader');
+const ParameterStoreStaticLoader = require('../../lib/ParameterStoreStaticLoader');
 const aws = require('aws-sdk');
 
 const sinon = require('sinon');
 const should = require('should');
 
-describe('internal.parameterStoreStaticLoader.ParameterStoreStaticLoader', function(){
+describe('internal-parameterstore-static-loader.ParameterStoreStaticLoader', function(){
     let sandbox;
 
     const errorFunc = () => { throw new Error('should be stubbed') };

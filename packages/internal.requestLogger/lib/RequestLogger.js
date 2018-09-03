@@ -8,6 +8,8 @@ class RequestLogger {
   extend(extension) {
     this.request = Object.assign({}, this.request, extension);
   }
+  /* eslint-disable no-console */
+
 
   debug(data) {
     const timestamp = new Date().toISOString();
@@ -40,6 +42,8 @@ class RequestLogger {
       severity: 'ERROR'
     }, this.request, data)));
   }
+  /* eslint-enable no-console */
+
 
   static Create(...args) {
     return new RequestLogger(...args);

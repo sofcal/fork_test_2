@@ -1,5 +1,5 @@
 {
-  "name": "internal-parameterstorestaticloader",
+  "name": "internal-parameterstore-static-loader",
   "version": "1.0.0",
   "author": "",
   "license": "ISC",
@@ -10,6 +10,8 @@
     "lib": "lib"
   },
   "dependencies": {
+    "aws-sdk": "^2.220.1",
+    "bluebird": "^3.5.1",
     "@babel/code-frame": "^7.0.0-beta.48",
     "@babel/core": "^7.0.0-beta.47",
     "@babel/preset-env": "^7.0.0-beta.47"

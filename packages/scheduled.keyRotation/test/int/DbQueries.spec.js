@@ -1,5 +1,5 @@
+const Promise = require('bluebird');
 const should = require('should');
-const sinon = require('sinon');
 const _ = require('underscore');
 const DB =  require('internal-services-db');
 const DbQueries = require('../../lib/DbQueries');
@@ -10,23 +10,29 @@ describe('scheduled.keyRotation.DbQueries',()=>{
     let queries;
 
     before(()=>{
-        db = new DB({env:'', region:'', domain:'', username:'', password:'', replicaSet:''});
-        db.connectionString = 'mongodb://localhost';
-        return db.connect('bank_db')
+        db = new DB({ localhost: true, db: 'scheduled_keyrotation' });
+        return db.connect()
             .then((result) =>{
                 dbConnection = result;
                 queries = new DbQueries(dbConnection);
             })
-    })
+    });
 
     after(()=>{
-        return db.disconnect();
-    })
+        return Promise.resolve(undefined)
+            .then(() => {
+                const connection = db.getConnection();
+                if(connection) {
+                    return connection.dropDatabase();
+                }
+            })
+            .then(() => db.disconnect());
+    });
 
     afterEach(()=>{
         return dropCollection('Organisation')
             .then(()=> dropCollection('Product'))
-    })
+    });
 
     beforeEach(()=>{
         return dropCollection('Organisation')
@@ -112,7 +118,7 @@ describe('scheduled.keyRotation.DbQueries',()=>{
             .then(() => dbConnection.collection('Product').update({_id: '4399ba47-c0b7-46df-ac6f-13c9409fea02'},{'name' : 'product1',},{upsert: true}))
             .then(() => dbConnection.collection('Product').update({_id: '1dfd1a9c-51fd-41e6-9b1d-88b2e12cab65'},{'name' : 'product2',},{upsert: true}))
             .then(() => dbConnection.collection('Product').update({_id: 'b50b244a-e183-4855-b815-ee40208e1a22'},{'name' : 'product3',},{upsert: true}))
-    })
+    });
 
     describe('getProducts', () =>{
         it('Should return contents of product collection', () =>{
@@ -133,7 +139,7 @@ describe('scheduled.keyRotation.DbQueries',()=>{
                    let fields  = Object.keys(result[0]);
                    should(fields).eql(['_id','productId','token']) ;
                 })
-        })
+        });
 
         it('Should ignore products that are excluded', () => {
             return queries.getOrgsToRotate(['productId1','productId3'])
@@ -215,19 +221,18 @@ describe('scheduled.keyRotation.DbQueries',()=>{
         })
     });
 
-    const dropCollection = (name) =>{
+    const dropCollection = (name) => {
         return collectionExists(name)
             .then((exists) =>{
-                return exists ? dbConnection.collection(name).drop() : Promise.resolve();
+                if (exists) {
+                    return dbConnection.collection(name).drop();
+                }
             })
-    }
+    };
 
     const collectionExists = (name) =>{
         return dbConnection.listCollections().toArray()
-            .then((collections)=>{
-                let result =  _.find(collections, (collection) => collection.name === name );
-                return result;
-            })
+            .then((collections)=>  _.find(collections, (collection) => collection.name === name ));
     }
 });
 

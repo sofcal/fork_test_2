@@ -1,41 +1,46 @@
+const Promise = require('bluebird');
 const should = require('should');
-const sinon = require('sinon');
 const _ = require('underscore');
 const DB =  require('internal-services-db');
-const DbQueries = require('../../lib/DbQueries')
+const DbQueries = require('../../lib/DbQueries');
 const Rule = require('internal-contracts-rule').Rule;
 const RuleBucket = require('internal-contracts-rule').RuleBucket;
 
-describe.only('machineLearning-actualActionsProcessor',() => {
+describe('machineLearning-actualActionsProcessor',() => {
     let db;
     let dbConnection;
     let queries;
 
     before(()=>{
-        db = new DB({env:'', region:'', domain:'', username:'', password:'', replicaSet:''});
-        db.connectionString = 'mongodb://localhost';
-        return db.connect('bank_db')
+        db = new DB({ localhost: true, db: 'machineLearning'});
+        return db.connect()
             .then((result) => {
                 dbConnection = result;
                 queries = new DbQueries(dbConnection);
             })
-    })
+    });
 
-    after(()=>{
-        return db.disconnect();
-    })
+    after(()=> {
+        return Promise.resolve(undefined)
+            .then(() => {
+                const connection = db.getConnection();
+                if(connection) {
+                    return connection.dropDatabase();
+                }
+            })
+            .then(() => db.disconnect());
+    });
 
     afterEach(()=>{
      /* return dropCollection('Transaction').then(()=>{
             return dropCollection('Rule');
         })*/
-    })
+    });
 
     beforeEach(()=>{
-        return dropCollection('Transaction').then(()=>{
-            return dropCollection('Rule');
-        })
-    })
+        return dropCollection('Transaction')
+            .then(()=> dropCollection('Rule'))
+    });
 
     describe('getTransactions', () => {
         it('Should return relevant properties on transactions across multiple buckets', () => {
@@ -62,14 +67,14 @@ describe.only('machineLearning-actualActionsProcessor',() => {
                 return queries.getRuleBucket('96616525-c5a3-4958-b1ee-fb856fd83403','5c94f4b7-bf84-418f-a6c6-a26349034a81').then((result) => {
                     should(result.rules.length).eql(1);
                     should(result.rules[0].uuid).eql('cb5e2c41-f3b8-4a8c-9d9c-12c8db9ab12c');
-                    should(result.etag).exists;
+                    should.exist(result.etag);
                     should(result.etag).not.eql(1535546756592.0);
 
                     const bucket = new RuleBucket(result);
                     bucket.validate();
                 })    
             })
-        })
+        });
 
         it('Should create a new bucket if does not exist', () =>{
             const testRules = require('./data/rules.json');
@@ -78,7 +83,7 @@ describe.only('machineLearning-actualActionsProcessor',() => {
                     should(result.organisationId).eql('d64c62df-2f23-49d1-aa35-d3b60a1945a5');
                     should(result.bankAccountId).eql('8e286041-53bb-485a-9cc4-8178098e9252');
                     should(result.rules.length).eql(0);
-                    should(result.etag).exists;
+                    should.exist(result.etag);
                 
                     const bucket = new RuleBucket(result);
                     bucket.validate();
@@ -86,7 +91,7 @@ describe.only('machineLearning-actualActionsProcessor',() => {
             })
 
         })
-    })
+    });
 
     describe('addFeedbackRule', () => {
         it('should add a feedback rule to an empty bucket.', () => {
@@ -103,7 +108,7 @@ describe.only('machineLearning-actualActionsProcessor',() => {
                     should(bucket.rules[0].ruleName).eql('integrationTestRule1');
                 });   
             });
-        })
+        });
 
         it('should add a feedback rule to an existing bucket.', () => {
             const newRule = new Rule();
@@ -125,20 +130,19 @@ describe.only('machineLearning-actualActionsProcessor',() => {
                     });  
                 })
         })
-    })
+    });
 
     const collectionExists = (name) =>{
         return dbConnection.listCollections().toArray()
-            .then((collections)=>{
-                let result =  _.find(collections, (collection) => collection.name === name );
-                return result;
-            })
-    }
+            .then((collections)=> _.find(collections, (collection) => collection.name === name ));
+    };
 
     const dropCollection = (name) =>{
         return collectionExists(name)
-            .then((exists) =>{
-                return exists ? dbConnection.collection(name).drop() : Promise.resolve();
+            .then((exists) => {
+                if (exists) {
+                    return dbConnection.collection(name).drop();
+                }
             })
     }
 });

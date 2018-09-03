@@ -9,6 +9,7 @@ class RequestLogger {
         this.request = Object.assign({}, this.request, extension);
     }
 
+    /* eslint-disable no-console */
     debug(data) {
         const timestamp = new Date().toISOString();
         console.log(JSON.stringify(Object.assign({ '@timestamp': timestamp, severity: 'DEBUG' }, this.request, data)));
@@ -28,6 +29,7 @@ class RequestLogger {
         const timestamp = new Date().toISOString();
         console.error(JSON.stringify(Object.assign({ '@timestamp': timestamp, severity: 'ERROR' }, this.request, data)));
     }
+    /* eslint-enable no-console */
 
     static Create(...args) {
         return new RequestLogger(...args);

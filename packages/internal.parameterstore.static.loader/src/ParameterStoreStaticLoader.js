@@ -4,8 +4,8 @@ const Promise = require('bluebird');
 const AWS = require('aws-sdk');
 
 class ParameterStoreStaticLoader {
-    constructor({keys=null, paramPrefix=null, env: { region } = {}, ssm}){
-        if(!region) {
+    constructor({ keys = null, paramPrefix = null, env: { region } = {}, ssm }) {
+        if (!region) {
             throw new Error('[ParameterStoreStaticLoader] invalid region');
         }
 
@@ -27,22 +27,22 @@ class ParameterStoreStaticLoader {
 ParameterStoreStaticLoader.MaxResults = 10;
 
 const loadImpl = Promise.method((self, params) => {
-    const keys = self.keys;
+    const { keys } = self;
 
-    if(!keys) {
+    if (!keys) {
         throw new Error('[ParameterStoreStaticLoader] keys object missing');
     }
 
     const prefix = self.paramPrefix;
-    const list = self.keys;//.split(',');
-    const MaxResults = ParameterStoreStaticLoader.MaxResults;
+    const list = self.keys;
+    const { MaxResults } = ParameterStoreStaticLoader;
 
     // we're still limited to 10 results at a
-    const getPage = Promise.method((keys, params) => {
-        const req = { Names: keys, WithDecryption: true };
+    const getPage = Promise.method((Names, p) => {
+        const req = { Names, WithDecryption: true };
 
         return self.ssm.getParametersAsync(req)
-            .then((response) => mapResponse(params, response, prefix));
+            .then((response) => mapResponse(p, response, prefix));
     });
 
     // parameters might be hierarchical in AWS. We add a prefix to the keys so they can be provided without environment specific
@@ -50,9 +50,9 @@ const loadImpl = Promise.method((self, params) => {
 
     const groups = [];
     for (let i = 0; i < list.length; ++i) {
-        const div = Math.floor(i/MaxResults);
-        const mod = i%MaxResults;
-        if(!(mod)){
+        const div = Math.floor(i / MaxResults);
+        const mod = i % MaxResults;
+        if (!(mod)) {
             groups[div] = [];
         }
 
@@ -63,8 +63,10 @@ const loadImpl = Promise.method((self, params) => {
 });
 
 const mapResponse = (params, response, prefix) => {
-    for (let p of response.Parameters) {
+    // for loop used for performance reasons
+    for (const p of response.Parameters) { // eslint-disable-line no-restricted-syntax
         const name = p.Name.substring(prefix ? prefix.length : 0);
+        // eslint-disable-next-line no-param-reassign
         params[name] = p.Type === 'StringList' ? p.Value.split(',') : p.Value;
     }
 };

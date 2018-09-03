@@ -4,7 +4,7 @@ const Promise = require('bluebird');
 const impl = require('./impl');
 const ErrorSpecs = require('./ErrorSpecs');
 
-const { ParameterStoreStaticLoader } = require('internal-parameterstorestaticloader');
+const { ParameterStoreStaticLoader } = require('internal-parameterstore-static-loader');
 const { RequestLogger } = require('internal-request-logger');
 const { StatusCodeError } = require('internal-status-code-error');
 
@@ -13,6 +13,8 @@ const DB = require('internal-services-db');
 const serviceImpls = { DB };
 
 const keys = require('./params');
+
+const dbName = 'bank_db';
 
 module.exports.run = (event, context, callback) => {
     const func = 'handler.run';
@@ -104,9 +106,9 @@ const connectDB = (services, { env, region }, params, logger) => {
     } = params;
 
     // eslint-disable-next-line no-param-reassign
-    services.db = serviceImpls.DB.Create({ env, region, domain, username, password, replicaSet });
+    services.db = serviceImpls.DB.Create({ env, region, domain, username, password, replicaSet, db: dbName });
 
-    return services.db.connect('bank_db')
+    return services.db.connect()
         .then((db) => {
             logger.info({ function: func, log: 'ended' });
             return db;
