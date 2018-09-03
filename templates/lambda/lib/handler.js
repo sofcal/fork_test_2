@@ -22,7 +22,7 @@ module.exports.run = (event, context, callback) => {
     event.logger.info({ function: func, log: 'started' });
 
     // these environment variables allow us to retrieve the correct param-store values for more configurable options
-    const { env = 'test', AWS_REGION: region = 'local' } = event;
+    const { Environment: env, AWS_REGION: region } = process.env;
     const services = {};
 
     return Promise.resolve(undefined)
@@ -78,16 +78,17 @@ const getParams = ({ env, region }, logger) => {
 
     const loader = ParameterStoreStaticLoader.Create({ keys, paramPrefix, env: { region } });
     return loader.load(params)
-        .then((retrieved) => {
-            const retrievedCount = Object.keys(retrieved).length;
+        .then(() => {
+            const retrievedCount = Object.keys(params).length;
+
             logger.info({ function: func, log: 'finished retrieving param-store keys', requested: keys.length, retrieved: retrievedCount });
 
-            if (!retrieved || retrievedCount < keys.length) {
+            if (!retrievedCount || retrievedCount < keys.length) {
                 throw StatusCodeError.CreateFromSpecs([ErrorSpecs.failedToRetrieveParameters], ErrorSpecs.failedToRetrieveParameters.statusCode);
             }
 
             logger.info({ function: func, log: 'ended' });
-            return retrieved;
+            return params;
         });
 };
 
