@@ -1,6 +1,7 @@
 'use strict';
 
 const Promise = require('bluebird');
+const _ = require('underscore');
 const validate = require('./validators');
 const DbQueries = require('./DbQueries');
 const FeedBackRuleGenerator = require('./FeedbackRuleGenerator');
@@ -11,12 +12,18 @@ module.exports.run = Promise.method((event, params, services) => {
 
     validate.event(event);
 
-    const dbQueries = new DbQueries(services.db);
+    const dbQueries = new DbQueries(services.db.getConnection());
     const feedbackRuleGenerator = new FeedBackRuleGenerator(event.logger, dbQueries);
 
-    const bankAccountId = event.Records[0].body.message.content.baId;
-    const organisationid = event.Records[0].body.message.content.orgId;
-    const transactionIds = _.map(event.records, (evtRec) => evtRec.body.message.content.trId);
+    const notifications = _.map(event.Records, (evtRec) => {
+        const body = JSON.parse(evtRec.body);
+        return JSON.parse(body.Message);
+    });
+   
+    event.logger.info({ function: func, log: `notifications: ${JSON.stringify(notifications)}` });
+    const bankAccountId = notifications[0].baId;
+    const organisationid = notifications[0].orgId;
+    const transactionIds = _.map(notifications, (notification) => notification.trId);
 
     let successCount = 0;
     return dbQueries.getTransactions(bankAccountId, transactionIds).then((trasactions) => {

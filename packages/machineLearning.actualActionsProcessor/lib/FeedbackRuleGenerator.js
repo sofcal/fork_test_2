@@ -27,7 +27,7 @@ const processTransactionImpl = Promise.method((self, orgId, baId, transaction) =
     newRule.ruleConditions = [];
     newRule.ruleActions = [];
 
-    return self.dbQueries.addFeedbackRule(orgId, paramId, newRule).then(() => {
+    return self.dbQueries.addFeedbackRule(orgId, baId, newRule).then(() => {
         self.logger.info({ function: func, log: 'ended' });
     });
 });
