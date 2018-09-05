@@ -1105,5 +1105,70 @@ describe('services.ruleService', function () {
             })
 
         })
+
+        describe.only('CreateFromActualActionImpl', () => {
+            it('Should create a rule with a single accounts posting', (done) => {
+                let transaction = require('./data/actualActionTransaction.json');
+                let newFeedbackRule = Rule.createFromActualAction(transaction, transaction.transactionNarrative);
+
+                //console.log('** FeedBack Rule:', JSON.stringify(newFeedbackRule));
+                newFeedbackRule.validate();
+
+                should(newFeedbackRule.ruleName).eql('Feedback Rule: Ref001');
+                should(newFeedbackRule.ruleRank).eql(1);
+
+                should(newFeedbackRule.ruleConditions.length).eql(1);
+                should(newFeedbackRule.ruleConditions[0].ruleField).eql('transactionNarrative');
+                should(newFeedbackRule.ruleConditions[0].ruleOperation).eql('contains');
+                should(newFeedbackRule.ruleConditions[0].ruleCriteria).eql('Ref001');
+
+                should(newFeedbackRule.ruleActions.length).eql(1);
+                should(newFeedbackRule.ruleActions[0].splitPercentage).eql(100);
+                should(newFeedbackRule.ruleActions[0].accountantNarrative).eql('narrative');
+                should(newFeedbackRule.ruleActions[0].accountsPostings.length).eql(1);
+                should(newFeedbackRule.ruleActions[0].accountsPostings[0].type).eql('supplier');
+                should(newFeedbackRule.ruleActions[0].accountsPostings[0].code).eql('SUPP1');
+
+                done();
+            })
+
+            it('Should create rule with mutliple accounts postings and split percentage', (done) => {
+                let transaction = require('./data/actualActionTransactionMultiplePostings.json');
+                let newFeedbackRule = Rule.createFromActualAction(transaction, transaction.transactionNarrative);
+                
+                //console.log('** FeedBack Rule:', JSON.stringify(newFeedbackRule));
+                newFeedbackRule.validate();
+
+                should(newFeedbackRule.ruleName).eql('Feedback Rule: Ref001');
+                should(newFeedbackRule.ruleRank).eql(1);
+    
+                should(newFeedbackRule.ruleConditions.length).eql(1);
+                should(newFeedbackRule.ruleConditions[0].ruleField).eql('transactionNarrative');
+                should(newFeedbackRule.ruleConditions[0].ruleOperation).eql('contains');
+                should(newFeedbackRule.ruleConditions[0].ruleCriteria).eql('Ref001');
+
+                should(newFeedbackRule.ruleActions.length).eql(3);
+                should(newFeedbackRule.ruleActions[0].splitPercentage).eql(20);
+                should(newFeedbackRule.ruleActions[0].accountantNarrative).eql('narrative');
+                should(newFeedbackRule.ruleActions[0].accountsPostings.length).eql(1);
+                should(newFeedbackRule.ruleActions[0].accountsPostings[0].type).eql('supplier');
+                should(newFeedbackRule.ruleActions[0].accountsPostings[0].code).eql('SUPP2');
+
+                should(newFeedbackRule.ruleActions[1].splitPercentage).eql(50);
+                should(newFeedbackRule.ruleActions[1].accountantNarrative).eql('narrative');
+                should(newFeedbackRule.ruleActions[1].accountsPostings.length).eql(1);
+                should(newFeedbackRule.ruleActions[1].accountsPostings[0].type).eql('supplier');
+                should(newFeedbackRule.ruleActions[1].accountsPostings[0].code).eql('SUPP1');
+
+                should(newFeedbackRule.ruleActions[2].splitPercentage).eql(100);
+                should(newFeedbackRule.ruleActions[2].accountantNarrative).eql('narrative');
+                should(newFeedbackRule.ruleActions[2].accountsPostings.length).eql(1);
+                should(newFeedbackRule.ruleActions[2].accountsPostings[0].type).eql('supplier');
+                should(newFeedbackRule.ruleActions[2].accountsPostings[0].code).eql('SUPP3');
+
+                done();
+
+            })
+        })
     })
 });

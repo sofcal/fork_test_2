@@ -7,6 +7,7 @@ const { StatusCodeError, StatusCodeErrorItem } = require('internal-status-code-e
 const { toStatusCodeError, toStatusCodeErrorItems } = require('internal-jsonschema-to-statuscodeerror');
 const access = require('safe-access');
 const _ = require('underscore');
+const Big = require('bignumber.js');
 
 class Rule {
     constructor(data) {
@@ -29,6 +30,10 @@ class Rule {
     static Create(...args) {
         return new Rule(...args);
     }
+
+    static createFromActualAction(...args){
+        return createFromActualActionImpl(...args);
+    };
 
     validate(noThrow = false) {
         return Rule.validate(this, noThrow);
@@ -167,6 +172,60 @@ const getRuleTypesToProcessImpl = (bankAccount) => {
         ruleTypesToProcess.push(Rule.ruleTypes.global);
     }
     return ruleTypesToProcess;
+};
+
+const createFromActualActionImpl = (transaction, narrativeCriteria) => {
+    const actualAccountsPostings = access(transaction,'actualAction.action.accountsPosting.accountsPostings');
+    if ((actualAccountsPostings === null) || actualAccountsPostings.length === 0) {
+        return null;
+    }
+
+    const ruleData = {};
+    ruleData.ruleName = `Feedback Rule: ${narrativeCriteria}`;
+    ruleData.ruleName = ruleData.ruleName.substring(0, 200);
+    ruleData.ruleRank = 1;
+
+    ruleData.ruleConditions = [{
+        ruleField: 'transactionNarrative',
+        ruleOperation: Rule.operations.contains,
+        ruleCriteria: narrativeCriteria,
+    }];
+
+    let amountToSplit = new Big(transaction.transactionAmount);
+    const ruleActions = [];
+
+    _.each(actualAccountsPostings, (actualAccountsPosting) => {
+        const ruleAction = {};
+
+        ruleAction.splitPercentage = (new Big(actualAccountsPosting.grossAmount)).div(amountToSplit).times(100).toNumber();
+
+        if (ruleAction.splitPercentage.toString().length >= 15) {
+            // can't even construct a big number with more than 15 significant DP
+            const splitPercentageTrunc = ruleAction.splitPercentage.toString().substring(0, 15);
+            // eslint-disable-next-line no-param-reassign
+            ruleAction.splitPercentage = parseFloat(splitPercentageTrunc);
+        }
+        amountToSplit -= (new Big(amountToSplit)).times(ruleAction.splitPercentage).div(100).round(2);
+
+        ruleAction.accountantNarrative = actualAccountsPosting.accountantNarrative;
+
+        const ruleAccountsPostingInstructions = [];
+        _.each(actualAccountsPosting.postingInstructions, (actualPostingInstr) => {
+            const ruleAccountsPostingInstruction = {};
+            ruleAccountsPostingInstruction.type = actualPostingInstr.type;
+            ruleAccountsPostingInstruction.code = actualPostingInstr.code;
+            ruleAccountsPostingInstructions.push(ruleAccountsPostingInstruction);
+        });
+        ruleAction.accountsPostings = ruleAccountsPostingInstructions;
+        ruleActions.push(ruleAction);
+    });
+
+    ruleData.ruleActions = ruleActions;
+    ruleData.ruleStatus = 'Active';
+    ruleData.ruleType = 'Feedback';
+    ruleData.targetType = 'Transaction';
+
+    return new Rule(ruleData);
 };
 
 const _Keys = [

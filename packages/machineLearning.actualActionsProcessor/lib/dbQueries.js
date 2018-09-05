@@ -40,7 +40,7 @@ const getTransactionsImpl = Promise.method((self, bankAccountId, transactionIds)
             return Promise.each(buckets, (bucket) => {
                 _.each(bucket.transactions, (t) => {
                     if (_.contains(sorted, t.incrementedId)) {
-                        result.push({incrementedId: t.incrementedId, transactionAmount: t.transactionAmount, actualAction: t.actualAction});
+                        result.push({incrementedId: t.incrementedId, transactionAmount: t.transactionAmount, transactionNarrative: t.transactionNarrative, actualAction: t.actualAction});
                     }
                 });
             });
@@ -85,18 +85,18 @@ const addFeedbackRuleImpl = Promise.method((self, organisationId, bankAccountId,
             }
 
             let ruleAlreadyExists = false;
-            const newFeedbackRuleCriteria = access(newRule, 'ruleConditions[0]');
+            const newFeedbackRuleCriteria = access(newRule, 'ruleConditions[0].ruleCriteria');
             _.find(bucket.rules, (rule) => {
                 if (rule.ruleType === Rule.ruleTypes.feedback) {
-                    const exisitingRuleCriteris = access(rules, 'ruleConditions[0]');
-                    if (newFeedbackRuleCriteria === exisitingRuleCriteris) {
+                    const exisitingRuleCriteria = access(rule, 'ruleConditions[0].ruleCriteria');
+                    if (newFeedbackRuleCriteria === exisitingRuleCriteria) {
                         ruleAlreadyExists = true;
                     }
                 }
             });
 
             if (ruleAlreadyExists) {
-                return;
+                return  {ruleAlreadyExists };
             }
 
             bucket.rules = RuleBucket.addOrUpdateRuleByRank(bucket.rules, newRule);
@@ -109,7 +109,7 @@ const addFeedbackRuleImpl = Promise.method((self, organisationId, bankAccountId,
             return self.db.collection('Rule').updateOne(query, {$set: bucket},  options);
         })
         .then((result) => {       
-            if (result.modifiedCount !== 1) {
+            if ((!result.ruleAlreadyExists) && result.modifiedCount !== 1) {
                 throw new Error('Failed to update rule bucket for new rule.');
             }
         });

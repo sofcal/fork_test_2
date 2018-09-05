@@ -16,17 +16,9 @@ class FeedbackRuleGenerator {
 }
 const processTransactionImpl = Promise.method((self, orgId, baId, transaction) => {
     const func = 'impl.run';
-    self.logger.info({ function: func, log: 'started' });
+    self.logger.info({ function: func, log: 'started', params: { orgId, baId, transactionId: transaction.incrementedId } });
 
-    console.log('**Transaction:', JSON.stringify(transaction));
-
-    const newRule = new Rule();
-    newRule.ruleName = 'integrationTestRule1';
-    newRule.targetType = 'Transaction';
-    newRule.status = 'active';
-    newRule.ruleConditions = [];
-    newRule.ruleActions = [];
-
+    const newRule = Rule.createFromActualAction(transaction, transaction.transactionNarrative);
     return self.dbQueries.addFeedbackRule(orgId, baId, newRule).then(() => {
         self.logger.info({ function: func, log: 'ended' });
     });
