@@ -110,7 +110,7 @@ const addFeedbackRuleImpl = Promise.method((self, organisationId, bankAccountId,
                 return self.db.collection('Rule').updateOne(query, {$set: bucket},  options);
             }
         })
-        .then((result) => {   
+        .then((result) => {  
             if ((!result.ruleAlreadyExists) && result.modifiedCount !== 1) {
                 const retryErr = new Error('Failed to update rule bucket for new rule.');
                 retryErr.failLambda = true;

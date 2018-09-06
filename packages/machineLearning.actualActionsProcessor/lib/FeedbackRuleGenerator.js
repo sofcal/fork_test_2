@@ -26,8 +26,13 @@ const processTransactionImpl = Promise.method((self, orgId, baId, transaction) =
             });
         })
         .catch((err) => {
-        
             self.logger.info({ function: func, log: 'Failed to process transaction', err });
+
+            if (err.failLambda) {
+                throw err;  // retry lamda sqs batch
+            } else {
+                // log and continue
+            }
         });
 });
 
