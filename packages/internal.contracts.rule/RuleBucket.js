@@ -134,17 +134,22 @@ const resetRuleRanksImpl = (rules) => {
     });
 };
 
-const checkForDuplicateRuleNamesImpl = (bucket) => {
+const checkForDuplicateRuleNamesImpl = (bucket, doNotThrow) => {
+    let duplicatesPresent = false;
     const duplicates = [];
+
     _.chain(bucket.rules)
         .pluck('ruleName')
         .each((rn) => {
             if (_.contains(duplicates, rn)) {
-                throw new StatusCodeError([new StatusCodeErrorItem('AlreadyExists', `A rule with the given name already exists: ${rn}`)], 409);
+                if (!doNotThrow) {
+                    throw new StatusCodeError([new StatusCodeErrorItem('AlreadyExists', `A rule with the given name already exists: ${rn}`)], 409);
+                }
+                duplicatesPresent = true;
             }
-
             duplicates.push(rn);
         });
+    return duplicatesPresent;
 };
 
 module.exports = RuleBucket;

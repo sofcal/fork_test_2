@@ -18,10 +18,17 @@ const processTransactionImpl = Promise.method((self, orgId, baId, transaction) =
     const func = 'impl.run';
     self.logger.info({ function: func, log: 'started', params: { orgId, baId, transactionId: transaction.incrementedId } });
 
-    const newRule = Rule.createFromActualAction(transaction, transaction.transactionNarrative);
-    return self.dbQueries.addFeedbackRule(orgId, baId, newRule).then(() => {
-        self.logger.info({ function: func, log: 'ended' });
-    });
+    return Promise.resolve()
+        .then(() => {
+            const newRule = Rule.createFromActualAction(transaction, transaction.transactionNarrative);
+            return self.dbQueries.addFeedbackRule(orgId, baId, newRule).then(() => {
+                self.logger.info({ function: func, log: 'ended' });
+            });
+        })
+        .catch((err) => {
+        
+            self.logger.info({ function: func, log: 'Failed to process transaction', err });
+        });
 });
 
 module.exports = FeedbackRuleGenerator;

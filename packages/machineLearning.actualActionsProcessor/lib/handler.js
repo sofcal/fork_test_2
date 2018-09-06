@@ -62,7 +62,7 @@ module.exports.run = (event, context, callback) => {
             const status = statusCodeError.statusCode;
 
             event.logger.info({ function: func, log: `sending failure response: ${status}`, response });
-            callback(null, { statusCode: status, body: JSON.stringify(response) });
+            callback(err.failLambda ? err : null, { statusCode: status, body: JSON.stringify(response) });
         })
         .finally(() => {
             return disconnectDB(services, event.logger);

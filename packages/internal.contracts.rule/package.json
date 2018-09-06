@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "clean": "rm -rf ./coverage/ && rm -rf ./.nyc_output/ && rm -rf ./.serverless/ && rm -rf ./node_modules/",
-    "test": "NODE_ENV=test nyc --cache false --x test/ mocha -b --colors \"./tests/units/**/*.js\"",
+    "test": "NODE_ENV=test nyc --cache false --x test/ mocha -b --colors \"./test/unit/**/*.js\"",
     "cover": "NODE_ENV=test npm run test && nyc report --reporter=lcov",
     "report": "open coverage/lcov-report/index.html",
     "int": "NODE_ENV=test nyc --x lib/_legacy --x test/ mocha -b --colors --reporter spec \"./tests/integration/**/*.js\"",
@@ -20,7 +20,8 @@
     "internal-status-code-error": "^1.0.0",
     "jsonschema": "^1.1.1",
     "safe-access": "^0.1.0",
-    "underscore": "^1.9.0"
+    "underscore": "^1.9.0",
+    "bignumber.js": "^4.0.0"
   },
   "devDependencies": {
     "babel-eslint": "^8.0.2",

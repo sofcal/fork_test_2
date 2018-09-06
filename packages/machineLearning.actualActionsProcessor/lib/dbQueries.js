@@ -72,7 +72,6 @@ const getRuleBucketImpl = Promise.method((self, organisationId, bankAccountId) =
         });
 });
 
-// should it be called feedback rule - creation
 const addFeedbackRuleImpl = Promise.method((self, organisationId, bankAccountId, newRule) => {
     Rule.validate(newRule);
     newRule.uuid = uuid();
@@ -100,17 +99,22 @@ const addFeedbackRuleImpl = Promise.method((self, organisationId, bankAccountId,
             }
 
             bucket.rules = RuleBucket.addOrUpdateRuleByRank(bucket.rules, newRule);
-            RuleBucket.checkForDuplicateRuleNames(bucket);
-            bucket.numberOfRules++;
-          
-            const query = { _id: bucket._id, etag: bucket.etag};
-            const options = {upsert: false};
+            const duplicates = RuleBucket.checkForDuplicateRuleNames(bucket, true);
 
-            return self.db.collection('Rule').updateOne(query, {$set: bucket},  options);
+            if (!duplicates) {
+                bucket.numberOfRules += 1;
+          
+                const query = { _id: bucket._id, etag: bucket.etag};
+                const options = {upsert: false};
+    
+                return self.db.collection('Rule').updateOne(query, {$set: bucket},  options);
+            }
         })
-        .then((result) => {       
+        .then((result) => {   
             if ((!result.ruleAlreadyExists) && result.modifiedCount !== 1) {
-                throw new Error('Failed to update rule bucket for new rule.');
+                const retryErr = new Error('Failed to update rule bucket for new rule.');
+                retryErr.failLambda = true;
+                throw retryErr;
             }
         });
 });
