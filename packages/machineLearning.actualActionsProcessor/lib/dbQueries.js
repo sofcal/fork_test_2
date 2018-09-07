@@ -18,6 +18,10 @@ class DbQueries {
         return getTransactionsImpl(this, ...args);
     }
 
+    getNarrativeDictionary(...args) {
+        return getNarrativeDictionaryImpl(this, ...args);
+    }
+
     addFeedbackRule(...args) {
         return addFeedbackRuleImpl(this, ...args);
     }
@@ -46,6 +50,19 @@ const getTransactionsImpl = Promise.method((self, bankAccountId, transactionIds)
             });
         })
         .then(() => result);
+});
+
+const getNarrativeDictionaryImpl = Promise.method((self, countryCode) => {
+    const where = {countryCode };
+
+    return self.db.collection('NarrativeDictionary').find(where).toArray()
+        .then((dictionaries) => {
+            if (dictionaries.length > 1) {
+                throw new Error(`More than one dictionary found for ${countryCode}`);
+            }
+
+            return dictionaries[0];
+        });
 });
 
 const getRuleBucketImpl = Promise.method((self, organisationId, bankAccountId) => {

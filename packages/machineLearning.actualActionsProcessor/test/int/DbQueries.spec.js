@@ -32,9 +32,11 @@ describe('machineLearning-actualActionsProcessor',() => {
     });
 
     afterEach(()=>{
-     /* return dropCollection('Transaction').then(()=>{
-            return dropCollection('Rule');
-        })*/
+        return dropCollection('Transaction').then(()=>{
+            return dropCollection('Rule').then(()=> {
+                return dropCollection('NarrativeDictionary');
+            })
+        })
     });
 
     beforeEach(()=>{
@@ -131,6 +133,27 @@ describe('machineLearning-actualActionsProcessor',() => {
                 })
         })
     });
+
+    describe('getNarrativeDictionary', () => {
+        it('should return a narrative dictionary for a country code', () => {
+            const testDictionaries = require('./data/narrativeDictionary.json');
+            return dbConnection.collection('NarrativeDictionary').insertMany(testDictionaries).then(() => {
+                return queries.getNarrativeDictionary('GBR').then((dictionaryEntry) => {
+                    should(dictionaryEntry.countryCode).eql('GBR');
+                    should(dictionaryEntry.data.length).eql(27349);
+                })
+            }); 
+        });
+
+        it('should return null when no narrative dictionary exists for the country code', () => {
+            const testDictionaries = require('./data/narrativeDictionary.json');
+            return dbConnection.collection('NarrativeDictionary').insertMany(testDictionaries).then(() => {
+                return queries.getNarrativeDictionary('IRL').then((dictionaryEntry) => {
+                    should(dictionaryEntry).eql(undefined);
+                })
+            }); 
+        });
+    })
 
     const collectionExists = (name) =>{
         return dbConnection.listCollections().toArray()
