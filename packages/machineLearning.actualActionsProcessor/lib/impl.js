@@ -19,21 +19,19 @@ module.exports.run = Promise.method((event, params, services) => {
         const body = JSON.parse(evtRec.body);
         return JSON.parse(body.Message);
     });
-   
-    event.logger.info({ function: func, log: `notifications: ${JSON.stringify(notifications)}` });
-    const bankAccountId = notifications[0].baId;
-    const organisationid = notifications[0].orgId;
-    const transactionIds = _.map(notifications, (notification) => notification.trId);
 
-    let successCount = 0;
-    return dbQueries.getTransactions(bankAccountId, transactionIds).then((trasactions) => {
-        return Promise.each(trasactions, (transaction) => {
-            return feedbackRuleGenerator.ProcessTransaction(organisationid, bankAccountId, transaction).then(() => {
-                successCount += 1;
+    event.logger.info({ function: func, log: `notifications: ${JSON.stringify(notifications)}` });
+
+    let processed = 0;
+    return Promise.each(notifications, (notification) => {
+        return dbQueries.getTransactions(notification.baId, [notification.trId]).then((trasactions) => {
+            return Promise.each(trasactions, (transaction) => {
+                return feedbackRuleGenerator.ProcessTransaction(notification.orgId, notifications.baId, transaction).then(()=>{
+                     processed += 1;
+                })
             });
-        });
     }).then(() => {
         event.logger.info({ function: func, log: 'ended' });
-        return { processed: successCount };
+        return { msg: `processed ${notifications.length} of ${processed}` };
     });
 });

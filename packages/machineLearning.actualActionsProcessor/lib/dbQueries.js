@@ -95,23 +95,22 @@ const addFeedbackRuleImpl = Promise.method((self, organisationId, bankAccountId,
             });
 
             if (ruleAlreadyExists) {
-                return  {ruleAlreadyExists };
+                return  {skippedCreation: true };
             }
 
             bucket.rules = RuleBucket.addOrUpdateRuleByRank(bucket.rules, newRule);
-            const duplicates = RuleBucket.checkForDuplicateRuleNames(bucket, true);
-
-            if (!duplicates) {
-                bucket.numberOfRules += 1;
-          
-                const query = { _id: bucket._id, etag: bucket.etag};
-                const options = {upsert: false};
-    
-                return self.db.collection('Rule').updateOne(query, {$set: bucket},  options);
+            if (RuleBucket.checkForDuplicateRuleNames(bucket, true)) {
+                return  {skippedCreation: true };
             }
+
+            bucket.numberOfRules += 1;
+          
+            const query = { _id: bucket._id, etag: bucket.etag};
+            const options = {upsert: false};    
+            return self.db.collection('Rule').updateOne(query, {$set: bucket},options);
         })
         .then((result) => {  
-            if ((!result.ruleAlreadyExists) && result.modifiedCount !== 1) {
+            if ((!result.skippedCreation) && result.modifiedCount !== 1) {
                 const retryErr = new Error('Failed to update rule bucket for new rule.');
                 retryErr.failLambda = true;
                 throw retryErr;
