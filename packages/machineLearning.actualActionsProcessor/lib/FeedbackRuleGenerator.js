@@ -30,7 +30,7 @@ const processTransactionImpl = Promise.method((self, orgId, baId, transaction, c
         .then((narrativeDictionary) => {
             const match = narrativeDictionary.matches(transaction.transactionNarrative);
 
-            if (match.matches) {
+            if (match.matches.length > 0) {
                 self.logger.info({ function: func, log: `'Match for: ${transaction.transactionNarrative}`});
                 const newRule = Rule.createFromActualAction(transaction, match.longest);
                 return self.dbQueries.addFeedbackRule(orgId, baId, newRule).then(() => self.logger.info({ function: func, log: 'ended' }));
@@ -46,7 +46,7 @@ const processTransactionImpl = Promise.method((self, orgId, baId, transaction, c
                 throw err;  // retry lamda sqs batch
             } else {
                 // log and continue
-                self.logger.info({ function: func, log: 'Continuing - Failed to process transaction', err : err.message });
+                self.logger.info({ function: func, log: 'Continuing - Failed to process transaction', err: err.message });
             }
         });
 });
@@ -57,7 +57,7 @@ const getNarrativeDictionaryImpl = Promise.method((self, countryCode) => {
     let narrativeDictionary = narrativeDictionaryCache[countryCode];
     if (!narrativeDictionary) {
         return self.dbQueries.getNarrativeDictionary(countryCode).then((narrativeDictionaryDoc) => {
-            narrativeDictionary = new NarrativeDictionaryContract.NarrativeDictionary(narrativeDictionaryDoc);
+            narrativeDictionary = new NarrativeDictionaryContract.NarrativeDictionary(JSON.parse(narrativeDictionaryDoc.data));
             narrativeDictionaryCache[countryCode] = narrativeDictionary;
 
             if (!narrativeDictionary) {
@@ -65,6 +65,7 @@ const getNarrativeDictionaryImpl = Promise.method((self, countryCode) => {
                 self.logger.info({ function: func, log: 'ended' });
                 return null;
             }
+            self.logger.info({ function: func, log: 'ended' });
 
             return narrativeDictionary;
         });
