@@ -26,7 +26,7 @@ module.exports.run = Promise.method((event, params, services) => {
     return Promise.each(notifications, (notification) => {
         return dbQueries.getTransactions(notification.baId, [notification.trId]).then((trasactions) => {
             return Promise.each(trasactions, (transaction) => {
-                return feedbackRuleGenerator.ProcessTransaction(notification.orgId, notifications.baId, transaction, notification.region).then(() => {
+                return feedbackRuleGenerator.processTransaction(notification.orgId, notifications.baId, transaction, notification.region).then(() => {
                     processed += 1;
                 });
             });

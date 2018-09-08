@@ -53,7 +53,7 @@ const getTransactionsImpl = Promise.method((self, bankAccountId, transactionIds)
 });
 
 const getNarrativeDictionaryImpl = Promise.method((self, countryCode) => {
-    const where = {countryCode };
+    const where = { countryCode };
 
     return self.db.collection('NarrativeDictionary').find(where).toArray()
         .then((dictionaries) => {
