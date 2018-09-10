@@ -65,7 +65,7 @@ describe('machine-learning-actual-actions-processor', function(){  //TEMP:RJ:TES
                                 "ruleConditions" : [ 
                                     {
                                         "ruleField" : "transactionNarrative",
-                                        "ruleOperation" : "contains",
+                                        "ruleOperation" : "containsWords",
                                         "ruleCriteria" : "ACADEMY LEASING"
                                     }
                                 ],
@@ -148,7 +148,7 @@ describe('machine-learning-actual-actions-processor', function(){  //TEMP:RJ:TES
                                 "ruleConditions" : [ 
                                     {
                                         "ruleField" : "transactionNarrative",
-                                        "ruleOperation" : "contains",
+                                        "ruleOperation" : "containsWords",
                                         "ruleCriteria" : "ACADEMY LEASING"
                                     }
                                 ],
