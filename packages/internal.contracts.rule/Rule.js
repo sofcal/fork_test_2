@@ -187,7 +187,7 @@ const createFromActualActionImpl = (transaction, narrativeCriteria) => {
 
     ruleData.ruleConditions = [{
         ruleField: 'transactionNarrative',
-        ruleOperation: Rule.operations.contains,
+        ruleOperation: Rule.operations.containsWords,
         ruleCriteria: narrativeCriteria,
     }];
 

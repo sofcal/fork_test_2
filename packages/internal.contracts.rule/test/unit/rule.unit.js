@@ -1106,7 +1106,7 @@ describe('services.ruleService', function () {
 
         })
 
-        describe.only('CreateFromActualActionImpl', () => {
+        describe('CreateFromActualActionImpl', () => {
             it('Should create a rule with a single accounts posting', (done) => {
                 let transaction = require('./data/actualActionTransaction.json');
                 let newFeedbackRule = Rule.createFromActualAction(transaction, transaction.transactionNarrative);
@@ -1119,7 +1119,7 @@ describe('services.ruleService', function () {
 
                 should(newFeedbackRule.ruleConditions.length).eql(1);
                 should(newFeedbackRule.ruleConditions[0].ruleField).eql('transactionNarrative');
-                should(newFeedbackRule.ruleConditions[0].ruleOperation).eql('contains');
+                should(newFeedbackRule.ruleConditions[0].ruleOperation).eql('containsWords');
                 should(newFeedbackRule.ruleConditions[0].ruleCriteria).eql('Ref001');
 
                 should(newFeedbackRule.ruleActions.length).eql(1);
@@ -1144,7 +1144,7 @@ describe('services.ruleService', function () {
     
                 should(newFeedbackRule.ruleConditions.length).eql(1);
                 should(newFeedbackRule.ruleConditions[0].ruleField).eql('transactionNarrative');
-                should(newFeedbackRule.ruleConditions[0].ruleOperation).eql('contains');
+                should(newFeedbackRule.ruleConditions[0].ruleOperation).eql('containsWords');
                 should(newFeedbackRule.ruleConditions[0].ruleCriteria).eql('Ref001');
 
                 should(newFeedbackRule.ruleActions.length).eql(3);
