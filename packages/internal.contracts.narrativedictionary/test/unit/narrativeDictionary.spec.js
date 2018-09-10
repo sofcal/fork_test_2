@@ -238,7 +238,7 @@ describe('internal-contracts-narrativedictionary.NarrativeDictionary', function(
             }
         });
 
-        it('should set longest to the match with the most words', (done) => {
+        it('should set longest to the match with the most words', (done) => {  //TEMP:RJ:TESTMATRIX:FR10
             try {
                 const actual = narrativeDictionary.matches('one two');
                 const expected = { matches: ['one two', 'two'], longest: 'one two' };
@@ -251,7 +251,7 @@ describe('internal-contracts-narrativedictionary.NarrativeDictionary', function(
             }
         });
 
-        it('should set the first match (from the original list) as the longest if multiple same length matches are found', (done) => {
+        it('should set the first match (from the original list) as the longest if multiple same length matches are found', (done) => {  //TEMP:RJ:TESTMATRIX:FR11
             try {
                 const actual = narrativeDictionary.matches('two three four');
                 const expected = { matches: ['two', 'two three', 'three four'], longest: 'two three' };

@@ -36,12 +36,15 @@ describe('machineLearning-actualActionsProcessor',() => {
             return dropCollection('Rule').then(()=> {
                 return dropCollection('NarrativeDictionary');
             })
-        })
+        });
     });
 
     beforeEach(()=>{
-        return dropCollection('Transaction')
-            .then(()=> dropCollection('Rule'))
+        return dropCollection('Transaction').then(()=>{
+            return dropCollection('Rule').then(()=> {
+                return dropCollection('NarrativeDictionary');
+            })
+        });
     });
 
     describe('getTransactions', () => {
@@ -53,7 +56,7 @@ describe('machineLearning-actualActionsProcessor',() => {
                     return queries.getTransactions(bankAccountId,[1,5,6,7])
                         .then((result)=>{
                             should(result.length).eql(4);
-                            should(result[0].transactionAmount).eql(100);
+                            should(result[0].transactionAmount).eql(1000);
                             should(result[1].transactionAmount).eql(500);
                             should(result[2].transactionAmount).eql(600);
                             should(result[3].transactionAmount).eql(700);
@@ -140,7 +143,7 @@ describe('machineLearning-actualActionsProcessor',() => {
             return dbConnection.collection('NarrativeDictionary').insertMany(testDictionaries).then(() => {
                 return queries.getNarrativeDictionary('GBR').then((dictionaryEntry) => {
                     should(dictionaryEntry.countryCode).eql('GBR');
-                    should(dictionaryEntry.data.length).eql(27349);
+                    should(dictionaryEntry.data.length).eql(27320);
                 })
             }); 
         });

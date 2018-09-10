@@ -14,7 +14,7 @@
                 "datePosted" : "2018-04-24T21:41:14.001Z",
                 "dateUserInitiated" : null,
                 "dateFundsAvailable" : "2018-04-24T21:41:14.001Z",
-                "transactionAmount" : 100,
+                "transactionAmount" : 1000,
                 "transactionId" : null,
                 "incrementedId" : 1,
                 "correctionId" : null,
@@ -38,7 +38,7 @@
                 "dateFileArrived" : "2018-04-24T21:41:14.001Z",
                 "transactionHash" : "5bde78eb6da8b2d88cb29178b880b42858431a4006cc022344b7e3e6a544a1c1",
                 "accountsPostings" : [],
-                "transactionNarrative" : "NONREF CD FUNDING -MIAMISBG 031607AC#123456789012 RPM  116111500000000",
+                "transactionNarrative" : "NONREF ACADEMY LEASING RPM  116111500000000",
                 "internalProcessingStatus" : null,
                 "raw" : {
                     "fileName" : "2017_19122017082211_HSBCTestFile.txt",
@@ -48,7 +48,72 @@
                     "transactionCode" : "122"
                 },
                 "validationStatus" : "manual",
-                "predictedActions" : []
+                "predictedActions" : [],
+                "actualAction" : {
+                    "transactionId" : 1,
+                    "predictionId" : "aaaaaaaa-aaaa-aaaa-aaaa-000000000001",
+                    "action" : {
+                        "actionType" : "create",
+                        "accountsPosting" : {
+                            "accountsTransactionId" : "1",
+                            "type" : "DirectDebit",
+                            "reference" : "Rent June",
+                            "accountsPostings" : [ 
+                                {
+                                    "grossAmount" : 200,
+                                    "netAmount" : 160,
+                                    "taxAmount" : 40,
+                                    "accountantNarrative" : "narrative",
+                                    "postingInstructions" : [ 
+                                        {
+                                            "type" : "supplier",
+                                            "userDefinedTypeName" : "my_departments_uk",
+                                            "code" : "SUPP2",
+                                            "name" : "John's Skips",
+                                            "status" : "Account on hold",
+                                            "value" : 200,
+                                            "description" : "Invoice for supply of skip"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "grossAmount" : 400,
+                                    "netAmount" : 320,
+                                    "taxAmount" : 80,
+                                    "accountantNarrative" : "narrative",
+                                    "postingInstructions" : [ 
+                                        {
+                                            "type" : "supplier",
+                                            "userDefinedTypeName" : "my_departments_uk",
+                                            "code" : "SUPP1",
+                                            "name" : "Rich's Skips",
+                                            "status" : "Account on hold",
+                                            "value" : 1000,
+                                            "description" : "Invoice for supply of skip"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "grossAmount" : 400,
+                                    "netAmount" : 320,
+                                    "taxAmount" : 80,
+                                    "accountantNarrative" : "narrative",
+                                    "postingInstructions" : [ 
+                                        {
+                                            "type" : "supplier",
+                                            "userDefinedTypeName" : "my_departments_uk",
+                                            "code" : "SUPP3",
+                                            "name" : "Rich's Restaurant",
+                                            "status" : "Account on hold",
+                                            "value" : 1000,
+                                            "description" : "Invoice for supply of food"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                }
             }, 
             {
                 "uuid" : "00000000-0000-0000-0000-000000000000",

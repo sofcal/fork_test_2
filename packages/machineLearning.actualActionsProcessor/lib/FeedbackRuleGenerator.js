@@ -42,11 +42,11 @@ const processTransactionImpl = Promise.method((self, orgId, baId, transaction, c
         })
         .catch((err) => {
             if (err.failLambda) {
-                self.logger.info({ function: func, log: 'Failing - Failed to process transaction', err: err.message });
+                self.logger.error({ function: func, log: 'Failing - Failed to process transaction', err: err.message });
                 throw err;  // retry lamda sqs batch
             } else {
                 // log and continue
-                self.logger.info({ function: func, log: 'Continuing - Failed to process transaction', err: err.message });
+                self.logger.error({ function: func, log: 'Continuing - Failed to process transaction', err: err.message });
             }
         });
 });
@@ -57,14 +57,15 @@ const getNarrativeDictionaryImpl = Promise.method((self, countryCode) => {
     let narrativeDictionary = narrativeDictionaryCache[countryCode];
     if (!narrativeDictionary) {
         return self.dbQueries.getNarrativeDictionary(countryCode).then((narrativeDictionaryDoc) => {
-            narrativeDictionary = new NarrativeDictionaryContract.NarrativeDictionary(JSON.parse(narrativeDictionaryDoc.data));
-            narrativeDictionaryCache[countryCode] = narrativeDictionary;
 
-            if (!narrativeDictionary) {
+            if (!narrativeDictionaryDoc) {
                 self.logger.info({ function: func, log: `unable to find a narrative dictionary for regions ${countryCode}.` });
                 self.logger.info({ function: func, log: 'ended' });
                 return null;
             }
+            narrativeDictionary = new NarrativeDictionaryContract.NarrativeDictionary(JSON.parse(narrativeDictionaryDoc.data));
+            narrativeDictionaryCache[countryCode] = narrativeDictionary;
+
             self.logger.info({ function: func, log: 'ended' });
 
             return narrativeDictionary;
