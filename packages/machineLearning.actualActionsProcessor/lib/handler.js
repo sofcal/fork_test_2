@@ -3,6 +3,7 @@
 const Promise = require('bluebird');
 const impl = require('./impl');
 const ErrorSpecs = require('./ErrorSpecs');
+const AWS = require('aws-sdk');
 
 const { ParameterStoreStaticLoader } = require('internal-parameterstore-static-loader');
 const { RequestLogger } = require('internal-request-logger');
@@ -40,6 +41,9 @@ module.exports.run = (event, context, callback) => {
                     return connectDB(services, { env, region }, params, event.logger)
                         .then(() => params);
                 });
+        })
+        .then(() => {
+            return setupLogGroupSubscription();
         })
         .then((params) => impl.run(event, params, services))
         .then((ret) => {
@@ -128,4 +132,27 @@ const disconnectDB = Promise.method((services, logger) => {
         .then(() => {
             logger.info({ function: func, log: 'ended' });
         });
+});
+
+const setupLogGroupSubscription = Promise.method((event, context) => {
+    const cloudwatchlogs = Promise.promisifyAll(new AWS.CloudWatchLogs());
+    return cloudwatchlogs.describeSubscriptionFiltersAsync({logGroupName: context.logGroupName })
+        .then((subFilterDetails) => {
+            if (subFilterDetails.subscriptionFilters.length === 0) {
+                console.log('Adding log group subscription filter.');
+                console.log('***', process.env.SumoLogicLambdaARN);
+                const params = {
+                    destinationArn: process.env.SumoLogicLambdaARN,
+                    filterName: 'sumoLogic',
+                    filterPattern: ' ',
+                    logGroupName: context.logGroupName
+                };
+                return cloudwatchlogs.putSubscriptionFilterAsync(params);
+            }             
+            console.log('Log group subscription filter already present.');
+            return null;
+        })
+        .catch((err) => {
+            console.log('FAILED TO CONFIGURE SUMO COLLECTION:', err);
+        })
 });
