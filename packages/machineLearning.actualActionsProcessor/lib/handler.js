@@ -135,12 +135,12 @@ const disconnectDB = Promise.method((services, logger) => {
 });
 
 const setupLogGroupSubscription = Promise.method((event, context) => {
+    const func = 'handler.setupLogGroupSubscription';
     const cloudwatchlogs = Promise.promisifyAll(new AWS.CloudWatchLogs());
     return cloudwatchlogs.describeSubscriptionFiltersAsync({logGroupName: context.logGroupName })
         .then((subFilterDetails) => {
             if (subFilterDetails.subscriptionFilters.length === 0) {
-                console.log('Adding log group subscription filter.');
-                console.log('***', process.env.SumoLogicLambdaARN);
+                event.logger.info({ function: func, log: 'assigning subscription filter' });
                 const params = {
                     destinationArn: process.env.SumoLogicLambdaARN,
                     filterName: 'sumoLogic',
@@ -148,11 +148,11 @@ const setupLogGroupSubscription = Promise.method((event, context) => {
                     logGroupName: context.logGroupName
                 };
                 return cloudwatchlogs.putSubscriptionFilterAsync(params);
-            }             
-            console.log('Log group subscription filter already present.');
+            }
+            event.logger.info({ function: func, log: 'subscription filter already assigned' });
             return null;
         })
         .catch((err) => {
-            console.log('FAILED TO CONFIGURE SUMO COLLECTION:', err);
-        })
+            event.logger.error({ function: func, log: 'failed to configure logging subscription filter.', err: err.message });
+        });
 });
