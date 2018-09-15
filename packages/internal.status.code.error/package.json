@@ -40,9 +40,10 @@
     "test": "NODE_ENV=test nyc --cache false --x test/ mocha -b --colors \"./test/unit/**/*.spec.js\"",
     "cover": "NODE_ENV=test npm run test && nyc report --reporter=lcov",
     "report": "open coverage/lcov-report/index.html",
-    "int": "NODE_ENV=test nyc --x lib/_legacy --x test/ mocha -b --colors --reporter spec \"./test/integration/**/*.spec.js\"",
+    "int": "NODE_ENV=test nyc --x lib/_legacy --x test/ mocha -b --colors --reporter spec \"./test/int/**/*.spec.js\"",
     "lint": "eslint ./src/**",
-    "build": "babel src -d lib",
+    "build": "babel src -d lib --copy-files",
+    "watch": "babel --watch src --out-dir lib --copy-files",
     "unlock": "rimraf package-lock.json"
   }
 }

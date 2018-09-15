@@ -34,7 +34,7 @@ const uploadImpl = Promise.method((self, key, stream, encryption) => {
         Key: key, Body: stream
     };
 
-    if(encryption) {
+    if (encryption) {
         options.ServerSideEncryption = encryption;
     }
 
@@ -47,12 +47,12 @@ const putImpl = Promise.method((self, key, buffer, encryption) => {
         Key: key, Body: buffer
     };
 
-    if(encryption) {
+    if (encryption) {
         options.ServerSideEncryption = encryption;
     }
 
     return self._s3.putObjectAsync(options)
-        .then((response) => response.VersionId)
+        .then((response) => response.VersionId);
 });
 
 const getImpl = Promise.method((self, key) => {
@@ -78,14 +78,16 @@ const listImpl = Promise.method((self, bucket) => {
             .then((data) => {
                 keys.push(...data.Contents);
 
-                if (data.IsTruncated) {
-                    return iterate(data.NextContinuationToken);
+                if (!data.IsTruncated) {
+                    return undefined;
                 }
-            })
+
+                return iterate(data.NextContinuationToken);
+            });
     });
 
     return iterate()
-        .then(() => keys)
+        .then(() => keys);
 });
 
 module.exports = S3;

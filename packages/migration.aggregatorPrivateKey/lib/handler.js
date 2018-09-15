@@ -2,7 +2,7 @@
 
 const Promise = require('bluebird');
 
-const ParameterStoreStaticLoader = require('internal-parameterstorestaticloader');
+const ParameterStoreStaticLoader = require('internal-parameterstore-static-loader');
 const serviceImpls = {
     DB: require('internal-services-db'),
     Encryption: require('internal-services-encryption'),
@@ -11,6 +11,7 @@ const serviceImpls = {
 
 let env, region, keyAlias;
 const keySpec = 'AES_256';
+const dbName = 'bank_db';
 
 module.exports.run = (event, context, callback) => {
     const services = {};
@@ -110,7 +111,7 @@ const getServices = (env, region, params, services) => {
     const replicaSet = params['defaultMongo.replicaSet'];
     const domain = params['domain'];
 
-    services.db = new serviceImpls.DB({ env, region, domain, username, password, replicaSet });
+    services.db = new serviceImpls.DB({ env, region, domain, username, password, replicaSet, db: dbName });
     services.key = new serviceImpls.Key({region});
     services.encryption = new serviceImpls.Encryption({});
 
@@ -139,7 +140,7 @@ const getParams = (env, region) => {
 };
 
 const connectDB = (services) => {
-    return services.db.connect('bank_db')
+    return services.db.connect()
         .then((db) => {
             console.log('db connected');
             return db;

@@ -81,9 +81,11 @@ const listImpl = Promise.method((self, bucket) => {
     return self._s3.listObjectsV2Async(options).then(data => {
       keys.push(...data.Contents);
 
-      if (data.IsTruncated) {
-        return iterate(data.NextContinuationToken);
+      if (!data.IsTruncated) {
+        return undefined;
       }
+
+      return iterate(data.NextContinuationToken);
     });
   });
   return iterate().then(() => keys);

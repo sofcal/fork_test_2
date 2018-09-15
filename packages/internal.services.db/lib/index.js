@@ -1,19 +1,15 @@
 'use strict';
 
-const MongoClient = require('mongodb').MongoClient;
+const {
+  MongoClient
+} = require('mongodb');
 
 const Promise = require('bluebird');
 
 class DB {
-  constructor({
-    env,
-    region,
-    domain,
-    username,
-    password,
-    replicaSet
-  }) {
-    this.connectionString = getConnectionString(env, region, domain, username, password, replicaSet);
+  constructor(options) {
+    this.connectionString = getConnectionString(options);
+    this._MongoClient = MongoClient;
   }
 
   connect(...args) {
@@ -24,44 +20,56 @@ class DB {
     return disconnectImpl(this, ...args);
   }
 
+  getConnection() {
+    if (!this.client) {
+      return null;
+    }
+
+    return this.client.db();
+  }
+
   static Create(...args) {
     return new DB(...args);
   }
 
 }
 
-const connectImpl = Promise.method((self, database) => {
-  return disconnectImpl(self).then(() => connectPromise(self)).then(client => {
-    self.client = client;
-    return client.db(database);
+const connectImpl = Promise.method(self => {
+  const url = self.connectionString;
+  return self._MongoClient.connect(url).then(client => {
+    self.client = client; // eslint-disable-line no-param-reassign
+
+    return client.db();
   });
 });
 const disconnectImpl = Promise.method(self => {
-  if (self.client) {
-    self.client.close();
-    self.client = null;
+  if (!self.client) {
+    return undefined;
   }
-});
-const connectPromise = Promise.method(self => {
-  const url = self.connectionString;
-  return new Promise((resolve, reject) => {
-    MongoClient.connect(url, (err, client) => {
-      if (err) {
-        reject(err);
-      }
 
-      resolve(client);
-    });
+  return self.client.close().then(() => {
+    self.client = null; // eslint-disable-line no-param-reassign
   });
 });
 
-const getConnectionString = (awsEnv, awsRegion, domain, username, password, replicaSet) => {
-  // eslint-disable-next-line no-param-reassign
-  const hosts = [`mdb-a.${awsEnv}.${awsRegion}.${domain}:27017`, `mdb-b.${awsEnv}.${awsRegion}.${domain}:27017`, `mdb-c.${awsEnv}.${awsRegion}.${domain}:27017`]; // const hosts = ['localhost:27017'];
+const getConnectionString = ({
+  env: awsEnv,
+  region: awsRegion,
+  domain,
+  username,
+  password,
+  replicaSet,
+  db,
+  localhost = false
+}) => {
+  if (localhost) {
+    return `mongodb://localhost:27017/${db}`;
+  }
 
+  const hosts = [`mdb-a.${awsEnv}.${awsRegion}.${domain}:27017`, `mdb-b.${awsEnv}.${awsRegion}.${domain}:27017`, `mdb-c.${awsEnv}.${awsRegion}.${domain}:27017`];
   const credentialsString = username && password ? `${username}:${password}@` : '';
   const replicaSetString = replicaSet ? `?replicaSet=${replicaSet}` : '';
-  return `mongodb://${credentialsString}${hosts.join(',')}/bank_db${replicaSetString}`; // return `mongodb://${hosts.join(',')}/bank_db`;
+  return `mongodb://${credentialsString}${hosts.join(',')}/${db}${replicaSetString}`;
 };
 
 module.exports = DB;

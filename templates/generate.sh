@@ -9,6 +9,22 @@ while getopts ":t:p:" opt; do
   esac
 done
 
+error() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')][TEMPLATE] Usage: npm run template -- -t <type:[internal|lambda]> -p <package_name:dash-separated-string>"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')][TEMPLATE] Example: npm run template -- -t internal -p package-name"
+    exit 1;
+}
+
+if [[ -z $TYPE ]]; then
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')][TEMPLATE] ERROR: missing TYPE (-t) parameter"
+    error
+fi
+
+if [[ -z $PACKAGE_NAME ]]; then
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')][TEMPLATE] ERROR: missing PACKAGE_NAME (-p) parameter"
+    error
+fi
+
 if [[ $TYPE == "internal" ]]; then
     PACKAGE_NAME="internal-$PACKAGE_NAME"
 fi
