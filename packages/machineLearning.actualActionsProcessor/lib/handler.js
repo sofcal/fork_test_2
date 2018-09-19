@@ -43,7 +43,7 @@ module.exports.run = (event, context, callback) => {
                 });
         })
         .then(() => {
-            return setupLogGroupSubscription();
+            return setupLogGroupSubscription(event, context);
         })
         .then((params) => impl.run(event, params, services))
         .then((ret) => {
