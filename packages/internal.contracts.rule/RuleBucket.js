@@ -15,8 +15,12 @@ class RuleBucket {
             this.organisationId = data.organisationId;
             this.bankAccountId = data.bankAccountId;
             this.numberOfRules = data.numberOfRules;
+            this.numberOfUserRules = data.numberOfUserRules || 0;
+            this.numberOfFeedbackRules = data.numberOfFeedbackRules || 0;
+            this.numberOfGlobalRules = data.numberOfGlobalRules || 0;
             this.rules = _.map(data.rules || [], (r) => (new Rule(r)));
             this.isAccountOwnerRules = data.isAccountOwnerRules || false;
+            this.productId = data.productId || null;
         }
     }
 
@@ -31,8 +35,6 @@ class RuleBucket {
     static validate(...args) {
         return validateImpl(...args);
     }
-
-    static MaxBucketSize() { return 300; }
 
     static addOrUpdateRuleByRank(...args) {
         return addOrUpdateRuleByRankImpl(...args);

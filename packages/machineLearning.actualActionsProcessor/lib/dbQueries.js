@@ -8,8 +8,13 @@ const moment = require('moment');
 const access = require('safe-access');
 
 class DbQueries {
-    constructor(db) {
+    constructor(db, params) {
         this.db = db;
+        this.params = params;
+        this.maxNumberOfUserRules = parseInt(params['rules.maxNumberOfUserRules'], 10);
+        this.maxNumberOfFeedbackRules = parseInt(params['rules.maxNumberOfFeedbackRules'], 10);
+        this.maxNumberOfGlobalRules = parseInt(params['rules.maxNumberOfGlobalRules'], 10);
+        this.maxBucketSize = this.maxNumberOfUserRules + this.maxNumberOfFeedbackRules + this.maxNumberOfGlobalRules;
     }
 
     getTransactions(...args) {
@@ -75,6 +80,9 @@ const getRuleBucketImpl = Promise.method((self, organisationId, bankAccountId) =
                 data.rules = [];
                 data.isAccountOwnerRules = false;
                 data.numberOfRules = 0;
+                data.numberOfUserRules = 0;
+                data.numberOfFeedbackRules = 0;
+                data.numberOfGlobalRules = 0;
                 data.region = ' ';
             }
 
@@ -93,8 +101,11 @@ const addFeedbackRuleImpl = Promise.method((self, organisationId, bankAccountId,
 
     return self.getRuleBucket(organisationId, bankAccountId, newRule)
         .then((bucket) => {
-            if (bucket.rules.length >= RuleBucket.MaxBucketSize) {
+            if (bucket.rules.length >= self.maxBucketSize) {
                 throw new Error('Rule bucket full');
+            }
+            if (bucket.numberOfFeedbackRules >= self.maxNumberOfFeedbackRules) {
+                throw new Error('Feedback rules limit exceeded');
             }
 
             let ruleAlreadyExists = false;
@@ -118,6 +129,7 @@ const addFeedbackRuleImpl = Promise.method((self, organisationId, bankAccountId,
             }
 
             bucket.numberOfRules += 1; // eslint-disable-line no-param-reassign
+            bucket.numberOfFeedbackRules += 1; // eslint-disable-line no-param-reassign
 
             const query = { _id: bucket._id, etag: bucket.etag };
             const options = { upsert: false };

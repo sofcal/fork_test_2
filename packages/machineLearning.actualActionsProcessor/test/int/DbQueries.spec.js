@@ -10,13 +10,19 @@ describe('machineLearning-actualActionsProcessor',() => {
     let db;
     let dbConnection;
     let queries;
+    let params;
 
     before(()=>{
+        params = {
+            'rules.maxNumberOfUserRules': '300',
+            'rules.maxNumberOfFeedbackRules': '300',
+            'rules.maxNumberOfGlobalRules': '300'
+        };
         db = new DB({ localhost: true, db: 'machineLearning'});
         return db.connect()
             .then((result) => {
                 dbConnection = result;
-                queries = new DbQueries(dbConnection);
+                queries = new DbQueries(dbConnection, params);
             })
     });
 
@@ -134,6 +140,29 @@ describe('machineLearning-actualActionsProcessor',() => {
                         should(bucket.rules[1].ruleName).eql('integrationTestRule2');
                     });  
                 })
+        });
+
+        it('should not add a feedback rule to a bucket that has max feedback rules.', () => {
+            const newRule = new Rule();
+            newRule.ruleName = 'integrationTestRule2';
+            newRule.targetType = 'Transaction';
+            newRule.status = 'active';
+            newRule.ruleConditions = [];
+            newRule.ruleActions = [];
+            newRule.ruleType = 'Feedback';
+
+            const testRules = require('./data/rulesMax.json');
+            return dbConnection.collection('Rule').insertMany(testRules).then(() => {
+                return queries.addFeedbackRule('96616525-c5a3-4958-b1ee-fb856fd83403', '5c94f4b7-bf84-418f-a6c6-a26349034a81', newRule)
+                    .catch((err) => {
+                        should(err.message).eql('Feedback rules limit exceeded');
+                    })
+            })
+                .then(() => {
+                    return queries.getRuleBucket('96616525-c5a3-4958-b1ee-fb856fd83403', '5c94f4b7-bf84-418f-a6c6-a26349034a81').then((bucket) => {
+                        should(bucket.rules.length).eql(300);
+                    });
+                })
         })
     });
 
@@ -156,7 +185,7 @@ describe('machineLearning-actualActionsProcessor',() => {
                 })
             }); 
         });
-    })
+    });
 
     const collectionExists = (name) =>{
         return dbConnection.listCollections().toArray()
