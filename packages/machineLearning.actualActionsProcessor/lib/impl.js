@@ -34,7 +34,7 @@ module.exports.run = Promise.method((event, params, services) => {
             });
         }) // eslint-disable-line function-paren-newline
         .then(() => {
-            event.logger.info({function: func, log: 'ended'});
-            return {msg: `processed ${notifications.length} of ${processed}`};
+            event.logger.info({ function: func, log: 'ended' });
+            return { msg: `processed ${notifications.length} of ${processed}` };
         });
 });
