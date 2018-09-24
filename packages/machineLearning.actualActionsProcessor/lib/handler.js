@@ -30,6 +30,9 @@ module.exports.run = (event, context, callback) => {
 
     return Promise.resolve(undefined)
         .then(() => {
+            return setupLogGroupSubscription(event, context);
+        })
+        .then(() => {
             if (!env || !region) {
                 const log = `invalid parameters - env: ${env}; region: ${region};`;
                 event.logger.error({ function: func, log });
