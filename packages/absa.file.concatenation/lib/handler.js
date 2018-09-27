@@ -34,7 +34,8 @@ module.exports.run = (event, context, callback) => {
                 throw StatusCodeError.CreateFromSpecs([ErrorSpecs.invalidEvent], ErrorSpecs.invalidEvent.statusCode);
             }
 
-            return getParams({ env, region }, event.logger)
+            return setupLogGroupSubscription(event, context)
+                .then(() => getParams({ env, region }, event.logger))
                 .then((params) => {
                     populateServices(services, { env, region, params }, event.logger);
                     return connectDB(services, event.logger)
@@ -137,5 +138,28 @@ const disconnectDB = Promise.method((services, logger) => {
     return services.db.disconnect()
         .then(() => {
             logger.info({ function: func, log: 'ended' });
+        });
+});
+
+const setupLogGroupSubscription = Promise.method((event, context) => {
+    const func = 'handler.setupLogGroupSubscription';
+    const cloudwatchlogs = Promise.promisifyAll(new AWS.CloudWatchLogs());
+    return cloudwatchlogs.describeSubscriptionFiltersAsync({ logGroupName: context.logGroupName })
+        .then((subFilterDetails) => {
+            if (subFilterDetails.subscriptionFilters.length === 0) {
+                event.logger.info({ function: func, log: 'assigning subscription filter' });
+                const params = {
+                    destinationArn: process.env.SumoLogicLambdaARN,
+                    filterName: 'sumoLogic',
+                    filterPattern: ' ',
+                    logGroupName: context.logGroupName
+                };
+                return cloudwatchlogs.putSubscriptionFilterAsync(params);
+            }
+            event.logger.info({ function: func, log: 'subscription filter already assigned' });
+            return null;
+        })
+        .catch((err) => {
+            event.logger.error({ function: func, log: 'failed to configure logging subscription filter.', err: err.message });
         });
 });
