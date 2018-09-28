@@ -14,8 +14,9 @@ module.exports.run = Promise.method((event, params, services) => {
     const func = 'impl.run';
     event.logger.info({ function: func, log: 'started' });
 
-    const { bucket, fromPrefix, toPrefix } = validate.env(process.env);
+    let { bucket, fromPrefix, toPrefix } = validate.env(process.env);
     const { eventTargetDate } = validate.event(event);
+    bucket = bucket.replace('arn:aws:s3:::','');
 
     const startDate = eventTargetDate ? moment(eventTargetDate).startOf('day') : moment().subtract(1, 'days').startOf('day');
     const endDate = moment(startDate).endOf('day');
