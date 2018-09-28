@@ -74,7 +74,7 @@ module.exports.run = Promise.method((event, params, services) => {
             const putDate = timestamp.toISOString();
             const header = `__${concatenationId}__CONCATENATED_FILE__${timestamp}`;
 
-            const filename = `${toPrefix}/${putDate}-absa-statements.txt`;
+            let filename = `${toPrefix}/${putDate}-absa-statements.txt`;
             filename = filename.replace(/[:-]/g,'_');
             filename = filename.replace('.',''); // only replace first
 
