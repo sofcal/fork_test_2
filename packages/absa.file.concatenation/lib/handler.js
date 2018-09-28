@@ -14,6 +14,7 @@ const DB = require('internal-services-db');
 const serviceImpls = { DB };
 
 const keys = require('./params');
+const AWS = require('aws-sdk');
 
 module.exports.run = (event, context, callback) => {
     const func = 'handler.run';
