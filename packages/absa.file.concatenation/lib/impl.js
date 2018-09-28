@@ -75,6 +75,8 @@ module.exports.run = Promise.method((event, params, services) => {
             const header = `__${concatenationId}__CONCATENATED_FILE__${timestamp}`;
 
             const filename = `${toPrefix}/${putDate}-absa-statements.txt`;
+            filename = filename.replace(/[:-]/g,'_');
+            filename = filename.replace('.',''); // only replace first
 
             event.logger.info({ function: func, log: 'uploading concatenated file to s3', bucket, filename });
             return services.s3.put(filename, Buffer.from(`${header}\n${concatenated}`), 'AES256')
