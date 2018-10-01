@@ -9,6 +9,7 @@ class S3 {
             region,
             params: { Bucket: bucket }
         });
+        this.bucket = bucket;
         this._s3 = Promise.promisifyAll(s3);
     }
 
@@ -27,11 +28,15 @@ class S3 {
     upload(...args) {
         return uploadImpl(this, ...args);
     }
+
+    static Create(...args) {
+        return new S3(...args);
+    }
 }
 
-const uploadImpl = Promise.method((self, key, stream, encryption) => {
+const uploadImpl = Promise.method((self, key, stream, encryption, bucket = self.bucket) => {
     const options = {
-        Key: key, Body: stream
+        Key: key, Body: stream, Bucket: bucket
     };
 
     if (encryption) {
@@ -42,9 +47,9 @@ const uploadImpl = Promise.method((self, key, stream, encryption) => {
         .then((response) => response.Key);
 });
 
-const putImpl = Promise.method((self, key, buffer, encryption) => {
+const putImpl = Promise.method((self, key, buffer, encryption, bucket = self.bucket) => {
     const options = {
-        Key: key, Body: buffer
+        Key: key, Body: buffer, Bucket: bucket
     };
 
     if (encryption) {
@@ -55,20 +60,22 @@ const putImpl = Promise.method((self, key, buffer, encryption) => {
         .then((response) => response.VersionId);
 });
 
-const getImpl = Promise.method((self, key) => {
-    const options = {
-        Key: key
-    };
+const getImpl = Promise.method((self, key, bucket = self.bucket) => {
+    const options = { Key: key, Bucket: bucket };
 
     return self._s3.getObjectAsync(options)
         .then((data) => data);
 });
 
 // takes an overriden bucket id
-const listImpl = Promise.method((self, bucket) => {
+const listImpl = Promise.method((self, bucket = self.bucket, prefix) => {
     const keys = [];
     const iterate = Promise.method((token) => {
         const options = { Bucket: bucket };
+
+        if (prefix) {
+            options.Prefix = prefix;
+        }
 
         if (token) {
             options.ContinuationToken = token;
