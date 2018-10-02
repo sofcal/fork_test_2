@@ -1,6 +1,4 @@
 const should = require('should');
-const sinon = require('sinon');
-const _ = require('underscore');
 const Rule = require('../../Rule');
 const { resources } = require('../../_bankDrive');
 const { StatusCodeError } = require('internal-status-code-error');
@@ -57,7 +55,7 @@ describe ('Rule', () => {
         }
     });
 
-    it.only('should throw an error if an invalid rule is provided', (done) => {
+    it('should throw an error if an invalid rule is provided', (done) => {
         try {
             Rule.validate('bob');
             done(new Error('should have thrown'));
@@ -65,7 +63,7 @@ describe ('Rule', () => {
             err.should.be.instanceOf(StatusCodeError);
             err.statusCode.should.eql(400);
             err.items[0].applicationCode.should.eql(resources.services.common.InvalidType);
-            err.items[0].message.should.eql('Expected object of type: Rule')
+            err.items[0].message.should.eql('Expected object of type: Rule');
             done();
         }
     });
