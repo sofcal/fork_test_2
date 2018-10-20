@@ -70,7 +70,7 @@ const getNarrativeDictionaryImpl = Promise.method((self, countryCode) => {
 const getRuleBucketImpl = Promise.method((self, organisationId, bankAccountId) => {
     const query = { bankAccountId, organisationId };
     const update = { $set: { etag: moment.utc().valueOf() } };
-    const options = { upsert: true, new: true };
+    const options = {upsert: true, new: true, writeConcern: { w : "majority"}};
 
     // create rule bucket if it doesn't exist
     return self.db.collection('Rule').findAndModify(query, null, update, options)
@@ -131,8 +131,11 @@ const addFeedbackRuleImpl = Promise.method((self, organisationId, bankAccountId,
             bucket.numberOfRules += 1; // eslint-disable-line no-param-reassign
             bucket.numberOfFeedbackRules += 1; // eslint-disable-line no-param-reassign
 
-            const query = { _id: bucket._id, etag: bucket.etag };
-            const options = { upsert: false };
+            const query = { _id: bucket._id, etag: bucket.etag};
+            const options = {upsert: false, writeConcern: { w : "majority"} };
+
+            bucket.etag = moment.utc().valueOf();
+
             return self.db.collection('Rule').updateOne(query, { $set: bucket }, options);
         })
         .then((result) => {

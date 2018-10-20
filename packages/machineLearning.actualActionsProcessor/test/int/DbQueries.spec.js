@@ -79,7 +79,7 @@ describe('machineLearning-actualActionsProcessor',() => {
                     should(result.rules.length).eql(1);
                     should(result.rules[0].uuid).eql('cb5e2c41-f3b8-4a8c-9d9c-12c8db9ab12c');
                     should.exist(result.etag);
-                    should(result.etag).not.eql(1535546756592.0);
+                    should(result.etag !== 1535546756592.0).eql(true);
 
                     const bucket = new RuleBucket(result);
                     bucket.validate();

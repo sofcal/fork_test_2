@@ -10,7 +10,7 @@ const { ParameterStoreStaticLoader } = require('internal-parameterstore-static-l
 const DB = require('internal-services-db');
 const { StatusCodeError, StatusCodeErrorItem } = require('internal-status-code-error');
 
-describe.skip('machineLearning-actualActionsProcessor.handler', function() {
+describe('machineLearning-actualActionsProcessor.handler', function() {
     let sandbox;
     let config, context, event;
 
@@ -28,6 +28,9 @@ describe.skip('machineLearning-actualActionsProcessor.handler', function() {
 
     before(() => {
         sandbox = sinon.createSandbox();
+
+        process.env['AWS_REGION'] = 'eu-west-1';
+        process.env['Environment'] = 'local';
     });
 
     beforeEach(() => {
@@ -38,7 +41,10 @@ describe.skip('machineLearning-actualActionsProcessor.handler', function() {
             'defaultMongo.username': username,
             'defaultMongo.password': password,
             'defaultMongo.replicaSet': replicaSet,
-            domain
+            domain,
+            'rules.maxNumberOfUserRules': 300, 
+            'rules.maxNumberOfFeedbackRules': 300, 
+            'rules.maxNumberOfGlobalRules': 300  
         };
     });
 
@@ -66,7 +72,7 @@ describe.skip('machineLearning-actualActionsProcessor.handler', function() {
                     { keys, paramPrefix, env: { region } }
                 )).eql(true);
 
-
+                
                 should(dummyLoader.load.callCount).eql(1);
                 should(dummyLoader.load.calledWith(
                     {}
@@ -91,8 +97,8 @@ describe.skip('machineLearning-actualActionsProcessor.handler', function() {
 
         handler.run({}, context, () => {
             try {
-                const paramPrefix = '/test/';
-                const region = 'local';
+                const paramPrefix = '/local/';
+                const region = 'eu-west-1';
 
                 should(ParameterStoreStaticLoader.Create.callCount).eql(1);
                 should(ParameterStoreStaticLoader.Create.calledWithExactly(
@@ -113,6 +119,7 @@ describe.skip('machineLearning-actualActionsProcessor.handler', function() {
     });
 
     it('should connect and disconnect from the db', (done) => {
+
         sandbox.stub(dummyLoader, 'load').resolves(config);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
         sandbox.stub(DB, 'Create').returns(db);
@@ -127,13 +134,11 @@ describe.skip('machineLearning-actualActionsProcessor.handler', function() {
             .then(() => {
                 should(DB.Create.callCount).eql(1);
                 should(DB.Create.calledWithExactly(
-                    { env, region, domain, username, password, replicaSet }
+                    { env, region, domain, username, password, replicaSet, db:'bank_db'}
                 )).eql(true);
 
                 should(db.connect.callCount).eql(1);
-                should(db.connect.calledWith(
-                    'bank_db'
-                )).eql(true);
+                should(db.connect.calledWith()).eql(true);
 
                 should(db.disconnect.callCount).eql(1);
                 should(db.disconnect.calledWith(
@@ -272,6 +277,9 @@ describe.skip('machineLearning-actualActionsProcessor.handler', function() {
 
     it('should fail if any param store values are missing', function(done) {
         delete config['defaultMongo.password'];
+
+        sandbox.stub(dummyLoader, 'load').resolves(config);
+        sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
 
         handler.run(event, context, (first, second) => {
             try {
