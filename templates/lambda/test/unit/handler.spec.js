@@ -6,7 +6,7 @@ const should = require('should');
 const sinon = require('sinon');
 const Promise = require('bluebird');
 
-const { ParameterStoreStaticLoader } = require('internal-parameterstorestaticloader');
+const { ParameterStoreStaticLoader } = require('internal-parameterstore-static-loader');
 const DB = require('internal-services-db');
 const { StatusCodeError, StatusCodeErrorItem } = require('internal-status-code-error');
 
@@ -28,6 +28,8 @@ describe('__package_name__.handler', function() {
 
     before(() => {
         sandbox = sinon.createSandbox();
+        process.env['AWS_REGION'] = region;
+        process.env['Environment'] = env;
     });
 
     beforeEach(() => {
@@ -91,8 +93,8 @@ describe('__package_name__.handler', function() {
 
         handler.run({}, context, () => {
             try {
-                const paramPrefix = '/test/';
-                const region = 'local';
+                const paramPrefix = '/local/';
+                const region = 'eu-west-1';
 
                 should(ParameterStoreStaticLoader.Create.callCount).eql(1);
                 should(ParameterStoreStaticLoader.Create.calledWithExactly(
@@ -272,6 +274,12 @@ describe('__package_name__.handler', function() {
 
     it('should fail if any param store values are missing', function(done) {
         delete config['defaultMongo.password'];
+
+        sandbox.stub(dummyLoader, 'load').resolves(config);
+        sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
+        sandbox.stub(DB, 'Create').returns(db);
+        sandbox.stub(db, 'connect').resolves();
+        sandbox.stub(db, 'disconnect').resolves();
 
         handler.run(event, context, (first, second) => {
             try {

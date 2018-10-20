@@ -3,8 +3,10 @@
 const Promise = require('bluebird');
 const impl = require('./impl');
 const ErrorSpecs = require('./ErrorSpecs');
+const AWS = require('aws-sdk');
+AWS.config.setPromisesDependency(require('bluebird'));
 
-const { ParameterStoreStaticLoader } = require('internal-parameterstorestaticloader');
+const { ParameterStoreStaticLoader } = require('internal-parameterstore-static-loader');
 const { RequestLogger } = require('internal-request-logger');
 const { StatusCodeError } = require('internal-status-code-error');
 
@@ -26,6 +28,7 @@ module.exports.run = (event, context, callback) => {
     const services = {};
 
     return Promise.resolve(undefined)
+        .then(() => setupLogGroupSubscription(event, context))
         .then(() => {
             if (!env || !region) {
                 const log = `invalid parameters - env: ${env}; region: ${region};`;
@@ -124,5 +127,28 @@ const disconnectDB = Promise.method((services, logger) => {
     return services.db.disconnect()
         .then(() => {
             logger.info({ function: func, log: 'ended' });
+        });
+});
+
+const setupLogGroupSubscription = Promise.method((event, context) => {
+    const func = 'handler.setupLogGroupSubscription';
+    const cloudwatchlogs = new AWS.CloudWatchLogs();
+    return cloudwatchlogs.describeSubscriptionFilters({ logGroupName: context.logGroupName }).promise()
+        .then((subFilterDetails) => {
+            if (subFilterDetails.subscriptionFilters.length === 0) {
+                event.logger.info({ function: func, log: 'assigning subscription filter' });
+                const params = {
+                    destinationArn: process.env.SumoLogicLambdaARN,
+                    filterName: 'sumoLogic',
+                    filterPattern: ' ',
+                    logGroupName: context.logGroupName
+                };
+                return cloudwatchlogs.putSubscriptionFilter(params).promise();
+            }
+            event.logger.info({ function: func, log: 'subscription filter already assigned' });
+            return null;
+        })
+        .catch((err) => {
+            event.logger.error({ function: func, log: 'failed to configure logging subscription filter.', err: err.message });
         });
 });
