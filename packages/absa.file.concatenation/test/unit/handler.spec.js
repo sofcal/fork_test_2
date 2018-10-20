@@ -6,9 +6,10 @@ const should = require('should');
 const sinon = require('sinon');
 const Promise = require('bluebird');
 
-const { ParameterStoreStaticLoader } = require('internal-parameterstorestaticloader');
+const { ParameterStoreStaticLoader } = require('internal-parameterstore-static-loader');
 const DB = require('internal-services-db');
 const { StatusCodeError, StatusCodeErrorItem } = require('internal-status-code-error');
+const S3 = require('internal-services-s3');
 
 describe('absa-file-concatenation.handler', function() {
     let sandbox;
@@ -28,6 +29,10 @@ describe('absa-file-concatenation.handler', function() {
 
     before(() => {
         sandbox = sinon.createSandbox();
+
+        process.env['AWS_REGION'] = 'eu-west-1';
+        process.env['Environment'] = 'local';
+        process.env['bucket'] = 'local';
     });
 
     beforeEach(() => {
@@ -91,8 +96,8 @@ describe('absa-file-concatenation.handler', function() {
 
         handler.run({}, context, () => {
             try {
-                const paramPrefix = '/test/';
-                const region = 'local';
+                const paramPrefix = '/local/';
+                const region = 'eu-west-1';
 
                 should(ParameterStoreStaticLoader.Create.callCount).eql(1);
                 should(ParameterStoreStaticLoader.Create.calledWithExactly(
@@ -113,12 +118,15 @@ describe('absa-file-concatenation.handler', function() {
     });
 
     it('should connect and disconnect from the db', (done) => {
+
         sandbox.stub(dummyLoader, 'load').resolves(config);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
         sandbox.stub(DB, 'Create').returns(db);
         sandbox.stub(db, 'connect').resolves();
         sandbox.stub(db, 'disconnect').resolves();
 
+        sandbox.stub(S3, 'Create').returns();
+        
         const expected = { value: 'result' };
         sandbox.stub(impl, 'run').resolves(expected);
 
@@ -127,13 +135,11 @@ describe('absa-file-concatenation.handler', function() {
             .then(() => {
                 should(DB.Create.callCount).eql(1);
                 should(DB.Create.calledWithExactly(
-                    { env, region, domain, username, password, replicaSet }
+                    { env, region, domain, username, password, replicaSet, db:'bank_db'}
                 )).eql(true);
 
                 should(db.connect.callCount).eql(1);
-                should(db.connect.calledWith(
-                    'bank_db'
-                )).eql(true);
+                should(db.connect.calledWith()).eql(true);
 
                 should(db.disconnect.callCount).eql(1);
                 should(db.disconnect.calledWith(
@@ -173,6 +179,9 @@ describe('absa-file-concatenation.handler', function() {
         sandbox.stub(db, 'connect').resolves();
         sandbox.stub(db, 'disconnect').resolves();
 
+        const s3Inst = {};
+        sandbox.stub(S3, 'Create').returns(s3Inst);
+
         const expected = { value: 'result' };
         sandbox.stub(impl, 'run').resolves(expected);
 
@@ -180,7 +189,7 @@ describe('absa-file-concatenation.handler', function() {
             try {
                 should(impl.run.callCount).eql(1);
                 should(impl.run.calledWithExactly(
-                    event, config, { db }
+                    event, config, { db, s3: s3Inst }
                 )).eql(true);
 
                 done();
@@ -196,6 +205,7 @@ describe('absa-file-concatenation.handler', function() {
         sandbox.stub(DB, 'Create').returns(db);
         sandbox.stub(db, 'connect').resolves();
         sandbox.stub(db, 'disconnect').resolves();
+        sandbox.stub(S3, 'Create').returns();
 
         const expected = { value: 'result' };
         sandbox.stub(impl, 'run').resolves(expected);
@@ -222,6 +232,7 @@ describe('absa-file-concatenation.handler', function() {
         sandbox.stub(DB, 'Create').returns(db);
         sandbox.stub(db, 'connect').resolves();
         sandbox.stub(db, 'disconnect').resolves();
+        sandbox.stub(S3, 'Create').returns();
 
         const expected = StatusCodeError.Create([StatusCodeErrorItem.Create('Code', 'Message')], 400);
         sandbox.stub(impl, 'run').rejects(expected);
@@ -248,6 +259,7 @@ describe('absa-file-concatenation.handler', function() {
         sandbox.stub(DB, 'Create').returns(db);
         sandbox.stub(db, 'connect').resolves();
         sandbox.stub(db, 'disconnect').resolves();
+        sandbox.stub(S3, 'Create').returns();
 
         const err = new Error('impl.run.error');
         sandbox.stub(impl, 'run').rejects(err);
@@ -268,10 +280,15 @@ describe('absa-file-concatenation.handler', function() {
             }
         });
     });
-
-
     it('should fail if any param store values are missing', function(done) {
         delete config['defaultMongo.password'];
+
+        sandbox.stub(dummyLoader, 'load').resolves(config);
+        sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
+        sandbox.stub(DB, 'Create').returns(db);
+        sandbox.stub(db, 'connect').resolves();
+        sandbox.stub(db, 'disconnect').resolves();
+        sandbox.stub(S3, 'Create').returns();
 
         handler.run(event, context, (first, second) => {
             try {

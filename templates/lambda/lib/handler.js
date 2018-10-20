@@ -78,17 +78,16 @@ const getParams = ({ env, region }, logger) => {
 
     const loader = ParameterStoreStaticLoader.Create({ keys, paramPrefix, env: { region } });
     return loader.load(params)
-        .then(() => {
-            const retrievedCount = Object.keys(params).length;
-
+        .then((retrieved) => {
+            const retrievedCount = Object.keys(retrieved).length;
             logger.info({ function: func, log: 'finished retrieving param-store keys', requested: keys.length, retrieved: retrievedCount });
 
-            if (!retrievedCount || retrievedCount < keys.length) {
+            if (!retrieved || retrievedCount < keys.length) {
                 throw StatusCodeError.CreateFromSpecs([ErrorSpecs.failedToRetrieveParameters], ErrorSpecs.failedToRetrieveParameters.statusCode);
             }
 
             logger.info({ function: func, log: 'ended' });
-            return params;
+            return retrieved;
         });
 };
 

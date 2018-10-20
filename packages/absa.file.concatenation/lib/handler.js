@@ -15,6 +15,7 @@ const serviceImpls = { DB };
 
 const keys = require('./params');
 const AWS = require('aws-sdk');
+AWS.config.setPromisesDependency(require('bluebird'));
 
 module.exports.run = (event, context, callback) => {
     const func = 'handler.run';
@@ -34,7 +35,6 @@ module.exports.run = (event, context, callback) => {
                 event.logger.error({ function: func, log });
                 throw StatusCodeError.CreateFromSpecs([ErrorSpecs.invalidEvent], ErrorSpecs.invalidEvent.statusCode);
             }
-
             return setupLogGroupSubscription(event, context)
                 .then(() => getParams({ env, region }, event.logger))
                 .then((params) => {
@@ -82,8 +82,8 @@ const getParams = ({ env, region }, logger) => {
 
     const loader = ParameterStoreStaticLoader.Create({ keys, paramPrefix, env: { region } });
     return loader.load(params)
-        .then(() => {
-            const retrievedCount = Object.keys(params).length;
+        .then((retrieved) => {
+            const retrievedCount = Object.keys(retrieved).length;
 
             logger.info({ function: func, log: 'finished retrieving param-store keys', requested: keys.length, retrieved: retrievedCount });
 
@@ -92,7 +92,7 @@ const getParams = ({ env, region }, logger) => {
             }
 
             logger.info({ function: func, log: 'ended' });
-            return params;
+            return retrieved;
         });
 };
 
@@ -144,8 +144,8 @@ const disconnectDB = Promise.method((services, logger) => {
 
 const setupLogGroupSubscription = Promise.method((event, context) => {
     const func = 'handler.setupLogGroupSubscription';
-    const cloudwatchlogs = Promise.promisifyAll(new AWS.CloudWatchLogs());
-    return cloudwatchlogs.describeSubscriptionFiltersAsync({ logGroupName: context.logGroupName })
+    const cloudwatchlogs = new AWS.CloudWatchLogs();
+    return cloudwatchlogs.describeSubscriptionFilters({ logGroupName: context.logGroupName }).promise()
         .then((subFilterDetails) => {
             if (subFilterDetails.subscriptionFilters.length === 0) {
                 event.logger.info({ function: func, log: 'assigning subscription filter' });
@@ -155,7 +155,7 @@ const setupLogGroupSubscription = Promise.method((event, context) => {
                     filterPattern: ' ',
                     logGroupName: context.logGroupName
                 };
-                return cloudwatchlogs.putSubscriptionFilterAsync(params);
+                return cloudwatchlogs.putSubscriptionFilter(params).promise();
             }
             event.logger.info({ function: func, log: 'subscription filter already assigned' });
             return null;
