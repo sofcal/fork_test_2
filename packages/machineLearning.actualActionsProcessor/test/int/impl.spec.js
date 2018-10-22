@@ -2,7 +2,7 @@ const Promise = require('bluebird');
 const should = require('should');
 const _ = require('underscore');
 const DB =  require('internal-services-db');
-const impl = require('./../../lib/impl.js')
+const impl = require('./../../lib/impl.js');
 
 describe('machine-learning-actual-actions-processor', function(){  //TEMP:RJ:TESTMATRIX:FR8,FR12,FR14
     let db;
@@ -45,7 +45,7 @@ describe('machine-learning-actual-actions-processor', function(){  //TEMP:RJ:TES
             .then(()=>{
                 const logFunc = (data) => {console.log(JSON.stringify(data))};
                 
-                let notification = {orgId:'e09c1bbc-75d4-425a-8913-754f64f08524', baId:'ee905d97-5922-6ddc-33b9-5a83ed280670', trId:1, region:'GBR'}
+                let notification = {orgId:'e09c1bbc-75d4-425a-8913-754f64f08524', baId:'ee905d97-5922-6ddc-33b9-5a83ed280670', trId:1, region:'GBR'};
                 let bodyString = JSON.stringify({"Message": JSON.stringify(notification)});
                 let event = { logger: { info: logFunc, error: logFunc }, Records: [{body: bodyString }]};
                 let services = { db};
@@ -125,7 +125,7 @@ describe('machine-learning-actual-actions-processor', function(){  //TEMP:RJ:TES
             .then(()=>{
                 const logFunc = (data) => {console.log(JSON.stringify(data))};
                 
-                let notification = {orgId:'e09c1bbc-75d4-425a-8913-754f64f08524', baId:'ee905d97-5922-6ddc-33b9-5a83ed280670', trId:1, region:'GBR'}
+                let notification = {orgId:'e09c1bbc-75d4-425a-8913-754f64f08524', baId:'ee905d97-5922-6ddc-33b9-5a83ed280670', trId:1, region:'GBR'};
                 let bodyString = JSON.stringify({"Message": JSON.stringify(notification)});
                 let event = { logger: { info: logFunc, error: logFunc }, Records: [{body: bodyString }]};
                 let services = { db};
@@ -204,13 +204,14 @@ describe('machine-learning-actual-actions-processor', function(){  //TEMP:RJ:TES
         const testDictionaries = require('./data/narrativeDictionary.json');
         const testTransactions = require('./data/transactions.json');
 
+        const originalNarrative = testTransactions[0].transactions[0].transactionNarrative;
         testTransactions[0].transactions[0].transactionNarrative = 'RICH';
         return dbConnection.collection('Transaction').insertMany(testTransactions)
             .then(() => dbConnection.collection('NarrativeDictionary').insertMany(testDictionaries))
             .then(()=>{
                 const logFunc = (data) => {console.log(JSON.stringify(data))};
                 
-                let notification = {orgId:'e09c1bbc-75d4-425a-8913-754f64f08524', baId:'ee905d97-5922-6ddc-33b9-5a83ed280670', trId:1, region:'GBR'}
+                let notification = {orgId:'e09c1bbc-75d4-425a-8913-754f64f08524', baId:'ee905d97-5922-6ddc-33b9-5a83ed280670', trId:1, region:'GBR'};
                 let bodyString = JSON.stringify({"Message": JSON.stringify(notification)});
                 let event = { logger: { info: logFunc, error: logFunc }, Records: [{body: bodyString }]};
                 let services = { db};
@@ -224,6 +225,9 @@ describe('machine-learning-actual-actions-processor', function(){  //TEMP:RJ:TES
                         should(ruleBucket).eql(null);
                     });
             })
+            .then(() => {
+                testTransactions[0].transactions[0].transactionNarrative = originalNarrative;
+            })
     });
 
     it('should not create a feedback rule if there is no dictionary for the country',()=>{ //TEMP:RJ:TESTMATRIX:FR05
@@ -234,7 +238,7 @@ describe('machine-learning-actual-actions-processor', function(){  //TEMP:RJ:TES
             .then(()=>{
                 const logFunc = (data) => {console.log(JSON.stringify(data))};
                 
-                let notification = {orgId:'e09c1bbc-75d4-425a-8913-754f64f08524', baId:'ee905d97-5922-6ddc-33b9-5a83ed280670', trId:1, region:'AUS'}
+                let notification = {orgId:'e09c1bbc-75d4-425a-8913-754f64f08524', baId:'ee905d97-5922-6ddc-33b9-5a83ed280670', trId:1, region:'AUS'};
                 let bodyString = JSON.stringify({"Message": JSON.stringify(notification)});
                 let event = { logger: { info: logFunc, error: logFunc }, Records: [{body: bodyString }]};
                 let services = { db};
@@ -251,7 +255,40 @@ describe('machine-learning-actual-actions-processor', function(){  //TEMP:RJ:TES
             })
     });
 
-   
+    it('should log an error to sumo if adding a feedback rule would create more than 300 feedback rules, and the rule should not be created and no counts incremented', () => {
+        const testDictionaries = require('./data/narrativeDictionary.json');
+        const testTransactions = require('./data/transactions.json');
+        const testRules = require('./data/rulesMax.json');
+        const logs = [];
+        const expected = {
+            function: 'feedbackRuleGenerator.processTransactionImpl',
+            log: 'Continuing - Failed to process transaction',
+            err: 'Feedback rules limit exceeded'
+        };
+
+        return dbConnection.collection('Rule').insertMany(testRules)
+            .then(() => dbConnection.collection('Transaction').insertMany(testTransactions))
+            .then(() => dbConnection.collection('NarrativeDictionary').insertMany(testDictionaries))
+            .then(()=>{
+                const logFunc = (data) => {logs.push(data)};
+
+                let notification = {orgId:'e09c1bbc-75d4-425a-8913-754f64f08524', baId:'ee905d97-5922-6ddc-33b9-5a83ed280670', trId:1, region:'GBR'};
+                let bodyString = JSON.stringify({"Message": JSON.stringify(notification)});
+                let event = { logger: { info: logFunc, error: logFunc }, Records: [{body: bodyString }]};
+                let services = { db };
+                const params = {
+                    'rules.maxNumberOfUserRules': '300',
+                    'rules.maxNumberOfFeedbackRules': '300',
+                    'rules.maxNumberOfGlobalRules': '300'
+                };
+
+                return impl.run(event, params, services);
+            })
+            .then(() => {  // check log create
+                const found = logs.find(l => l.err === 'Feedback rules limit exceeded');
+                should(found).eql(expected);
+            })
+    });
 
     const collectionExists = (name) =>{
         return dbConnection.listCollections().toArray()

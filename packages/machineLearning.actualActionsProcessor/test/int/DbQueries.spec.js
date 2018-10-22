@@ -113,11 +113,11 @@ describe('machineLearning-actualActionsProcessor',() => {
             newRule.ruleConditions = [];
             newRule.ruleActions = [];
 
-            return queries.addFeedbackRule('d64c62df-2f23-49d1-aa35-d3b60a1945a5','8e286041-53bb-485a-9cc4-8178098e9252',newRule).then(() => {
-                return queries.getRuleBucket('d64c62df-2f23-49d1-aa35-d3b60a1945a5','8e286041-53bb-485a-9cc4-8178098e9252').then((bucket) => {
+            return queries.addFeedbackRule('d64c62df-2f23-49d1-aa35-d3b60a1945a5', '8e286041-53bb-485a-9cc4-8178098e9252', newRule).then(() => {
+                return queries.getRuleBucket('d64c62df-2f23-49d1-aa35-d3b60a1945a5', '8e286041-53bb-485a-9cc4-8178098e9252').then((bucket) => {
                     should(bucket.rules.length).eql(1);
                     should(bucket.rules[0].ruleName).eql('integrationTestRule1');
-                });   
+                });
             });
         });
 
@@ -132,14 +132,14 @@ describe('machineLearning-actualActionsProcessor',() => {
 
             const testRules = require('./data/rules.json');
             return dbConnection.collection('Rule').insertMany(testRules).then(() => {
-                    return queries.addFeedbackRule('96616525-c5a3-4958-b1ee-fb856fd83403','5c94f4b7-bf84-418f-a6c6-a26349034a81',newRule)
-                }).then(()=>{
-                    return queries.getRuleBucket('96616525-c5a3-4958-b1ee-fb856fd83403','5c94f4b7-bf84-418f-a6c6-a26349034a81').then((bucket) => {
-                        should(bucket.rules.length).eql(2);
-                        should(bucket.rules[0].ruleName).eql('fred');
-                        should(bucket.rules[1].ruleName).eql('integrationTestRule2');
-                    });  
-                })
+                return queries.addFeedbackRule('96616525-c5a3-4958-b1ee-fb856fd83403', '5c94f4b7-bf84-418f-a6c6-a26349034a81', newRule)
+            }).then(() => {
+                return queries.getRuleBucket('96616525-c5a3-4958-b1ee-fb856fd83403', '5c94f4b7-bf84-418f-a6c6-a26349034a81').then((bucket) => {
+                    should(bucket.rules.length).eql(2);
+                    should(bucket.rules[0].ruleName).eql('fred');
+                    should(bucket.rules[1].ruleName).eql('integrationTestRule2');
+                });
+            })
         });
 
         it('should not add a feedback rule to a bucket that has max feedback rules.', () => {
@@ -153,17 +153,53 @@ describe('machineLearning-actualActionsProcessor',() => {
 
             const testRules = require('./data/rulesMax.json');
             return dbConnection.collection('Rule').insertMany(testRules).then(() => {
-                return queries.addFeedbackRule('96616525-c5a3-4958-b1ee-fb856fd83403', '5c94f4b7-bf84-418f-a6c6-a26349034a81', newRule)
+                return queries.addFeedbackRule('e09c1bbc-75d4-425a-8913-754f64f08524', 'ee905d97-5922-6ddc-33b9-5a83ed280670', newRule)
                     .catch((err) => {
                         should(err.message).eql('Feedback rules limit exceeded');
                     })
             })
                 .then(() => {
-                    return queries.getRuleBucket('96616525-c5a3-4958-b1ee-fb856fd83403', '5c94f4b7-bf84-418f-a6c6-a26349034a81').then((bucket) => {
+                    return queries.getRuleBucket('e09c1bbc-75d4-425a-8913-754f64f08524', 'ee905d97-5922-6ddc-33b9-5a83ed280670').then((bucket) => {
                         should(bucket.rules.length).eql(300);
                     });
                 })
-        })
+        });
+
+        // FR03 if it can add 2 and update the counts via the addFeedbackRule it can add 300
+        it('should add up to 300 feedback rules to the clients rule bucket and increment the rules count accordingly', () => {
+
+            const createRule = (ruleNum) => {
+                const newRule = new Rule();
+                const ruleName = 'integrationTestRule';
+                newRule.targetType = 'Transaction';
+                newRule.status = 'active';
+                newRule.ruleConditions = [{
+                    "ruleField": "transactionAmount",
+                    "ruleOperation": "gt",
+                    "ruleCriteria": `${ruleNum}`
+                }];
+                newRule.ruleActions = [];
+                newRule.ruleName = `${ruleName}${ruleNum}`;
+                newRule.ruleRank = ruleNum;
+                return newRule;
+            };
+
+            let newRule = createRule(1);
+            return queries.addFeedbackRule('d64c62df-2f23-49d1-aa35-d3b60a1945a5', '8e286041-53bb-485a-9cc4-8178098e9252', newRule)
+                .then(() => {
+                    newRule = createRule(2);
+                    return queries.addFeedbackRule('d64c62df-2f23-49d1-aa35-d3b60a1945a5', '8e286041-53bb-485a-9cc4-8178098e9252', newRule)
+                })
+                .then(() => {
+                    return queries.getRuleBucket('d64c62df-2f23-49d1-aa35-d3b60a1945a5', '8e286041-53bb-485a-9cc4-8178098e9252').then((bucket) => {
+                        should(bucket.rules.length).eql(2);
+                        should(bucket.numberOfRules).eql(2);
+                        should(bucket.numberOfUserRules).eql(0);
+                        should(bucket.numberOfFeedbackRules).eql(2);
+                        should(bucket.numberOfGlobalRules).eql(0);
+                    })
+                });
+        });
     });
 
     describe('getNarrativeDictionary', () => {
