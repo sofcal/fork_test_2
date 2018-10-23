@@ -15,61 +15,58 @@ const serviceImpls = { DB };
 
 const keys = require('./params');
 
-module.exports.run = (event, context, callback) => {
-    const func = 'handler.run';
+class Handler {
+    static run(event, context, callback) {
+        const func = 'handler.run';
+        const { Environment: env = 'test', AWS_REGION: region = 'local' } = process.env;
+        const services = {};
+        return Promise.resolve(undefined)
+            .then(() => {
+                // eslint-disable-next-line no-param-reassign
+                event.logger = RequestLogger.Create({ service: 'jwt-certificate-rotation' });
+                if (!env || !region) {
+                    const log = `invalid parameters - env: ${env}; region: ${region};`;
+                    event.logger.error({ function: func, log });
+                    throw StatusCodeError.CreateFromSpecs([ErrorSpecs.invalidEvent], ErrorSpecs.invalidEvent.statusCode);
+                }
 
-    // eslint-disable-next-line no-param-reassign
-    event.logger = RequestLogger.Create({ service: 'jwt-certificate-rotation' });
-    event.logger.info({ function: func, log: 'started' });
+                return getParams({ env, region }, event.logger)
+                    .then((params) => {
+                        return populateServices(services, { env, region, params }, event.logger)
+                            .then(() => {
+                                return connectDB(services, { env, region }, params, event.logger)
+                                    .then(() => params);
+                            });
+                    });
+            })
+            .then((params) => impl.run(event, params, services))
+            .then((ret) => {
+                const response = {
+                    statusCode: 200,
+                    body: JSON.stringify(ret)
+                };
 
-    // these environment variables allow us to retrieve the correct param-store values for more configurable options
-    const { Environment: env = 'test', AWS_REGION: region = 'local' } = process.env;
-    const services = {};
+                event.logger.info({ function: func, log: 'sending success response: 200' });
+                callback(null, response);
+            })
+            .catch((err) => {
+                event.logger.error({ function: func, log: 'an error occurred while processing the request', error: err.message || err });
 
-    return Promise.resolve(undefined)
-        .then(() => {
-            if (!env || !region) {
-                const log = `invalid parameters - env: ${env}; region: ${region};`;
-                event.logger.error({ function: func, log });
-                throw StatusCodeError.CreateFromSpecs([ErrorSpecs.invalidEvent], ErrorSpecs.invalidEvent.statusCode);
-            }
+                const statusCodeError = StatusCodeError.is(err)
+                    ? err
+                    : StatusCodeError.CreateFromSpecs([ErrorSpecs.internalServer], ErrorSpecs.internalServer.statusCode);
 
-            return getParams({ env, region }, event.logger)
-                .then((params) => {
-                    return populateServices(services, { env, region, params }, event.logger)
-                        .then(() => {
-                            return connectDB(services, { env, region }, params, event.logger)
-                                .then(() => params);
-                        });
-                });
-        })
-        .then((params) => impl.run(event, params, services))
-        .then((ret) => {
-            const response = {
-                statusCode: 200,
-                body: JSON.stringify(ret)
-            };
+                const response = statusCodeError.toDiagnoses();
+                const status = statusCodeError.statusCode;
 
-            event.logger.info({ function: func, log: 'sending success response: 200' });
-            callback(null, response);
-        })
-        .catch((err) => {
-            event.logger.error({ function: func, log: 'an error occurred while processing the request', error: err.message || err });
-
-            const statusCodeError = StatusCodeError.is(err)
-                ? err
-                : StatusCodeError.CreateFromSpecs([ErrorSpecs.internalServer], ErrorSpecs.internalServer.statusCode);
-
-            const response = statusCodeError.toDiagnoses();
-            const status = statusCodeError.statusCode;
-
-            event.logger.info({ function: func, log: `sending failure response: ${status}`, response });
-            callback(err.failLambda ? err : null, { statusCode: status, body: JSON.stringify(response) });
-        })
-        .finally(() => {
-            return disconnectDB(services, event.logger);
-        });
-};
+                event.logger.info({ function: func, log: `sending failure response: ${status}`, response });
+                callback(err.failLambda ? err : null, { statusCode: status, body: JSON.stringify(response) });
+            })
+            .finally(() => {
+                return disconnectDB(services, event.logger);
+            });
+    }
+}
 
 const getParams = ({ env, region }, logger) => {
     const func = 'handler.getParams';
@@ -141,3 +138,5 @@ const disconnectDB = Promise.method((services, logger) => {
             logger.info({ function: func, log: 'ended' });
         });
 });
+
+module.exports.run = Handler.run;
