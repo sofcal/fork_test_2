@@ -5,12 +5,14 @@ const ErrorSpecs = require('../../lib/ErrorSpecs');
 const should = require('should');
 const sinon = require('sinon');
 const Promise = require('bluebird');
+const _ = require('underscore');
 
 const { ParameterStoreStaticLoader } = require('internal-parameterstore-static-loader');
 const DB = require('internal-services-db');
 const { StatusCodeError, StatusCodeErrorItem } = require('internal-status-code-error');
+const serviceLoader = require('../../lib/serviceLoader');
 
-describe('__package_name__.handler', function() {
+describe('jwt-certificate-rotation.handler', function() {
     let sandbox;
     let config, context, event;
 
@@ -28,10 +30,12 @@ describe('__package_name__.handler', function() {
 
     before(() => {
         sandbox = sinon.createSandbox();
+        event = { AWS_REGION: region, env };
     });
 
     beforeEach(() => {
         context = { context: 'context' };
+        sandbox.stub(process, 'env').value(_.extend(process.env, {Environment: env, AWS_REGION: region}));
         event = { AWS_REGION: region, env };
 
         config = {
@@ -85,6 +89,7 @@ describe('__package_name__.handler', function() {
         sandbox.stub(DB, 'Create').returns(db);
         sandbox.stub(db, 'connect').resolves();
         sandbox.stub(db, 'disconnect').resolves();
+        sandbox.stub(process, 'env').value(_.omit(process.env, ['Environment', 'AWS_REGION']));
 
         const expected = { value: 'result' };
         sandbox.stub(impl, 'run').resolves(expected);
@@ -113,8 +118,15 @@ describe('__package_name__.handler', function() {
     });
 
     it('should connect and disconnect from the db', (done) => {
-        sandbox.stub(dummyLoader, 'load').resolves(config);
+        sandbox.stub(dummyLoader, 'load').callsFake(Promise.method((params) => {
+            _.each(_.keys(config), (key) => {
+                params[key] = config[key];
+            });
+
+            return params;
+        }));
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
+        // sandbox.stub(handler, 'getParams').resolves(config);
         sandbox.stub(DB, 'Create').returns(db);
         sandbox.stub(db, 'connect').resolves();
         sandbox.stub(db, 'disconnect').resolves();
@@ -127,7 +139,7 @@ describe('__package_name__.handler', function() {
             .then(() => {
                 should(DB.Create.callCount).eql(1);
                 should(DB.Create.calledWithExactly(
-                    { env, region, domain, username, password, replicaSet }
+                    { env, region, domain, username, password, replicaSet, db: 'bank_db' }
                 )).eql(true);
 
                 should(db.connect.callCount).eql(1);
@@ -167,7 +179,12 @@ describe('__package_name__.handler', function() {
     });
 
     it('should call impl.run', (done) => {
-        sandbox.stub(dummyLoader, 'load').resolves(config);
+        sandbox.stub(dummyLoader, 'load').callsFake(Promise.method((params) => {
+            _.each(_.keys(config), (key) => {
+                params[key] = config[key];
+            });
+            return params;
+        }));
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
         sandbox.stub(DB, 'Create').returns(db);
         sandbox.stub(db, 'connect').resolves();
@@ -179,9 +196,13 @@ describe('__package_name__.handler', function() {
         handler.run(event, context, () => {
             try {
                 should(impl.run.callCount).eql(1);
-                should(impl.run.calledWithExactly(
-                    event, config, { db }
+
+                should(impl.run.calledWith(
+                    event, config
                 )).eql(true);
+
+                should(impl.run.getCall(0).args[2]).have.property('parameter');
+                should(impl.run.getCall(0).args[2]).have.property('db');
 
                 done();
             } catch(err) {
@@ -191,7 +212,12 @@ describe('__package_name__.handler', function() {
     });
 
     it('should call the callback with the success response', (done) => {
-        sandbox.stub(dummyLoader, 'load').resolves(config);
+        sandbox.stub(dummyLoader, 'load').callsFake(Promise.method((params) => {
+            _.each(_.keys(config), (key) => {
+                params[key] = config[key];
+            });
+            return params;
+        }));
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
         sandbox.stub(DB, 'Create').returns(db);
         sandbox.stub(db, 'connect').resolves();
@@ -217,7 +243,12 @@ describe('__package_name__.handler', function() {
     });
 
     it('should call the callback with diagnoses', (done) => {
-        sandbox.stub(dummyLoader, 'load').resolves(config);
+        sandbox.stub(dummyLoader, 'load').callsFake(Promise.method((params) => {
+            _.each(_.keys(config), (key) => {
+                params[key] = config[key];
+            });
+            return params;
+        }));
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
         sandbox.stub(DB, 'Create').returns(db);
         sandbox.stub(db, 'connect').resolves();
@@ -243,7 +274,12 @@ describe('__package_name__.handler', function() {
     });
 
     it('should call the callback with a default 500 if impl throws an unexpected error', (done) => {
-        sandbox.stub(dummyLoader, 'load').resolves(config);
+        sandbox.stub(dummyLoader, 'load').callsFake(Promise.method((params) => {
+            _.each(_.keys(config), (key) => {
+                params[key] = config[key];
+            });
+            return params;
+        }));
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
         sandbox.stub(DB, 'Create').returns(db);
         sandbox.stub(db, 'connect').resolves();

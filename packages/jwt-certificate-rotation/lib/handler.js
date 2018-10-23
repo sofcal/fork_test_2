@@ -3,6 +3,7 @@
 const Promise = require('bluebird');
 const impl = require('./impl');
 const ErrorSpecs = require('./ErrorSpecs');
+const serviceLoader = require('./serviceLoader');
 
 const { ParameterStoreStaticLoader } = require('internal-parameterstore-static-loader');
 const { RequestLogger } = require('internal-request-logger');
@@ -18,11 +19,11 @@ module.exports.run = (event, context, callback) => {
     const func = 'handler.run';
 
     // eslint-disable-next-line no-param-reassign
-    event.logger = RequestLogger.Create({ service: '__package_name__' });
+    event.logger = RequestLogger.Create({ service: 'jwt-certificate-rotation' });
     event.logger.info({ function: func, log: 'started' });
 
     // these environment variables allow us to retrieve the correct param-store values for more configurable options
-    const { Environment: env, AWS_REGION: region } = process.env;
+    const { Environment: env = 'test', AWS_REGION: region = 'local' } = process.env;
     const services = {};
 
     return Promise.resolve(undefined)
@@ -35,8 +36,11 @@ module.exports.run = (event, context, callback) => {
 
             return getParams({ env, region }, event.logger)
                 .then((params) => {
-                    return connectDB(services, { env, region }, params, event.logger)
-                        .then(() => params);
+                    return populateServices(services, { env, region, params }, event.logger)
+                        .then(() => {
+                            return connectDB(services, { env, region }, params, event.logger)
+                                .then(() => params);
+                        });
                 });
         })
         .then((params) => impl.run(event, params, services))
@@ -92,6 +96,16 @@ const getParams = ({ env, region }, logger) => {
         });
 };
 
+const populateServices = Promise.method((services, { env, region, params }, logger) => {
+    const func = 'handler.populateServices';
+    logger.info({ function: func, log: 'started' });
+    // add any additional services that are created by the serviceLoader for the lambda
+    Object.assign(services, serviceLoader({ env, region, params, logger }));
+
+    logger.info({ function: func, log: 'ended' });
+    return services;
+});
+
 const connectDB = (services, { env, region }, params, logger) => {
     const func = 'handler.connectDB';
     logger.info({ function: func, log: 'started' });
@@ -104,7 +118,7 @@ const connectDB = (services, { env, region }, params, logger) => {
     } = params;
 
     // eslint-disable-next-line no-param-reassign
-    services.db = serviceImpls.DB.Create({ env, region, domain, username, password, replicaSet });
+    services.db = serviceImpls.DB.Create({ env, region, domain, username, password, replicaSet, db: 'bank_db' });
 
     return services.db.connect('bank_db')
         .then((db) => {
