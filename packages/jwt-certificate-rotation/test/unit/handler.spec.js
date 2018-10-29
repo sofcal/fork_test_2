@@ -1,4 +1,5 @@
 const handler = require('../../lib/handler');
+const Jwt = require('../../lib/index');
 const impl = require('../../lib/impl');
 const keys = require('../../lib/params');
 const ErrorSpecs = require('../../lib/ErrorSpecs');
@@ -48,6 +49,15 @@ describe('jwt-certificate-rotation.handler', function() {
 
     afterEach(() => {
         sandbox.restore();
+    });
+
+    it('should do something', (done) => {
+        const jwt = new Jwt().run();
+        // console.log(jwt.options);
+        // return jwt.run()
+        //     .then(() => {
+        //         done();
+        //     });
     });
 
     it('should retrieve params from param-store', (done) => {

@@ -62,7 +62,7 @@ custom:
 
 functions:
   run:
-    handler: lib/handler.run
+    handler: lib/index.run
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events

@@ -3,13 +3,19 @@
 const Promise = require('bluebird');
 const validate = require('./validators');
 
-module.exports.run = Promise.method((event, params, services) => {
-    const func = 'impl.run';
-    event.logger.info({ function: func, log: 'started' });
+class Impl {
+    static run(event, params, services) {
+        return Promise.method(() => {
+            const func = 'impl.run';
+            event.logger.info({ function: func, log: 'started' });
 
-    const { env, region } = event;
+            const { env, region } = event;
 
-    validate.event(event);
+            validate.event(event);
 
-    return { value: 'sample body' };
-});
+            return { value: 'sample body' };
+        })
+    }
+}
+
+module.exports.run = Impl.run;

@@ -1,9 +1,7 @@
 'use strict';
 
 const Promise = require('bluebird');
-const impl = require('./impl');
 const ErrorSpecs = require('./ErrorSpecs');
-const serviceLoader = require('./serviceLoader');
 
 const { ParameterStoreStaticLoader } = require('internal-parameterstore-static-loader');
 const { RequestLogger } = require('internal-request-logger');
@@ -13,33 +11,49 @@ const DB = require('internal-services-db');
 
 const serviceImpls = { DB };
 
-const keys = require('./params');
-
 class Handler {
-    static run(event,context,callback) {
+    constructor({ dbName, serviceLoader, keys }) {
+        if (new.target === Handler) {
+            throw new Error('Handler should not be instantiated; extend Handler instead.');
+        }
+        if (!dbName || typeof dbName !== 'string') {
+            throw new Error('dbName must be a string');
+        }
+        if (!serviceLoader || typeof serviceLoader !== 'function') {
+            throw new Error('serviceLoader must be a function');
+        }
+        if (!keys || !Array.isArray(keys)) {
+            throw new Error('keys must be an array');
+        }
+        this.dbName = dbName;
+        this.services = {};
+        this.serviceLoader = serviceLoader;
+        this.keys = keys;
+    }
+
+    run(event, context, callback) {
         const func = 'handler.run';
+        const self = this;
         const { Environment: env = 'test', AWS_REGION: region = 'local' } = process.env;
-        const services = {};
+        const services = self.services || {};
         return Promise.resolve(undefined)
             .then(() => {
                 // eslint-disable-next-line no-param-reassign
-                event.logger = RequestLogger.Create({ service: '__package_name__' });
+                event.logger = RequestLogger.Create({ service: 'internal-handler' });
                 if (!env || !region) {
                     const log = `invalid parameters - env: ${env}; region: ${region};`;
                     event.logger.error({ function: func, log });
                     throw StatusCodeError.CreateFromSpecs([ErrorSpecs.invalidEvent], ErrorSpecs.invalidEvent.statusCode);
                 }
 
-                return getParams({ env, region }, event.logger)
+                return getParams({ env, region }, self, event.logger)
                     .then((params) => {
-                        return populateServices(services, { env, region, params }, event.logger)
-                            .then(() => {
-                                return connectDB(services, { env, region }, params, event.logger)
-                                    .then(() => params);
-                            });
+                        return self.populateServices({ env, region, params }, event.logger)
+                            .then(() => connectDB(self.services, params, event.logger, self.dbName))
+                            .then(() => params);
                     });
             })
-            .then((params) => impl.run(event, params, services))
+            .then((params) => this.impl(event, params, services))
             .then((ret) => {
                 const response = {
                     statusCode: 200,
@@ -67,9 +81,42 @@ class Handler {
             });
     }
 
+    impl() { // eslint-disable-line class-methods-use-this
+        throw new Error('impl function should be extended');
+    }
+
+    loadAdditionalServices() {
+        throw new Error('loadAdditionalServices function should be extended');
+    }
+
+    populateServices(...args) {
+        return populateServicesImpl(this, ...args);
+    }
 }
 
-const getParams = ({ env, region }, logger) => {
+const populateServicesImpl = Promise.method((self, services, { env, region, params }, logger) => {
+    const func = 'handler.populateServices';
+    logger.info({ function: func, log: 'started' });
+
+    const {
+        'defaultMongo.username': username,
+        'defaultMongo.password': password,
+        'defaultMongo.replicaSet': replicaSet,
+        domain
+    } = params;
+
+    // eslint-disable-next-line no-param-reassign
+    services.db = serviceImpls.DB.Create({ env, region, domain, username, password, replicaSet, db: self.dbName = 'bank_db' });
+
+    // add any additional services that are created by the serviceLoader for the lambda
+    self.loadAdditionalServices();
+
+    logger.info({ function: func, log: 'ended' });
+    return services;
+});
+
+const getParams = ({ env, region }, self, logger) => {
+    const { keys } = self; // eslint-disable-line no-shadow
     const func = 'handler.getParams';
     logger.info({ function: func, log: 'started' });
 
@@ -94,31 +141,11 @@ const getParams = ({ env, region }, logger) => {
         });
 };
 
-const populateServices = Promise.method((services, { env, region, params }, logger) => {
-    const func = 'handler.populateServices';
-    logger.info({ function: func, log: 'started' });
-    // add any additional services that are created by the serviceLoader for the lambda
-    Object.assign(services, serviceLoader({ env, region, params, logger }));
-
-    logger.info({ function: func, log: 'ended' });
-    return services;
-});
-
-const connectDB = (services, { env, region }, params, logger) => {
+const connectDB = (services, params, logger, dbName) => {
     const func = 'handler.connectDB';
     logger.info({ function: func, log: 'started' });
 
-    const {
-        'defaultMongo.username': username,
-        'defaultMongo.password': password,
-        'defaultMongo.replicaSet': replicaSet,
-        domain
-    } = params;
-
-    // eslint-disable-next-line no-param-reassign
-    services.db = serviceImpls.DB.Create({ env, region, domain, username, password, replicaSet });
-
-    return services.db.connect('bank_db')
+    return services.db.connect(dbName)
         .then((db) => {
             logger.info({ function: func, log: 'ended' });
             return db;
@@ -140,4 +167,4 @@ const disconnectDB = Promise.method((services, logger) => {
         });
 });
 
-module.exports.run = Handler.run;
+module.exports = Handler;
