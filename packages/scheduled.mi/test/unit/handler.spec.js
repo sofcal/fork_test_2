@@ -10,7 +10,7 @@ const { ParameterStoreStaticLoader } = require('internal-parameterstore-static-l
 const DB = require('internal-services-db');
 const { StatusCodeError, StatusCodeErrorItem } = require('internal-status-code-error');
 
-describe('__package_name__.handler', function() {
+describe('scheduled-mi.handler', function() {
     let sandbox;
     let config, context, event;
 
