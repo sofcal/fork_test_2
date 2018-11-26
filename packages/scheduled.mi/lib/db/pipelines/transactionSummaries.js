@@ -23,10 +23,10 @@ module.exports = ({ bankAccountId } = {}) => {
                 _id: '$bankAccountId',
                 creditsTotalCount: { $sum: { $cond: [{ $gte: ['$transactions.transactionAmount', 0] }, 1, 0] } },
                 creditsTotalValue: { $sum: { $cond: [{ $gte: ['$transactions.transactionAmount', 0] }, '$transactions.transactionAmount', 0] } },
-                creditsMaxValue: { $max: '$transactions.transactionAmount' },
+                creditsMaxValue: { $max: { $cond: [{ $gte: ['$transactions.transactionAmount', 0] }, '$transactions.transactionAmount', 0] } },
                 debitsTotalCount: { $sum: { $cond: [{ $lt: ['$transactions.transactionAmount', 0] }, 1, 0] } },
                 debitsTotalValue: { $sum: { $cond: [{ $lt: ['$transactions.transactionAmount', 0] }, '$transactions.transactionAmount', 0] } },
-                debitsMaxValue: { $min: '$transactions.transactionAmount' },
+                debitsMaxValue: { $min: { $cond: [{ $lt: ['$transactions.transactionAmount', 0] }, '$transactions.transactionAmount', 0] } },
                 absoluteTotalCount: { $sum: 1 },
                 absoluteTotalValue: { $sum: { $abs: '$transactions.transactionAmount' } },
             }
@@ -37,14 +37,14 @@ module.exports = ({ bankAccountId } = {}) => {
                 creditsTotalCount: 1,
                 creditsTotalValue: 1,
                 creditsMaxValue: 1,
-                creditsAverageValue: { $divide: ['$creditsTotalValue', '$creditsTotalCount'] },
+                creditsAverageValue: { $cond: [{ $eq: ['$creditsTotalCount', 0] }, '$creditsTotalCount', { $divide: ['$creditsTotalValue', '$creditsTotalCount'] }] },
                 debitsTotalCount: 1,
                 debitsTotalValue: 1,
                 debitsMaxValue: 1,
-                debitsAverageValue: { $divide: ['$debitsTotalValue', '$debitsTotalCount'] },
+                debitsAverageValue: { $cond: [{ $eq: ['$debitsTotalCount', 0] }, '$debitsTotalCount', { $divide: ['$debitsTotalValue', '$debitsTotalCount'] }] },
                 absoluteTotalCount: 1,
                 absoluteTotalValue: 1,
-                absoluteAverageValue: { $divide: ['$absoluteTotalValue', '$absoluteTotalCount'] },
+                absoluteAverageValue: { $cond: [{ $eq: ['$absoluteTotalCount', 0] }, '$absoluteTotalCount', { $divide: ['$absoluteTotalValue', '$absoluteTotalCount'] }] }
             }
         }
     ];

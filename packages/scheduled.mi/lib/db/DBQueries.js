@@ -25,7 +25,7 @@ class DBQueries {
     }
 }
 
-const organisationsCompaniesBankAccountsImpl = Promise.method((self, { organisationId = null, productId = null, count = false , all = false } = {}) => {
+const organisationsCompaniesBankAccountsImpl = Promise.method((self, { organisationId = null, productId = null, count = false, all = false } = {}) => {
     const collection = self.db.collection('Organisation');
     const pipeline = self.pipelines.organisationsCompaniesBankAccounts({ organisationId, productId, count });
 
