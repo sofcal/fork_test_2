@@ -9,13 +9,15 @@ const getBucketName = require('./getBucketName');
 // external modules
 const Promise = require('bluebird');
 const moment = require('moment');
+const _ = require('underscore');
+
+const consts = {
+    KEY_PREFIX: 'mi'
+};
 
 class BlobStorage {
     constructor({ s3, thisRegion, otherRegion, env, bucketName }) {
         this.s3 = s3;
-
-        this.thisRegion = thisRegion;
-        this.otherRegion = otherRegion;
 
         this.thisBucket = getBucketName({ env, region: thisRegion, bucketName });
         this.otherBucket = getBucketName({ env, region: otherRegion, bucketName });
@@ -30,8 +32,8 @@ class BlobStorage {
     }
 }
 
-const getResultsImpl = Promise.method((self, { keyOverride, other = false }) => {
-    const key = keyOverride || `${moment.utc().format('YYYY-MM-DD')}_${self.thisRegion}`;
+const getResultsImpl = Promise.method((self, { keyPostfix, other = false }) => {
+    const key = `${consts.KEY_PREFIX}/${moment.utc().format('YYYY-MM-DD')}/${keyPostfix}.json`;
     const bucket = other ? self.otherBucket : self.thisBucket;
 
     console.log('getResultsImpl', bucket, key);
@@ -39,12 +41,12 @@ const getResultsImpl = Promise.method((self, { keyOverride, other = false }) => 
         .then((result) => ({ key, result }));
 });
 
-const storeResultsImpl = Promise.method((self, { keyOverride, results }) => {
-    const key = keyOverride || `${moment.utc().format('YYYY-MM-DD')}_${self.thisRegion}`;
+const storeResultsImpl = Promise.method((self, { keyPostfix, results, stringified }) => {
+    const key = `${consts.KEY_PREFIX}/${moment.utc().format('YYYY-MM-DD')}/${keyPostfix}.json`;
 
     const readable = new Readable();
     readable._read = () => {}; // _read should be used to populate the stream, but we're pushing direct to it as we have the data in memory
-    readable.push(JSON.stringify(results));
+    readable.push(stringified || JSON.stringify(results));
     readable.push(null);
 
     console.log('storeResultsImpl', self.thisBucket, key);

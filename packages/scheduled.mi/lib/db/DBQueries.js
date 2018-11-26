@@ -8,6 +8,11 @@ const pipelines = require('./pipelines');
 // external modules
 const Promise = require('bluebird');
 
+// consts
+const consts = {
+    DEFAULT_OPTIONS: Object.freeze({ allowDiskUse: true, readPreference: 'secondary' })
+};
+
 class DBQueries {
     constructor({ db }) {
         this.db = db;
@@ -29,7 +34,7 @@ const organisationsCompaniesBankAccountsImpl = Promise.method((self, { organisat
     const collection = self.db.collection('Organisation');
     const pipeline = self.pipelines.organisationsCompaniesBankAccounts({ organisationId, productId, count });
 
-    const promise = collection.aggregate(pipeline, { allowDiskUse: true });
+    const promise = collection.aggregate(pipeline, consts.DEFAULT_OPTIONS);
 
     if (!all) {
         return promise;
@@ -38,11 +43,11 @@ const organisationsCompaniesBankAccountsImpl = Promise.method((self, { organisat
     return promise.toArray();
 });
 
-const transactionSummariesImpl = Promise.method((self, { unresolved = false, bankAccountId = null, all = false } = {}) => {
+const transactionSummariesImpl = Promise.method((self, { unresolved = false, bankAccountIds = null, all = false } = {}) => {
     const collection = self.db.collection(unresolved ? 'Unresolved' : 'Transaction');
-    const pipeline = self.pipelines.transactionSummaries({ bankAccountId });
+    const pipeline = self.pipelines.transactionSummaries({ bankAccountIds });
 
-    const promise = collection.aggregate(pipeline, { allowDiskUse: true });
+    const promise = collection.aggregate(pipeline, consts.DEFAULT_OPTIONS);
 
     if (!all) {
         return promise;
@@ -55,7 +60,7 @@ const orphanedBankAccountsImpl = Promise.method((self, { all = false }) => {
     const collection = self.db.collection('BankAccount');
     const pipeline = self.pipelines.orphanedBankAccounts();
 
-    const promise = collection.aggregate(pipeline, { allowDiskUse: true });
+    const promise = collection.aggregate(pipeline, consts.DEFAULT_OPTIONS);
 
     if (!all) {
         return promise;

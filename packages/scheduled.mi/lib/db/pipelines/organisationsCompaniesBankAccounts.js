@@ -21,20 +21,19 @@ module.exports = ({ productId, count } = {}) => {
     }
 
     const pipeline = [
-        // find all organisations for the product/organisationId
-        // { $match: { 'products.productId': productId } },
-        { $match: { _id: { $in: ['5a1431ff-16b2-48ca-9c5e-c6c80c9db5bd', 'c66b1e91-6987-46fa-b624-d0875be2cb13'] } } },
+        { $match: { 'products.productId': productId } },
+        // { $match: { _id: { $in: ['782c0a2f-854b-4488-856d-681d2f776f63', 'd6fff9c2-afba-4b45-a38d-3810a7ea54a5'] } } },
         // remove properties that we don't care about using a project
         {
             $project: {
-                _id: '$_id',
-                type: '$type',
+                _id: 1,
+                type: 1,
                 // since products is an array, we need the map function to get it into the shape we want (with just an _id field)
                 products: { $map: { input: '$products', as: 'product', in: { _id: '$$product.productId' } } },
-                bankAccounts_bck: '$bankAccounts',
-                bankAccounts: '$bankAccounts',
-                companies_bck: '$companies',
-                companies: '$companies'
+                bankAccountCount: { $size: '$bankAccounts' },
+                bankAccounts: 1,
+                companyCount: { $size: '$companies' },
+                companies: 1
             }
         },
         // unwind the bankAccounts array to give us a single document for each bank account * see $unwind comment below
@@ -44,55 +43,62 @@ module.exports = ({ productId, count } = {}) => {
         { $lookup: { from: 'Bank', localField: 'bankAccountLookup.bankId', foreignField: '_id', as: 'bankLookup' } },
         {
             $project: {
-                _id: '$_id',
-                type: '$type',
-                products: '$products',
-                companies: '$companies',
+                _id: 1,
+                type: 1,
+                products: 1,
+                companyCount: 1,
+                companies: 1,
+                bankAccountCount: 1,
                 bankAccounts: {
                     _id: '$bankAccounts.bankAccountId',
-                    region: '$bankAccounts.region',
+                    region: 1,
                     deleted: { $cond: [{ $not: ['$bankAccounts.deleted'] }, null, '$bankAccounts.deleted'] },
-                    // deleted: { $cond: { if: { $eq: ['$bankAccounts.deleted', undefined] }, then: null, else: '$bankAccounts.deleted' } },
 
                     missing: { $cond: [{ $not: ['$bankAccountLookup'] }, true, false] },
-                    // missing: { $cond: { if: { $eq: ['$bankAccountLookup', undefined] }, then: true, else: false } },
 
                     status: { $cond: [{ $not: ['$bankAccountLookup'] }, null, '$bankAccountLookup.status'] },
-                    // status: { $cond: { if: { $eq: ['$bankAccountLookup', undefined] }, then: null, else: '$bankAccountLookup.status' } },
+                    transactionCount: { $cond: [{ $not: ['$bankAccountLookup'] }, null, { $add: ['$lastTransactionId', '$lastHeldTransactionId'] }] },
                     bankId: { $cond: [{ $not: ['$bankAccountLookup'] }, null, '$bankAccountLookup.bankId'] },
                     bankName: { $cond: [{ $not: ['$bankAccountLookup'] }, null, { $arrayElemAt: ['$bankLookup.name', 0] }] },
-                    // bankName: { $cond: { if: { $eq: ['$bankAccountLookup', undefined] }, then: null, else: { $arrayElemAt: ['$bankLookup.name', 0] } } },
                     aggregatorName: { $cond: [{ $not: ['$bankAccountLookup'] }, null, '$bankAccountLookup.aggregatorName'] },
-                    // aggregatorName: { $cond: { if: { $eq: ['$bankAccountLookup', undefined] }, then: null, else: '$bankAccountLookup.aggregatorName' } },
-                    accountantManaged: { $cond: [{ $not: ['$bankAccountLookup'] }, null, '$bankAccountLookup.accountant.accountantManaged'] },
-                    // accountantManaged: { $cond: { if: { $eq: ['$bankAccountLookup', undefined] }, then: null, else: '$bankAccountLookup.accountant.accountantManaged' } },
+                    accountantManaged: { $cond: [{ $not: ['$bankAccountLookup'] }, null, '$bankAccountLookup.accountant.accountantManaged'] }
                 }
             }
         },
-        { $group: { _id: { _id: '$_id', type: '$type', products: '$products', companies: '$companies' }, bankAccounts: { $addToSet: '$bankAccounts' } } },
-        { $project: { _id: '$_id._id', type: '$_id.type', products: '$_id.products', companies: '$_id.companies', bankAccounts: '$bankAccounts' } },
+        { $group: { _id: { _id: '$_id', type: '$type', products: '$products', companyCount: '$companyCount', companies: '$companies', bankAccountCount: '$bankAccountCount' }, bankAccounts: { $addToSet: '$bankAccounts' } } },
+        { $project: { _id: '$_id._id', type: '$_id.type', products: '$_id.products', companyCount: '$_id.companyCount', companies: '$_id.companies', bankAccountCount: '$_id.bankAccountCount', bankAccounts: '$bankAccounts' } },
 
         { $unwind: { path: '$companies', preserveNullAndEmptyArrays: true } },
         { $lookup: { from: 'Company', localField: 'companies', foreignField: '_id', as: 'companyLookup' } },
         { $unwind: { path: '$companyLookup', preserveNullAndEmptyArrays: true } },
         {
             $project: {
-                _id: '$_id',
-                type: '$type',
-                products: '$products',
-                bankAccounts: '$bankAccounts',
+                _id: 1,
+                type: 1,
+                products: 1,
+                bankAccountCount: 1,
+                bankAccounts: 1,
+                companyCount: 1,
                 companies: {
                     _id: '$companies',
                     bankAccountCount: { $size: { $cond: [{ $not: ['$companyLookup.bankAccounts'] }, [], '$companyLookup.bankAccounts'] } },
-                    // bankAccountCount: { $size: { $cond: { if: { $eq: ['$companyLookup.bankAccounts', undefined] }, then: [], else: '$companyLookup.bankAccounts' } } },
 
-                    missing: { $cond: [{ $not: ['$companyLookup'] }, true, false] },
-                    // missing: { $cond: { if: { $eq: ['$companyLookup', undefined] }, then: true, else: false } }
+                    missing: { $cond: [{ $not: ['$companyLookup'] }, true, false] }
                 }
             }
         },
-        { $group: { _id: { _id: '$_id', type: '$type', products: '$products', bankAccounts: '$bankAccounts' }, companies: { $addToSet: '$companies' } } },
-        { $project: { _id: '$_id._id', type: '$_id.type', products: '$_id.products', companies: '$companies', bankAccounts: '$_id.bankAccounts', bankAccountCount: { $size: '$_id.bankAccounts' }, companyCount: { $size: '$companies' } } },
+        { $group: { _id: { _id: '$_id', type: '$type', products: '$products', bankAccounts: '$bankAccounts', bankAccountCount: '$bankAccountCount', companyCount: '$companyCount' }, companies: { $addToSet: '$companies' } } },
+        {
+            $project: {
+                _id: '$_id._id',
+                type: '$_id.type',
+                products: '$_id.products',
+                companyCount: '$_id.companyCount',
+                companies: { $cond: [{ $gt: ['$_id.companyCount', 0] }, '$companies', []] },
+                bankAccountCount: '$_id.bankAccountCount',
+                bankAccounts: { $cond: [{ $gt: ['$_id.bankAccountCount', 0] }, '$_id.bankAccounts', []] }
+            }
+        }
     ];
 
     if (count) {
