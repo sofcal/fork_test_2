@@ -11,20 +11,43 @@ const flows = require('./flows');
 // external modules
 const Promise = require('bluebird');
 const _ = require('underscore');
+const moment = require('moment');
+
+const consts = {
+    all: 'ALL'
+};
 
 module.exports.run = Promise.method((event, params, services) => {
     const func = 'impl.run';
     event.logger.info({ function: func, log: 'started' });
 
-    const { Environment: env, AWS_REGION: region, bucket } = process.env;
-    const { products, concat, orphans } = event;
+    const { Environment: env, AWS_REGION: thisRegion, bucket: bucketName } = process.env;
+    const { orphans } = event;
+    let { products, concat } = event;
 
     validate.event(event);
 
+    const otherRegion = BlobStorage.getOtherRegion(thisRegion);
+
     const queries = new DBQueries({ db: services.db.getConnection() });
-    const blob = new BlobStorage({ s3: services.s3, thisRegion: region, otherRegion: 'us-east-1', env, bucketName: bucket });
+    const blob = new BlobStorage({ s3: services.s3, thisRegion, otherRegion, env, bucketName });
 
     return Promise.resolve(undefined)
+        .then(() => {
+            // ALL is used as a special keyword to specify the stage should run for ALL products. So we map the input
+            //  to the expected array of products
+            if (products !== consts.all && concat !== consts.all) {
+                return undefined;
+            }
+
+            return queries.products({ all: true })
+                .then((results) => {
+                    const mapped = _.map(results, (result) => ({ _id: result._id, name: result.name }));
+
+                    products = (products === consts.all) ? mapped : products;
+                    concat = (concat === consts.all) ? mapped : concat;
+                });
+        })
         .then(() => {
             if (!orphans) {
                 console.log('orphans flag not specified on event. Skipping orphans check.');
@@ -32,7 +55,7 @@ module.exports.run = Promise.method((event, params, services) => {
             }
 
             return flows.orphans(queries)
-                .then((results) => storeResults(blob, 'orphaned', results));
+                .then((results) => storeResults(blob, BlobStorage.Postfixes.orphaned, results));
         })
         .then(() => {
             if (!products) {
@@ -54,32 +77,14 @@ module.exports.run = Promise.method((event, params, services) => {
                 return undefined;
             }
 
-            // return gatherResults(queries, productId)
-            //     .then((thisRegionResults) => {
-            //         if (otherRegionResults) {
-            //             return concatResults(productId, thisRegionResults, otherRegionResults);
-            //         }
-            //
-            //         return thisRegionResults;
-            //     });
-            // return storeResults(blob, 'concatenated', results);
+            const keyPostfix = `${BlobStorage.Postfixes.concatenated}_${moment.utc().format('hh:mm:ss.SSS')}`;
+            return flows.concat(blob, [thisRegion, otherRegion], concat)
+                .then((results) => storeResults(blob, keyPostfix, results));
         })
         .then(() => {
             return { status: 'done' };
         });
 });
-
-
-const getOtherRegionResults = (blob, keyIn) => {
-    return blob.getResults({ other: true, keyIn })
-        .catch((err) => {
-            if (err.statusCode !== 404) {
-                throw err; // something bad happened
-            }
-
-            // swallow, the file isn't there and that's fine. Means this is the first region to run
-        });
-};
 
 const storeResults = (blob, keyPostfix, results) => {
     console.log('____WRITING DATA', keyPostfix);

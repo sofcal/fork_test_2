@@ -19,6 +19,9 @@ class DBQueries {
         this.pipelines = pipelines;
     }
 
+    products(...args) {
+        return productsImpl(this, ...args);
+    }
     organisationsCompaniesBankAccounts(...args) {
         return organisationsCompaniesBankAccountsImpl(this, ...args);
     }
@@ -29,6 +32,18 @@ class DBQueries {
         return orphanedBankAccountsImpl(this, ...args);
     }
 }
+
+const productsImpl = Promise.method((self, { all = false }) => {
+    const collection = self.db.collection('Product');
+
+    const promise = collection.find({}, consts.DEFAULT_OPTIONS);
+
+    if (!all) {
+        return promise;
+    }
+
+    return promise.toArray();
+});
 
 const organisationsCompaniesBankAccountsImpl = Promise.method((self, { organisationId = null, productId = null, count = false, all = false } = {}) => {
     const collection = self.db.collection('Organisation');

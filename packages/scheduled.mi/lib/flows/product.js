@@ -1,5 +1,5 @@
 // project
-const { ProductIntermediarySummary } = require('../summaries');
+const { ProductIntermediarySummary, TransactionSummary } = require('../summaries');
 
 // external modules
 const Promise = require('bluebird');
@@ -28,7 +28,7 @@ module.exports = Promise.method((queries, { _id: productId, name: productName })
                             // console.log('summary count: ', summaries.length);
                             _.each(summaries, (summary) => {
                                 // unlike with orphaned accounts, we can total these all up straight away and reduce memory footprint
-                                intermediary.transactionSummary.updateFrom(summary);
+                                intermediary.transactionSummary.updateFrom(new TransactionSummary(summary));
                             });
                         })
                         .catch((err) => {

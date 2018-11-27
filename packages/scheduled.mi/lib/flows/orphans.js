@@ -1,5 +1,5 @@
 // project
-const { OrphansIntermediarySummary } = require('../summaries');
+const { OrphansIntermediarySummary, TransactionSummary } = require('../summaries');
 
 // external modules
 const Promise = require('bluebird');
@@ -18,7 +18,7 @@ module.exports = Promise.method((queries) => {
                         .then((summaries) => {
                             // because we don't know yet if this account is actually linked, we can't total up
                             //  the values and instead have to store them per bank account
-                            bankAccount.transactionSummary = summaries.length ? summaries[0] : null; // eslint-disable-line no-param-reassign
+                            bankAccount.transactionSummary = summaries.length ? new TransactionSummary(summaries[0]) : null; // eslint-disable-line no-param-reassign
                             intermediary.orphaned.push(bankAccount);
                         })
                         .catch((err) => {

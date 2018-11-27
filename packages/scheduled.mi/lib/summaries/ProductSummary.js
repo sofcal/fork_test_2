@@ -1,7 +1,12 @@
 const TransactionSummary = require('./TransactionSummary');
 
+const _ = require('underscore');
+
 class ProductSummary {
-    constructor() {
+    constructor({ productId, productName }) {
+        this.productId = productId;
+        this.productName = productName;
+
         this.organisations = {
             total: 0,
             companiesMax: 0,
@@ -15,6 +20,7 @@ class ProductSummary {
 
         this.bankAccounts = {
             total: 0,
+            missing: 0,
             statuses: {
                 pending: 0,
                 active: 0,
@@ -43,10 +49,14 @@ class ProductSummary {
         });
 
         _.each(org.bankAccounts, (bankAccount) => {
-            this.bankAccounts.total += 1;
-            this.bankAccounts.statuses[bankAccount.status] += 1;
-            this.bankAccounts.accountantManaged += bankAccount.accountantManaged === 'none' ? 0 : 1;
-            this.bankAccounts.transactionsMax = Math.max(this.bankAccounts.transactionsMax, bankAccount.transactionCount);
+            if (bankAccount.missing) {
+                this.bankAccounts.missing += 1;
+            } else {
+                this.bankAccounts.total += 1;
+                this.bankAccounts.statuses[bankAccount.status] += 1;
+                this.bankAccounts.accountantManaged += bankAccount.accountantManaged === 'none' ? 0 : 1;
+                this.bankAccounts.transactionsMax = Math.max(this.bankAccounts.transactionsMax, bankAccount.transactionCount);
+            }
         });
     }
 }

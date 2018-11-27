@@ -1,15 +1,18 @@
+// external modules
+const Big = require('bignumber.js');
+
 class TransactionSummary {
     constructor(data = {}) {
         this.creditsTotalCount = data.creditsTotalCount || 0;
-        this.creditsTotalValue = data.creditsTotalValue || 0;
-        this.creditsMaxValue = data.creditsMaxValue || 0;
+        this.creditsTotalValue = Math.round(data.creditsTotalValue) || 0;
+        this.creditsMaxValue = Math.round(data.creditsMaxValue) || 0;
 
         this.debitsTotalCount = data.debitsTotalCount || 0;
-        this.debitsTotalValue = data.debitsTotalValue || 0;
-        this.debitsMaxValue = data.debitsMaxValue || 0;
+        this.debitsTotalValue = Math.round(data.debitsTotalValue) || 0;
+        this.debitsMaxValue = Math.round(data.debitsMaxValue) || 0;
 
         this.absoluteTotalCount = data.absoluteTotalCount || 0;
-        this.absoluteTotalValue = data.absoluteTotalValue || 0;
+        this.absoluteTotalValue = Math.round(data.absoluteTotalValue) || 0;
 
         this.creditsAverageValue = data.creditsAverageValue || null;
         this.debitsAverageValue = data.debitsAverageValue || null;
@@ -30,16 +33,17 @@ class TransactionSummary {
     }
 
     updateAverages() {
-        this.creditsAverageValue = average('credits');
-        this.debitsAverageValue = average('debits');
-        this.absoluteAverageValue = average('absolute');
+        this.creditsAverageValue = average(this, 'credits');
+        this.debitsAverageValue = average(this, 'debits');
+        this.absoluteAverageValue = average(this, 'absolute');
     }
 }
 
 const average = (self, type) => {
-    const value = self[`${type}TotalValue`];
-    const count = self[`${type}TotalCount`];
-    return Math.ceil(value / count);
+    const value = new Big(self[`${type}TotalValue`]);
+    const count = new Big(self[`${type}TotalCount`]);
+
+    return value.div(count).round(2).toNumber();
 };
 
 module.exports = TransactionSummary;
