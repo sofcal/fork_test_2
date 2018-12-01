@@ -1,6 +1,10 @@
 // project
 const { ResultsSummary, ProductSummary, TransactionSummary } = require('../summaries');
 const { BlobStorage } = require('../blob');
+const ErrorSpecs = require('../ErrorSpecs');
+
+// internal modules
+const { StatusCodeError } = require('internal-status-code-error');
 
 // external modules
 const Promise = require('bluebird');
@@ -25,8 +29,9 @@ const runImpl = Promise.method((self, { regions, productInfos }, { logger }) => 
     return retrieveAndPrepareOrphans(self.blob, regions, logger)
         .catch((err) => {
             // we need the orphans files to create valid data for ANY product, so without it we can't continue processing
-            logger.error({ function: func, log: 'failed to retrieve and merge orphans. Processing cannot continue', params: { error: logger.stringifiableError(err), rethrow: true } });
-            throw err;
+            const spec = _.extend({ params: { error: logger.stringifiableError(err), rethrow: true } }, ErrorSpecs.flows.concat.orphansFailure);
+            logger.error({ function: func, log: spec.message, params: spec.params });
+            throw StatusCodeError.CreateFromSpecs([spec], spec.statusCode);
         })
         .then((groupedOrphans) => {
             logger.info({ function: func, log: 'retrieved and merged orphans files', params: { } });

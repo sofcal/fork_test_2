@@ -1,8 +1,13 @@
 // project
 const { OrphansIntermediarySummary, TransactionSummary } = require('../summaries');
+const ErrorSpecs = require('../ErrorSpecs');
+
+// internal modules
+const { StatusCodeError } = require('internal-status-code-error');
 
 // external modules
 const Promise = require('bluebird');
+const _ = require('underscore');
 
 class Orphans {
     constructor(queries) {
@@ -39,8 +44,9 @@ const runImpl = Promise.method((self, options, { logger }) => {
                         })
                         .catch((err) => {
                             // if this happens, we can't feasibly continue, as something is clearly broken
-                            logger.info({ function: func, log: 'error retrieving transaction information for orphaned accounts', params: { error: logger.stringifiableError(err), rethrow: true } });
-                            throw err;
+                            const spec = _.extend({ params: { error: logger.stringifiableError(err), rethrow: true } }, ErrorSpecs.flows.orphans.transactionFailure);
+                            logger.error({ function: func, log: spec.message, params: spec.params });
+                            throw StatusCodeError.CreateFromSpecs([spec], spec.statusCode);
                         });
                 },
                 // we set a concurrency limit to ensure we don't overload the DB or our connections limit

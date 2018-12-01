@@ -1,5 +1,9 @@
 // project
 const { ProductIntermediarySummary, TransactionSummary } = require('../summaries');
+const ErrorSpecs = require('../ErrorSpecs');
+
+// internal modules
+const { StatusCodeError } = require('internal-status-code-error');
 
 // external modules
 const Promise = require('bluebird');
@@ -15,14 +19,14 @@ class Product {
     }
 }
 
-const runImpl = Promise.method((queries, { _id: productId, name: productName }, { logger }) => {
+const runImpl = Promise.method((self, { _id: productId, name: productName }, { logger }) => {
     const func = `${consts.LOG_PREFIX}.run`;
     logger.info({ function: func, log: 'started', params: { productId, productName } });
 
     const intermediary = new ProductIntermediarySummary({ productName, productId });
 
     logger.info({ function: func, log: 'retrieving organisations, companies and bank accounts for product', params: { productId, productName } });
-    return queries.organisationsCompaniesBankAccounts({ productId, all: true })
+    return self.queries.organisationsCompaniesBankAccounts({ productId, all: true }, { logger })
         .then((orgs) => {
             logger.info({ function: func, log: 'successfully retrieved organisations, companies and bank accounts for product', params: { productId, productName, count: orgs.length } });
 
@@ -42,7 +46,7 @@ const runImpl = Promise.method((queries, { _id: productId, name: productName }, 
                     }
 
                     // get the transaction summaries for all bank accounts.
-                    return queries.transactionSummaries({ bankAccountIds, all: true })
+                    return self.queries.transactionSummaries({ bankAccountIds, all: true }, { logger })
                         .then((summaries) => {
                             // console.log('summary count: ', summaries.length);
                             _.each(summaries, (summary) => {
@@ -51,8 +55,9 @@ const runImpl = Promise.method((queries, { _id: productId, name: productName }, 
                             });
                         })
                         .catch((err) => {
-                            logger.error({ function: func, log: 'failed to pull transaction summaries for one or more accounts. Processing cannot continue', params: { productId, productName, bankAccountIds, error: logger.stringifiableError(err), rethrow: true } });
-                            throw err;
+                            const spec = _.extend({ params: { productId, productName, bankAccountIds, error: logger.stringifiableError(err), rethrow: true } }, ErrorSpecs.flows.product.transactionFailure);
+                            logger.error({ function: func, log: spec.message, params: spec.params });
+                            throw StatusCodeError.CreateFromSpecs([spec], spec.statusCode);
                         });
                 },
                 // we set a concurrency limit to ensure we don't overload the DB or our connections limit

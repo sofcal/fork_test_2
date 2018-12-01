@@ -20,7 +20,7 @@ module.exports.run = (event, context, callback) => {
     const func = 'handler.run';
 
     // eslint-disable-next-line no-param-reassign
-    event.logger = RequestLogger.Create({ service: 'scheduled-mi' });
+    event.logger = RequestLogger.Create({ service: 'scheduled-mi' }, event.logLevel);
     event.logger.info({ function: func, log: 'started' });
 
     // these environment variables allow us to retrieve the correct param-store values for more configurable options

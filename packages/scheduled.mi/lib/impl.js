@@ -47,7 +47,7 @@ module.exports.run = Promise.method((event, params, services) => {
             // ALL is used as a special keyword to specify the stage should run for ALL products. So we map the input
             //  to the expected array of products
             if (products !== consts.all && concat !== consts.all) {
-                event.logger.info({ function: func, log: 'products and concat are unset or manually specified. Skipping retrieval', params: { } });
+                event.logger.info({ function: func, log: 'neither products nor concat require products pull. Skipping retrieval', params: { } });
                 return undefined;
             }
 
@@ -69,7 +69,7 @@ module.exports.run = Promise.method((event, params, services) => {
             return flows.orphans.run(null, debug)
                 .then((results) => {
                     event.logger.info({ function: func, log: 'retrieved orphan information.', params: { } });
-                    return blob.storeResults({ keyPostfix: BlobStorage.Postfixes.orphaned, results });
+                    return blob.storeResults({ keyPostfix: BlobStorage.Postfixes.orphaned, results }, debug);
                 });
         })
         .then(() => {
@@ -85,7 +85,7 @@ module.exports.run = Promise.method((event, params, services) => {
                     return flows.product.run(product, debug)
                         .then((results) => {
                             event.logger.info({ function: func, log: 'retrieved product information.', params: { } });
-                            return blob.storeResults({ keyPostfix: product._id, results });
+                            return blob.storeResults({ keyPostfix: product._id, results }, debug);
                         });
                 }); // eslint-disable-line function-paren-newline
         })
@@ -96,10 +96,10 @@ module.exports.run = Promise.method((event, params, services) => {
             }
 
             const keyPostfix = `${BlobStorage.Postfixes.concatenated}_${moment.utc().format('hh:mm:ss.SSS')}`;
-            return flows.concat.run({ regions: [thisRegion, otherRegion], debug })
+            return flows.concat.run({ regions: [thisRegion, otherRegion] }, debug)
                 .then((results) => {
                     event.logger.info({ function: func, log: 'successfully concatenated all data; storing.', params: { } });
-                    return blob.storeResults({ keyPostfix, results })
+                    return blob.storeResults({ keyPostfix, results }, debug);
                 });
         })
         .then(() => {
