@@ -1,5 +1,5 @@
-const orphans = require('./orphans');
-const product = require('./product');
-const concat = require('./concat');
+const Orphans = require('./Orphans');
+const Product = require('./Product');
+const Concat = require('./Concat');
 
-module.exports = { orphans, product, concat };
+module.exports = { Orphans, Product, Concat };
