@@ -16,9 +16,13 @@ module.exports = ({ bankAccountIds } = {}) => {
     }
 
     return [
+        // find all the transactions for bank accounts specified in bankAccountIds
         { $match: { bankAccountId: { $in: bankAccountIds } } },
+        // unwind to generate a document per transaction - this could get big, so allowDiskUse will almost certainly be needed
         { $unwind: { path: '$transactions', preserveNullAndEmptyArrays: true } },
         {
+            // now group the transactions again, generating only summary information (this will be a very small document)
+            // we multiply everything by 100 so we can avoid too many rounding errors (there will still be some)
             $group: {
                 _id: '$bankAccountId',
                 creditsTotalCount: { $sum: { $cond: [{ $gte: ['$transactions.transactionAmount', 0] }, 1, 0] } },
@@ -32,6 +36,8 @@ module.exports = ({ bankAccountIds } = {}) => {
             }
         },
         {
+            // another project stage will allow us to gather average values. Note, there is no round function, so we trunc
+            // instead. Therefore these values are NOT guaranteed to be to the penny accurate
             $project: {
                 _id: 1,
                 creditsTotalCount: 1,

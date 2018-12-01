@@ -2,9 +2,13 @@
 
 module.exports = ({ count = false } = {}) => {
     const pipeline = [
-        // { $match: { _id: { $in: ['e6b048b4-089a-404d-a1c1-88753ca38bcb', '72059d00-8fbf-43f5-8836-aa8d6df46432'] } } },
+        // with no $match stage, our results will contain all bank accounts in the database
+        // so now we attempt to find the organisation for each of them
         { $lookup: { from: 'Organisation', localField: 'organisationId', foreignField: '_id', as: 'organisationLookup' } },
+        // since lookup gives us back an array, we unwind to give us a document per organisation (though we know there'll
+        // be one or none for each bank account)
         { $unwind: { path: '$organisationLookup', preserveNullAndEmptyArrays: true } },
+        // now we can project to filter off information we don't want
         {
             $project: {
                 _id: 1,
@@ -14,12 +18,16 @@ module.exports = ({ count = false } = {}) => {
                 transactionCount: { $add: ['$lastTransactionId', '$lastHeldTransactionId'] },
                 aggregatorName: 1,
                 accountantManaged: '$accountant.accountantManaged',
+                // we also add a missing flag, which tells us whether this bank account has an organisation in this db
                 missing: { $cond: [{ $not: ['$organisationLookup'] }, true, false] }
             }
         },
+        // we only care about the bank accounts with no organisation, so match on that
         { $match: { missing: true } },
+        // we want the bank name, so lookup the bank document belonging to this bank account
         { $lookup: { from: 'Bank', localField: 'bankId', foreignField: '_id', as: 'bankLookup' } },
         {
+            // finally, project the document again to extract the bank name
             $project: {
                 _id: 1,
                 organisationId: 1,
@@ -32,6 +40,9 @@ module.exports = ({ count = false } = {}) => {
                 bankName: { $cond: [{ $or: [{ $not: ['$bankLookup'] }, { $eq: ['$bankAccount', []] }] }, null, { $arrayElemAt: ['$bankLookup.name', 0] }] },
             }
         }
+
+        // we would now have a document for each bank account with no organisation in this region. It will have some
+        // general summary information from the bank account and bank
     ];
 
     if (count) {
