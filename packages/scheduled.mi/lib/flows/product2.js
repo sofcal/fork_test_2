@@ -5,12 +5,30 @@ const { ProductIntermediarySummary, TransactionSummary } = require('../summaries
 const Promise = require('bluebird');
 const _ = require('underscore');
 
-module.exports = Promise.method((queries, { _id: productId, name: productName }) => {
+class Product {
+    constructor(queries) {
+        this.queries = queries;
+    }
+
+    run(...args) {
+        return runImpl(this, ...args);
+    }
+}
+
+const runImpl = Promise.method((queries, { _id: productId, name: productName }, { logger }) => {
+    const func = `${consts.LOG_PREFIX}.run`;
+    logger.info({ function: func, log: 'started', params: { productId, productName } });
+
     const intermediary = new ProductIntermediarySummary({ productName, productId });
 
+    logger.info({ function: func, log: 'retrieving organisations, companies and bank accounts for product', params: { productId, productName } });
     return queries.organisationsCompaniesBankAccounts({ productId, all: true })
         .then((orgs) => {
-            console.log('org count: ', orgs.length);
+            logger.info({ function: func, log: 'successfully retrieved organisations, companies and bank accounts for product', params: { productId, productName, count: orgs.length } });
+
+            /**
+             * NOTE: This is a tight loop, and so logging is kept to a minimum for performance reasons
+             */
             return Promise.map(orgs, // eslint-disable-line function-paren-newline
                 (org) => {
                     intermediary.organisations.push(org);
@@ -23,6 +41,7 @@ module.exports = Promise.method((queries, { _id: productId, name: productName })
                         return undefined;
                     }
 
+                    // get the transaction summaries for all bank accounts.
                     return queries.transactionSummaries({ bankAccountIds, all: true })
                         .then((summaries) => {
                             // console.log('summary count: ', summaries.length);
@@ -32,16 +51,25 @@ module.exports = Promise.method((queries, { _id: productId, name: productName })
                             });
                         })
                         .catch((err) => {
-                            console.log(err);
+                            logger.error({ function: func, log: 'failed to pull transaction summaries for one or more accounts. Processing cannot continue', params: { productId, productName, bankAccountIds, error: logger.stringifiableError(err), rethrow: true } });
                             throw err;
                         });
                 },
+                // we set a concurrency limit to ensure we don't overload the DB or our connections limit
                 { concurrency: 50 }); // eslint-disable-line function-paren-newline
         })
         .then(() => {
-            console.log('finished pulling for bank accounts')
+            logger.info({ function: func, log: 'successfully retrieved transaction summaries for all accounts', params: { productId, productName } });
             intermediary.transactionSummary.updateAverages();
-            console.log('calculated averages');
         })
-        .then(() => intermediary);
+        .then(() => {
+            logger.info({ function: func, log: 'ended', params: { productId, productName } });
+            return intermediary;
+        });
 });
+
+const consts = {
+    LOG_PREFIX: Product.name
+};
+
+module.exports = Product;

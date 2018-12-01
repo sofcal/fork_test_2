@@ -31,6 +31,12 @@ class RequestLogger {
     }
     /* eslint-enable no-console */
 
+    stringifiableError(err) { // eslint-disable-line class-methods-use-this
+        // Error objects are not stringifiable, as it's properties are not marked as enumerable. There are ways around this, but
+        // for simple usage this will do the trick
+        return err.constructor === Error ? { message: err.message } : err;
+    }
+
     static Create(...args) {
         return new RequestLogger(...args);
     }

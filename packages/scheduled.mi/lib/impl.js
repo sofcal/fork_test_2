@@ -29,8 +29,8 @@ module.exports.run = Promise.method((event, params, services) => {
 
     const otherRegion = BlobStorage.getOtherRegion(thisRegion);
 
-    const queries = new DBQueries({ db: services.db.getConnection() });
-    const blob = new BlobStorage({ s3: services.s3, thisRegion, otherRegion, env, bucketName });
+    const queries = new DBQueries({ db: services.db.getConnection(), debug: { logger: event.logger } });
+    const blob = new BlobStorage({ s3: services.s3, thisRegion, otherRegion, env, bucketName, debug: { logger: event.logger } });
 
     return Promise.resolve(undefined)
         .then(() => {
