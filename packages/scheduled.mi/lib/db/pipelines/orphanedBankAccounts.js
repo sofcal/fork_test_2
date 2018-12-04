@@ -15,7 +15,8 @@ module.exports = ({ count = false } = {}) => {
                 bankId: 1,
                 organisationId: 1,
                 status: 1,
-                transactionCount: { $add: ['$lastTransactionId', '$lastHeldTransactionId'] },
+                transactionCount: '$lastTransactionId',
+                unresolvedCount: '$lastHeldTransactionId',
                 aggregatorName: 1,
                 accountantManaged: '$accountant.accountantManaged',
                 // we also add a missing flag, which tells us whether this bank account has an organisation in this db
@@ -33,6 +34,7 @@ module.exports = ({ count = false } = {}) => {
                 organisationId: 1,
                 status: 1,
                 transactionCount: 1,
+                unresolvedCount: 1,
                 aggregatorName: 1,
                 accountantManaged: 1,
                 missing: 1,

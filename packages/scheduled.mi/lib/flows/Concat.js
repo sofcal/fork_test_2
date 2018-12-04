@@ -52,7 +52,8 @@ const runImpl = Promise.method((self, { regions, productInfos }, { logger }) => 
                             logger.error({ function: func, log: 'failed to merge results for product', params: { productInfo, error: logger.stringifiableError(err), rethrow: false } });
                         });
                 }) // eslint-disable-line function-paren-newline
-                .then(() => summariseRemainingOrphans(results, groupedOrphans))
+                .then(() => summariseRemainingOrphans(results, groupedOrphans, logger))
+                .then(() => results.updateCSV())
                 .then(() => {
                     logger.info({ function: func, log: 'ended', params: { regions, productInfos } });
                     return results;
@@ -137,6 +138,7 @@ const mergeProductAndOrphans = Promise.method((results, reducedProduct, groupedO
                     results.orphaned.transactions.updateFrom(orphan.transactionSummary);
                 }
 
+                delete orphan.transactionSummary; // eslint-disable-line no-param-reassign
                 return undefined;
             }
 
@@ -202,8 +204,12 @@ const summariseRemainingOrphans = (results, groupedOrphans, logger) => {
                 // again, if the orphan has a transaction summary, we track this too
                 results.orphaned.transactions.updateFrom(orphan.transactionSummary);
             }
+
+            delete orphan.transactionSummary; // eslint-disable-line no-param-reassign
         });
     });
+
+    results.orphaned.transactions.updateAverages();
     logger.info({ function: func, log: 'ended', params: { } });
 };
 

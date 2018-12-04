@@ -48,14 +48,14 @@ class BlobStorage {
 BlobStorage.Postfixes = { orphaned: 'orphaned', concatenated: 'concatenated' };
 BlobStorage.Regions = { euWest1: 'eu-west-1', usEast1: 'us-east-1' };
 
-const retrieveFilesImpl = Promise.method((blob, regions, keyPostfix, { logger }) => {
+const retrieveFilesImpl = Promise.method((self, { regions, keyPostfix }, { logger }) => {
     const func = `${consts.LOG_PREFIX}.getResults`;
     logger.debug({ function: func, log: 'started', params: { regions, keyPostfix } });
 
     return Promise.map(regions, // eslint-disable-line function-paren-newline
         (region) => {
             logger.debug({ function: func, log: 'attempting to retrieve file for region', params: { region, keyPostfix } });
-            return this.getResults({ region, keyPostfix })
+            return self.getResults({ region, keyPostfix }, { logger })
                 .catch((err) => {
                     if (err.statusCode === 404) {
                         logger.debug({ function: func, log: 'file missing in region', params: { region, keyPostfix } });

@@ -15,6 +15,7 @@ class ProductSummary {
 
         this.companies = {
             total: 0,
+            missing: 0,
             bankAccountsMax: 0
         };
 
@@ -32,7 +33,8 @@ class ProductSummary {
                 invalid: 0
             },
             accountantManaged: 0,
-            transactionsMax: 0
+            transactionsMax: 0,
+            unresolvedMax: 0
         };
 
         this.transactions = new TransactionSummary();
@@ -44,8 +46,12 @@ class ProductSummary {
         this.organisations.bankAccountsMax = Math.max(this.organisations.bankAccountsMax, org.bankAccountCount);
 
         _.each(org.companies, (company) => {
-            this.companies.total += 1;
-            this.companies.bankAccountsMax = Math.max(this.companies.bankAccountsMax, company.bankAccountCount);
+            if (company.missing) {
+                this.companies.missing += 1;
+            } else {
+                this.companies.total += 1;
+                this.companies.bankAccountsMax = Math.max(this.companies.bankAccountsMax, company.bankAccountCount);
+            }
         });
 
         _.each(org.bankAccounts, (bankAccount) => {
@@ -56,8 +62,22 @@ class ProductSummary {
                 this.bankAccounts.statuses[bankAccount.status] += 1;
                 this.bankAccounts.accountantManaged += bankAccount.accountantManaged === 'none' ? 0 : 1;
                 this.bankAccounts.transactionsMax = Math.max(this.bankAccounts.transactionsMax, bankAccount.transactionCount);
+                this.bankAccounts.unresolvedMax = Math.max(this.bankAccounts.unresolvedMax, bankAccount.unresolvedCount);
             }
         });
+    }
+
+    toCSV() {
+        // Product,Organisations,Companies,BankAccounts,ActiveBankAccounts,Transactions,TotalCredit,TotalDebit,TotalAbsolute
+        const notActiveKeys = ['cancelled', 'pending'];
+        let active = 0;
+        _.each(this.bankAccounts.statuses, (v, k) => {
+            if (!_.find(notActiveKeys, k)) {
+                active += v;
+            }
+        });
+
+        return `${this.productName},${this.organisations.total},${this.companies.total},${this.bankAccounts.total},${active},${this.transactions.absoluteTotalCount},${this.transactions.creditsTotalValue},${this.transactions.debitsTotalValue},${this.transactions.absoluteTotalValue}`;
     }
 }
 

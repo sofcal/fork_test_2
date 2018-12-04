@@ -96,7 +96,7 @@ module.exports.run = Promise.method((event, params, services) => {
             }
 
             const keyPostfix = `${BlobStorage.Postfixes.concatenated}_${moment.utc().format('hh:mm:ss.SSS')}`;
-            return flows.concat.run({ regions: [thisRegion, otherRegion] }, debug)
+            return flows.concat.run({ regions: [thisRegion, otherRegion], productInfos: concat }, debug)
                 .then((results) => {
                     event.logger.info({ function: func, log: 'successfully concatenated all data; storing.', params: { } });
                     return blob.storeResults({ keyPostfix, results }, debug);

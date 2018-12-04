@@ -1,5 +1,7 @@
 const TransactionSummary = require('../summaries/TransactionSummary');
 
+const _ = require('underscore');
+
 class ResultsSummary {
     constructor({ products = [] } = {}) {
         this.orphaned = {
@@ -12,6 +14,14 @@ class ResultsSummary {
         };
 
         this.products = products;
+        this.csv = null;
+    }
+
+    updateCSV = () => {
+        const initial = 'Product,Organisations,Companies,BankAccounts,ActiveBankAccounts,Transactions,TotalCredit,TotalDebit,TotalAbsolute';
+        this.csv = _.reduce(this.products, (memo, product) => {
+            return `${memo}\n${product.toCSV()}`;
+        }, initial);
     }
 }
 
