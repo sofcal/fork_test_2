@@ -72,7 +72,7 @@ class ProductSummary {
         const notActiveKeys = ['cancelled', 'pending'];
         let active = 0;
         _.each(this.bankAccounts.statuses, (v, k) => {
-            if (!_.find(notActiveKeys, k)) {
+            if (!_.contains(notActiveKeys, k)) {
                 active += v;
             }
         });
