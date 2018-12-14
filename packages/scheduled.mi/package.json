@@ -1,6 +1,6 @@
 {
   "name": "scheduled-mi",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "",
   "license": "ISC",
   "description": "",
@@ -50,6 +50,8 @@
     "build": "serverless package",
     "postbuild": "mkdir -p ../../build && mv ./.serverless/${PWD##*/}.zip ../../build/${PWD##*/}.zip",
     "unlock": "rimraf package-lock.json",
+    "upload": "sh ../../upload.sh -r \"eu-west-1 us-east-1\" -p ../../build/${PWD##*/}.zip -l managementInfo",
+    "version": "npm --no-git-tag-version version patch",
     "lint": "eslint ./lib/**"
   }
 }

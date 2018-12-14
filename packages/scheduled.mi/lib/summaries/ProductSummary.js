@@ -77,9 +77,9 @@ class ProductSummary {
             }
         });
 
-        const totalCreditsMajor = this.transactions.creditsTotalValue / 100;
-        const totalDebitsMajor = this.transactions.debitsTotalValue / 100;
-        const totalAbsoluteMajor = this.transactions.absoluteTotalValue / 100;
+        const totalCreditsMajor = (this.transactions.creditsTotalValue / 100).toFixed(2);
+        const totalDebitsMajor = (this.transactions.debitsTotalValue / 100).toFixed(2);
+        const totalAbsoluteMajor = (this.transactions.absoluteTotalValue / 100).toFixed(2);
         return `${this.productName},${this.organisations.total},${this.companies.total},${this.bankAccounts.total},${active},${this.transactions.absoluteTotalCount},${totalCreditsMajor},${totalDebitsMajor},${totalAbsoluteMajor}`;
     }
 }
