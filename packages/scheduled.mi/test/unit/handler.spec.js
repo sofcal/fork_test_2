@@ -1,4 +1,5 @@
 const handler = require('../../lib/handler');
+const serviceLoader = require('../../lib/serviceLoader');
 const impl = require('../../lib/impl');
 const keys = require('../../lib/params');
 const ErrorSpecs = require('../../lib/ErrorSpecs');
@@ -10,7 +11,7 @@ const { ParameterStoreStaticLoader } = require('internal-parameterstore-static-l
 const DB = require('internal-services-db');
 const { StatusCodeError, StatusCodeErrorItem } = require('internal-status-code-error');
 
-describe('__package_name__.handler', function() {
+describe('scheduled-mi.handler', function() {
     let sandbox;
     let config, context, event;
 
@@ -32,7 +33,7 @@ describe('__package_name__.handler', function() {
 
     beforeEach(() => {
         context = { context: 'context' };
-        event = { AWS_REGION: region, env };
+        event = { };
 
         config = {
             'defaultMongo.username': username,
@@ -47,6 +48,7 @@ describe('__package_name__.handler', function() {
     });
 
     it('should retrieve params from param-store', (done) => {
+        sandbox.stub(process, 'env').value({ AWS_REGION: region, Environment: env });
         sandbox.stub(dummyLoader, 'load').resolves(config);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
         sandbox.stub(DB, 'Create').returns(db);
@@ -79,40 +81,9 @@ describe('__package_name__.handler', function() {
         });
     });
 
-    it('should default env and region to test values', (done) => {
-        sandbox.stub(dummyLoader, 'load').resolves(config);
-        sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
-        sandbox.stub(DB, 'Create').returns(db);
-        sandbox.stub(db, 'connect').resolves();
-        sandbox.stub(db, 'disconnect').resolves();
-
-        const expected = { value: 'result' };
-        sandbox.stub(impl, 'run').resolves(expected);
-
-        handler.run({}, context, () => {
-            try {
-                const paramPrefix = '/test/';
-                const region = 'local';
-
-                should(ParameterStoreStaticLoader.Create.callCount).eql(1);
-                should(ParameterStoreStaticLoader.Create.calledWithExactly(
-                    { keys, paramPrefix, env: { region } }
-                )).eql(true);
-
-
-                should(dummyLoader.load.callCount).eql(1);
-                should(dummyLoader.load.calledWith(
-                    {}
-                )).eql(true);
-
-                done();
-            } catch(err) {
-                done(err instanceof Error ? err : new Error(err));
-            }
-        });
-    });
-
     it('should connect and disconnect from the db', (done) => {
+        sandbox.stub(serviceLoader, 'load').returns({});
+        sandbox.stub(process, 'env').value({ AWS_REGION: region, Environment: env });
         sandbox.stub(dummyLoader, 'load').resolves(config);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
         sandbox.stub(DB, 'Create').returns(db);
@@ -127,12 +98,11 @@ describe('__package_name__.handler', function() {
             .then(() => {
                 should(DB.Create.callCount).eql(1);
                 should(DB.Create.calledWithExactly(
-                    { env, region, domain, username, password, replicaSet }
+                    { env, region, domain, username, password, replicaSet, db: 'bank_db' }
                 )).eql(true);
 
                 should(db.connect.callCount).eql(1);
                 should(db.connect.calledWith(
-                    'bank_db'
                 )).eql(true);
 
                 should(db.disconnect.callCount).eql(1);
@@ -145,6 +115,8 @@ describe('__package_name__.handler', function() {
     });
 
     it('should not attempt to disconnect from the db if the db was never created', (done) => {
+        sandbox.stub(serviceLoader, 'load').returns({});
+        sandbox.stub(process, 'env').value({ AWS_REGION: region, Environment: env });
         sandbox.stub(dummyLoader, 'load').rejects(new Error('params_error'));
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
         sandbox.stub(DB, 'Create').returns(db);
@@ -167,6 +139,8 @@ describe('__package_name__.handler', function() {
     });
 
     it('should call impl.run', (done) => {
+        sandbox.stub(serviceLoader, 'load').returns({});
+        sandbox.stub(process, 'env').value({ AWS_REGION: region, Environment: env });
         sandbox.stub(dummyLoader, 'load').resolves(config);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
         sandbox.stub(DB, 'Create').returns(db);
@@ -190,7 +164,35 @@ describe('__package_name__.handler', function() {
         });
     });
 
+    it('should call impl.run with concatenated services', (done) => {
+        sandbox.stub(serviceLoader, 'load').returns({ service1: { value: 'service1' } });
+        sandbox.stub(process, 'env').value({ AWS_REGION: region, Environment: env });
+        sandbox.stub(dummyLoader, 'load').resolves(config);
+        sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
+        sandbox.stub(DB, 'Create').returns(db);
+        sandbox.stub(db, 'connect').resolves();
+        sandbox.stub(db, 'disconnect').resolves();
+
+        const expected = { value: 'result' };
+        sandbox.stub(impl, 'run').resolves(expected);
+
+        handler.run(event, context, () => {
+            try {
+                should(impl.run.callCount).eql(1);
+                should(impl.run.calledWithExactly(
+                    event, config, { db, service1: { value: 'service1' } }
+                )).eql(true);
+
+                done();
+            } catch(err) {
+                done(err instanceof Error ? err : new Error(err));
+            }
+        });
+    });
+
     it('should call the callback with the success response', (done) => {
+        sandbox.stub(serviceLoader, 'load').returns({});
+        sandbox.stub(process, 'env').value({ AWS_REGION: region, Environment: env });
         sandbox.stub(dummyLoader, 'load').resolves(config);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
         sandbox.stub(DB, 'Create').returns(db);
@@ -217,6 +219,8 @@ describe('__package_name__.handler', function() {
     });
 
     it('should call the callback with diagnoses', (done) => {
+        sandbox.stub(serviceLoader, 'load').returns({});
+        sandbox.stub(process, 'env').value({ AWS_REGION: region, Environment: env });
         sandbox.stub(dummyLoader, 'load').resolves(config);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
         sandbox.stub(DB, 'Create').returns(db);
@@ -243,6 +247,8 @@ describe('__package_name__.handler', function() {
     });
 
     it('should call the callback with a default 500 if impl throws an unexpected error', (done) => {
+        sandbox.stub(serviceLoader, 'load').returns({});
+        sandbox.stub(process, 'env').value({ AWS_REGION: region, Environment: env });
         sandbox.stub(dummyLoader, 'load').resolves(config);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
         sandbox.stub(DB, 'Create').returns(db);
@@ -272,6 +278,10 @@ describe('__package_name__.handler', function() {
 
     it('should fail if any param store values are missing', function(done) {
         delete config['defaultMongo.password'];
+
+        sandbox.stub(serviceLoader, 'load').returns({});
+        sandbox.stub(process, 'env').value({ AWS_REGION: region, Environment: env });
+        sandbox.stub(dummyLoader, 'load').resolves(config);
 
         handler.run(event, context, (first, second) => {
             try {

@@ -59,7 +59,8 @@ const loadImpl = Promise.method((self, params) => {
         groups[div][mod] = `${prefix || ''}${list[i]}`;
     }
 
-    return Promise.map(groups, (group) => getPage(group, params));
+    return Promise.map(groups, (group) => getPage(group, params))
+        .then(() => params);
 });
 
 const mapResponse = (params, response, prefix) => {

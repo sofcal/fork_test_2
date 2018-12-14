@@ -60,7 +60,7 @@ describe('internal-request-logger.requestLogger', function(){
             sandbox.useFakeTimers(now);
             sandbox.stub(console, 'log');
 
-            const rl = new RequestLogger({ id: 1 });
+            const rl = new RequestLogger({ id: 1}, RequestLogger.LogLevels.DEBUG);
             rl.debug({ value: 'debug' });
 
             should(console.log.callCount).eql(1);
