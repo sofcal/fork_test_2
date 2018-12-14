@@ -97,10 +97,7 @@ const storeResultsImpl = Promise.method((self, { keyPostfix, results, stringifie
     const key = `${consts.KEY_PREFIX}/${moment.utc().format('YYYY-MM-DD')}/${keyPostfix}.json`;
     const data = stringified || JSON.stringify(results);
 
-    const readable = new Readable();
-    readable._read = () => {}; // _read should be used to populate the stream, but we're pushing direct to it as we have the data in memory
-    readable.push(data);
-    readable.push(null);
+    const readable = stringToBuffer(data);
 
     logger.debug({ function: func, log: 'uploading results to s3', params: { key, length: data.length } });
     return self.s3.upload(key, readable, 'AES256', self.thisBucket)
@@ -113,6 +110,15 @@ const storeResultsImpl = Promise.method((self, { keyPostfix, results, stringifie
             throw err;
         });
 });
+
+const stringToBuffer = (data) => {
+    const readable = new Readable();
+    readable._read = () => {}; // _read should be used to populate the stream, but we're pushing direct to it as we have the data in memory
+    readable.push(data);
+    readable.push(null);
+
+    return readable;
+};
 
 const consts = {
     KEY_PREFIX: 'mi',

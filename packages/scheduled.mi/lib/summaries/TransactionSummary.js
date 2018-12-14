@@ -14,6 +14,7 @@ class TransactionSummary {
         this.absoluteTotalCount = data.absoluteTotalCount || 0;
         this.absoluteTotalValue = Math.round(data.absoluteTotalValue) || 0;
 
+        // these are all defaulted to null as they're calculated AFTER all of the updateFrom calls have been made
         this.creditsAverageValue = data.creditsAverageValue || null;
         this.debitsAverageValue = data.debitsAverageValue || null;
         this.absoluteAverageValue = data.absoluteAverageValue || null;

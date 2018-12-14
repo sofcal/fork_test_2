@@ -22,10 +22,11 @@ module.exports.run = Promise.method((event, params, services) => {
     event.logger.info({ function: func, log: 'started' });
 
     const { Environment: env, AWS_REGION: thisRegion, bucket: bucketName } = process.env;
-    const { orphans } = event;
-    let { products, concat } = event;
 
     validate.event(event);
+
+    const { orphans } = event;
+    let { products, concat } = event;
 
     const otherRegion = BlobStorage.getOtherRegion(thisRegion);
 

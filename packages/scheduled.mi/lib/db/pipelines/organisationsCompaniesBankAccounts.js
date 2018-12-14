@@ -15,12 +15,6 @@ module.exports = ({ productId, count } = {}) => {
         throw StatusCodeError.CreateFromSpecs([spec], spec.statusCode);
     }
 
-    const $match = { };
-    if (productId) {
-        // if a productId was specified, this will ensure our search only runs for a single product
-        $match['products.productId'] = productId;
-    }
-
     const pipeline = [
         { $match: { 'products.productId': productId } },
         // remove properties that we don't care about using a project
@@ -80,7 +74,7 @@ module.exports = ({ productId, count } = {}) => {
         // because we're on mongo 3.2, we have no replaceRoot function, so we have this slightly ugly projection to get rid of our nested _id object field
         { $project: { _id: '$_id._id', type: '$_id.type', products: '$_id.products', companyCount: '$_id.companyCount', companies: '$_id.companies', bankAccountCount: '$_id.bankAccountCount', bankAccounts: '$bankAccounts' } },
 
-        // we now go through the same process as for bank accounts, but for complanies. Unwinding the array...
+        // we now go through the same process as for bank accounts, but for companies. Unwinding the array...
         { $unwind: { path: '$companies', preserveNullAndEmptyArrays: true } },
         // ... retrieving the company objects with a lookup
         { $lookup: { from: 'Company', localField: 'companies', foreignField: '_id', as: 'companyLookup' } },

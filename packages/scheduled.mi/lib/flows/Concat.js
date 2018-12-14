@@ -41,7 +41,7 @@ const runImpl = Promise.method((self, { regions, productInfos }, { logger }) => 
             //  appending orphaned accounts and updating the transactionSummary
             return Promise.each(productInfos, // eslint-disable-line function-paren-newline
                 (productInfo) => {
-                    logger.info({ function: func, log: 'merging results for product', params: { productInfo} });
+                    logger.info({ function: func, log: 'merging results for product', params: { productInfo } });
                     return retrieveAndPrepareProduct(self.blob, regions, productInfo, logger)
                         .then((reducedProduct) => mergeProductAndOrphans(results, reducedProduct, groupedOrphans, productInfo, logger))
                         .then(() => {
@@ -88,7 +88,7 @@ const retrieveAndPrepareProduct = Promise.method((blob, regions, { _id: productI
         .then((results) => {
             // this is the initial memo object we're going to pass in. Allows us to avoid modifying any entry in the
             // array
-            const template = {
+            const initial = {
                 productId, productName, organisations: [], transactionSummary: new TransactionSummary()
             };
 
@@ -99,7 +99,7 @@ const retrieveAndPrepareProduct = Promise.method((blob, regions, { _id: productI
 
                 // memo will get passed to the next iteration
                 return memo;
-            }, template);
+            }, initial);
 
             logger.info({ function: func, log: 'ended', params: { regions } });
             return ret;
@@ -138,6 +138,7 @@ const mergeProductAndOrphans = Promise.method((results, reducedProduct, groupedO
                     results.orphaned.transactions.updateFrom(orphan.transactionSummary);
                 }
 
+                // we don't want this showing up in the results output, as it's just noise
                 delete orphan.transactionSummary; // eslint-disable-line no-param-reassign
                 return undefined;
             }
@@ -205,6 +206,7 @@ const summariseRemainingOrphans = (results, groupedOrphans, logger) => {
                 results.orphaned.transactions.updateFrom(orphan.transactionSummary);
             }
 
+            // we don't want this showing up in the results output, as it's just noise
             delete orphan.transactionSummary; // eslint-disable-line no-param-reassign
         });
     });
