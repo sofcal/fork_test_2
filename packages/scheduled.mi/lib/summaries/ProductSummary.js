@@ -77,7 +77,10 @@ class ProductSummary {
             }
         });
 
-        return `${this.productName},${this.organisations.total},${this.companies.total},${this.bankAccounts.total},${active},${this.transactions.absoluteTotalCount},${this.transactions.creditsTotalValue},${this.transactions.debitsTotalValue},${this.transactions.absoluteTotalValue}`;
+        const totalCreditsMajor = this.transactions.creditsTotalValue / 100;
+        const totalDebitsMajor = this.transactions.debitsTotalValue / 100;
+        const totalAbsoluteMajor = this.transactions.absoluteTotalValue / 100;
+        return `${this.productName},${this.organisations.total},${this.companies.total},${this.bankAccounts.total},${active},${this.transactions.absoluteTotalCount},${totalCreditsMajor},${totalDebitsMajor},${totalAbsoluteMajor}`;
     }
 }
 

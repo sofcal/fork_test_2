@@ -82,8 +82,8 @@ const getParams = ({ env, region }, logger) => {
 
     const loader = ParameterStoreStaticLoader.Create({ keys, paramPrefix, env: { region } });
     return loader.load(params)
-        .then(() => {
-            const retrievedCount = Object.keys(params).length;
+        .then((updated) => {
+            const retrievedCount = Object.keys(updated).length;
 
             logger.info({ function: func, log: 'finished retrieving param-store keys', requested: keys.length, retrieved: retrievedCount });
 
@@ -92,7 +92,7 @@ const getParams = ({ env, region }, logger) => {
             }
 
             logger.info({ function: func, log: 'ended' });
-            return params;
+            return updated;
         });
 };
 
@@ -111,7 +111,7 @@ const populateServices = (services, { env, region, params }, logger) => {
     services.db = serviceImpls.DB.Create({ env, region, domain, username, password, replicaSet, db: 'bank_db' });
 
     // add any additional services that are created by the serviceLoader for the lambda
-    Object.assign(services, serviceLoader({ env, region, params }));
+    Object.assign(services, serviceLoader.load({ env, region, params }));
 
     logger.info({ function: func, log: 'ended' });
 };
