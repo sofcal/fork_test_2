@@ -24,6 +24,7 @@
   "license": "ISC",
   "dependencies": {
     "@babel/cli": "^7.0.0-beta.47",
+    "@babel/core": "^7.2.2",
     "@babel/register": "^7.0.0-beta.48",
     "aws-sdk": "^2.220.1",
     "babel-eslint": "^8.0.3",

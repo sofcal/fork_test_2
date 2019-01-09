@@ -2,7 +2,7 @@
 
 const Promise = require('bluebird');
 
-const ErrorSpecs = require('./ErrorSpecs');
+const AWS = require('aws-sdk');
 
 const {
   ParameterStoreStaticLoader
@@ -14,9 +14,15 @@ const {
 
 const {
   StatusCodeError
-} = require('internal-status-code-error'); // const DB = require('internal-services-db');
-// const serviceImpls = { DB };
+} = require('internal-status-code-error');
 
+const ErrorSpecs = require('./ErrorSpecs');
+
+const DB = require('internal-services-db');
+
+const serviceImpls = {
+  DB
+};
 
 class Handler {
   constructor({
@@ -32,17 +38,17 @@ class Handler {
       throw new Error('dbName must be a string');
     }
 
-    if (!serviceLoader || typeof serviceLoader !== 'function') {
-      throw new Error('serviceLoader must be a function');
-    }
-
     if (!keys || !Array.isArray(keys)) {
       throw new Error('keys must be an array');
     }
 
     this.dbName = dbName;
+    this.services = {};
     this.serviceLoader = serviceLoader;
     this.keys = keys;
+    this.logger = RequestLogger.Create({
+      service: 'internal-handler'
+    });
   }
 
   run(event, context, callback) {
@@ -55,13 +61,10 @@ class Handler {
     const services = self.services || {};
     return Promise.resolve(undefined).then(() => {
       // eslint-disable-next-line no-param-reassign
-      event.logger = RequestLogger.Create({
-        service: 'internal-handler'
-      });
-
+      // event.logger = RequestLogger.Create({ service: 'internal-handler' });
       if (!env || !region) {
         const log = `invalid parameters - env: ${env}; region: ${region};`;
-        event.logger.error({
+        self.logger.error({
           function: func,
           log
         });
@@ -71,27 +74,27 @@ class Handler {
       return getParams({
         env,
         region
-      }, self, event.logger).then(params => {
-        return self.populateServices(services, {
+      }, self, self.logger).then(params => {
+        return self.populateServices(self.services, {
           env,
           region,
           params
-        }, event.logger).then(() => {
-          return connectDB(services, params, event.logger, self.dbName).then(() => params);
-        });
+        }, self.logger).then(() => connectDB(self.services, params, self.logger, self.dbName)).then(() => params);
       });
+    }).then(() => {
+      return setupLogGroupSubscription(event, context);
     }).then(params => this.impl(event, params, services)).then(ret => {
       const response = {
         statusCode: 200,
         body: JSON.stringify(ret)
       };
-      event.logger.info({
+      self.logger.info({
         function: func,
         log: 'sending success response: 200'
       });
       callback(null, response);
     }).catch(err => {
-      event.logger.error({
+      self.logger.error({
         function: func,
         log: 'an error occurred while processing the request',
         error: err.message || err
@@ -99,7 +102,7 @@ class Handler {
       const statusCodeError = StatusCodeError.is(err) ? err : StatusCodeError.CreateFromSpecs([ErrorSpecs.internalServer], ErrorSpecs.internalServer.statusCode);
       const response = statusCodeError.toDiagnoses();
       const status = statusCodeError.statusCode;
-      event.logger.info({
+      self.logger.info({
         function: func,
         log: `sending failure response: ${status}`,
         response
@@ -109,13 +112,17 @@ class Handler {
         body: JSON.stringify(response)
       });
     }).finally(() => {
-      return disconnectDB(services, event.logger);
+      return disconnectDB(services, self.logger);
     });
   }
 
   impl() {
     // eslint-disable-line class-methods-use-this
     throw new Error('impl function should be extended');
+  }
+
+  loadAdditionalServices() {
+    throw new Error('loadAdditionalServices function should be extended');
   }
 
   populateServices(...args) {
@@ -128,23 +135,34 @@ const populateServicesImpl = Promise.method((self, services, {
   env,
   region,
   params
-}, logger) => {
+}) => {
   const func = 'handler.populateServices';
-  logger.info({
+  self.logger.info({
     function: func,
     log: 'started'
   });
   const {
-    dbName
-  } = self; // add any additional services that are created by the serviceLoader for the lambda
+    'defaultMongo.username': username,
+    'defaultMongo.password': password,
+    'defaultMongo.replicaSet': replicaSet,
+    domain
+  } = params; // eslint-disable-next-line no-param-reassign
 
-  Object.assign(services, self.serviceLoader({
+  services.db = serviceImpls.DB.Create({
     env,
     region,
-    params,
-    dbName
-  }));
-  logger.info({
+    domain,
+    username,
+    password,
+    replicaSet,
+    db: self.dbName = 'bank_db'
+  }); // add any additional services that are created by the serviceLoader for the lambda
+
+  self.loadAdditionalServices({
+    env,
+    region
+  });
+  self.logger.info({
     function: func,
     log: 'ended'
   });
@@ -205,15 +223,7 @@ const connectDB = (services, params, logger, dbName) => {
   logger.info({
     function: func,
     log: 'started'
-  }); // const {
-  //     'defaultMongo.username': username,
-  //     'defaultMongo.password': password,
-  //     'defaultMongo.replicaSet': replicaSet,
-  //     domain
-  // } = params;
-  // eslint-disable-next-line no-param-reassign
-  // services.db = serviceImpls.DB.Create({ env, region, domain, username, password, replicaSet, db: dbName });
-
+  });
   return services.db.connect(dbName).then(db => {
     logger.info({
       function: func,
@@ -242,6 +252,40 @@ const disconnectDB = Promise.method((services, logger) => {
     logger.info({
       function: func,
       log: 'ended'
+    });
+  });
+});
+const setupLogGroupSubscription = Promise.method((event, context) => {
+  console.log('>>>> context', context);
+  const func = 'handler.setupLogGroupSubscription';
+  const cloudwatchlogs = Promise.promisifyAll(new AWS.CloudWatchLogs());
+  return cloudwatchlogs.describeSubscriptionFiltersAsync({
+    logGroupName: context.logGroupName
+  }).then(subFilterDetails => {
+    if (subFilterDetails.subscriptionFilters.length === 0) {
+      event.logger.info({
+        function: func,
+        log: 'assigning subscription filter'
+      });
+      const params = {
+        destinationArn: process.env.SumoLogicLambdaARN,
+        filterName: 'sumoLogic',
+        filterPattern: ' ',
+        logGroupName: context.logGroupName
+      };
+      return cloudwatchlogs.putSubscriptionFilterAsync(params);
+    }
+
+    event.logger.info({
+      function: func,
+      log: 'subscription filter already assigned'
+    });
+    return null;
+  }).catch(err => {
+    event.logger.error({
+      function: func,
+      log: 'failed to configure logging subscription filter.',
+      err: err.message
     });
   });
 });
