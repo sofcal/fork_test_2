@@ -1,4 +1,4 @@
-const { Handler, ErrorSpecs } = require('internal-handler');
+const { ErrorSpecs } = require('internal-handler');
 const Jwt = require('../../lib/index');
 const keys = require('../../lib/params');
 const keyPair = require('../../lib/keyPair');
@@ -9,7 +9,7 @@ const _ = require('underscore');
 
 const { ParameterStoreStaticLoader } = require('internal-parameterstore-static-loader');
 const DB = require('internal-services-db');
-const { StatusCodeError, StatusCodeErrorItem } = require('internal-status-code-error');
+const { StatusCodeError } = require('internal-status-code-error');
 const ParameterService = require('internal-parameter-service');
 
 describe('jwt-certificate-rotation', function() {
@@ -53,6 +53,10 @@ describe('jwt-certificate-rotation', function() {
             'defaultMongo.replicaSet': replicaSet,
             domain
         };
+
+        sandbox.stub(DB, 'Create').returns(db);
+        sandbox.stub(db, 'connect').resolves();
+        sandbox.stub(db, 'disconnect').resolves();
     });
 
     afterEach(() => {
@@ -63,9 +67,6 @@ describe('jwt-certificate-rotation', function() {
         it('should retrieve params from param-store', (done) => {
             sandbox.stub(dummyLoader, 'load').resolves(config);
             sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
-            sandbox.stub(DB, 'Create').returns(db);
-            sandbox.stub(db, 'connect').resolves();
-            sandbox.stub(db, 'disconnect').resolves();
 
             // const expected = { value: 'result' };
             // sandbox.stub(Jwt, 'run').resolves(expected);
@@ -96,9 +97,6 @@ describe('jwt-certificate-rotation', function() {
         it('should default env and region to test values', (done) => {
             sandbox.stub(dummyLoader, 'load').resolves(config);
             sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
-            sandbox.stub(DB, 'Create').returns(db);
-            sandbox.stub(db, 'connect').resolves();
-            sandbox.stub(db, 'disconnect').resolves();
             sandbox.stub(process, 'env').value(_.omit(process.env, ['Environment', 'AWS_REGION']));
 
             // const expected = { value: 'result' };
@@ -135,10 +133,6 @@ describe('jwt-certificate-rotation', function() {
                 return params;
             }));
             sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
-            // sandbox.stub(handler, 'getParams').resolves(config);
-            sandbox.stub(DB, 'Create').returns(db);
-            sandbox.stub(db, 'connect').resolves();
-            sandbox.stub(db, 'disconnect').resolves();
             sandbox.stub(keyPair, 'createKeyPair').resolves();
 
             // const expected = { value: 'result' };
@@ -170,9 +164,6 @@ describe('jwt-certificate-rotation', function() {
         it('should not attempt to disconnect from the db if the db was never created', (done) => {
             sandbox.stub(dummyLoader, 'load').rejects(new Error('params_error'));
             sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
-            sandbox.stub(DB, 'Create').returns(db);
-            sandbox.stub(db, 'connect').resolves();
-            sandbox.stub(db, 'disconnect').resolves();
 
             // const expected = { value: 'result' };
             // sandbox.stub(impl, 'run').resolves(expected);
@@ -198,9 +189,6 @@ describe('jwt-certificate-rotation', function() {
                 return params;
             }));
             sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
-            sandbox.stub(DB, 'Create').returns(db);
-            sandbox.stub(db, 'connect').resolves();
-            sandbox.stub(db, 'disconnect').resolves();
             sandbox.stub(Promise, 'map').rejects();
 
             // const err = new Error('impl.run.error');
@@ -252,9 +240,6 @@ describe('jwt-certificate-rotation', function() {
             }));
             sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
             sandbox.stub(ParameterService, 'Create').returns(dummyParamService);
-            sandbox.stub(DB, 'Create').returns(db);
-            sandbox.stub(db, 'connect').resolves();
-            sandbox.stub(db, 'disconnect').resolves();
 
             delete(event.env);
 
@@ -318,9 +303,6 @@ describe('jwt-certificate-rotation', function() {
             sandbox.stub(dummyParamService, 'getParameters').resolves(primaryKeysResponse);
             sandbox.stub(dummyParamService, 'setParameter').rejects();
             sandbox.stub(ParameterService, 'Create').returns(dummyParamService);
-            sandbox.stub(DB, 'Create').returns(db);
-            sandbox.stub(db, 'connect').resolves();
-            sandbox.stub(db, 'disconnect').resolves();
 
             Jwt.run(event, context, () => {
             })
@@ -349,9 +331,6 @@ describe('jwt-certificate-rotation', function() {
             });
             sandbox.stub(dummyParamService, 'setParameter').resolves();
             sandbox.stub(ParameterService, 'Create').returns(dummyParamService);
-            sandbox.stub(DB, 'Create').returns(db);
-            sandbox.stub(db, 'connect').resolves();
-            sandbox.stub(db, 'disconnect').resolves();
 
             Jwt.run(event, context, (first, second) => {
                 try {
@@ -387,9 +366,6 @@ describe('jwt-certificate-rotation', function() {
             sandbox.stub(dummyParamService, 'getParameters').resolves(primaryKeysResponse);
             sandbox.stub(dummyParamService, 'setParameter').resolves();
             sandbox.stub(ParameterService, 'Create').returns(dummyParamService);
-            sandbox.stub(DB, 'Create').returns(db);
-            sandbox.stub(db, 'connect').resolves();
-            sandbox.stub(db, 'disconnect').resolves();
             sandbox.stub(keyPair, 'createKeyPair').rejects();
 
             Jwt.run(event, context, () => {
@@ -421,7 +397,6 @@ describe('jwt-certificate-rotation', function() {
         });
 
         it('should throw an error if copying to secondary fails', (done) => {
-            let thrown = false;
 
             sandbox.stub(dummyLoader, 'load').callsFake(Promise.method((params) => {
                 _.each(_.keys(config), (key) => {
@@ -433,9 +408,6 @@ describe('jwt-certificate-rotation', function() {
             sandbox.stub(dummyParamService, 'getParameters').resolves(primaryKeysResponse);
             sandbox.stub(dummyParamService, 'setParameter').rejects();
             sandbox.stub(ParameterService, 'Create').returns(dummyParamService);
-            sandbox.stub(DB, 'Create').returns(db);
-            sandbox.stub(db, 'connect').resolves();
-            sandbox.stub(db, 'disconnect').resolves();
             callback = sandbox.spy();
 
             Jwt.run(event, context, (first, second) => {
@@ -471,9 +443,6 @@ describe('jwt-certificate-rotation', function() {
             sandbox.stub(dummyParamService, 'getParameters').resolves(primaryKeysResponse);
             sandbox.stub(dummyParamService, 'setParameter').resolves();
             sandbox.stub(ParameterService, 'Create').returns(dummyParamService);
-            sandbox.stub(DB, 'Create').returns(db);
-            sandbox.stub(db, 'connect').resolves();
-            sandbox.stub(db, 'disconnect').resolves();
             sandbox.spy(keyPair, 'createKeyPair');
 
             Jwt.run(event, context, () => {
@@ -504,9 +473,6 @@ describe('jwt-certificate-rotation', function() {
             sandbox.stub(dummyParamService, 'getParameters').resolves(primaryKeysResponse);
             sandbox.stub(dummyParamService, 'setParameter').resolves();
             sandbox.stub(ParameterService, 'Create').returns(dummyParamService);
-            sandbox.stub(DB, 'Create').returns(db);
-            sandbox.stub(db, 'connect').resolves();
-            sandbox.stub(db, 'disconnect').resolves();
             sandbox.stub(keyPair, 'createKeyPair').resolves({
                 public: 'publicKey',
                 private: 'privateKey'
@@ -537,8 +503,6 @@ describe('jwt-certificate-rotation', function() {
         });
 
         it('should throw an error if saving primary keys fails', (done) => {
-            let thrown = false;
-
             sandbox.stub(dummyLoader, 'load').callsFake(Promise.method((params) => {
                 _.each(_.keys(config), (key) => {
                     params[key] = config[key];
@@ -550,9 +514,6 @@ describe('jwt-certificate-rotation', function() {
             sandbox.stub(dummyParamService, 'setParameter').onCall(2).rejects();
             sandbox.stub(ParameterService, 'Create').returns(dummyParamService);
             sandbox.stub(keyPair, 'createKeyPair').resolves({ public: 'newPublicKey', private: 'newPrivateKey' });
-            sandbox.stub(DB, 'Create').returns(db);
-            sandbox.stub(db, 'connect').resolves();
-            sandbox.stub(db, 'disconnect').resolves();
             callback = sandbox.spy();
 
             Jwt.run(event, context, (first, second) => {

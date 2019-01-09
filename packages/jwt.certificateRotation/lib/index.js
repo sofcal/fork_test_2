@@ -74,9 +74,7 @@ class Jwt extends Handler {
 
     createKeyPair() { //eslint-disable-line
         return keyPair.createKeyPair()
-            .then((kp) => {
-                return kp;
-            })
+            .then((kp) => kp)
             .catch((err) => {
                 console.log('alert: ' + err);
                 throw new Error('Failed to create new primary keys');
@@ -109,9 +107,7 @@ class Jwt extends Handler {
             });
         }
         return this.setParams(newParams)
-            .then((response) => {
-                return response;
-            })
+            .then((response) => response)
             .catch((err) => {
                 console.log('alert: ' + err);
                 throw new Error('Failed to save new keys');
