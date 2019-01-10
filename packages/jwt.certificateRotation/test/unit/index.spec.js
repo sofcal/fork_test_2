@@ -432,6 +432,7 @@ describe('jwt-certificate-rotation', function() {
                 '/local/accessToken.primary.publicKey': 'aaa',
                 '/local/accessToken.primary.privateKey': 'bbb'
             };
+            const keyLength = 256;
 
             sandbox.stub(dummyLoader, 'load').callsFake(Promise.method((params) => {
                 _.each(_.keys(config), (key) => {
@@ -449,7 +450,7 @@ describe('jwt-certificate-rotation', function() {
             })
                 .then(() => {
                     should(keyPair.createKeyPair.callCount).eql(1);
-                    should(keyPair.createKeyPair.calledWithExactly()).eql(true);
+                    should(keyPair.createKeyPair.calledWithExactly(keyLength)).eql(true);
                     done();
                 })
                 .catch((err) => {

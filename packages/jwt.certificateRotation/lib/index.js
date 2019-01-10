@@ -73,7 +73,7 @@ class Jwt extends Handler {
     }
 
     createKeyPair() { //eslint-disable-line
-        return keyPair.createKeyPair()
+        return keyPair.createKeyPair(256) // TODO depends on algorithm used by JwtStrategy in BankDrive, currently 256 bits
             .then((kp) => kp)
             .catch((err) => {
                 console.log('alert: ' + err);

@@ -256,7 +256,6 @@ const disconnectDB = Promise.method((services, logger) => {
   });
 });
 const setupLogGroupSubscription = Promise.method((event, context) => {
-  console.log('>>>> context', context);
   const func = 'handler.setupLogGroupSubscription';
   const cloudwatchlogs = Promise.promisifyAll(new AWS.CloudWatchLogs());
   return cloudwatchlogs.describeSubscriptionFiltersAsync({
