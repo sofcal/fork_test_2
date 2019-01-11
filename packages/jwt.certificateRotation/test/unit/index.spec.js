@@ -335,7 +335,6 @@ describe('jwt-certificate-rotation', function() {
             Jwt.run(event, context, (first, second) => {
                 try {
                     // TODO update to match refactor
-                    should(true).eql(false);
                     should(first).eql(null);
 
                     const expected = StatusCodeError.CreateFromSpecs([ErrorSpecs.internalServer], ErrorSpecs.internalServer.statusCode);
@@ -352,7 +351,6 @@ describe('jwt-certificate-rotation', function() {
                 // // should(callback.firstCall.args).eql()
                 // done();
             });
-            done();
         });
 
         it('should copy primary keys to secondary keys if primary keys already exist', (done) => {
@@ -373,7 +371,7 @@ describe('jwt-certificate-rotation', function() {
                 .then(() => {
                     should(dummyLoader.load.callCount).eql(1);
                     should(ParameterService.Create.callCount).eql(1);
-                    should(dummyParamService.setParameter.callCount).eql(4);
+                    should(dummyParamService.setParameter.callCount).eql(2);
                     const firstCallArgs = dummyParamService.setParameter.getCall(0).args[0];
                     should(firstCallArgs).eql({
                         name: '/local/accessToken.secondary.publicKey',

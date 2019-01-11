@@ -42,11 +42,7 @@ class Jwt extends Handler {
                         .then((response) => {
                             // on first run, primary keys won't exist.
                             if (!response[key]) {
-                                this.createKeyPair()
-                                    .then((newKeyPair) => {
-                                        this.saveKeyPairToParams(newKeyPair, true);
-                                        throw new Error('Primary keys did not exist, created new primary and secondary keys');
-                                    });
+                                throw new Error('Primary keys did not exist, creating new primary and secondary keys');
                             }
                             // key found, return new SSM object for secondary key
                             return {
@@ -55,11 +51,15 @@ class Jwt extends Handler {
                                 value: response[key],
                                 overwrite: true
                             };
-                        })
-                        .catch((err) => {
-                            throw err;
                         });
                 })
+                    .catch((err) => {
+                        this.createKeyPair()
+                            .then((newKeyPair) => {
+                                this.saveKeyPairToParams(newKeyPair, true);
+                            });
+                        throw err;
+                    })
                     .then((secondaryKeyArray) => {
                         return this.setParams(secondaryKeyArray)
                             .catch((err) => {
