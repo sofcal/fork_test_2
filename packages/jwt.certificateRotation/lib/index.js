@@ -15,13 +15,14 @@ class Jwt extends Handler {
             dbName: 'bank_db',
             keys
         });
+        this.func = 'Jwt.impl';
     }
 
     impl(event, params, services) {
+        const self = this;
         return Promise.resolve(undefined)
             .then(() => {
-                this.func = 'Jwt.impl';
-                event.logger.info({ function: this.func, log: 'started' });
+                event.logger.info({ function: self.func, log: 'started' });
                 validate.process(process);
 
                 const { Environment: env } = process.env;
@@ -53,11 +54,14 @@ class Jwt extends Handler {
                             };
                         });
                 })
-                    .catch((err) => {
-                        this.createKeyPair()
-                            .then((newKeyPair) => {
-                                this.saveKeyPairToParams(newKeyPair, true);
-                            });
+                    .catch((err) => { // accounts for initial run where primary key doesn't exist and above .map() fails
+                        if (err.message === 'Primary keys did not exist, creating new primary and secondary keys') {
+                            event.logger.info({ function: self.func, log: 'no primary keys, creating new primary and secondary keys' });
+                            this.createKeyPair()
+                                .then((newKeyPair) => {
+                                    this.saveKeyPairToParams(event, newKeyPair, true);
+                                });
+                        }
                         throw err;
                     })
                     .then((secondaryKeyArray) => {
@@ -67,21 +71,32 @@ class Jwt extends Handler {
                                 throw new Error('Failed to copy primary key values to secondary key');
                             });
                     })
-                    .then(() => this.createKeyPair())
-                    .then((newKeyPair) => this.saveKeyPairToParams(newKeyPair));
+                    .then(() => {
+                        event.logger.info({ function: this.func, log: 'creating key pair' });
+                        return this.createKeyPair(event);
+                    })
+                    .then((newKeyPair) => {
+                        event.logger.info({ function: this.func, log: 'creating key pair' });
+                        this.saveKeyPairToParams(event, newKeyPair);
+                        event.logger.info({ function: self.func, log: 'ended' });
+                    });
             });
     }
 
-    createKeyPair() { //eslint-disable-line
-        return keyPair.createKeyPair(256) // TODO depends on algorithm used by JwtStrategy in BankDrive, currently 256 bits
-            .then((kp) => kp)
+    createKeyPair(event) { //eslint-disable-line
+        return keyPair.createKeyPair(256)
+            .then((kp) => {
+                event.logger.info({ function: this.func, log: 'returning new key pair' });
+                return kp;
+            })
             .catch((err) => {
                 console.log('alert: ' + err);
                 throw new Error('Failed to create new primary keys');
             });
     }
 
-    saveKeyPairToParams(keypair, copyToSecondary) {
+    saveKeyPairToParams(event, keypair, copyToSecondary) {
+        event.logger.info({ function: this.func, log: 'saving keys to param store', copyToSecondary });
         const newParams = [{
             name: `${this.paramPrefix}accessToken.primary.publicKey`,
             type: 'SecureString',
@@ -107,7 +122,10 @@ class Jwt extends Handler {
             });
         }
         return this.setParams(newParams)
-            .then((response) => response)
+            .then((response) => {
+                event.logger.info({ function: this.func, log: 'saved keys to param store', copyToSecondary });
+                return response;
+            })
             .catch((err) => {
                 console.log('alert: ' + err);
                 throw new Error('Failed to save new keys');

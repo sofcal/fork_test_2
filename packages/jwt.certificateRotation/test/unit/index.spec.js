@@ -334,7 +334,6 @@ describe('jwt-certificate-rotation', function() {
 
             Jwt.run(event, context, (first, second) => {
                 try {
-                    // TODO update to match refactor
                     should(first).eql(null);
 
                     const expected = StatusCodeError.CreateFromSpecs([ErrorSpecs.internalServer], ErrorSpecs.internalServer.statusCode);
@@ -347,9 +346,6 @@ describe('jwt-certificate-rotation', function() {
                 } catch (err) {
                     done(err instanceof Error ? err : new Error(err));
                 }
-                // should (callArgs[0].message).eql('Primary keys did not exist, created new primary and secondary keys');
-                // // should(callback.firstCall.args).eql()
-                // done();
             });
         });
 
@@ -510,7 +506,7 @@ describe('jwt-certificate-rotation', function() {
             }));
             sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
             sandbox.stub(dummyParamService, 'getParameters').resolves(primaryKeysResponse);
-            sandbox.stub(dummyParamService, 'setParameter').onCall(2).rejects();
+            sandbox.stub(dummyParamService, 'setParameter').onCall(0).onCall(1).rejects('Failed to save primary keys to param store');
             sandbox.stub(ParameterService, 'Create').returns(dummyParamService);
             sandbox.stub(keyPair, 'createKeyPair').resolves({ public: 'newPublicKey', private: 'newPrivateKey' });
             callback = sandbox.spy();
