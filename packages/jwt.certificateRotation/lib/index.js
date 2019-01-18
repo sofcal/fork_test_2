@@ -84,7 +84,7 @@ class Jwt extends Handler {
     }
 
     createKeyPair(event) { //eslint-disable-line
-        return keyPair.createKeyPair(256)
+        return keyPair.createKeyPair() // defaults to 2048, shorter keys cause problems due to length of digest
             .then((kp) => {
                 event.logger.info({ function: this.func, log: 'returning new key pair' });
                 return kp;
