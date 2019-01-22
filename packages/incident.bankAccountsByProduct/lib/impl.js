@@ -32,7 +32,7 @@ module.exports.run = Promise.method((event, params, services) => {
             _.each(result, (baDetails) => {
                 // ignore delete BAs
                 if (!baDetails.deleted) {
-                    event.logger.info({ function: func, log: `BA: ${baDetails._id}` });
+                    //event.logger.info({ function: func, log: `BA: ${baDetails._id}` });
                     accounts.bankAccountIds.push(baDetails._id);
                 }
             });

@@ -10,7 +10,7 @@ const { ParameterStoreStaticLoader } = require('internal-parameterstore-static-l
 const DB = require('internal-services-db');
 const { StatusCodeError, StatusCodeErrorItem } = require('internal-status-code-error');
 
-describe('incidents.bankAccountsByProduct.handler', function() {
+describe('incident.bankAccountsByProduct.handler', function() {
     let sandbox;
     let config, context, event;
 
