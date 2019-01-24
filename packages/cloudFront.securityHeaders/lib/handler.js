@@ -26,22 +26,8 @@ module.exports.run = (event, context, callback) => {
     // these environment variables allow us to retrieve the correct param-store values for more configurable options
     let { Environment: env, AWS_REGION: region } = process.env;
     // TODO: Remove below when deployed to environment
-    if (!env) {
-        env = 'dev01';
-    }
+    env = 'dev';
     region = 'eu-west-1'; // set to force lambda to get param store values from fixed region and not region it is running in
-
-    // check if uri contains /banking/ if not then just return so other onboarding flows do not get headers modified
-    const bankingCloudIdentifier = '/banking/';
-    const request = event.Records[0].cf.request; // eslint-disable-line prefer-destructuring
-    const originalResponse = event.Records[0].cf.response; // eslint-disable-line prefer-destructuring
-    const uri = request.uri.toLowerCase();
-    if (uri.indexOf(bankingCloudIdentifier) === -1) {
-        return Promise.resolve(undefined)
-            .then(() => {
-                callback(null, originalResponse);
-            });
-    }
 
     return Promise.resolve(undefined)
         .then(() => {
