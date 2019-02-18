@@ -13,6 +13,8 @@ module.exports.run = Promise.method((event, params) => {
     const request = event.Records[0].cf.request; // eslint-disable-line prefer-destructuring
     const headers = response.headers; // eslint-disable-line prefer-destructuring
     const query = request.querystring.toLowerCase();
+    const uri = request.uri.toLowerCase();
+    event.logger.info({ function: func, log: 'request', params: { request } });
 
     try {
         const whitelist = params['outboundApi.callbackUriWhiteList'] ? params['outboundApi.callbackUriWhiteList'] : '';
@@ -36,18 +38,16 @@ module.exports.run = Promise.method((event, params) => {
 
         if (whitelist && whitelist !== '') {
             headers['x-content-security-policy'] = [{ key: 'X-Content-Security-Policy', value: `allow-from frame-ancestors ${whitelistNoCommas}` }];
-            let headerValue = `img-src 'self' https://www.google-analytics.com https://s3-eu-west-1.amazonaws.com ${whitelistNoCommas}; `;
-            headerValue += `script-src 'self' *.sage.com 'unsafe-inline' https://www.google-analytics.com https://cdnjs.cloudflare.com ${whitelistNoCommas}; `;
-            headerValue += `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com ${whitelistNoCommas}; `;
-            headerValue += 'report-uri slippydog.com'; // TODO: remove
-            headers['content-security-policy-report-only'] = [{ key: 'Content-Security-Policy-Report-Only', value: headerValue }];
+            let headerValue = `img-src 'self' https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://s3-eu-west-1.amazonaws.com ${whitelistNoCommas}; `;
+            headerValue += `script-src 'self' *.sage.com 'unsafe-inline' https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://cdnjs.cloudflare.com https://ajax.googleapis.com https://cdn.plaid.com ${whitelistNoCommas}; `;
+            headerValue += `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com ${whitelistNoCommas}; `;
+            headers['content-security-policy'] = [{ key: 'Content-Security-Policy', value: headerValue }];
         } else {
             headers['x-content-security-policy'] = [{ key: 'X-Content-Security-Policy', value: 'default-src \'none\'' }];
-            let headerValue = 'img-src \'self\' https://www.google-analytics.com https://s3-eu-west-1.amazonaws.com; ';
-            headerValue += 'script-src \'self\' *.sage.com \'unsafe-inline\' https://www.google-analytics.com https://cdnjs.cloudflare.com; ';
-            headerValue += 'style-src \'self\' \'unsafe-inline\' https://fonts.googleapis.com; ';
-            headerValue += 'report-uri slippydog.com'; // TODO: remove
-            headers['content-security-policy-report-only'] = [{ key: 'Content-Security-Policy-Report-Only', value: headerValue }];
+            let headerValue = 'img-src \'self\' https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://s3-eu-west-1.amazonaws.com; ';
+            headerValue += 'script-src \'self\' \'unsafe-inline\' https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://cdnjs.cloudflare.com https://ajax.googleapis.com https://cdn.plaid.com; ';
+            headerValue += 'style-src \'self\' \'unsafe-inline\' https://fonts.googleapis.com https://fonts.gstatic.com; ';
+            headers['content-security-policy'] = [{ key: 'Content-Security-Policy', value: headerValue }];
         }
         event.logger.info({ function: func, log: 'added x-frame-options allow-from for domain', params: { xFrameOptions: headers['x-content-security-policy'][0].value } });
 
@@ -57,11 +57,12 @@ module.exports.run = Promise.method((event, params) => {
         if (xFrameDomain && whitelistNoCommas.toLowerCase().includes(xFrameDomain.toLowerCase())) {
             // if xFrameDomain in query string and in whitelist then add allow-from
             headers['x-frame-options'] = [{ key: 'X-Frame-Options', value: `ALLOW-FROM ${xFrameDomain}` }];
-        } else {
-            // if xFrameDomain NOT in query string then add DENY
+            event.logger.info({ function: func, log: 'added ', params: { xFrameOptions: headers['x-frame-options'][0].value } });
+        } else if (uri.includes('xframe.html')) {
+            // if xFrameDomain NOT in query and page is xframe.html then add DENY
             headers['x-frame-options'] = [{ key: 'X-Frame-Options', value: 'DENY' }];
+            event.logger.info({ function: func, log: 'added ', params: { xFrameOptions: headers['x-frame-options'][0].value } });
         }
-        event.logger.info({ function: func, log: 'added ', params: { xFrameOptions: headers['x-frame-options'][0].value } });
     } catch (e) {
         event.logger.error({ function: func, log: 'error adding headers', params: { errorMessage: e.message } });
         throw StatusCodeError.CreateFromSpecs([ErrorSpecs.generalError], ErrorSpecs.generalError.statusCode);
@@ -72,6 +73,9 @@ module.exports.run = Promise.method((event, params) => {
 });
 
 const getQuerySegment = (query, segment) => {
+    if (query.length < 1) {
+        return undefined;
+    }
     const queryObj = querystring.parse(query);
     return queryObj[segment];
 };
