@@ -5,6 +5,7 @@ const impl = require('./../../lib/impl.js');
 describe.only('impl', function(){
     let sandbox;
     const whiteList = 'https://pre-addons.eu.sageone.com,https://pre-addons.na.sageone.com,https://pre-addons.sageone.biz';
+    const whiteListNoCommas = whiteList.split(',').join(' ');
 
     before(()=>{
     });
@@ -25,8 +26,8 @@ describe.only('impl', function(){
         const expectedHeaders = {
             'cache-control': [{ key: 'Cache-Control', value: 'public, max-age=86400, no-transform' }],
             'strict-transport-security': [{ key: 'Strict-Transport-Security', value: 'max-age=15552000; includeSubDomains' }],
-            'x-content-security-policy': [{ key: 'X-Content-Security-Policy', value: 'allow-from frame-ancestors https://pre-addons.eu.sageone.com https://pre-addons.na.sageone.com https://pre-addons.sageone.biz' }],
-            'content-security-policy': [{ key: 'Content-Security-Policy', value: 'img-src \'self\' https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://s3-eu-west-1.amazonaws.com https://pre-addons.eu.sageone.com https://pre-addons.na.sageone.com https://pre-addons.sageone.biz; script-src \'self\' *.sage.com \'unsafe-inline\' https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://cdnjs.cloudflare.com https://ajax.googleapis.com https://cdn.plaid.com https://pre-addons.eu.sageone.com https://pre-addons.na.sageone.com https://pre-addons.sageone.biz; style-src \'self\' \'unsafe-inline\' https://fonts.googleapis.com https://fonts.gstatic.com https://pre-addons.eu.sageone.com https://pre-addons.na.sageone.com https://pre-addons.sageone.biz; '}],
+            'x-content-security-policy': [{ key: 'X-Content-Security-Policy', value: `allow-from frame-ancestors ${whiteListNoCommas}` }],
+            'content-security-policy': [{ key: 'Content-Security-Policy', value: `img-src 'self' https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://s3-eu-west-1.amazonaws.com ${whiteListNoCommas}; script-src 'self' *.sage.com 'unsafe-inline' https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://cdnjs.cloudflare.com https://ajax.googleapis.com https://cdn.plaid.com ${whiteListNoCommas}; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com ${whiteListNoCommas}; `}],
             'x-xss-protection': [{ key: 'X-XSS-Protection', value: '1; mode=block' }],
             'x-content-type-options': [{ key: 'X-Content-Type-Options', value: 'nosniff' }],
             'x-download-options': [{ key: 'X-Download-Options', value: 'noopen' }],
@@ -67,8 +68,8 @@ describe.only('impl', function(){
         const expectedHeaders = {
             'cache-control': [{ key: 'Cache-Control', value: 'public, max-age=86400, no-transform' }],
             'strict-transport-security': [{ key: 'Strict-Transport-Security', value: 'max-age=15552000; includeSubDomains' }],
-            'x-content-security-policy': [{ key: 'X-Content-Security-Policy', value: 'allow-from frame-ancestors https://pre-addons.eu.sageone.com https://pre-addons.na.sageone.com https://pre-addons.sageone.biz' }],
-            'content-security-policy': [{ key: 'Content-Security-Policy', value: 'img-src \'self\' https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://s3-eu-west-1.amazonaws.com https://pre-addons.eu.sageone.com https://pre-addons.na.sageone.com https://pre-addons.sageone.biz; script-src \'self\' *.sage.com \'unsafe-inline\' https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://cdnjs.cloudflare.com https://ajax.googleapis.com https://cdn.plaid.com https://pre-addons.eu.sageone.com https://pre-addons.na.sageone.com https://pre-addons.sageone.biz; style-src \'self\' \'unsafe-inline\' https://fonts.googleapis.com https://fonts.gstatic.com https://pre-addons.eu.sageone.com https://pre-addons.na.sageone.com https://pre-addons.sageone.biz; '}],
+            'x-content-security-policy': [{ key: 'X-Content-Security-Policy', value: `allow-from frame-ancestors ${whiteListNoCommas}` }],
+            'content-security-policy': [{ key: 'Content-Security-Policy', value: `img-src 'self' https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://s3-eu-west-1.amazonaws.com ${whiteListNoCommas}; script-src 'self' *.sage.com 'unsafe-inline' https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://cdnjs.cloudflare.com https://ajax.googleapis.com https://cdn.plaid.com ${whiteListNoCommas}; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com ${whiteListNoCommas}; `}],
             'x-xss-protection': [{ key: 'X-XSS-Protection', value: '1; mode=block' }],
             'x-content-type-options': [{ key: 'X-Content-Type-Options', value: 'nosniff' }],
             'x-download-options': [{ key: 'X-Download-Options', value: 'noopen' }],
@@ -97,8 +98,8 @@ describe.only('impl', function(){
         const expectedHeaders = {
             'cache-control': [{ key: 'Cache-Control', value: 'public, max-age=86400, no-transform' }],
             'strict-transport-security': [{ key: 'Strict-Transport-Security', value: 'max-age=15552000; includeSubDomains' }],
-            'x-content-security-policy': [{ key: 'X-Content-Security-Policy', value: 'allow-from frame-ancestors https://pre-addons.eu.sageone.com https://pre-addons.na.sageone.com https://pre-addons.sageone.biz' }],
-            'content-security-policy': [{ key: 'Content-Security-Policy', value: 'img-src \'self\' https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://s3-eu-west-1.amazonaws.com https://pre-addons.eu.sageone.com https://pre-addons.na.sageone.com https://pre-addons.sageone.biz; script-src \'self\' *.sage.com \'unsafe-inline\' https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://cdnjs.cloudflare.com https://ajax.googleapis.com https://cdn.plaid.com https://pre-addons.eu.sageone.com https://pre-addons.na.sageone.com https://pre-addons.sageone.biz; style-src \'self\' \'unsafe-inline\' https://fonts.googleapis.com https://fonts.gstatic.com https://pre-addons.eu.sageone.com https://pre-addons.na.sageone.com https://pre-addons.sageone.biz; '}],
+            'x-content-security-policy': [{ key: 'X-Content-Security-Policy', value: `allow-from frame-ancestors ${whiteListNoCommas}` }],
+            'content-security-policy': [{ key: 'Content-Security-Policy', value: `img-src 'self' https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://s3-eu-west-1.amazonaws.com ${whiteListNoCommas}; script-src 'self' *.sage.com 'unsafe-inline' https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://cdnjs.cloudflare.com https://ajax.googleapis.com https://cdn.plaid.com ${whiteListNoCommas}; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com ${whiteListNoCommas}; `}],
             'x-xss-protection': [{ key: 'X-XSS-Protection', value: '1; mode=block' }],
             'x-content-type-options': [{ key: 'X-Content-Type-Options', value: 'nosniff' }],
             'x-download-options': [{ key: 'X-Download-Options', value: 'noopen' }],
@@ -126,8 +127,8 @@ describe.only('impl', function(){
         const expectedHeaders = {
             'cache-control': [{ key: 'Cache-Control', value: 'public, max-age=86400, no-transform' }],
             'strict-transport-security': [{ key: 'Strict-Transport-Security', value: 'max-age=15552000; includeSubDomains' }],
-            'x-content-security-policy': [{ key: 'X-Content-Security-Policy', value: 'allow-from frame-ancestors https://pre-addons.eu.sageone.com https://pre-addons.na.sageone.com https://pre-addons.sageone.biz' }],
-            'content-security-policy': [{ key: 'Content-Security-Policy', value: 'img-src \'self\' https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://s3-eu-west-1.amazonaws.com https://pre-addons.eu.sageone.com https://pre-addons.na.sageone.com https://pre-addons.sageone.biz; script-src \'self\' *.sage.com \'unsafe-inline\' https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://cdnjs.cloudflare.com https://ajax.googleapis.com https://cdn.plaid.com https://pre-addons.eu.sageone.com https://pre-addons.na.sageone.com https://pre-addons.sageone.biz; style-src \'self\' \'unsafe-inline\' https://fonts.googleapis.com https://fonts.gstatic.com https://pre-addons.eu.sageone.com https://pre-addons.na.sageone.com https://pre-addons.sageone.biz; '}],
+            'x-content-security-policy': [{ key: 'X-Content-Security-Policy', value: `allow-from frame-ancestors ${whiteListNoCommas}` }],
+            'content-security-policy': [{ key: 'Content-Security-Policy', value: `img-src 'self' https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://s3-eu-west-1.amazonaws.com ${whiteListNoCommas}; script-src 'self' *.sage.com 'unsafe-inline' https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://cdnjs.cloudflare.com https://ajax.googleapis.com https://cdn.plaid.com ${whiteListNoCommas}; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com ${whiteListNoCommas}; `}],
             'x-xss-protection': [{ key: 'X-XSS-Protection', value: '1; mode=block' }],
             'x-content-type-options': [{ key: 'X-Content-Type-Options', value: 'nosniff' }],
             'x-download-options': [{ key: 'X-Download-Options', value: 'noopen' }],
