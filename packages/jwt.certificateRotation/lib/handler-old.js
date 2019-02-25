@@ -16,14 +16,14 @@ const serviceImpls = { DB };
 const keys = require('./params');
 
 class Handler {
-    static run(event,context,callback) {
+    static run(event, context, callback) {
         const func = 'handler.run';
         const { Environment: env = 'test', AWS_REGION: region = 'local' } = process.env;
         const services = {};
         return Promise.resolve(undefined)
             .then(() => {
                 // eslint-disable-next-line no-param-reassign
-                event.logger = RequestLogger.Create({ service: '__package_name__' });
+                event.logger = RequestLogger.Create({ service: 'jwt-certificate-rotation' });
                 if (!env || !region) {
                     const log = `invalid parameters - env: ${env}; region: ${region};`;
                     event.logger.error({ function: func, log });
@@ -66,7 +66,6 @@ class Handler {
                 return disconnectDB(services, event.logger);
             });
     }
-
 }
 
 const getParams = ({ env, region }, logger) => {
@@ -116,7 +115,7 @@ const connectDB = (services, { env, region }, params, logger) => {
     } = params;
 
     // eslint-disable-next-line no-param-reassign
-    services.db = serviceImpls.DB.Create({ env, region, domain, username, password, replicaSet });
+    services.db = serviceImpls.DB.Create({ env, region, domain, username, password, replicaSet, db: 'bank_db' });
 
     return services.db.connect('bank_db')
         .then((db) => {
