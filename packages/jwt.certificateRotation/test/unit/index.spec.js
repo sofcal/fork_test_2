@@ -444,7 +444,7 @@ describe('jwt-certificate-rotation', function() {
             })
                 .then(() => {
                     should(keyPair.createKeyPair.callCount).eql(1);
-                    should(keyPair.createKeyPair.calledWithExactly(keyLength)).eql(true);
+                    should(keyPair.createKeyPair.calledWithExactly()).eql(true);
                     done();
                 })
                 .catch((err) => {

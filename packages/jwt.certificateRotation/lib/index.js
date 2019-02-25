@@ -57,7 +57,7 @@ class Jwt extends Handler {
                     .catch((err) => { // accounts for initial run where primary key doesn't exist and above .map() fails
                         if (err.message === 'Primary keys did not exist, creating new primary and secondary keys') {
                             event.logger.info({ function: self.func, log: 'no primary keys, creating new primary and secondary keys' });
-                            this.createKeyPair()
+                            this.createKeyPair(event)
                                 .then((newKeyPair) => {
                                     this.saveKeyPairToParams(event, newKeyPair, true);
                                 });
