@@ -4,7 +4,7 @@ const timer = require('../../lib/timer');
 const sinon = require('sinon');
 const should = require('should');
 
-describe('internal-debug-utils.timer', function() {
+describe('@sage/bc-debug-utils.timer', function() {
     let sandbox;
 
     before(() => {

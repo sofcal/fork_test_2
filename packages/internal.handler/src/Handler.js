@@ -3,12 +3,12 @@
 const Promise = require('bluebird');
 const AWS = require('aws-sdk');
 
-const { ParameterStoreStaticLoader } = require('internal-parameterstore-static-loader');
-const { RequestLogger } = require('internal-request-logger');
-const { StatusCodeError } = require('internal-status-code-error');
+const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
+const { RequestLogger } = require('@sage/bc-request-logger');
+const { StatusCodeError } = require('@sage/bc-status-code-error');
 const ErrorSpecs = require('./ErrorSpecs');
 
-const DB = require('internal-services-db');
+const DB = require('@sage/bc-services-db');
 
 const serviceImpls = { DB };
 
@@ -27,7 +27,7 @@ class Handler {
         this.services = {};
         this.serviceLoader = serviceLoader;
         this.keys = keys;
-        this.logger = RequestLogger.Create({ service: 'internal-handler' });
+        this.logger = RequestLogger.Create({ service: '@sage/bc-default-lambda-handler' });
     }
 
     run(event, context, callback) {
@@ -38,7 +38,7 @@ class Handler {
         return Promise.resolve(undefined)
             .then(() => {
                 // eslint-disable-next-line no-param-reassign
-                // event.logger = RequestLogger.Create({ service: 'internal-handler' });
+                // event.logger = RequestLogger.Create({ service: '@sage/bc-default-lambda-handler' });
                 if (!env || !region) {
                     const log = `invalid parameters - env: ${env}; region: ${region};`;
                     self.logger.error({ function: func, log });

@@ -1,4 +1,4 @@
-const { ErrorSpecs } = require('internal-handler');
+const { ErrorSpecs } = require('@sage/bc-default-lambda-handler');
 const Jwt = require('../../lib/index');
 const keys = require('../../lib/params');
 const keyPair = require('../../lib/keyPair');
@@ -7,10 +7,10 @@ const sinon = require('sinon');
 const Promise = require('bluebird');
 const _ = require('underscore');
 
-const { ParameterStoreStaticLoader } = require('internal-parameterstore-static-loader');
-const DB = require('internal-services-db');
-const { StatusCodeError } = require('internal-status-code-error');
-const ParameterService = require('internal-parameter-service');
+const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
+const DB = require('@sage/bc-services-db');
+const { StatusCodeError } = require('@sage/bc-status-code-error');
+const ParameterService = require('@sage/bc-services-parameter');
 
 describe('jwt-certificate-rotation', function() {
 
@@ -198,7 +198,7 @@ describe('jwt-certificate-rotation', function() {
                 try {
                     should(first).eql(null);
 
-                    const expected = StatusCodeError.CreateFromSpecs([ErrorSpecs.internalServer], ErrorSpecs.internalServer.statusCode);
+                    const expected = StatusCodeError.CreateFromSpecs([ErrorSpecs.@sage/bcServer], ErrorSpecs.@sage/bcServer.statusCode);
                     should(second).eql({
                         statusCode: 500,
                         body: JSON.stringify(expected.toDiagnoses())
@@ -249,7 +249,7 @@ describe('jwt-certificate-rotation', function() {
 
                     should(second).eql({
                         statusCode: 500,
-                        body: '{"$diagnoses":[{"$applicationCode":"InternalServerError","$message":"an error occurred while processing the request","$sdataCode":"ApplicationDiagnosis","$severity":"Error"}]}'
+                        body: '{"$diagnoses":[{"$applicationCode":"@sage/bcServerError","$message":"an error occurred while processing the request","$sdataCode":"ApplicationDiagnosis","$severity":"Error"}]}'
                     });
 
                     done();
@@ -336,7 +336,7 @@ describe('jwt-certificate-rotation', function() {
                 try {
                     should(first).eql(null);
 
-                    const expected = StatusCodeError.CreateFromSpecs([ErrorSpecs.internalServer], ErrorSpecs.internalServer.statusCode);
+                    const expected = StatusCodeError.CreateFromSpecs([ErrorSpecs.@sage/bcServer], ErrorSpecs.@sage/bcServer.statusCode);
                     should(second).eql({
                         statusCode: 500,
                         body: JSON.stringify(expected.toDiagnoses())
@@ -407,7 +407,7 @@ describe('jwt-certificate-rotation', function() {
             Jwt.run(event, context, (first, second) => {
                 try {
                     should(first).eql(null);
-                    const expected = StatusCodeError.CreateFromSpecs([ErrorSpecs.internalServer], ErrorSpecs.internalServer.statusCode);
+                    const expected = StatusCodeError.CreateFromSpecs([ErrorSpecs.@sage/bcServer], ErrorSpecs.@sage/bcServer.statusCode);
                     should(second).eql({
                         statusCode: 500,
                         body: JSON.stringify(expected.toDiagnoses())
@@ -514,7 +514,7 @@ describe('jwt-certificate-rotation', function() {
             Jwt.run(event, context, (first, second) => {
                 try {
                     should(first).eql(null);
-                    const expected = StatusCodeError.CreateFromSpecs([ErrorSpecs.internalServer], ErrorSpecs.internalServer.statusCode);
+                    const expected = StatusCodeError.CreateFromSpecs([ErrorSpecs.@sage/bcServer], ErrorSpecs.@sage/bcServer.statusCode);
                     should(second).eql({
                         statusCode: 500,
                         body: JSON.stringify(expected.toDiagnoses())

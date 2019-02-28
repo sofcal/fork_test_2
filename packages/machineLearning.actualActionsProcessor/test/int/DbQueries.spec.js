@@ -1,10 +1,10 @@
 const Promise = require('bluebird');
 const should = require('should');
 const _ = require('underscore');
-const DB =  require('internal-services-db');
+const DB =  require('@sage/bc-services-db');
 const DbQueries = require('../../lib/DbQueries');
-const Rule = require('internal-contracts-rule').Rule;
-const RuleBucket = require('internal-contracts-rule').RuleBucket;
+const Rule = require('@sage/bc-contracts-rule').Rule;
+const RuleBucket = require('@sage/bc-contracts-rule').RuleBucket;
 
 describe('machineLearning-actualActionsProcessor',() => {
     let db;

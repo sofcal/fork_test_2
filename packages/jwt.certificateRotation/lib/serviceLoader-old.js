@@ -1,7 +1,7 @@
-const ParameterService = require('internal-parameter-service');
+const ParameterService = require('@sage/bc-services-parameter');
 
 // create and return any services that you'll need in your impl.
-//  NOTE: db service is created automatically in internal-handler/Handler.js
+//  NOTE: db service is created automatically in @sage/bc-default-lambda-handler/Handler.js
 module.exports = ({ env, region, params }) => {
     const paramPrefix = `/${env}/`;
 

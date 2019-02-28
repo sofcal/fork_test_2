@@ -3,8 +3,8 @@
 const jsonschema = require('jsonschema');
 const ruleSchema = require('./schemas/ruleSchema');
 const { utils, httpMethod } = require('./_bankDrive');
-const { StatusCodeError, StatusCodeErrorItem } = require('internal-status-code-error');
-const { toStatusCodeError, toStatusCodeErrorItems } = require('internal-jsonschema-to-statuscodeerror');
+const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-status-code-error');
+const { toStatusCodeError, toStatusCodeErrorItems } = require('@sage/bc-jsonschema-to-statuscodeerror');
 const access = require('safe-access');
 const _ = require('underscore');
 const Big = require('bignumber.js');

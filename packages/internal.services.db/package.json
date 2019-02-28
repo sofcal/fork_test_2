@@ -1,11 +1,14 @@
 {
-  "name": "internal-services-db",
+  "name": "@sage/bc-services-db",
   "version": "1.0.0",
   "author": "",
   "license": "ISC",
   "description": "",
-  "private": true,
   "main": "lib/index.js",
+  "publishConfig": {
+    "registry": "https://sage.myget.org/F/test-npm/npm/",
+    "access": "public"
+  },
   "directories": {
     "lib": "lib"
   },

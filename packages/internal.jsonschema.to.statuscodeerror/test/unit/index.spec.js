@@ -1,8 +1,8 @@
 const { toStatusCodeError, toStatusCodeErrorItems } = require('../../lib/index');
-const { StatusCodeError, StatusCodeErrorItem } = require('internal-status-code-error');
+const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-status-code-error');
 const should = require('should');
 
-describe('internal-jsonschema-to-statuscodeerror.index', function(){
+describe('@sage/bc-jsonschema-to-statuscodeerror.index', function(){
     class Type { }
 
     let obj;

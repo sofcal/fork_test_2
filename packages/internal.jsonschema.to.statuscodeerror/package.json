@@ -1,11 +1,14 @@
 {
-  "name": "internal-jsonschema-to-statuscodeerror",
+  "name": "@sage/bc-jsonschema-to-statuscodeerror",
   "version": "1.0.0",
   "author": "Sage UK",
   "license": "ISC",
   "description": "",
-  "private": true,
   "main": "lib/index.js",
+  "publishConfig": {
+    "registry": "https://sage.myget.org/F/test-npm/npm/",
+    "access": "public"
+  },
   "directories": {
     "lib": "lib"
   },
@@ -13,7 +16,7 @@
     "@babel/code-frame": "^7.0.0-beta.48",
     "@babel/core": "^7.0.0-beta.47",
     "@babel/preset-env": "^7.0.0-beta.47",
-    "internal-status-code-error": "^1.0.0",
+    "@sage/bc-status-code-error": "^1.0.0",
     "safe-access": "^0.1.0",
     "underscore": "^1.9.1",
     "underscore.string": "^3.3.4"

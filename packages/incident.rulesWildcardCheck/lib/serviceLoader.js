@@ -1,4 +1,4 @@
-const S3 = require('internal-services-s3');
+const S3 = require('@sage/bc-services-s3');
 
 const { BlobStorage } = require('./blob');
 

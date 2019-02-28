@@ -1,14 +1,14 @@
 'use strict';
 
 const NarrativeDictionary = require('../../lib/NarrativeDictionary');
-const debug = require('internal-debug-utils');
-const { StatusCodeError, StatusCodeErrorItem } = require('internal-status-code-error');
+const debug = require('@sage/bc-debug-utils');
+const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-status-code-error');
 const fs = require('fs');
 const sinon = require('sinon');
 const should = require('should');
 const _ = require('underscore');
 
-describe('internal-contracts-narrativedictionary.NarrativeDictionary', function(){
+describe('@sage/bc-contracts-narrativedictionary.NarrativeDictionary', function(){
     let sandbox;
 
     before(() => {

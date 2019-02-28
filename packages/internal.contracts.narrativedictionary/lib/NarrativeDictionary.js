@@ -4,7 +4,7 @@ const _ = require('underscore');
 
 const {
   toStatusCodeError
-} = require('internal-jsonschema-to-statuscodeerror');
+} = require('@sage/bc-jsonschema-to-statuscodeerror');
 
 const {
   Validator

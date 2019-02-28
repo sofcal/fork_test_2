@@ -3,9 +3,9 @@
 const Promise = require('bluebird');
 const _ = require('underscore');
 
-const ParameterStoreStaticLoader = require('internal-parameterstore-static-loader');
+const ParameterStoreStaticLoader = require('@sage/bc-parameterstore-static-loader');
 const serviceImpls = {
-    DB: require('internal-services-db')
+    DB: require('@sage/bc-services-db')
 };
 
 let env, region, bankId, duplicates, quarantinedFile;

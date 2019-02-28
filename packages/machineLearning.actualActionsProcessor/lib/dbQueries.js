@@ -2,7 +2,7 @@
 
 const Promise = require('bluebird');
 const _ = require('underscore');
-const { Rule, RuleBucket } = require('internal-contracts-rule');
+const { Rule, RuleBucket } = require('@sage/bc-contracts-rule');
 const uuid = require('uuid/v4');
 const moment = require('moment');
 const access = require('safe-access');

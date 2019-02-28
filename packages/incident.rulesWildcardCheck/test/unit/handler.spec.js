@@ -6,9 +6,9 @@ const should = require('should');
 const sinon = require('sinon');
 const Promise = require('bluebird');
 
-const { ParameterStoreStaticLoader } = require('internal-parameterstore-static-loader');
-const DB = require('internal-services-db');
-const { StatusCodeError, StatusCodeErrorItem } = require('internal-status-code-error');
+const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
+const DB = require('@sage/bc-services-db');
+const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-status-code-error');
 
 describe('incident-rulesWildcardCheck.handler', function() {
     let sandbox;

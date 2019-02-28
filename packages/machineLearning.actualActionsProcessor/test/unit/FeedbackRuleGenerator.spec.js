@@ -4,7 +4,7 @@ const _ = require('underscore');
 const impl = require('./../../lib/impl.js')
 const DbQueries = require('./../../lib/dbQueries');
 const FeedbackRuleGenerator = require('./../../lib/FeedbackRuleGenerator');
-const { Rule } = require('internal-contracts-rule');
+const { Rule } = require('@sage/bc-contracts-rule');
 const sinon = require('sinon');
 
 describe('FeedbackRuleGenerator', function(){

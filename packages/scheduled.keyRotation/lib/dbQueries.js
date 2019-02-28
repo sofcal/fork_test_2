@@ -1,7 +1,7 @@
 'use strict';
 const Promise = require('bluebird');
 const _ = require('underscore');
-const DB =  require('internal-services-db');
+const DB =  require('@sage/bc-services-db');
 const mongodb = require('mongodb');
 
 class DbQueries {

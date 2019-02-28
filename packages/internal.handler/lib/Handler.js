@@ -6,19 +6,19 @@ const AWS = require('aws-sdk');
 
 const {
   ParameterStoreStaticLoader
-} = require('internal-parameterstore-static-loader');
+} = require('@sage/bc-parameterstore-static-loader');
 
 const {
   RequestLogger
-} = require('internal-request-logger');
+} = require('@sage/bc-request-logger');
 
 const {
   StatusCodeError
-} = require('internal-status-code-error');
+} = require('@sage/bc-status-code-error');
 
 const ErrorSpecs = require('./ErrorSpecs');
 
-const DB = require('internal-services-db');
+const DB = require('@sage/bc-services-db');
 
 const serviceImpls = {
   DB
@@ -47,7 +47,7 @@ class Handler {
     this.serviceLoader = serviceLoader;
     this.keys = keys;
     this.logger = RequestLogger.Create({
-      service: 'internal-handler'
+      service: '@sage/bc-default-lambda-handler'
     });
   }
 
@@ -61,7 +61,7 @@ class Handler {
     const services = self.services || {};
     return Promise.resolve(undefined).then(() => {
       // eslint-disable-next-line no-param-reassign
-      // event.logger = RequestLogger.Create({ service: 'internal-handler' });
+      // event.logger = RequestLogger.Create({ service: '@sage/bc-default-lambda-handler' });
       if (!env || !region) {
         const log = `invalid parameters - env: ${env}; region: ${region};`;
         self.logger.error({

@@ -1,11 +1,14 @@
 {
-  "name": "internal-status-code-error",
+  "name": "@sage/bc-status-code-error",
   "version": "1.0.0",
   "author": "Sage UK",
   "license": "ISC",
   "description": "",
-  "private": true,
   "main": "lib/index.js",
+  "publishConfig": {
+    "registry": "https://sage.myget.org/F/test-npm/npm/",
+    "access": "public"
+  },
   "directories": {
     "lib": "lib"
   },

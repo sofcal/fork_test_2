@@ -2,7 +2,7 @@ const Handler = require('../../lib/index');
 const should = require('should');
 const Promise = require('bluebird');
 
-describe('internal-handler.index', function(){
+describe('@sage/bc-default-lambda-handler.index', function(){
     // placeholder
     it('should throw if Handler instantiated directly', (done) => {
         Promise.resolve(new Handler())

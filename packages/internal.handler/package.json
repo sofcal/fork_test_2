@@ -1,22 +1,25 @@
 {
-  "name": "internal-handler",
+  "name": "@sage/bc-default-lambda-handler",
   "version": "1.0.0",
   "author": "Sage UK",
   "license": "ISC",
   "description": "",
-  "private": true,
   "main": "lib/index.js",
+  "publishConfig": {
+    "registry": "https://sage.myget.org/F/test-npm/npm/",
+    "access": "public"
+  },
   "directories": {
     "lib": "lib"
   },
   "dependencies": {
     "aws-sdk": "^2.220.1",
     "bluebird": "^3.5.1",
-    "internal-parameterstore-static-loader": "^1.0.0",
-    "internal-services-db": "^1.0.0",
-    "internal-parameter-service": "^1.0.0",
-    "internal-request-logger": "^1.0.0",
-    "internal-status-code-error": "^1.0.0",
+    "@sage/bc-parameterstore-static-loader": "^1.0.0",
+    "@sage/bc-services-db": "^1.0.0",
+    "@sage/bc-services-parameter": "^1.0.0",
+    "@sage/bc-request-logger": "^1.0.0",
+    "@sage/bc-status-code-error": "^1.0.0",
     "mongodb": "^3.0.5",
     "underscore": "^1.9.0"
   },

@@ -6,7 +6,7 @@ const aws = require('aws-sdk');
 const sinon = require('sinon');
 const should = require('should');
 
-describe('internal-parameterstore-static-loader.ParameterStoreStaticLoader', function(){
+describe('@sage/bc-parameterstore-static-loader.ParameterStoreStaticLoader', function(){
     let sandbox;
 
     const errorFunc = () => { throw new Error('should be stubbed') };

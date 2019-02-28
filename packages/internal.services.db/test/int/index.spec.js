@@ -1,7 +1,7 @@
 const DB = require('../../lib');
 const should = require('should');
 
-describe('internal-services-db', function(){
+describe('@sage/bc-services-db', function(){
     let service;
     const collection = 'test_collection';
     let database;

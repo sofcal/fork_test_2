@@ -1,7 +1,7 @@
 const Promise = require('bluebird');
 const should = require('should');
 const _ = require('underscore');
-const DB =  require('internal-services-db');
+const DB =  require('@sage/bc-services-db');
 const DbQueries = require('../../lib/DbQueries');
 
 describe('scheduled.keyRotation.DbQueries',()=>{

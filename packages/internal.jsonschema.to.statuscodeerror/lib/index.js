@@ -3,7 +3,7 @@
 const {
   StatusCodeError,
   StatusCodeErrorItem
-} = require('internal-status-code-error');
+} = require('@sage/bc-status-code-error');
 
 const access = require('safe-access');
 

@@ -2,11 +2,11 @@
 
 const Promise = require('bluebird');
 
-const ParameterStoreStaticLoader = require('internal-parameterstore-static-loader');
+const ParameterStoreStaticLoader = require('@sage/bc-parameterstore-static-loader');
 const serviceImpls = {
-    DB: require('internal-services-db'),
-    Encryption: require('internal-services-encryption'),
-    Key: require('internal-services-key')
+    DB: require('@sage/bc-services-db'),
+    Encryption: require('@sage/bc-services-encryption'),
+    Key: require('@sage/bc-services-key')
 };
 
 let env, region, keyAlias;

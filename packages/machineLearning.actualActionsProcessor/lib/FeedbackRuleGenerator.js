@@ -1,8 +1,8 @@
 'use strict';
 
 const Promise = require('bluebird');
-const { Rule } = require('internal-contracts-rule');
-const NarrativeDictionaryContract = require('internal-contracts-narrativedictionary');
+const { Rule } = require('@sage/bc-contracts-rule');
+const NarrativeDictionaryContract = require('@sage/bc-contracts-narrativedictionary');
 
 const narrativeDictionaryCache = {};
 

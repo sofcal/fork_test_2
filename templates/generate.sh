@@ -26,7 +26,7 @@ if [[ -z $PACKAGE_NAME ]]; then
 fi
 
 if [[ $TYPE == "internal" ]]; then
-    PACKAGE_NAME="internal-$PACKAGE_NAME"
+    PACKAGE_NAME="@sage/bc-$PACKAGE_NAME"
 fi
 
 echo "[$(date '+%Y-%m-%d %H:%M:%S')][TEMPLATE] generating $TYPE package for $PACKAGE_NAME"

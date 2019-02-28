@@ -1,7 +1,7 @@
 'use strict';
 
 const _ = require('underscore');
-const { toStatusCodeError } = require('internal-jsonschema-to-statuscodeerror');
+const { toStatusCodeError } = require('@sage/bc-jsonschema-to-statuscodeerror');
 const { Validator } = require('jsonschema');
 const schema = require('./schema');
 

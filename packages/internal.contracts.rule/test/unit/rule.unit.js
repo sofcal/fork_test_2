@@ -1,7 +1,7 @@
 'use strict';
 
 const { resources } = require('../../_bankDrive');
-const { StatusCodeError } = require('internal-status-code-error');
+const { StatusCodeError } = require('@sage/bc-status-code-error');
 const Rule = require('../../Rule');
 const should = require('should');
 const sinon = require('sinon');

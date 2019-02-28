@@ -1,6 +1,6 @@
 const should = require('should');
 
-describe('internal-services-key', function(){
+describe('@sage/bc-services-key', function(){
     // placeholder
     it('should force file to be evaluated', (done) => {
         done();

@@ -2,9 +2,9 @@
 const validate = require('./validators');
 const Promise = require('bluebird');
 
-const { Handler } = require('internal-handler');
-const ParameterService = require('internal-parameter-service');
-const { RequestLogger } = require('internal-request-logger');
+const { Handler } = require('@sage/bc-default-lambda-handler');
+const ParameterService = require('@sage/bc-services-parameter');
+const { RequestLogger } = require('@sage/bc-request-logger');
 
 const keys = require('./params');
 const keyPair = require('./keyPair');

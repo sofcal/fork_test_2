@@ -5,15 +5,16 @@
   "license": "ISC",
   "description": "",
   "main": "handler.js",
+  "private": true,
   "dependencies": {
     "aws-sdk": "^2.220.1",
     "bluebird": "^3.5.1",
     "emitter": "0.0.5",
-    "internal-parameterstore-static-loader": "^1.0.0",
-    "internal-services-db": "^1.0.0",
-    "internal-services-encryption": "^1.0.0",
-    "internal-services-key": "^1.0.0",
-    "internal-services-s3": "^1.0.0",
+    "@sage/bc-parameterstore-static-loader": "^1.0.0",
+    "@sage/bc-services-db": "^1.0.0",
+    "@sage/bc-services-encryption": "^1.0.0",
+    "@sage/bc-services-key": "^1.0.0",
+    "@sage/bc-services-s3": "^1.0.0",
     "mongodb": "^3.0.5"
   },
   "devDependencies": {

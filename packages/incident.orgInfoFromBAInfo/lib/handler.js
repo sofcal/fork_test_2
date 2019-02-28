@@ -2,10 +2,10 @@
 
 const Promise = require('bluebird');
 
-const ParameterStoreStaticLoader = require('internal-parameterstore-static-loader');
+const ParameterStoreStaticLoader = require('@sage/bc-parameterstore-static-loader');
 const serviceImpls = {
-    DB: require('internal-services-db'),
-    S3: require('internal-services-s3')
+    DB: require('@sage/bc-services-db'),
+    S3: require('@sage/bc-services-s3')
 };
 
 let env, region, dbName, bucket;

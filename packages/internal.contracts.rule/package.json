@@ -1,8 +1,12 @@
 {
-  "name": "internal-contracts-rule",
+  "name": "@sage/bc-contracts-rule",
   "version": "1.0.0",
   "description": "Banking Cloud schemas",
   "main": "index.js",
+  "publishConfig": {
+    "registry": "https://sage.myget.org/F/test-npm/npm/",
+    "access": "public"
+  },
   "scripts": {
     "clean": "rm -rf ./coverage/ && rm -rf ./.nyc_output/ && rm -rf ./.serverless/ && rm -rf ./node_modules/",
     "test": "NODE_ENV=test nyc --cache false --x test/ mocha -b --colors \"./test/unit/**/*.js\"",
@@ -16,8 +20,8 @@
   "dependencies": {
     "bluebird": "^3.5.1",
     "emitter": "0.0.5",
-    "internal-jsonschema-to-statuscodeerror": "^1.0.0",
-    "internal-status-code-error": "^1.0.0",
+    "@sage/bc-jsonschema-to-statuscodeerror": "^1.0.0",
+    "@sage/bc-status-code-error": "^1.0.0",
     "jsonschema": "^1.1.1",
     "safe-access": "^0.1.0",
     "underscore": "^1.9.0",

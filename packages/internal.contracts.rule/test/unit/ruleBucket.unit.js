@@ -7,7 +7,7 @@ const should = require('should');
 const sinon = require('sinon');
 const _ = require('underscore');
 
-describe('internal-contracts-rule.RuleBucket', () => {
+describe('@sage/bc-contracts-rule.RuleBucket', () => {
     let sandbox;
     let data;
 

@@ -1,7 +1,7 @@
 const Promise = require('bluebird');
 const should = require('should');
 const _ = require('underscore');
-const DB =  require('internal-services-db');
+const DB =  require('@sage/bc-services-db');
 const impl = require('./../../lib/impl.js')
 
 describe('machine-learning-actual-actions-processor', function(){  //TEMP:RJ:TESTMATRIX:FR8,FR12,FR14
