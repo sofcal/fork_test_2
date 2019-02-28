@@ -198,7 +198,7 @@ describe('jwt-certificate-rotation', function() {
                 try {
                     should(first).eql(null);
 
-                    const expected = StatusCodeError.CreateFromSpecs([ErrorSpecs.@sage/bcServer], ErrorSpecs.@sage/bcServer.statusCode);
+                    const expected = StatusCodeError.CreateFromSpecs([ErrorSpecs.internalServer], ErrorSpecs.internalServer.statusCode);
                     should(second).eql({
                         statusCode: 500,
                         body: JSON.stringify(expected.toDiagnoses())
@@ -336,7 +336,7 @@ describe('jwt-certificate-rotation', function() {
                 try {
                     should(first).eql(null);
 
-                    const expected = StatusCodeError.CreateFromSpecs([ErrorSpecs.@sage/bcServer], ErrorSpecs.@sage/bcServer.statusCode);
+                    const expected = StatusCodeError.CreateFromSpecs([ErrorSpecs.internalServer], ErrorSpecs.internalServer.statusCode);
                     should(second).eql({
                         statusCode: 500,
                         body: JSON.stringify(expected.toDiagnoses())
@@ -407,7 +407,7 @@ describe('jwt-certificate-rotation', function() {
             Jwt.run(event, context, (first, second) => {
                 try {
                     should(first).eql(null);
-                    const expected = StatusCodeError.CreateFromSpecs([ErrorSpecs.@sage/bcServer], ErrorSpecs.@sage/bcServer.statusCode);
+                    const expected = StatusCodeError.CreateFromSpecs([ErrorSpecs.internalServer], ErrorSpecs.internalServer.statusCode);
                     should(second).eql({
                         statusCode: 500,
                         body: JSON.stringify(expected.toDiagnoses())
@@ -514,7 +514,7 @@ describe('jwt-certificate-rotation', function() {
             Jwt.run(event, context, (first, second) => {
                 try {
                     should(first).eql(null);
-                    const expected = StatusCodeError.CreateFromSpecs([ErrorSpecs.@sage/bcServer], ErrorSpecs.@sage/bcServer.statusCode);
+                    const expected = StatusCodeError.CreateFromSpecs([ErrorSpecs.internalServer], ErrorSpecs.internalServer.statusCode);
                     should(second).eql({
                         statusCode: 500,
                         body: JSON.stringify(expected.toDiagnoses())
