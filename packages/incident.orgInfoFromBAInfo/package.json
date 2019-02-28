@@ -1,30 +1,30 @@
 {
   "name": "incident-org-info-from-ba-info",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "author": "",
   "license": "ISC",
   "description": "",
   "main": "handler.js",
   "private": true,
   "dependencies": {
+    "@sage/bc-parameterstore-static-loader": "^1.2.0",
+    "@sage/bc-services-db": "^1.2.0",
+    "@sage/bc-services-encryption": "^1.2.0",
+    "@sage/bc-services-key": "^1.2.0",
+    "@sage/bc-services-s3": "^1.2.0",
     "aws-sdk": "^2.220.1",
     "bluebird": "^3.5.1",
     "emitter": "0.0.5",
-    "@sage/bc-parameterstore-static-loader": "^1.0.0",
-    "@sage/bc-services-db": "^1.0.0",
-    "@sage/bc-services-encryption": "^1.0.0",
-    "@sage/bc-services-key": "^1.0.0",
-    "@sage/bc-services-s3": "^1.0.0",
     "mongodb": "^3.0.5"
   },
   "devDependencies": {
-    "nyc": "^12.0.2",
-    "should": "^13.2.1",
-    "sinon": "^5.0.10",
     "eslint": "^4.11.0",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-plugin-import": "^2.8.0",
-    "eslint-stats": "^1.0.0"
+    "eslint-stats": "^1.0.0",
+    "nyc": "^12.0.2",
+    "should": "^13.2.1",
+    "sinon": "^5.0.10"
   },
   "scripts": {
     "clean": "rimraf ./coverage/ && rimraf ./.nyc_output/ && rimraf ./.serverless/ && rimraf ./node_modules/",
