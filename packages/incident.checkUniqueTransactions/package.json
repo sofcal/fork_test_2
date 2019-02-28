@@ -1,16 +1,16 @@
 {
   "name": "incident-check-unique-transactions",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "author": "",
   "license": "ISC",
   "description": "",
   "main": "lib/handler.js",
   "private": true,
   "dependencies": {
+    "@sage/bc-parameterstore-static-loader": "^1.2.0",
+    "@sage/bc-services-db": "^1.2.0",
     "aws-sdk": "^2.220.1",
     "bluebird": "^3.5.1",
-    "@sage/bc-parameterstore-static-loader": "^1.0.0",
-    "@sage/bc-services-db": "^1.0.0",
     "mongodb": "^3.0.5",
     "underscore": "^1.9.0"
   },

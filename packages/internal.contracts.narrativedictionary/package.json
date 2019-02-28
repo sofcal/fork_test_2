@@ -1,6 +1,6 @@
 {
   "name": "@sage/bc-contracts-narrativedictionary",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "author": "Sage UK",
   "license": "ISC",
   "description": "",
@@ -16,8 +16,8 @@
     "@babel/code-frame": "^7.0.0-beta.48",
     "@babel/core": "^7.0.0-beta.47",
     "@babel/preset-env": "^7.0.0-beta.47",
-    "@sage/bc-jsonschema-to-statuscodeerror": "^1.0.0",
-    "@sage/bc-status-code-error": "^1.0.0",
+    "@sage/bc-jsonschema-to-statuscodeerror": "^1.2.0",
+    "@sage/bc-status-code-error": "^1.2.0",
     "jsonschema": "^1.2.4",
     "underscore": "^1.9.1",
     "underscore.string": "^3.3.4"
@@ -25,6 +25,7 @@
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.47",
     "@babel/register": "^7.0.0-beta.48",
+    "@sage/bc-debug-utils": "^1.2.0",
     "babel-eslint": "^8.0.3",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-istanbul": "^4.1.6",
@@ -33,7 +34,6 @@
     "eslint-config-airbnb": "^16.1.0",
     "eslint-plugin-import": "^2.8.0",
     "eslint-stats": "^1.0.0",
-    "@sage/bc-debug-utils": "^1.0.0",
     "istanbul": "^1.1.0-alpha.1",
     "mocha": "^4.0.1",
     "nyc": "^12.0.2",
