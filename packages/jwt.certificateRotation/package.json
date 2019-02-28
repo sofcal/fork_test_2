@@ -1,13 +1,13 @@
 {
   "name": "jwt-certificate-rotation",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "author": "",
   "license": "ISC",
   "description": "",
   "private": true,
   "main": "lib/handler.js",
   "dependencies": {
-    "@sage/bc-default-lambda-handler": "^1.2.1",
+    "@sage/bc-default-lambda-handler": "^1.2.2",
     "@sage/bc-parameterstore-static-loader": "^1.2.1",
     "@sage/bc-request-logger": "^1.2.1",
     "@sage/bc-services-db": "^1.2.1",
