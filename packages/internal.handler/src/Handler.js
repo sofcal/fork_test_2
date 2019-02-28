@@ -23,6 +23,7 @@ class Handler {
         if (!keys || !Array.isArray(keys)) {
             throw new Error('keys must be an array');
         }
+
         this.dbName = dbName;
         this.services = {};
         this.serviceLoader = serviceLoader;
