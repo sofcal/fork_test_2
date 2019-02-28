@@ -1,5 +1,5 @@
 {
-  "name": "@sage/bc-jwt-certificate-rotation",
+  "name": "jwt-certificate-rotation",
   "version": "1.0.0",
   "author": "",
   "license": "ISC",
