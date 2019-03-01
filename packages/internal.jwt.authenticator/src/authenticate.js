@@ -41,11 +41,12 @@ class Authenticate {
     }
 
     checkAuthorisation() {
-        const verifyToken = partial(jwt.verify, this.authToken);
-        const validTokenFound = firstValid(this.certKeys, verifyToken);
-
         return Promise.resolve()
+            .then(() => this.getCertList())
             .then(() => {
+                const verifyToken = partial(jwt.verify, this.authToken);
+                const validTokenFound = firstValid(this.certKeys, verifyToken);
+
                 if (!validTokenFound) {
                     throw new Error('AuthFailed');
                 }
