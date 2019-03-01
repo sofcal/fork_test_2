@@ -3,22 +3,21 @@
 const { JWKSCache } = require('./jwkscache');
 
 class JWKSStore {
-    constructor(serviceMappings, jwksDelay) {
+    constructor(serviceMappings = {}, jwksDelay = 0) {
+        // mapping serviceID > endpoint
         this.serviceMappings = serviceMappings;
+        // Delay jwks
         this.jwksDelay = jwksDelay;
-
-        // structure:
-        //    serviceID:
-        //       endpoint:
-        //       cachelist: []
-        //       refreshTime
+        // cached entries for serviceID
         this.cacheList = {};
     }
 
+    // get Certificate list
     getCertList(serviceID) {
         return Promise.resolve()
+            // check if serviceID cached exists - if not, create
             .then(() => {
-                const serviceIDCache = this.cacheList[serviceID];
+                let serviceIDCache = this.cacheList[serviceID];
 
                 if (!serviceIDCache) {
                     const endPoint = this.serviceMappings[serviceID];
@@ -26,11 +25,16 @@ class JWKSStore {
                         throw new Error('authTokenIssuerInvalid');
                     }
 
+                    // create new cache
                     this.cacheList[serviceID] = new JWKSCache(endPoint, this.jwksDelay);
+                    serviceIDCache = this.cacheList[serviceID];
+                    // populate the cache
+                    return serviceIDCache.buildCache();
                 }
-
-                return serviceIDCache.getCerts();
-            });
+                return undefined;
+            })
+            // retrieve certs from cache
+            .then(() => this.cacheList[serviceID].getCerts());
     }
 }
 
