@@ -3,18 +3,19 @@
 const NodeCache = require('node-cache');
 const needle = require('needle');
 
-// set defaul user agent
+// set default user agent
 needle.defaults({
     user_agent: 'BankDrive'
 });
 
+// Cache of certificates for an endpoint
 class JWKSCache {
     constructor(endPoint = '', delay = 0) {
         this.endPoint = endPoint;
         this.delay = delay;
 
-        this.keyList = new NodeCache({ checkperiod: 60 });
-        this.keyList.on('del', () => this.closeCache());
+        this.certList = new NodeCache({ checkperiod: 60 });
+        this.certList.on('del', () => this.closeCache());
     }
 
     // check last refresh time hasn't passed expiry point
@@ -27,7 +28,7 @@ class JWKSCache {
         return Promise.resolve()
             // empty old cache
             .then(() => {
-                this.keyList.flushAll();
+                this.certList.flushAll();
             })
             // call endpoint
             .then(() => needle('get', this.endPoint))
@@ -35,7 +36,7 @@ class JWKSCache {
             .then((res) => {
                 const { keys } = res.body;
                 keys.forEach(({ kid, x5c }) =>
-                    this.keyList.set(kid, x5c, this.delay));
+                    this.certList.set(kid, x5c, this.delay));
 
                 this.refreshTime = Date.now() / 1000;
             });
@@ -65,8 +66,8 @@ class JWKSCache {
 
     // clear interval timeout to prevent memory leaks
     closeCache() {
-        if (!this.keyList.stats.keys) {
-            this.keyList.close();
+        if (!this.certList.stats.keys) {
+            this.certList.close();
         }
     }
 
@@ -82,9 +83,9 @@ class JWKSCache {
             })
             // extract all keys
             .then(() => {
-                const keys = this.keyList.keys();
+                const keys = this.certList.keys();
 
-                return this.keyList.mget(keys);
+                return this.certList.mget(keys);
             });
     }
 }
