@@ -1,10 +1,9 @@
-const index = require('../../lib/index');
+const index = require('../../src/index');
 const should = require('should');
 
 describe('internal-jwt-authenticator.index', function(){
-    // placeholder
     it('should export the correct modules', (done) => {
-        should(index).eql({ });
+        index.should.have.only.keys('Authenticate');
         done();
     });
 });

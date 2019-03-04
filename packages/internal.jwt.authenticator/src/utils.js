@@ -1,38 +1,44 @@
 'use strict';
 
-const expired = (exp) => {
+const utils = {};
+
+// check if exp date has passed
+// returns boolean
+utils.expired = (exp) => {
     const now = Date.now() / 1000;
     return typeof exp !== 'undefined' && exp < now;
 };
 
-const issuerInvalid = (iss, validIssuers) => validIssuers.includes(iss);
+// check if issuer in list of valid issuers
+// returns boolean
+utils.issuerInvalid = (iss, validIssuers) => !validIssuers.includes(iss);
 
-const validateToken = (exp = 0, iss = '', validIssuers = []) => {
-    if (expired(exp)) {
+// check expiry date and issuer
+// returns boolean
+utils.validateToken = (exp = 0, iss = '', validIssuers = []) => {
+    if (utils.expired(exp)) {
         throw new Error('authTokenExpired');
     }
-    if (issuerInvalid(iss, validIssuers)) {
+    if (utils.issuerInvalid(iss, validIssuers)) {
         throw new Error('authTokenIssuerInvalid');
     }
+    return true;
 };
 
-const firstValid = (arr, fn) => {
+// Returns true when first element passes predicate test
+// returns boolean
+utils.anyValid = (arr = [], predicate) =>
     arr.some((el) => {
         try {
-            fn(el);
+            predicate(el);
             return true;
         } catch (e) {
             return false;
         }
     });
-}
 
-const partial = (fn, arg) => (args) => fn(arg, ...args);
+// partial function application
+// returns function
+utils.partial = (fn, arg) => (...args) => fn(arg, ...args);
 
-module.exports = {
-    expired,
-    issuerInvalid,
-    validateToken,
-    firstValid,
-    partial,
-};
+module.exports = utils;
