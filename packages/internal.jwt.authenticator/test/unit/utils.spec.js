@@ -18,7 +18,6 @@ describe('utils', () => {
 
     describe('expired', () => {
         before(() => {
-            // sinon.stub(Date, 'now').returns(1000000);
             sinon.stub(Date, 'now').returns(10000); // 10 seconds
         });
 

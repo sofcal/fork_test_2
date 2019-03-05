@@ -15,7 +15,7 @@ utils.issuerInvalid = (iss, validIssuers) => !validIssuers.includes(iss);
 
 // check expiry date and issuer
 // returns boolean
-utils.validateToken = (exp = 0, iss = '', validIssuers = []) => {
+utils.validateToken = (exp, iss, validIssuers) => {
     if (utils.expired(exp)) {
         throw new Error('authTokenExpired');
     }
@@ -27,7 +27,7 @@ utils.validateToken = (exp = 0, iss = '', validIssuers = []) => {
 
 // Returns true when first element passes predicate test
 // returns boolean
-utils.anyValid = (arr = [], predicate) =>
+utils.anyValid = (arr, predicate) =>
     arr.some((el) => {
         try {
             predicate(el);
