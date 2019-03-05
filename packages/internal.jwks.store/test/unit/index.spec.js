@@ -1,10 +1,9 @@
-const index = require('../../lib/index');
+const index = require('../../src/index');
 const should = require('should');
 
 describe('internal-jwks-store.index', function(){
-    // placeholder
     it('should export the correct modules', (done) => {
-        should(index).eql({ });
+        index.should.have.only.keys('JWKSStore');
         done();
     });
 });
