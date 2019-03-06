@@ -1,7 +1,7 @@
 'use strict';
 
 const jwt = require('jsonwebtoken');
-const { validateToken, anyValid, partial } = require('./utils');
+const utils = require('./utils');
 
 class Authenticate {
     constructor(authToken = '', validIssuers = [], JwksCachingService) {
@@ -29,7 +29,7 @@ class Authenticate {
 
     validate() {
         return Promise.resolve()
-            .then(() => validateToken(this.exp, this.iss, this.validIssuers));
+            .then(() => utils.validateToken(this.exp, this.iss, this.validIssuers));
     }
 
     getCertList() {
@@ -44,8 +44,8 @@ class Authenticate {
         return Promise.resolve()
             .then(() => this.getCertList())
             .then(() => {
-                const verifyToken = partial(jwt.verify, this.authToken);
-                const validTokenFound = anyValid(this.certKeys, verifyToken);
+                const verifyToken = utils.partial(jwt.verify, this.authToken);
+                const validTokenFound = utils.anyValid(this.certKeys, verifyToken);
 
                 if (!validTokenFound) {
                     throw new Error('AuthFailed');
