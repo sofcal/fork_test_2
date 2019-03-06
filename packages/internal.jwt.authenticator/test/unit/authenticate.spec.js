@@ -91,9 +91,18 @@ describe('internal-jwt-authenticator.authenticate', function(){
 
     describe('Authenticate.getCertList', () => {
 
+        it('should call caching service getCertList method');
+
+        it('should populate store cert keys');
+
+        it('should reject promise if error thrown');
     });
 
     describe('Authenticate.checkAuthorisation', () => {
+        it('should call getCertList method');
 
+        it('should return Authorised if valid token found');
+
+        it('should reject promise if no valid token found');
     });
 });
