@@ -9,6 +9,7 @@ describe('internal-jwks-store', function(){
     const serviceMappings = {
         serv1: 'https://www.test.com/serv1',
         serv2: 'https://www.test.com/serv2',
+        serv3: 'invalid',
     };
     const jwksDelay = 10;
     const endPointResponse = [
@@ -110,6 +111,16 @@ describe('internal-jwks-store', function(){
         return test.getCertList(serviceID)
             .then((res) => res.should.eql(expectedCertList(0)))
             .then(() => should.strictEqual(cacheBuildSpy.called, true));
+    });
+
+    it('should reject when service endpoint not known', () => {
+        const serviceID = 'unknown';
+        return test.getCertList(serviceID).should.be.rejectedWith('authTokenIssuerInvalid');
+    });
+
+    it('should reject when invalid service endpoint', () => {
+        const serviceID = 'serv3';
+        return test.getCertList(serviceID).should.be.rejectedWith(/getaddrinfo ENOTFOUND invalid/);
     });
 
 });
