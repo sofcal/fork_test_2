@@ -23,11 +23,11 @@ module.exports.run = (event, context, callback) => {
     event.logger = RequestLogger.Create({ service: 'cloudFront-SecurityHeaders' });
     event.logger.info({ function: func, log: 'started' });
 
-    // these environment variables allow us to retrieve the correct param-store values for more configurable options
-    let { Environment: env, AWS_REGION: region } = process.env;
-    // TODO: Remove below when deployed to environment
-    env = 'dev';
-    region = 'eu-west-1'; // set to force lambda to get param store values from fixed region and not region it is running in
+    const request = event.Records[0].cf.request; // eslint-disable-line prefer-destructuring
+    const environment = request.origin.s3.customHeaders.environment;
+    const envObj = environment.find(obj => obj.key === 'Environment')
+    const env = envObj.value;
+    const region = 'eu-west-1'; // set to force lambda to get param store values from fixed region and not region it is running in
 
     return Promise.resolve(undefined)
         .then(() => {
@@ -40,7 +40,7 @@ module.exports.run = (event, context, callback) => {
             return setupLogGroupSubscription(event, context)
                 .then(() => {
                     if (paramsCache && Date.now() < nextReadParams) {
-                        event.logger.info({ function: func, log: 'get from paramsCache' });
+                        event.logger.info({ function: func, log: 'get from paramsCache', nextReadParams: nextReadParams.toISOString() });
                         return paramsCache;
                     }
                     event.logger.info({ function: func, log: 'get params' });

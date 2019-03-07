@@ -4,6 +4,7 @@ const Promise = require('bluebird');
 const ErrorSpecs = require('./ErrorSpecs');
 const { StatusCodeError } = require('internal-status-code-error');
 const querystring = require('querystring');
+const _ = require('underscore');
 
 module.exports.run = Promise.method((event, params) => {
     const func = 'impl.run';
@@ -54,7 +55,7 @@ module.exports.run = Promise.method((event, params) => {
         event.logger.info({ function: func, log: 'query', params: { query } });
         const xFrameDomain = getQuerySegment(query, 'xframedomain');
         event.logger.info({ function: func, log: 'xFrameDomain', params: { xFrameDomain } });
-        if (xFrameDomain && whitelistNoCommas.toLowerCase().includes(xFrameDomain.toLowerCase())) {
+        if (checkXFrameDomainInWhiteList(xFrameDomain, whitelist)) {
             // if xFrameDomain in query string and in whitelist then add allow-from
             headers['x-frame-options'] = [{ key: 'X-Frame-Options', value: `ALLOW-FROM ${xFrameDomain}` }];
             event.logger.info({ function: func, log: 'added ', params: { xFrameOptions: headers['x-frame-options'][0].value } });
@@ -67,10 +68,34 @@ module.exports.run = Promise.method((event, params) => {
         event.logger.error({ function: func, log: 'error adding headers', params: { errorMessage: e.message } });
         throw StatusCodeError.CreateFromSpecs([ErrorSpecs.generalError], ErrorSpecs.generalError.statusCode);
     }
-
     event.logger.info({ function: func, log: 'ended' });
     return response;
 });
+
+const checkXFrameDomainInWhiteList = (xFrameDomain, whiteList) => {
+    let exists = false;
+    if (xFrameDomain) {
+        const whiteListArray = whiteList.toString().split(',');
+        let lowDomain = '';
+        const lowXFrameDomain = xFrameDomain.toString().toLowerCase();
+        _.find(whiteListArray, (domain) => {
+            lowDomain = domain.toString().toLowerCase();
+            const pos = lowDomain.indexOf('*.');
+            if (pos > -1) {
+                lowDomain = lowDomain.substring(pos + 2);
+                if (lowXFrameDomain.endsWith(lowDomain)) {
+                    exists = true;
+                }
+            } else if (lowXFrameDomain.endsWith(lowDomain)) {
+                exists = true;
+            }
+        });
+        if (lowXFrameDomain.includes(lowDomain)) {
+            exists = true;
+        }
+    }
+    return exists;
+};
 
 const getQuerySegment = (query, segment) => {
     if (query.length < 1) {

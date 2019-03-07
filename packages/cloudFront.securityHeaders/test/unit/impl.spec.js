@@ -4,7 +4,7 @@ const impl = require('./../../lib/impl.js');
 
 describe.only('impl', function(){
     let sandbox;
-    const whiteList = 'https://pre-addons.eu.sageone.com,https://pre-addons.na.sageone.com,https://pre-addons.sageone.biz';
+    const whiteList = 'https://*.eu.sageone.com,https://*.na.sageone.com,https://*.sageone.biz,https://*.sage.com,https://https://*.intacct.com,https://addons.lvh.me';
     const whiteListNoCommas = whiteList.split(',').join(' ');
 
     before(()=>{
@@ -63,7 +63,7 @@ describe.only('impl', function(){
             })
     });
 
-    it('should add the x-frame-options-allow-from if the query string contains a domain in the whitelist', () => {
+    it('should add the x-frame-options-allow-from if the query string contains a wildcard domain in the whitelist', () => {
         const logFunc = (data) => {console.log(JSON.stringify(data))};
         const expectedHeaders = {
             'cache-control': [{ key: 'Cache-Control', value: 'public, max-age=86400, no-transform' }],
@@ -83,6 +83,36 @@ describe.only('impl', function(){
         const htmlBody = '<HEAD/><BODY>Test</BODY>';
         const bodyString = JSON.stringify(htmlBody);
         const event = { logger: { info: logFunc, error: logFunc }, Records: [{ cf: { request: { uri: 'https://www.test.com' ,querystring: 'xframedomain=https://pre-addons.na.sageone.com'}, response: { headers: {}, body: bodyString } }}]};
+        let params = {};
+        params['outboundApi.callbackUriWhiteList'] = whiteList;
+
+        return impl.run(event, params)
+            .then(()=>{
+                const headers = event.Records[0].cf.response.headers;
+                should(headers).eql(expectedHeaders);
+            })
+    });
+
+    it('should add the x-frame-options-allow-from if the query string contains a non wildcard domain in the whitelist', () => {
+        const logFunc = (data) => {console.log(JSON.stringify(data))};
+        const expectedHeaders = {
+            'cache-control': [{ key: 'Cache-Control', value: 'public, max-age=86400, no-transform' }],
+            'strict-transport-security': [{ key: 'Strict-Transport-Security', value: 'max-age=15552000; includeSubDomains' }],
+            'x-content-security-policy': [{ key: 'X-Content-Security-Policy', value: `allow-from frame-ancestors ${whiteListNoCommas}` }],
+            'content-security-policy': [{ key: 'Content-Security-Policy', value: `img-src 'self' https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://s3-eu-west-1.amazonaws.com ${whiteListNoCommas}; script-src 'self' *.sage.com 'unsafe-inline' https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://cdnjs.cloudflare.com https://ajax.googleapis.com https://cdn.plaid.com ${whiteListNoCommas}; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com ${whiteListNoCommas}; `}],
+            'x-xss-protection': [{ key: 'X-XSS-Protection', value: '1; mode=block' }],
+            'x-content-type-options': [{ key: 'X-Content-Type-Options', value: 'nosniff' }],
+            'x-download-options': [{ key: 'X-Download-Options', value: 'noopen' }],
+            'x-permitted-cross-domain-policies': [{ key: 'X-Permitted-Cross-Domain-Policies', value: 'master-only' }],
+            'x-frame-options': [{ key: 'X-Frame-Options', value: 'ALLOW-FROM https://addons.lvh.me' }],
+            'server': [{ key: 'Server', value: '' }],
+            'feature-policy': [{ key: 'Feature-Policy', value: 'geolocation \'none\'; midi \'none\'; sync-xhr \'self\'; microphone \'none\'; camera \'none\'; magnetometer \'none\'; gyroscope \'none\'; speaker \'none\'; fullscreen \'self\'; payment \'self\'' }],
+            'referrer-policy': [{ key: 'Referrer-Policy', value: 'same-origin' }]
+        };
+
+        const htmlBody = '<HEAD/><BODY>Test</BODY>';
+        const bodyString = JSON.stringify(htmlBody);
+        const event = { logger: { info: logFunc, error: logFunc }, Records: [{ cf: { request: { uri: 'https://www.test.com' ,querystring: 'xframedomain=https://addons.lvh.me'}, response: { headers: {}, body: bodyString } }}]};
         let params = {};
         params['outboundApi.callbackUriWhiteList'] = whiteList;
 
@@ -215,37 +245,5 @@ describe.only('impl', function(){
             })
     });
 
-    it('should not modify headers if url does not include banking', () => {
-        const logFunc = (data) => {console.log(JSON.stringify(data))};
-
-        const htmlBody = '<HEAD/><BODY>Test</BODY>';
-        const bodyString = JSON.stringify(htmlBody);
-        const event = { logger: { info: logFunc, error: logFunc }, Records: [{ cf: { request: { uri: 'https://www.test.com' ,querystring: ''}, response: { headers: {}, body: bodyString } }}]};
-        const expectedHeaders = {};
-        let params = {};
-        params['outboundApi.callbackUriWhiteList'] = whiteList;
-        const eventNoBanking = {
-            logger: {info: logFunc, error: logFunc},
-            Records: [{
-                cf: {
-                    request: {
-                        uri: 'https://www.test.com/payments/dosomething',
-                        querystring: ''
-                    },
-                    response: {
-                        headers: {},
-                        body: bodyString
-                    }
-                }
-            }]
-        };
-
-
-        return impl.run(eventNoBanking, params)
-            .then(()=>{
-                const headers = event.Records[0].cf.response.headers;
-                should(headers).eql(expectedHeaders);
-            })
-    });
 });
 
