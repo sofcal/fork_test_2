@@ -9,6 +9,8 @@ build
 .nyc_output
 .idea
 lerna-debug.json
+lerna-debug.log
 coverage
 
-lerna-debug.log
+**/packages/npm-debug*
+

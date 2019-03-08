@@ -11,7 +11,7 @@
 #
 # Happy Coding!
 
-service: scheduled.keyRotation # NOTE: update this with your service name
+service: lambda.authentication.certificateRotation
 
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details
@@ -45,6 +45,7 @@ provider:
 #  environment:
 #    variable1: value1
 
+# you can add packaging information here
 package:
   exclude:
     - test/**
@@ -61,7 +62,7 @@ custom:
 
 functions:
   run:
-    handler: lib/handler.run
+    handler: lib/index.run
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events

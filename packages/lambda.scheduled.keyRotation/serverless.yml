@@ -11,7 +11,7 @@
 #
 # Happy Coding!
 
-service: incident.checkQuarantineTransactionsDontExist # NOTE: update this with your service name
+service: lambda.scheduled.keyRotation # NOTE: update this with your service name
 
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details
@@ -45,7 +45,6 @@ provider:
 #  environment:
 #    variable1: value1
 
-# you can add packaging information here
 package:
   exclude:
     - test/**
