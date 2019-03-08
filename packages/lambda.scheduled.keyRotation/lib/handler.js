@@ -1,7 +1,7 @@
 'use strict';
 
 const Promise = require('bluebird');
-const DbQueries = require('./DbQueries');
+const DbQueries = require('./dbQueries');
 const _ = require('underscore');
 const ParameterStoreStaticLoader = require('@sage/bc-parameterstore-static-loader');
 const serviceImpls = {
