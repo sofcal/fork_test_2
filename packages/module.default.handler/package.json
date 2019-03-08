@@ -6,7 +6,7 @@
   "description": "",
   "main": "lib/index.js",
   "publishConfig": {
-    "registry": "https://sage.myget.org/F/test-npm/npm/",
+    "registry": "https://sage.myget.org/F/npm/npm/",
     "access": "public"
   },
   "directories": {
@@ -24,8 +24,8 @@
     "underscore": "^1.9.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.0.0-beta.47",
-    "@babel/register": "^7.0.0-beta.48",
+    "@babel/cli": "^7.0.0",
+    "@babel/register": "^7.0.0",
     "babel-eslint": "^8.0.3",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-istanbul": "^4.1.6",

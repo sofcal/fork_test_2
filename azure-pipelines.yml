@@ -17,17 +17,8 @@ steps:
 
 - task: CmdLine@2
   inputs:
-    script: 'echo "CWD: ${PWD}"; cat ${PWD}/.npmrc; echo "end"'
-    #workingDirectory: # Optional
-    #failOnStderr: false # Optional
-
-- task: CmdLine@2
-  inputs:
-    script: 'echo "CWD: ${PWD}"; cat ${PWD}/.npmrc; echo "end"'
-
-- task: CmdLine@2
-  inputs:
     script: 'git checkout develop'
+  displayName: 'branch checkout (why?)'
 
 - task: Npm@1
   inputs:
@@ -35,6 +26,7 @@ steps:
     customCommand: run prepenv
     customRegistry: 'useNpmrc'
     customEndpoint: npm_repos
+  displayName: 'prepenv'
 
 - task: Npm@1
   inputs:
@@ -42,10 +34,12 @@ steps:
     customCommand: run build
     customRegistry: 'useNpmrc'
     customEndpoint: npm_repos
+  displayName: 'build'
 
 - task: CmdLine@2
   inputs:
     script: 'git update-index --assume-unchanged .npmrc'
+  displayName: 'ignore .npmrc change'
 
 - task: Npm@1
   inputs:
@@ -53,3 +47,4 @@ steps:
     customCommand: run release:ci
     customRegistry: 'useNpmrc'
     customEndpoint: npm_repos
+  displayName: 'publish'

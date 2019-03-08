@@ -4,7 +4,7 @@
   "description": "Banking Cloud schemas",
   "main": "index.js",
   "publishConfig": {
-    "registry": "https://sage.myget.org/F/test-npm/npm/",
+    "registry": "https://sage.myget.org/F/npm/npm/",
     "access": "public"
   },
   "scripts": {
@@ -23,22 +23,22 @@
     "bignumber.js": "^4.0.0",
     "bluebird": "^3.5.1",
     "emitter": "0.0.5",
-    "jsonschema": "^1.1.1",
+    "jsonschema": "^1.2.4",
     "safe-access": "^0.1.0",
     "underscore": "^1.9.0"
   },
   "devDependencies": {
-    "babel-eslint": "^8.0.2",
+    "babel-eslint": "^8.0.3",
     "eslint": "^4.11.0",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-plugin-import": "^2.8.0",
-    "istanbul": "^0.4.5",
-    "mocha": "^2.1.0",
-    "mongodb": "^2.2.24",
+    "istanbul": "^1.1.0-alpha.1",
+    "mocha": "^4.0.1",
+    "mongodb": "^3.0.5",
     "nock": "^9.0.13",
-    "nyc": "^11.4.1",
+    "nyc": "^12.0.2",
     "should": "^13.2.1",
-    "sinon": "^2.3.2",
+    "sinon": "^5.0.10",
     "sleep": "^5.1.0",
     "snyk": "^1.19.1",
     "watch": "^1.0.2"
