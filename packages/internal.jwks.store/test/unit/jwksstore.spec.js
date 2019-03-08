@@ -12,7 +12,12 @@ describe('internal-jwks-store.jwksstore', function(){
     };
     const jwksDelay = 100;
 
-    const test = new JWKSStore(serviceMappings, jwksDelay);
+    const logger = {
+        info: (msg) => console.log(msg),
+        error: (msg) => console.error(msg),
+    };
+
+    const test = new JWKSStore(serviceMappings, jwksDelay, logger);
 
     const mockCerts = {
         kid1: [
@@ -46,7 +51,7 @@ describe('internal-jwks-store.jwksstore', function(){
     });
 
     it('should allow cache Class to be overwritten', () => {
-        const testCache = new JWKSStore(serviceMappings, jwksDelay, 'test');
+        const testCache = new JWKSStore(serviceMappings, jwksDelay, logger, 'test');
         should.strictEqual(testCache.Cache, 'test');
     });
 
@@ -107,7 +112,7 @@ describe('internal-jwks-store.jwksstore', function(){
             return dummyEntry;
         });
 
-        const test2 = new JWKSStore(serviceMappings, jwksDelay, DummyCache);
+        const test2 = new JWKSStore(serviceMappings, jwksDelay, logger, DummyCache);
 
         it('should return new cache entry', function() {
             const result = test2.createCacheEntry('serviceID', 'endPoint');

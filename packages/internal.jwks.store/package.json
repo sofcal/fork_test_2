@@ -13,8 +13,7 @@
     "@babel/code-frame": "^7.0.0-beta.48",
     "@babel/core": "^7.0.0-beta.47",
     "@babel/preset-env": "^7.0.0-beta.47",
-    "needle": "^2.2.4",
-    "node-cache": "^4.2.0"
+    "needle": "^2.2.4"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.47",
@@ -27,6 +26,7 @@
     "eslint-config-airbnb": "^16.1.0",
     "eslint-plugin-import": "^2.8.0",
     "eslint-stats": "^1.0.0",
+    "internal-request-logger": "^1.0.0",
     "istanbul": "^1.1.0-alpha.1",
     "mocha": "^4.0.1",
     "nock": "^10.0.6",

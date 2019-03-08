@@ -57,8 +57,12 @@ describe('internal-jwks-store', function(){
                 return final;
             }
         , {});
+    const logger = {
+        info: (msg) => console.log(msg),
+        error: (msg) => console.error(msg),
+    };
 
-    const test = new JWKSStore(serviceMappings, jwksDelay);
+    const test = new JWKSStore(serviceMappings, jwksDelay, logger);
 
     const nockEndPoints = nock('https://www.test.com')
         .persist()

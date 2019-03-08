@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 'use strict';
 
 const needle = require('needle');
@@ -9,9 +11,12 @@ needle.defaults({
 
 // Cache of certificates for an endpoint
 class JWKSCache {
-    constructor(endPoint, delay) {
+    constructor(endPoint, delay, logger) {
         this.endPoint = endPoint;
         this.delay = delay;
+        this.logger = logger;
+
+        this.func = 'JWKSCache.impl';
 
         this.certList = {};
     }
@@ -40,6 +45,7 @@ class JWKSCache {
                 this._refreshTime = Math.floor(Date.now() / 1000);
             })
             .catch((err) => {
+                this.logger.error({ function: this.func, log: `Error building cache: ${err}` });
                 throw err;
             });
     }
@@ -50,6 +56,7 @@ class JWKSCache {
             // check if cache needs to be refreshed
             .then(() => {
                 if (this.cacheExpired()) {
+                    this.logger.info({ function: this.func, log: `endpoint ${this.endPoint} cache expired, refreshing` });
                     return this.buildCache();
                 }
                 return undefined;
@@ -60,8 +67,13 @@ class JWKSCache {
 
     // fetch endpoint
     fetchEndPoint() {
+        this.logger.info({ function: this.func, log: `Fetching data from endpoint ${this.endPoint}` });
         return Promise.resolve()
-            .then(() => needle('get', this.endPoint));
+            .then(() => needle('get', this.endPoint))
+            .catch((err) => {
+                console.log(`alert: ${err}`);
+                throw new Error(`Fetch endpoint error: ${err.message}`);
+            });
     }
 }
 

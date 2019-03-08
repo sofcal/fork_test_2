@@ -1,9 +1,11 @@
+/* eslint-disable no-console */
+
 'use strict';
 
 const { JWKSCache } = require('./jwkscache');
 
 class JWKSStore {
-    constructor(serviceMappings, jwksDelay, cacheClass = JWKSCache) {
+    constructor(serviceMappings, jwksDelay, logger, cacheClass = JWKSCache) {
         // mapping serviceID > endpoint
         this.serviceMappings = serviceMappings;
         // Delay jwks
@@ -11,6 +13,8 @@ class JWKSStore {
         // cached entries for serviceID
         this.cacheList = {};
         this.Cache = cacheClass;
+        this.logger = logger;
+        this.func = 'JWKSStore.impl';
     }
 
     // get Certificate list
@@ -22,6 +26,7 @@ class JWKSStore {
 
                 // if no cache for this service
                 if (!serviceIDCache) {
+                    this.logger.info({ function: this.func, log: `Building cache for ${serviceID}` });
                     const endPoint = this.getEndPoint(serviceID);
 
                     // create new cache
@@ -32,11 +37,14 @@ class JWKSStore {
                 return undefined;
             })
             // retrieve certs from cache
-            .then(() => this.cacheList[serviceID].getCerts());
+            .then(() => {
+                this.logger.info({ function: this.func, log: `Getting certificates for ${serviceID}` });
+                return this.cacheList[serviceID].getCerts();
+            });
     }
 
     createCacheEntry(serviceID, endPoint) {
-        this.cacheList[serviceID] = new this.Cache(endPoint, this.jwksDelay);
+        this.cacheList[serviceID] = new this.Cache(endPoint, this.jwksDelay, this.logger);
         return this.cacheList[serviceID];
     }
 
@@ -44,6 +52,7 @@ class JWKSStore {
         const endPoint = this.serviceMappings[serviceID];
         // endpoint not known
         if (!endPoint) {
+            console.log(`alert: Auth token issuer not known - ${serviceID}`);
             throw new Error('authTokenIssuerInvalid');
         }
         return endPoint;

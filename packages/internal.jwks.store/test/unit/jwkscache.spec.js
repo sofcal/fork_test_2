@@ -6,6 +6,11 @@ const nock = require('nock');
 const { JWKSCache } = imported;
 
 describe('internal-jwks-store.jwkscache', function(){
+    const logger = {
+        info: (msg) => console.log(msg),
+        error: (msg) => console.error(msg),
+    };
+
     it('should export the correct modules', (done) => {
         imported.should.have.only.keys('JWKSCache');
         done();
@@ -14,7 +19,7 @@ describe('internal-jwks-store.jwkscache', function(){
     it('should be able to create new cache object', () => {
         const endpoint = 'endpoint';
         const delay = 100;
-        const test = new JWKSCache(endpoint, delay);
+        const test = new JWKSCache(endpoint, delay, logger);
 
         test.should.be.Object();
         test.should.be.instanceof(JWKSCache);
@@ -23,7 +28,7 @@ describe('internal-jwks-store.jwkscache', function(){
     it('should create cache object with correct properties', () => {
         const endpoint = 'endpoint';
         const delay = 100;
-        const test = new JWKSCache(endpoint, delay);
+        const test = new JWKSCache(endpoint, delay, logger);
 
         should.strictEqual(test.delay, delay);
         should.strictEqual(test.endPoint, endpoint);
@@ -43,7 +48,7 @@ describe('internal-jwks-store.jwkscache', function(){
         it('should return true if cache expired', () => {
             const endpoint = 'endpoint';
             const delay = 50;
-            const test = new JWKSCache(endpoint, delay);
+            const test = new JWKSCache(endpoint, delay, logger);
             test._refreshTime = 0;
 
             should.strictEqual(test.cacheExpired(), true);
@@ -52,7 +57,7 @@ describe('internal-jwks-store.jwkscache', function(){
         it('should return false if cache still valid', () => {
             const endpoint = 'endpoint';
             const delay = 50;
-            const test = new JWKSCache(endpoint, delay);
+            const test = new JWKSCache(endpoint, delay, logger);
             test._refreshTime = 100;
 
             should.strictEqual(test.cacheExpired(), false);
@@ -61,7 +66,7 @@ describe('internal-jwks-store.jwkscache', function(){
         it('should return false if cache still valid - boundary test', () => {
             const endpoint = 'endpoint';
             const delay = 50;
-            const test = new JWKSCache(endpoint, delay);
+            const test = new JWKSCache(endpoint, delay, logger);
             test._refreshTime = 50;
 
             should.strictEqual(test.cacheExpired(), false);
@@ -71,7 +76,7 @@ describe('internal-jwks-store.jwkscache', function(){
     describe('JWKSCache.getCerts ', () => {
         const endpoint = 'endpoint';
         const delay = 50;
-        let test = new JWKSCache(endpoint, delay);
+        let test = new JWKSCache(endpoint, delay, logger);
 
         let cacheExpiredStub;
         let buildCacheStub;
@@ -131,11 +136,10 @@ describe('internal-jwks-store.jwkscache', function(){
         });
     });
 
-
     describe('JWKSCache.buildCache ', () => {
         const endpoint = 'https://test1.com/buildCache';
         const delay = 50;
-        let test = new JWKSCache(endpoint, delay);
+        let test = new JWKSCache(endpoint, delay, logger);
         const endPointResponse = {
             body:
                 {
@@ -232,7 +236,7 @@ describe('internal-jwks-store.jwkscache', function(){
     describe('JWKSCache.fetchEndPoint ', () => {
         const endpoint = undefined;
         const delay = 50;
-        const test = new JWKSCache(endpoint, delay);
+        const test = new JWKSCache(endpoint, delay, logger);
         const expected = {
             keys: [
                 {
@@ -262,7 +266,7 @@ describe('internal-jwks-store.jwkscache', function(){
         });
 
         it('should reject promise if any errors', () => {
-            return (test.fetchEndPoint()).should.be.rejectedWith('URL must be a string, not undefined');
+            return (test.fetchEndPoint()).should.be.rejectedWith('Fetch endpoint error: URL must be a string, not undefined');
         });
 
         it('should return keys from endpoint', () => {
