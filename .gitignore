@@ -12,3 +12,4 @@ lerna-debug.json
 coverage
 
 lerna-debug.log
+.DS_Store
