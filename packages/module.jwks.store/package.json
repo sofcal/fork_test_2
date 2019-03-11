@@ -1,5 +1,5 @@
 {
-  "name": "internal-jwks-store",
+  "name": "@sage/bc-jwks-store",
   "version": "1.0.0",
   "author": "Sage UK",
   "license": "ISC",
@@ -11,13 +11,13 @@
   },
   "dependencies": {
     "@babel/code-frame": "^7.0.0-beta.48",
-    "@babel/core": "^7.0.0-beta.47",
+    "@babel/core": "^7.2.2",
     "@babel/preset-env": "^7.0.0-beta.47",
     "needle": "^2.2.4"
   },
   "devDependencies": {
-    "@babel/cli": "^7.0.0-beta.47",
-    "@babel/register": "^7.0.0-beta.48",
+    "@babel/cli": "^7.0.0",
+    "@babel/register": "^7.0.0",
     "babel-eslint": "^8.0.3",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-istanbul": "^4.1.6",
@@ -26,7 +26,6 @@
     "eslint-config-airbnb": "^16.1.0",
     "eslint-plugin-import": "^2.8.0",
     "eslint-stats": "^1.0.0",
-    "internal-request-logger": "^1.0.0",
     "istanbul": "^1.1.0-alpha.1",
     "mocha": "^4.0.1",
     "nock": "^10.0.6",

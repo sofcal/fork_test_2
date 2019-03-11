@@ -2,13 +2,13 @@
 const validate = require('./validators');
 const Promise = require('bluebird');
 
-const { Handler } = require('internal-handler');
-const ParameterService = require('internal-parameter-service');
-const { RequestLogger } = require('internal-request-logger');
-const { Authenticate } = require('internal-jwt-authenticator');
-const { JWSKService } = require('internal-jwks-store');
-const { ErrorSpecs } = require('internal-handler');
-const { StatusCodeError } = require('internal-status-code-error');
+const { Handler } = require('@sage/bc-default-lambda-handler');
+const ParameterService = require('@sage/bc-parameterstore-static-loader');
+const { RequestLogger } = require('@sage/bc-request-logger');
+const { Authenticate } = require('@sage/bc-jwt-authenticator');
+const { JWKSStore } = require('@sage/bc-jwks-store');
+const { ErrorSpecs } = require('@sage/bc-default-lambda-handler');
+const { StatusCodeError } = require('@sage/bc-status-code-error');
 
 const keys = require('./params');
 
@@ -37,14 +37,15 @@ class JwtAuth extends Handler {
 
                 const cachingService = new JWKSStore(serviceMappings, jwksDelay);
                 const validIssuers = serviceMappings.map(s => s.iss);
-                const auth = new Authenticate(event.authToken, validIssuers, cachingService);
+                const auth = new Authenticate(event.authToken, validIssuers, cachingService, event.logger);
 
                 return auth.validate()
                     .then(() => event.logger.info({ function: self.func, log: 'cert structure validated' }))
                     .then(() => auth.getCertList())
                     .then(() => auth.checkAuthorisation())
-                    .catch((err) => throw StatusCodeError.CreateFromSpecs([ErrorSpecs[err]], ErrorSpecs[err].statusCode));
-
+                    .catch((err) => {
+                        throw StatusCodeError.CreateFromSpecs([ErrorSpecs[err]], ErrorSpecs[err].statusCode)
+                    });
             });
     }
 
