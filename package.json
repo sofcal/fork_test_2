@@ -21,7 +21,7 @@
     "release:ci": "lerna publish from-git --registry=https://sage.myget.org/F/npm/npm/ --yes",
     "release:local": "lerna publish from-git --registry=https://sage.myget.org/F/npm/npm/",
     "template": "./templates/generate.sh",
-    "version": "lerna version --force-publish=*"
+    "version": "lerna version"
   },
   "author": "",
   "license": "ISC",
