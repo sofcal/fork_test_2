@@ -9,7 +9,8 @@ build
 .nyc_output
 .idea
 lerna-debug.json
-coverage
-
 lerna-debug.log
+coverage
 .DS_Store
+
+packages/**/npm-debug*
