@@ -1,29 +1,30 @@
 'use strict';
 
 const { Authenticate } = require('../../src/authenticate');
-const { JWKSStore } = require('internal-jwks-store');
+const { JWKSStore } = require('@sage/bc-jwks-store');
 const should = require('should');
 const jwt = require('jsonwebtoken');
 const sinon = require('sinon');
 const nock = require('nock');
-const needle = require('needle');
 
 describe('internal-jwt-authenticator', function(){
 
     const logger = {
         info: (msg) => console.log(msg),
-        error: (msg) => console.error(msg),
+        warn: (msg) => console.log(msg),
+        error: (msg) => console.log(msg),
     };
 
-    const hostname = 'https://www.test.com';
+    const hostname = 'https://www.testjwt.com';
     const serviceMappings = {
         'sage.serv1': `${hostname}/serv1`,
-        'sage.serv2': 'https://www.test.com/serv2',
+        'sage.serv2': `${hostname}/serv2`,
         'sage.serv3': 'invalid',
     };
     const validIssuers = Object.keys(serviceMappings);
+    const jwksDelay = 50;
     const payload = {
-        exp: 100,
+        exp: (Date.now() / 1000) + jwksDelay,
         iss: 'sage.serv1',
         kid: 'kid1',
     };
@@ -53,10 +54,13 @@ describe('internal-jwt-authenticator', function(){
             'cert4',
         ],
     };
-    const jwksDelay = 50;
-    const JwksCachingService = new JWKSStore(serviceMappings, jwksDelay, logger);
 
-    nock(hostname)
+    let JwksCachingService;
+    let getCertListSpy;
+    let getEndPointSpy;
+
+    const nockcalls = nock(hostname)
+        .persist()
         .get('/serv1')
         .reply(200, {
             keys,
@@ -64,70 +68,150 @@ describe('internal-jwt-authenticator', function(){
 
 
     before(() => {
-        sinon.stub(Date, 'now').returns(100000); // 100 seconds
-       // cachingServiceGetCertsSpy = sinon.spy(JwksCachingService, 'getCerts');
+        JwksCachingService = new JWKSStore(serviceMappings, jwksDelay, logger);
+        getCertListSpy = sinon.spy(JwksCachingService, 'getCertList');
+        getEndPointSpy = sinon.spy(JwksCachingService, 'getEndPoint');
+    });
+
+    afterEach(() => {
+        getCertListSpy.resetHistory();
+        getEndPointSpy.resetHistory();
     });
 
     after(() => {
+        JwksCachingService = null;
         sinon.restore();
     });
 
-    it('should extract correct details from jwt', () => {
-        const secret = certs[payload.kid][0];
-        const token = jwt.sign( payload, secret);
-        const test = new Authenticate(token, validIssuers, JwksCachingService, logger);
+    describe('Validation tests', () => {
+        it('should extract correct details from jwt', () => {
+            const secret = certs[payload.kid][0];
+            const token = jwt.sign( payload, secret);
+            const test = new Authenticate(token, validIssuers, JwksCachingService, logger);
 
-        should.strictEqual(test.kid, payload.kid);
-        should.strictEqual(test.iss, payload.iss);
-        should.strictEqual(test.exp, payload.exp);
+            should.strictEqual(test.kid, payload.kid);
+            should.strictEqual(test.iss, payload.iss);
+            should.strictEqual(test.exp, payload.exp);
+        });
+
+        it('should throw an error if invalid jwt passed in', () => {
+            const token = 'invalid-token';
+            should.throws(() => new Authenticate(token, validIssuers, JwksCachingService, logger), /invalidAuthToken/);
+        });
+
+        it('should reject an expired token', () => {
+            const secret = certs[payload.kid][0];
+            const expiredPayLoad = Object.assign({}, payload, { exp: 0});
+            const token = jwt.sign( expiredPayLoad, secret);
+            const test = new Authenticate(token, validIssuers, JwksCachingService, logger);
+
+            return test.validate().should.be.rejectedWith('authTokenExpired');
+        });
+
+        it('should reject a token with an invalid issuer', () => {
+            const secret = certs[payload.kid][0];
+            const expiredPayLoad = Object.assign({}, payload, { iss: 'invalid'});
+            const token = jwt.sign( expiredPayLoad, secret);
+            const test = new Authenticate(token, validIssuers, JwksCachingService, logger);
+
+            return test.validate().should.be.rejectedWith('authTokenIssuerInvalid');
+        });
+
+        it('should return true when calling validate on a valid token', () => {
+            const secret = certs[payload.kid][0];
+
+            const token = jwt.sign( payload, secret);
+            const test = new Authenticate(token, validIssuers, JwksCachingService, logger);
+
+            return test.validate().should.be.fulfilledWith(true);
+        });
     });
 
-    it('should throw an error if invalid jwt passed in', () => {
-        const token = 'invalid-token';
-        should.throws(() => new Authenticate(token, validIssuers, JwksCachingService, logger), /invalidAuthToken/);
+    describe('endpoint tests', () => {
+        it('should retrieve certificate lists from jwks endpoint when authorising a new service ID', () => {
+            const secret = certs[payload.kid][1];
+
+            const token = jwt.sign( payload, secret);
+            const test = new Authenticate(token, validIssuers, JwksCachingService, logger);
+
+            return test.validate()
+                .then((val) => val.should.be.true())
+                .then(() => test.checkAuthorisation())
+                .then((data) => {
+                    should.strictEqual(data.authorised, true);
+                    getCertListSpy.calledOnce.should.be.true();
+                    getEndPointSpy.calledOnce.should.be.true();
+                    should.strictEqual(nockcalls.interceptors[0].interceptionCounter, 1);
+                });
+        });
+
+        it('should retrieve certificate lists from cache when authorising a non-expired service ID', () => {
+            const secret = certs[payload.kid][0];
+
+            const token = jwt.sign( payload, secret);
+            const test = new Authenticate(token, validIssuers, JwksCachingService, logger);
+
+            return test.validate()
+                .then((val) => val.should.be.true())
+                .then(() => test.checkAuthorisation())
+                .then((data) => {
+                    should.strictEqual(data.authorised, true);
+                    getCertListSpy.calledOnce.should.be.true();
+                    getEndPointSpy.calledOnce.should.be.false();
+                    should.strictEqual(nockcalls.interceptors[0].interceptionCounter, 1);
+                })
+        });
     });
 
-    it('should reject an expired token', () => {
-        const secret = certs[payload.kid][0];
-        const expiredPayLoad = Object.assign({}, payload, { exp: 0});
-        const token = jwt.sign( expiredPayLoad, secret);
-        const test = new Authenticate(token, validIssuers, JwksCachingService, logger);
+    describe('Error capture tests', () => {
+        it('should throw an error if invalid issuer', () => {
+            const secret = certs[payload.kid][0];
 
-        return test.validate().should.be.rejectedWith('authTokenExpired');
+            const newPayload = Object.assign({}, payload,  {iss: 'unknown'});
+            const token = jwt.sign( newPayload, secret);
+            const test = new Authenticate(token, validIssuers, JwksCachingService, logger);
+            (test.checkAuthorisation()).should.be.rejectedWith(/authTokenIssuerInvalid/);
+        });
+
+        it('should throw an error if auth check fails', () => {
+            const secret = certs[payload.kid][0];
+
+            const newPayload = Object.assign({}, payload,  {kid: 'unknown'});
+            const token = jwt.sign( newPayload, secret);
+            const test = new Authenticate(token, validIssuers, JwksCachingService, logger);
+            (test.checkAuthorisation()).should.be.rejectedWith(/AuthFailed/);
+        });
     });
 
-    it('should reject a token with an invalid issuer', () => {
-        const secret = certs[payload.kid][0];
-        const expiredPayLoad = Object.assign({}, payload, { iss: 'invalid'});
-        const token = jwt.sign( expiredPayLoad, secret);
-        const test = new Authenticate(token, validIssuers, JwksCachingService, logger);
+    describe('expired cache test', () => {
 
-        return test.validate().should.be.rejectedWith('authTokenIssuerInvalid');
+        before(() => {
+            const newTime = Date.now() + (jwksDelay * 20000);
+            sinon.stub(Date, 'now').returns( newTime );
+        });
+
+        after(() => {
+            sinon.restore();
+        });
+
+
+        it('should refresh certificate lists from endpoint when authorising an expired service ID', () => {
+            const secret = certs[payload.kid][0];
+
+            const newPayload = Object.assign({}, payload,  {exp: (Date.now() / 1000) + jwksDelay * 3});
+            const token = jwt.sign( newPayload, secret);
+            const test = new Authenticate(token, validIssuers, JwksCachingService, logger);
+
+            return test.validate()
+                .then((val) => val.should.be.true())
+                .then(() => test.checkAuthorisation())
+                .then((data) => {
+                    should.strictEqual(data.authorised, true);
+                    getCertListSpy.calledOnce.should.be.true();
+                    getEndPointSpy.calledOnce.should.be.false();
+
+                    should.strictEqual(nockcalls.interceptors[0].interceptionCounter, 2);
+                })
+        })
     });
-
-    it('should return true when calling validate on a valid token', () => {
-        const secret = certs[payload.kid][0];
-
-        const token = jwt.sign( payload, secret);
-        const test = new Authenticate(token, validIssuers, JwksCachingService, logger);
-
-        return test.validate().should.be.fulfilledWith(true);
-    });
-
-    it('should retrieve certificate lists from jwks endpoint when authorising a new service ID', () => {
-        const secret = certs[payload.kid][0];
-
-        const token = jwt.sign( payload, secret);
-        const test = new Authenticate(token, validIssuers, JwksCachingService, logger);
-
-        return test.validate()
-            .then((val) => val.should.be.true())
-            .then(() => test.populateCertList())
-            .then((data) => {
-                data.should.be.eql(certs[payload.kid]);
-            })
-    });
-
-    it('should retrieve certificate lists from cache when authorising a non-expired service ID');
-
 });
