@@ -67,14 +67,6 @@ describe('internal-jwt-authenticator.authenticate', function(){
             should.strictEqual(jwtDecodeStub.calledOnce, true);
         });
 
-        it('should throw an error if jwt decode fails', () => {
-            jwtDecodeStub.throws();
-
-            should.throws(() => new Authenticate('authToken', ['valid issuer'], { name: 'caching service'}, logger), /invalidAuthToken/);
-
-            should.strictEqual(jwtDecodeStub.calledOnce, true);
-        });
-
         it('should throw an error if jwt decode returns null', () => {
             jwtDecodeStub.returns(null);
 
