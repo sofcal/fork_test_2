@@ -9,6 +9,7 @@ const { Authenticate } = imported;
 describe('internal-jwt-authenticator.authenticate', function(){
     const logger = {
         info: (msg) => console.log(msg),
+        warn: (msg) => console.log(msg),
         error: (msg) => console.error(msg),
     };
     let jwtDecodeStub;
