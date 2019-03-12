@@ -134,6 +134,10 @@ describe('utils', () => {
             should.strictEqual(anyValid(arr, alwaysThrowSpy), false);
         });
 
+        it('Should return false when array undefined', () => {
+            should.strictEqual(anyValid(undefined, alwaysThrowSpy), false);
+        });
+
         it('Should call predicate for each entry when all fail', () => {
             anyValid(arr, alwaysThrowSpy);
             should.strictEqual(alwaysThrowSpy.alwaysThrew(), true);

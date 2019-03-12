@@ -27,7 +27,7 @@ utils.validateToken = (exp, iss, validIssuers) => {
 
 // Returns true when first element passes predicate test
 // returns boolean
-utils.anyValid = (arr, predicate) =>
+utils.anyValid = (arr = [], predicate) =>
     arr.some((el) => {
         try {
             predicate(el);
