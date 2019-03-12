@@ -2,8 +2,11 @@
 
 'use strict';
 
+// TODO error codes?
+
 const needle = require('needle');
 
+// TODO get from params? + test
 // set default user agent
 needle.defaults({
     user_agent: 'BankDrive'
@@ -23,7 +26,7 @@ class JWKSCache {
 
     // check last refresh time hasn't passed expiry point
     cacheExpired() {
-        return Math.floor(Date.now() / 1000) > (this._refreshTime + this.delay);
+        return Math.floor(Date.now() / 1000) > (this.refreshTime + this.delay);
     }
 
     // Empty existing cache, then call JWKS endpoint to get new keylist
@@ -42,7 +45,7 @@ class JWKSCache {
                     this.certList[kid] = x5c;
                 });
 
-                this._refreshTime = Math.floor(Date.now() / 1000);
+                this.refreshTime = Math.floor(Date.now() / 1000);
             })
             .catch((err) => {
                 this.logger.error({ function: this.func, log: `Error building cache: ${err}` });

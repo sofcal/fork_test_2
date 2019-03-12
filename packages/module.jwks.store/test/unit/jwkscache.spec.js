@@ -49,7 +49,7 @@ describe('internal-jwks-store.jwkscache', function(){
             const endpoint = 'endpoint';
             const delay = 50;
             const test = new JWKSCache(endpoint, delay, logger);
-            test._refreshTime = 0;
+            test.refreshTime = 0;
 
             should.strictEqual(test.cacheExpired(), true);
         });
@@ -58,7 +58,7 @@ describe('internal-jwks-store.jwkscache', function(){
             const endpoint = 'endpoint';
             const delay = 50;
             const test = new JWKSCache(endpoint, delay, logger);
-            test._refreshTime = 100;
+            test.refreshTime = 100;
 
             should.strictEqual(test.cacheExpired(), false);
         });
@@ -67,7 +67,7 @@ describe('internal-jwks-store.jwkscache', function(){
             const endpoint = 'endpoint';
             const delay = 50;
             const test = new JWKSCache(endpoint, delay, logger);
-            test._refreshTime = 50;
+            test.refreshTime = 50;
 
             should.strictEqual(test.cacheExpired(), false);
         });
@@ -221,7 +221,7 @@ describe('internal-jwks-store.jwkscache', function(){
             fetchEndPointStub.returns(Promise.resolve(endPointResponse));
 
             return test.buildCache()
-                .then(() => test._refreshTime.should.be.eql(100))
+                .then(() => test.refreshTime.should.be.eql(100))
         });
 
         it('should populate certList from endpoint', function() {
