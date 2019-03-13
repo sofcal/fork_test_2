@@ -30,14 +30,15 @@ class Jwt extends Handler {
 
                 const primaryKeyNames = [
                     `${this.paramPrefix}accessToken.primary.publicKey`,
-                    `${this.paramPrefix}accessToken.primary.privateKey`
+                    `${this.paramPrefix}accessToken.primary.privateKey`,
+                    `${this.paramPrefix}accessToken.primary.createdAt`
                 ];
-
                 return Promise.map(primaryKeyNames, (key) => {
                     // get current primary key values (public and private)
+
                     return services.parameter.getParameters([key])
                         .catch((err) => {
-                            console.log('alert: ' + err);
+                            event.logger.error({ function: self.func, log: `services.parameter.getParameters(${key})`, err: err });
                             throw new Error('Error thrown by getParameters.');
                         })
                         .then((response) => {
@@ -77,7 +78,9 @@ class Jwt extends Handler {
                     })
                     .then((newKeyPair) => {
                         event.logger.info({ function: this.func, log: 'creating key pair' });
-                        this.saveKeyPairToParams(event, newKeyPair);
+                        return this.saveKeyPairToParams(event, newKeyPair);
+                    })
+                    .finally(() => {
                         event.logger.info({ function: self.func, log: 'ended' });
                     });
             });
@@ -97,6 +100,7 @@ class Jwt extends Handler {
 
     saveKeyPairToParams(event, keypair, copyToSecondary) {
         event.logger.info({ function: this.func, log: 'saving keys to param store', copyToSecondary });
+        const createdAt = new Date().getTime();
         const newParams = [{
             name: `${this.paramPrefix}accessToken.primary.publicKey`,
             type: 'SecureString',
@@ -106,6 +110,11 @@ class Jwt extends Handler {
             name: `${this.paramPrefix}accessToken.primary.privateKey`,
             type: 'SecureString',
             value: keypair.private,
+            overwrite: true
+        }, {
+            name: `${this.paramPrefix}accessToken.primary.createdAt`,
+            type: 'SecureString',
+            value: createdAt,
             overwrite: true
         }];
         if (copyToSecondary) {
@@ -119,6 +128,11 @@ class Jwt extends Handler {
                 type: 'SecureString',
                 value: keypair.private,
                 overwrite: true
+            }, {
+                name: `${this.paramPrefix}accessToken.secondary.createdAt`,
+                type: 'SecureString',
+                value: createdAt,
+                overwrite: true
             });
         }
         return this.setParams(newParams)
@@ -127,7 +141,7 @@ class Jwt extends Handler {
                 return response;
             })
             .catch((err) => {
-                console.log('alert: ' + err);
+                event.logger.error({ function: this.func, log: `Failed to save new keys:`, err: err });
                 throw new Error('Failed to save new keys');
             });
     }
