@@ -2,9 +2,9 @@
 const validate = require('./validators');
 const Promise = require('bluebird');
 
-const { Handler } = require('@sage/bc-default-lambda-handler');
+const {Handler} = require('@sage/bc-default-lambda-handler');
 const ParameterService = require('@sage/bc-services-parameter');
-const { RequestLogger } = require('@sage/bc-request-logger');
+const {RequestLogger} = require('@sage/bc-request-logger');
 
 const keys = require('./params');
 const keyPair = require('./keyPair');
@@ -22,10 +22,10 @@ class Jwt extends Handler {
         const self = this;
         return Promise.resolve(undefined)
             .then(() => {
-                event.logger.info({ function: self.func, log: 'started' });
+                event.logger.info({function: self.func, log: 'started'});
                 validate.process(process);
 
-                const { Environment: env } = process.env;
+                const {Environment: env} = process.env;
                 this.paramPrefix = `/${env}/`;
 
                 const primaryKeyNames = [
@@ -38,7 +38,11 @@ class Jwt extends Handler {
 
                     return services.parameter.getParameters([key])
                         .catch((err) => {
-                            event.logger.error({ function: self.func, log: `services.parameter.getParameters(${key})`, err: err });
+                            event.logger.error({
+                                function: self.func,
+                                log: `services.parameter.getParameters(${key})`,
+                                err: err
+                            });
                             throw new Error('Error thrown by getParameters.');
                         })
                         .then((response) => {
@@ -57,7 +61,10 @@ class Jwt extends Handler {
                 })
                     .catch((err) => { // accounts for initial run where primary key doesn't exist and above .map() fails
                         if (err.message === 'Primary keys did not exist, creating new primary and secondary keys') {
-                            event.logger.info({ function: self.func, log: 'no primary keys, creating new primary and secondary keys' });
+                            event.logger.info({
+                                function: self.func,
+                                log: 'no primary keys, creating new primary and secondary keys'
+                            });
                             this.createKeyPair(event)
                                 .then((newKeyPair) => {
                                     this.saveKeyPairToParams(event, newKeyPair, true);
@@ -68,38 +75,48 @@ class Jwt extends Handler {
                     .then((secondaryKeyArray) => {
                         return this.setParams(secondaryKeyArray)
                             .catch((err) => {
-                                console.log('alert: ' + err);
+                                event.logger.error({
+                                    function: self.func,
+                                    log: `setParams(${secondaryKeyArray})`,
+                                    err: err
+                                });
                                 throw new Error('Failed to copy primary key values to secondary key');
                             });
                     })
                     .then(() => {
-                        event.logger.info({ function: this.func, log: 'creating key pair' });
+                        event.logger.info({function: this.func, log: 'creating key pair'});
                         return this.createKeyPair(event);
                     })
                     .then((newKeyPair) => {
-                        event.logger.info({ function: this.func, log: 'creating key pair' });
+                        event.logger.info({function: this.func, log: 'creating key pair'});
                         return this.saveKeyPairToParams(event, newKeyPair);
                     })
                     .finally(() => {
-                        event.logger.info({ function: self.func, log: 'ended' });
+                        event.logger.info({function: self.func, log: 'ended'});
                     });
             });
     }
 
     createKeyPair(event) { //eslint-disable-line
+        const func = 'createKeyPair';
         return keyPair.createKeyPair() // defaults to 2048, shorter keys cause problems due to length of digest
             .then((kp) => {
-                event.logger.info({ function: this.func, log: 'returning new key pair' });
+                event.logger.info({function: func, log: 'returning new key pair'});
                 return kp;
             })
             .catch((err) => {
-                console.log('alert: ' + err);
+                event.logger.error({
+                    function: func,
+                    log: `createKeyPair`,
+                    err: err
+                });
                 throw new Error('Failed to create new primary keys');
             });
     }
 
     saveKeyPairToParams(event, keypair, copyToSecondary) {
-        event.logger.info({ function: this.func, log: 'saving keys to param store', copyToSecondary });
+        const func = 'saveKeyPairToParams';
+        event.logger.info({function: func, log: 'saving keys to param store', copyToSecondary});
         const createdAt = new Date().getTime();
         const newParams = [{
             name: `${this.paramPrefix}accessToken.primary.publicKey`,
@@ -137,29 +154,29 @@ class Jwt extends Handler {
         }
         return this.setParams(newParams)
             .then((response) => {
-                event.logger.info({ function: this.func, log: 'saved keys to param store', copyToSecondary });
+                event.logger.info({function: this.func, log: 'saved keys to param store', copyToSecondary});
                 return response;
             })
             .catch((err) => {
-                event.logger.error({ function: this.func, log: `Failed to save new keys:`, err: err });
+                event.logger.error({function: this.func, log: `Failed to save new keys:`, err: err});
                 throw new Error('Failed to save new keys');
             });
     }
 
-    loadAdditionalServices({ env, region }) {
+    loadAdditionalServices({env, region}) {
         const paramPrefix = `/${env}/`;
-        this.services.parameter = ParameterService.Create({ env: { region }, paramPrefix });
+        this.services.parameter = ParameterService.Create({env: {region}, paramPrefix});
     }
 
     setParams(params) {
-        return Promise.each(params, ({ name, value, type, overwrite }) => {
-            return this.services.parameter.setParameter({ name, value, type, overwrite });
+        return Promise.each(params, ({name, value, type, overwrite}) => {
+            return this.services.parameter.setParameter({name, value, type, overwrite});
         });
     }
 }
 
 module.exports.run = (event, context, callback) => {
     // eslint-disable-next-line no-param-reassign
-    event.logger = RequestLogger.Create({ service: 'jwt-certificate-rotation' });
+    event.logger = RequestLogger.Create({service: 'jwt-certificate-rotation'});
     return new Jwt().run(event, context, callback);
 };
