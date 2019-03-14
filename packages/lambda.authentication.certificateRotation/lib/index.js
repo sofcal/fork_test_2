@@ -3,19 +3,19 @@ const validate = require('./validators');
 const Promise = require('bluebird');
 
 const {Handler} = require('@sage/bc-default-lambda-handler');
-const ParameterService = require('@sage/bc-services-parameter');
 const {RequestLogger} = require('@sage/bc-request-logger');
 
 const keys = require('./params');
 const keyPair = require('./keyPair');
 
 class Jwt extends Handler {
-    constructor() {
+    constructor(parameterStore) {
         super({
             dbName: 'bank_db',
             keys
         });
         this.func = 'Jwt.impl';
+        this.services.parameter = parameterStore;
     }
 
     impl(event, params, services) {
@@ -36,7 +36,7 @@ class Jwt extends Handler {
                 return Promise.map(primaryKeyNames, (key) => {
                     // get current primary key values (public and private)
 
-                    return services.parameter.getParameters([key])
+                    return this.services.parameter.getParameters([key])
                         .catch((err) => {
                             event.logger.error({
                                 function: self.func,
@@ -163,9 +163,9 @@ class Jwt extends Handler {
             });
     }
 
-    loadAdditionalServices({env, region}) {
-        const paramPrefix = `/${env}/`;
-        this.services.parameter = ParameterService.Create({env: {region}, paramPrefix});
+    loadAdditionalServices({env, region}) { // TODO: It should be here (because of the parent), but it should be empty
+        // const paramPrefix = `/${env}/`;
+        // this.services.parameter = ParameterService.Create({env: {region}, paramPrefix});
     }
 
     setParams(params) {
@@ -175,8 +175,15 @@ class Jwt extends Handler {
     }
 }
 
+/**
+ *
+ * @param event {AWS_REGION: region, env}
+ * @param context {context: ..., logGroupName: ... , parameterstore: ...}
+ * @param callback AWS callback ?
+ * @returns {*}
+ */
 module.exports.run = (event, context, callback) => {
     // eslint-disable-next-line no-param-reassign
     event.logger = RequestLogger.Create({service: 'jwt-certificate-rotation'});
-    return new Jwt().run(event, context, callback);
+    return new Jwt(context.parameterstore).run(event, context, callback);
 };

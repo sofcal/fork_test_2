@@ -1,9 +1,9 @@
-'use strict';
+'use strict';var _require =
 
-const {
-  JWKSStore
-} = require('./jwksstore');
+
+
+require('./JwksEndpoint');const JWKSEndpoint = _require.JWKSEndpoint;
 
 module.exports = {
-  JWKSStore
-};
+    JWKSEndpoint };
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uL3NyYy9pbmRleC5qcyJdLCJuYW1lcyI6WyJyZXF1aXJlIiwiSldLU0VuZHBvaW50IiwibW9kdWxlIiwiZXhwb3J0cyJdLCJtYXBwaW5ncyI6IkFBQUEsYTs7OztBQUlJQSxRQUFRLGdCQUFSLEMsT0FEQUMsWSxZQUFBQSxZOztBQUdKQyxPQUFPQyxPQUFQLEdBQWlCO0FBQ2JGLGdCQURhLEVBQWpCIiwiZmlsZSI6ImluZGV4LmpzIiwic291cmNlc0NvbnRlbnQiOlsiJ3VzZSBzdHJpY3QnO1xuXG5jb25zdCB7XG4gICAgSldLU0VuZHBvaW50XG59ID0gcmVxdWlyZSgnLi9Kd2tzRW5kcG9pbnQnKTtcblxubW9kdWxlLmV4cG9ydHMgPSB7XG4gICAgSldLU0VuZHBvaW50XG59OyJdfQ==

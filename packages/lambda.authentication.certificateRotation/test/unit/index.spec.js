@@ -46,7 +46,10 @@ describe('jwt-certificate-rotation', function() {
     });
 
     beforeEach(() => {
-        context = {context: 'context', logGroupName: 'logGroupName'};
+        context = {context: 'context',
+            logGroupName: 'logGroupName',
+            parameterstore: dummyParamService
+        };
         sandbox.stub(process, 'env').value(_.extend(process.env, {Environment: env, AWS_REGION: region }));
         event = {AWS_REGION: region, env};
         callback = () => {
@@ -229,7 +232,6 @@ describe('jwt-certificate-rotation', function() {
         let primaryKeysResponse;
 
         beforeEach(() => {
-            context = {context: 'context', logGroupName: 'logGroupName'};
             sandbox.stub(process, 'env').value(_.extend(process.env, {Environment: env, AWS_REGION: region}));
             event = {AWS_REGION: region, env};
             callback = () => {
@@ -275,7 +277,6 @@ describe('jwt-certificate-rotation', function() {
             })
                 .then(() => {
                     should(dummyLoader.load.callCount).eql(1);
-                    should(ParameterService.Create.callCount).eql(1);
                     should(dummyParamService.getParameters.callCount).eql(3);
                 })
         });
@@ -339,7 +340,6 @@ describe('jwt-certificate-rotation', function() {
             })
                 .then(() => {
                     should(dummyLoader.load.callCount).eql(1);
-                    should(ParameterService.Create.callCount).eql(1);
                     should(dummyParamService.setParameter.callCount).eql(3);
                     const firstCallArgs = dummyParamService.setParameter.getCall(0).args[0];
                     should(firstCallArgs).eql({
@@ -375,7 +375,6 @@ describe('jwt-certificate-rotation', function() {
                 return params;
             }));
             sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
-            sandbox.stub(ParameterService, 'Create').returns(dummyParamService);
             sandbox.stub(dummyParamService, 'getParameters').resolves(primaryKeysResponse);
             sandbox.stub(dummyParamService, 'setParameter').rejects();
             callback = sandbox.spy();
