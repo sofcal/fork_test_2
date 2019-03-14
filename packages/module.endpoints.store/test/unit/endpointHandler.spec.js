@@ -1,41 +1,42 @@
-const imported = require('../../src/jwkscache');
+const imported = require('../../src/endpointHandler');
 const should = require('should');
 const sinon = require('sinon');
 const nock = require('nock');
 
-const { JWKSCache } = imported;
+const { EndpointHandler } = imported;
 
-describe('internal-jwks-store.jwkscache', function(){
+describe.only('module-endpoint-store.EndpointHandler', function(){
     const logger = {
         info: (msg) => console.log(msg),
         error: (msg) => console.error(msg),
     };
 
     it('should export the correct modules', (done) => {
-        imported.should.have.only.keys('JWKSCache');
+        imported.should.have.only.keys('EndpointHandler');
         done();
     });
 
     it('should be able to create new cache object', () => {
         const endpoint = 'endpoint';
         const delay = 100;
-        const test = new JWKSCache(endpoint, delay, logger);
+        const test = new EndpointHandler({endpoint, delay, logger});
 
         test.should.be.Object();
-        test.should.be.instanceof(JWKSCache);
+        test.should.be.instanceof(EndpointHandler);
     });
 
     it('should create cache object with correct properties', () => {
         const endpoint = 'endpoint';
         const delay = 100;
-        const test = new JWKSCache(endpoint, delay, logger);
+        const test = new EndpointHandler(endpoint, delay, logger);
+
 
         should.strictEqual(test.delay, delay);
         should.strictEqual(test.endPoint, endpoint);
         test.certList.should.match({});
     });
 
-    describe('JWKSCache.cacheExpired() ', () => {
+    describe('EndpointHandler.cacheExpired() ', () => {
 
         before(() => {
             sinon.stub(Date, 'now').returns(100000); // 100 seconds
@@ -48,7 +49,7 @@ describe('internal-jwks-store.jwkscache', function(){
         it('should return true if cache expired', () => {
             const endpoint = 'endpoint';
             const delay = 50;
-            const test = new JWKSCache(endpoint, delay, logger);
+            const test = new EndpointHandler(endpoint, delay, logger);
             test.refreshTime = 0;
 
             should.strictEqual(test.cacheExpired(), true);
@@ -57,7 +58,7 @@ describe('internal-jwks-store.jwkscache', function(){
         it('should return false if cache still valid', () => {
             const endpoint = 'endpoint';
             const delay = 50;
-            const test = new JWKSCache(endpoint, delay, logger);
+            const test = new EndpointHandler(endpoint, delay, logger);
             test.refreshTime = 100;
 
             should.strictEqual(test.cacheExpired(), false);
@@ -66,24 +67,24 @@ describe('internal-jwks-store.jwkscache', function(){
         it('should return false if cache still valid - boundary test', () => {
             const endpoint = 'endpoint';
             const delay = 50;
-            const test = new JWKSCache(endpoint, delay, logger);
+            const test = new EndpointHandler(endpoint, delay, logger);
             test.refreshTime = 50;
 
             should.strictEqual(test.cacheExpired(), false);
         });
     });
 
-    describe('JWKSCache.getCerts ', () => {
+    describe('EndpointHandler.getCerts ', () => {
         const endpoint = 'endpoint';
         const delay = 50;
-        let test = new JWKSCache(endpoint, delay, logger);
+        let test = new EndpointHandler(endpoint, delay, logger);
 
         let cacheExpiredStub;
         let buildCacheStub;
 
         before(() => {
-            cacheExpiredStub = sinon.stub(JWKSCache.prototype, 'cacheExpired');
-            buildCacheStub = sinon.stub(JWKSCache.prototype, 'buildCache')
+            cacheExpiredStub = sinon.stub(EndpointHandler.prototype, 'cacheExpired');
+            buildCacheStub = sinon.stub(EndpointHandler.prototype, 'buildCache')
         });
 
         after(() => {
@@ -136,10 +137,10 @@ describe('internal-jwks-store.jwkscache', function(){
         });
     });
 
-    describe('JWKSCache.buildCache ', () => {
+    describe('EndpointHandler.buildCache ', () => {
         const endpoint = 'https://test1.com/buildCache';
         const delay = 50;
-        let test = new JWKSCache(endpoint, delay, logger);
+        let test = new EndpointHandler(endpoint, delay, logger);
         const endPointResponse = {
             body:
                 {
@@ -181,7 +182,7 @@ describe('internal-jwks-store.jwkscache', function(){
 
         before(() => {
             sinon.stub(Date, 'now').returns(100000); // 100 seconds
-            fetchEndPointStub = sinon.stub(JWKSCache.prototype, 'fetchEndPoint');
+            fetchEndPointStub = sinon.stub(EndpointHandler.prototype, 'fetchEndPoint');
         });
 
         after(() => {
@@ -233,10 +234,10 @@ describe('internal-jwks-store.jwkscache', function(){
         });
     });
 
-    describe('JWKSCache.fetchEndPoint ', () => {
+    describe('EndpointHandler.fetchEndPoint ', () => {
         const endpoint = undefined;
         const delay = 50;
-        const test = new JWKSCache(endpoint, delay, logger);
+        const test = new EndpointHandler(endpoint, delay, logger);
         const expected = {
             keys: [
                 {

@@ -2,39 +2,41 @@
 
 'use strict';
 
-// TODO error codes?
-
 const needle = require('needle');
 
-// TODO get from params? + test
-// set default user agent
-needle.defaults({
-    user_agent: 'BankDrive'
-});
-
-// Cache of certificates for an endpoint
-class JWKSCache {
-    constructor(endPoint, delay, logger) {
+// Cache of data for an endpoint
+class EndpointHandler {
+    constructor({
+        endPoint,
+        cacheExpiry,
+        logger,
+        opts,
+    }) {
         this.endPoint = endPoint;
-        this.delay = delay;
+        this.cacheExpiry = cacheExpiry;
         this.logger = logger;
 
-        this.func = 'JWKSCache.impl';
+        this.func = 'EndpointHandler.impl';
 
-        this.certList = {};
+        this.data = {};
+
+        // set default user agent
+        needle.defaults({
+            user_agent: opts.userAgent
+        });
     }
 
     // check last refresh time hasn't passed expiry point
     cacheExpired() {
-        return Math.floor(Date.now() / 1000) > (this.refreshTime + this.delay);
+        return Math.floor(Date.now() / 1000) > (this.refreshTime + this.cacheExpiry);
     }
 
-    // Empty existing cache, then call JWKS endpoint to get new keylist
+    // Empty existing cache, then call endpoint to get new data
     buildCache() {
         return Promise.resolve()
             // empty old cache
             .then(() => {
-                this.certList = {};
+                this.data = {};
             })
             // call endpoint
             .then(() => this.fetchEndPoint())
@@ -42,9 +44,10 @@ class JWKSCache {
             .then((res) => {
                 const { keys } = res.body;
                 keys.forEach(({ kid, x5c }) => {
-                    this.certList[kid] = x5c;
+                    this.data[kid] = x5c;
                 });
-
+            })
+            .then(() => {
                 this.refreshTime = Math.floor(Date.now() / 1000);
             })
             .catch((err) => {
@@ -53,8 +56,8 @@ class JWKSCache {
             });
     }
 
-    // get Cert lists
-    getCerts() {
+    // get Data - return from cache if not expired, otherwise call buildCache to refresh
+    getData() {
         return Promise.resolve()
             // check if cache needs to be refreshed
             .then(() => {
@@ -65,7 +68,7 @@ class JWKSCache {
                 return undefined;
             })
             // return all keys/certlists
-            .then(() => this.certList);
+            .then(() => this.data);
     }
 
     // fetch endpoint
@@ -81,5 +84,5 @@ class JWKSCache {
 }
 
 module.exports = {
-    JWKSCache
+    EndpointHandler
 };

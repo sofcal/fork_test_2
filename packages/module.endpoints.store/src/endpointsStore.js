@@ -2,9 +2,9 @@
 
 'use strict';
 
-const { JWKSCache } = require('./jwkscache');
+const { JWKSCache } = require('./endpointHandler');
 
-class JWKSStore {
+class EndpointsStore {
     constructor(serviceMappings, jwksDelay, logger, cacheClass = JWKSCache) {
         // mapping serviceID > endpoint
         this.serviceMappings = serviceMappings;
@@ -14,7 +14,7 @@ class JWKSStore {
         this.cacheList = {};
         this.Cache = cacheClass;
         this.logger = logger;
-        this.func = 'JWKSStore.impl';
+        this.func = 'EndpointsStore.impl';
     }
 
     // get Certificate list
@@ -60,5 +60,5 @@ class JWKSStore {
 }
 
 module.exports = {
-    JWKSStore
+    EndPointsStore: EndpointsStore
 };

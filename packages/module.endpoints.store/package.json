@@ -1,5 +1,5 @@
 {
-  "name": "@sage/bc-jwks-store",
+  "name": "@sage/bc-endpoints-store",
   "version": "1.0.0",
   "author": "Sage UK",
   "license": "ISC",

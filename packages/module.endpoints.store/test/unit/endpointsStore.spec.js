@@ -1,9 +1,9 @@
-const imported = require('../../src/jwksstore');
+const imported = require('../../src/endpointsStore');
 const should = require('should');
 const sinon = require('sinon');
-const { JWKSCache } = require('../../src/jwkscache');
+const { JWKSCache } = require('../../src/endpointHandler');
 
-const { JWKSStore } = imported;
+const { EndPointsStore } = imported;
 
 describe('internal-jwks-store.jwksstore', function(){
     const serviceMappings = {
@@ -17,7 +17,7 @@ describe('internal-jwks-store.jwksstore', function(){
         error: (msg) => console.error(msg),
     };
 
-    const test = new JWKSStore(serviceMappings, jwksDelay, logger);
+    const test = new EndPointsStore(serviceMappings, jwksDelay, logger);
 
     const mockCerts = {
         kid1: [
@@ -31,13 +31,13 @@ describe('internal-jwks-store.jwksstore', function(){
     };
 
     it('should export the correct modules', (done) => {
-        imported.should.have.only.keys('JWKSStore');
+        imported.should.have.only.keys('EndPointsStore');
         done();
     });
 
     it('should be able to create new store object', () => {
         test.should.be.Object();
-        test.should.be.instanceof(JWKSStore);
+        test.should.be.instanceof(EndPointsStore);
     });
 
     it('should create store object with correct properties', () => {
@@ -51,15 +51,15 @@ describe('internal-jwks-store.jwksstore', function(){
     });
 
     it('should allow cache Class to be overwritten', () => {
-        const testCache = new JWKSStore(serviceMappings, jwksDelay, logger, 'test');
+        const testCache = new EndPointsStore(serviceMappings, jwksDelay, logger, 'test');
         should.strictEqual(testCache.Cache, 'test');
     });
 
-    describe('JWKSStore.getCertList', () => {
+    describe('EndPointsStore.getCertList', () => {
         let createCacheEntryStub;
 
         before(() => {
-            createCacheEntryStub =  sinon.stub(JWKSStore.prototype, 'createCacheEntry');
+            createCacheEntryStub =  sinon.stub(EndPointsStore.prototype, 'createCacheEntry');
         });
 
         after(() => {
@@ -104,7 +104,7 @@ describe('internal-jwks-store.jwksstore', function(){
         });
     });
 
-    describe('JWKSStore.createCacheEntry', () => {
+    describe('EndPointsStore.createCacheEntry', () => {
         const dummyEntry = {
             dummyCache: true,
         };
@@ -112,7 +112,7 @@ describe('internal-jwks-store.jwksstore', function(){
             return dummyEntry;
         });
 
-        const test2 = new JWKSStore(serviceMappings, jwksDelay, logger, DummyCache);
+        const test2 = new EndPointsStore(serviceMappings, jwksDelay, logger, DummyCache);
 
         it('should return new cache entry', function() {
             const result = test2.createCacheEntry('serviceID', 'endPoint');
@@ -120,7 +120,7 @@ describe('internal-jwks-store.jwksstore', function(){
         });
     });
 
-    describe('JWKSStore.getEndPoint', () => {
+    describe('EndPointsStore.getEndPoint', () => {
         it('should return valid endPoint', function() {
             const serviceID = Object.keys(serviceMappings)[0];
             const result = test.getEndPoint(serviceID);
