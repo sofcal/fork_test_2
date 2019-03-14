@@ -2,63 +2,93 @@
 
 'use strict';
 
-const { JWKSCache } = require('./endpointHandler');
+const { Cache } = require('@sage/bc-data-cache');
+
+const identity = ((data) => data);
 
 class EndpointsStore {
-    constructor(serviceMappings, jwksDelay, logger, cacheClass = JWKSCache) {
-        // mapping serviceID > endpoint
-        this.serviceMappings = serviceMappings;
-        // Delay jwks
-        this.jwksDelay = jwksDelay;
-        // cached entries for serviceID
+    constructor({
+        endpointMappings,
+        cacheExpiry,
+        logger,
+        cacheClass = Cache,
+        refreshFunction,
+        mappingFunction = identity
+    }) {
+        // mapping ID > endpoint
+        this.endpointMappings = endpointMappings;
+        // cache expiration limit
+        this.cacheExpiry = cacheExpiry;
+        // list of caches by ID
         this.cacheList = {};
+
+        // Cache class requires a refresh function (to retrieve data from endpont), and
+        // a mapping function (to map results to internal storage)
+        this.refreshFunction = refreshFunction;
+        this.mappingFunction = mappingFunction;
         this.Cache = cacheClass;
+
         this.logger = logger;
         this.func = 'EndpointsStore.impl';
     }
 
-    // get Certificate list
-    getCertList(serviceID) {
+    // get Data for an ID
+    getData(ID) {
         return Promise.resolve()
-            // check if serviceID cached exists - if not, create
+            // check if cache exists for ID - if not, create
             .then(() => {
-                let serviceIDCache = this.cacheList[serviceID];
+                let IDCache = this.cacheList[ID];
 
-                // if no cache for this service
-                if (!serviceIDCache) {
-                    this.logger.info({ function: this.func, log: `Building cache for ${serviceID}` });
-                    const endPoint = this.getEndPoint(serviceID);
+                // if no cache for this ID
+                if (!IDCache) {
+                    this.logger.info({
+                        function: this.func,
+                        log: `Building cache for ${ID}`
+                    });
+                    const endPoint = this.getEndPoint(ID);
 
                     // create new cache
-                    serviceIDCache = this.createCacheEntry(serviceID, endPoint);
+                    IDCache = this.createCacheEntry(ID, endPoint);
+
                     // populate the cache
-                    return serviceIDCache.buildCache();
+                    return IDCache.buildCache();
                 }
                 return undefined;
             })
             // retrieve certs from cache
             .then(() => {
-                this.logger.info({ function: this.func, log: `Getting certificates for ${serviceID}` });
-                return this.cacheList[serviceID].getCerts();
+                this.logger.info({
+                    function: this.func,
+                    log: `Getting certificates for ${ID}`
+                });
+                return this.cacheList[ID].getCerts();
             });
     }
 
-    createCacheEntry(serviceID, endPoint) {
-        this.cacheList[serviceID] = new this.Cache(endPoint, this.jwksDelay, this.logger);
-        return this.cacheList[serviceID];
+    // Create a new cache entry for an ID
+    createCacheEntry(ID, endPoint) {
+        this.cacheList[ID] = new this.Cache({
+            endPoint,
+            cacheExpiry: this.cacheExpiry,
+            logger: this.logger,
+            mappingFunction: this.mappingFunction,
+            refreshFunction: this.refreshFunction,
+        });
+        return this.cacheList[ID];
     }
 
-    getEndPoint(serviceID) {
-        const endPoint = this.serviceMappings[serviceID];
+    // Get endpoint for an ID from endpointMappings
+    getEndPoint(ID) {
+        const endPoint = this.endpointMappings[ID];
         // endpoint not known
         if (!endPoint) {
-            console.log(`alert: Auth token issuer not known - ${serviceID}`);
-            throw new Error('authTokenIssuerInvalid');
+            console.log(`alert: ID not known - ${ID}`);
+            throw new Error('IDInvalid');
         }
         return endPoint;
     }
 }
 
 module.exports = {
-    EndPointsStore: EndpointsStore
+    EndpointsStore
 };

@@ -13,6 +13,7 @@
     "@babel/code-frame": "^7.0.0-beta.48",
     "@babel/core": "^7.2.2",
     "@babel/preset-env": "^7.0.0-beta.47",
+    "@sage/bc-data-cache": "^1.0.0",
     "needle": "^2.2.4"
   },
   "devDependencies": {
