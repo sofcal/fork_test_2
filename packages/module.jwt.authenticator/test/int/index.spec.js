@@ -1,7 +1,7 @@
 'use strict';
 
 const { Authenticate } = require('../../src/authenticate');
-const { JWKSStore } = require('@sage/bc-jwks-store');
+const { EndPointsStore } = require('@sage/bc-endpoints-store');
 const should = require('should');
 const jwt = require('jsonwebtoken');
 const sinon = require('sinon');
@@ -68,7 +68,7 @@ describe('internal-jwt-authenticator', function(){
 
 
     before(() => {
-        JwksCachingService = new JWKSStore(serviceMappings, jwksDelay, logger);
+        JwksCachingService = new EndPointsStore(serviceMappings, jwksDelay, logger);
         getCertListSpy = sinon.spy(JwksCachingService, 'getCertList');
         getEndPointSpy = sinon.spy(JwksCachingService, 'getEndPoint');
     });

@@ -6,7 +6,7 @@ const { Handler } = require('@sage/bc-default-lambda-handler');
 const ParameterService = require('@sage/bc-parameterstore-static-loader');
 const { RequestLogger } = require('@sage/bc-request-logger');
 const { Authenticate } = require('@sage/bc-jwt-authenticator');
-const { JWKSStore } = require('@sage/bc-jwks-store');
+const { EndPointsStore } = require('@sage/bc-endpoints-store');
 const { ErrorSpecs } = require('@sage/bc-default-lambda-handler');
 const { StatusCodeError } = require('@sage/bc-status-code-error');
 
@@ -35,7 +35,7 @@ class JwtAuth extends Handler {
                 const serviceMappings = [];
                 const jwksDelay = 300;
 
-                const cachingService = new JWKSStore(serviceMappings, jwksDelay);
+                const cachingService = new EndPointsStore(serviceMappings, jwksDelay);
                 const validIssuers = serviceMappings.map(s => s.iss);
                 const auth = new Authenticate(event.authToken, validIssuers, cachingService, event.logger);
 
