@@ -5,24 +5,41 @@ const jwt = require('jsonwebtoken');
 const _ = require('underscore');
 
 class JWTIssuer {
-    constructor(cache) {
+    constructor(cache, { iss, newCertDelay } = {}) {
         this._jwt = Promise.promisifyAll(jwt);
 
         this.cache = cache;
-        this.cache = { get };
+        this.newCertDelay = newCertDelay;
+        this.iss = iss;
+
+        this.validate();
+    }
+
+    validate() {
+        if (!this.cache || !_.isFunction(this.cache.getData)) {
+            throw new Error('invalid cache: expected object with getData function');
+        }
+
+        if (!this.iss || !_.isString(this.iss)) {
+            throw new Error('invalid iss: expected string');
+        }
+        if (!this.newCertDelay || (!_.isNumber(this.newCertDelay) || _.isNaN(this.newCertDelay))) {
+            throw new Error('invalid newCertDelay: expected number of seconds');
+        }
     }
 
     generate({ claims, expiresIn, algorithm }) {
         // return cache.get()
-        return this.cache.get()
+        return this.cache.getData()
             .then((cached) => {
-                const certWrap = _.find(cached, (c) => c.status === 'primary');
+                const certWrap = getUsableCert(cached, this.newCertDelay);
 
                 const defaultClaims = {
-                    kid: certWrap.kid
+                    kid: certWrap.kid,
+                    iss: this.iss
                 };
 
-                const privateKey = cached[0].key;
+                const privateKey = certWrap.private;
 
                 const jwtClaims = Object.assign({ }, claims, defaultClaims);
 
@@ -31,20 +48,16 @@ class JWTIssuer {
     }
 }
 
-const get = () => {
-    return [{
-        status: 'primary',
-        private: 'primary_private',
-        public: 'primary_public',
-        timestamp: 'primary_timestamp',
-        kid: 'primary_kid'
-    }, {
-        status: 'secondary',
-        private: 'secondary_private',
-        public: 'secondary_public',
-        timestamp: 'secondary_timestamp',
-        kid: 'secondary_kid'
-    }];
+const getUsableCert = (cached, newCertDelay) => {
+    const nowS = Math.ceil(Date.now() / 1000);
+
+    if (cached[0] && (nowS > (cached[0].timestamp + newCertDelay))) {
+        return cached[0];
+    }
+
+    return cached[1];
 };
 
 JWTIssuer.Algortithms = { RS256: 'RS256' };
+
+module.exports = JWTIssuer;

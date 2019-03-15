@@ -1,11 +1,11 @@
 const index = require('../../lib/index');
-const RequestLogger = require('../../lib/RequestLogger');
+const JWTIssuer = require('../../lib/JWTIssuer');
 const should = require('should');
 
-describe('@sage/bc-request-logger.index', function(){
+describe('@sage/sfab-s2s-jwt-issuer.index', function(){
     // placeholder
     it('should export the correct modules', (done) => {
-        should(index).eql({ RequestLogger });
+        should(index).eql({ JWTIssuer });
         done();
     });
 });
