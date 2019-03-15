@@ -20,6 +20,7 @@ class JwksEndpoint {
         this.paramPrefix = `/${env}/`;
         this.primaryKeyName = `${this.paramPrefix}accessToken.primary.publicKey`;
         this.secondaryKeyName = `${this.paramPrefix}accessToken.secondary.publicKey`;
+        this.salt = process.env.salt;
 
         this.tokenCache = new JwksCache({ endpoint: 'TODO', cacheExpiry: cacheExpiry }, this.logger, parameterStore); // TODO: create it somewhere else
     }
@@ -67,8 +68,8 @@ function makeResponse(self, keys) {
     const primaryDer = convertPemToDer(keys.primary);
     const secondaryDer = convertPemToDer(keys.secondary);
 
-    const primaryKeyId = getHash(primaryDer);
-    const secondaryKeyId = getHash(secondaryDer);
+    const primaryKeyId = getHash(primaryDer, self.salt);
+    const secondaryKeyId = getHash(secondaryDer, self.salt);
 
     // "x5c" is the DER of the key, "kid" is a hash of this
     const response = {
