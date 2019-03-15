@@ -2,9 +2,7 @@
 
 const BCCache = require('@sage/bc-data-cache');
 
-
 let self;
-
 
 class JwksCache {
     constructor(config, logger, parameterStore) { // TODO: rewrite me
@@ -35,6 +33,6 @@ const refreshFunction = () => {  // TODO: check it
         `${self.paramPrefix}accessToken.primary.publicKey`,
         `${self.paramPrefix}accessToken.secondary.publicKey`
     ]);
-}
+};
 
 module.exports = JwksCache;

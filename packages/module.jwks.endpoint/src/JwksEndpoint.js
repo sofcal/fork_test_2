@@ -97,7 +97,6 @@ function getHash(data, salt = 'DefaultSaltMustBeRewritten') {
     return crypto.createHash('sha256').update(data + salt).digest('hex');
 }
 
-
 function convertPemToDer(pem) {
     return pem.replace(/-----BEGIN RSA PUBLIC KEY-----/g, '')
         .replace(/-----END RSA PUBLIC KEY-----/g, '')
