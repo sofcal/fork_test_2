@@ -42,8 +42,39 @@ describe('@sage/bc-data-cache.Cache', function(){
     
         it('should default to identity function when no mappingFunction passed', () => {
             const test = new Cache({ endpoint, cacheExpiry, logger, refreshFunction });
-    
+            const myObj = { test: true };
+
             should.strictEqual(!!test.mappingFunction, true);
+            // should return same object passed to function
+            (test.mappingFunction(myObj)).should.eql(myObj);
+        });
+
+        it('should throw when refresh function invalid or missing', () => {
+            should.throws( () => new Cache({ endpoint, cacheExpiry, logger, refreshFunction: 'refreshFunction' }) );
+            should.throws( () => new Cache({ endpoint, cacheExpiry, logger }) );
+        });
+
+        it('should throw when mapping function invalid or missing', () => {
+            should.throws( () => new Cache({ endpoint, cacheExpiry, logger, refreshFunction, mappingFunction: 'mappingFunction' }) );
+            should.throws( () => new Cache({ endpoint, cacheExpiry, logger, refreshFunction, mappingFunction: null }) );
+        });
+
+        it('should throw when endpoint invalid or missing', () => {
+            should.throws( () => new Cache({ endpoint: {}, cacheExpiry, logger, refreshFunction }) );
+            should.throws( () => new Cache({ cacheExpiry, logger, refreshFunction }) );
+        });
+
+        it('should throw when cacheExpiry invalid or missing', () => {
+            should.throws( () => new Cache({ endpoint, cacheExpiry: 'cacheExpiry', logger, refreshFunction }) );
+            should.throws( () => new Cache({ endpoint, logger, refreshFunction }) );
+        });
+
+        it('should throw when logger invalid or missing', () => {
+            const noop = () => {};
+            should.throws( () => new Cache({ endpoint, cacheExpiry, logger : 'logger', refreshFunction }) );
+            should.throws( () => new Cache({ endpoint, cacheExpiry, refreshFunction }) );
+            should.throws( () => new Cache({ endpoint, cacheExpiry, refreshFunction, logger: { info: noop } }) );
+            should.throws( () => new Cache({ endpoint, cacheExpiry, refreshFunction, logger: { error: noop } }) );
         });
     });
 
@@ -299,7 +330,7 @@ describe('@sage/bc-data-cache.Cache', function(){
     });
 
     describe('Cache.fetchEndPoint ', () => {
-        const endpoint = undefined;
+        const endpoint = ' ';
         const cacheExpiry = 50;
 
         const refreshFunction = function() {
