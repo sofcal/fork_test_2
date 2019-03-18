@@ -4,7 +4,7 @@ const Promise = require('bluebird');
 const jwt = require('jsonwebtoken');
 const _ = require('underscore');
 
-class JWTIssuer {
+class JwtIssuer {
     constructor(cache, { iss, newCertDelay } = {}) {
         this._jwt = Promise.promisifyAll(jwt);
 
@@ -58,6 +58,6 @@ const getUsableCert = (cached, newCertDelay) => {
     return cached[1];
 };
 
-JWTIssuer.Algortithms = { RS256: 'RS256' };
+JwtIssuer.Algortithms = { RS256: 'RS256' };
 
-module.exports = JWTIssuer;
+module.exports = JwtIssuer;

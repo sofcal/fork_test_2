@@ -1,3 +1,3 @@
-const JWTIssuer = require('./JWTIssuer');
+const JwtIssuer = require('./JwtIssuer');
 
-module.exports = { JWTIssuer };
+module.exports = { JwtIssuer };
