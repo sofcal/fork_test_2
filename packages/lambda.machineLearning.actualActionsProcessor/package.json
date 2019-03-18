@@ -1,6 +1,6 @@
 {
   "name": "machineLearning-actualActionsProcessor",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "author": "",
   "license": "ISC",
   "description": "",
@@ -8,7 +8,7 @@
   "main": "lib/handler.js",
   "dependencies": {
     "@sage/bc-contracts-narrativedictionary": "^1.3.2",
-    "@sage/bc-contracts-rule": "^1.3.2",
+    "@sage/bc-contracts-rule": "^1.4.0",
     "@sage/bc-parameterstore-static-loader": "^1.3.2",
     "@sage/bc-request-logger": "^1.3.2",
     "@sage/bc-services-db": "^1.3.2",
