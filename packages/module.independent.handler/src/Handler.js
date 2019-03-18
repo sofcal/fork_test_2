@@ -27,15 +27,15 @@ class Handler {
                 event.logger = RequestLogger.Create({ service: '@sage/bc-default-lambda-handler' });
                 event.logger.info({ function: func, log: 'started' });
 
-                this.validate({ logger: event.logger });
+                this.validate(event, { logger: event.logger });
                 return Promise.resolve(undefined)
                     .then(() => {
-                        event.logger.info({ function: func, log: 'initialising CloudWatch Subscription' });
                         const { SumoLogicLambdaARN } = this.config;
                         if (!SumoLogicLambdaARN) {
                             return undefined;
                         }
 
+                        event.logger.info({ function: func, log: 'initialising CloudWatch Subscription' });
                         // initialise the CloudWatchSubscription which pushes logs to the sumo logic lambda
                         return CloudWatchSubscription.Register(event.logger, SumoLogicLambdaARN, context.logGroupName);
                     })
@@ -47,17 +47,17 @@ class Handler {
                         // give the derived instance an opportunity to initialise any services or add-ons that are required for the
                         // running of the function. Since this class should be instantiated once, it gives the ability to cache items
                         event.logger.info({ function: func, log: 'initialising services and add-ons' });
-                        return this.init(event);
+                        return this.init(event, { logger: event.logger });
                     })
                     .then(() => {
                         // now that everything else is set-up and ready to go, call the implementation for handling this request.
                         // This will be the business logic for the invocation of the lambda.
                         event.logger.info({ function: func, log: 'invoking handler function' });
-                        return this.impl(event);
+                        return this.impl(event, { logger: event.logger });
                     })
                     .then((ret) => {
                         // if we get a valid response, give the derived class the opportunity to modify the response before we send it
-                        const response = this.buildResponse(ret);
+                        const response = this.buildResponse(ret, { logger: event.logger });
 
                         event.logger.info({ function: func, log: 'sending success response' });
                         event.logger.info({ function: func, log: 'ended' });
@@ -94,7 +94,7 @@ class Handler {
             });
     }
 
-    validate({ logger }) {
+    validate(event, { logger }) {
         const func = 'Handler.validate';
         const { Environment: env = 'test', AWS_REGION: region = 'local' } = this.config;
 
@@ -107,20 +107,20 @@ class Handler {
         return this.config;
     }
 
-    init() { // eslint-disable-line class-methods-use-this
+    init(/* event, { logger } */) { // eslint-disable-line class-methods-use-this
         // default behaviour is to do nothing
         return Promise.resolve(undefined);
     }
 
-    impl() { // eslint-disable-line class-methods-use-this
+    impl(/* event, { logger } */) { // eslint-disable-line class-methods-use-this
         throw new Error('impl function should be extended');
     }
 
-    buildResponse(ret) { // eslint-disable-line class-methods-use-this
+    buildResponse(ret /*, { logger } */) { // eslint-disable-line class-methods-use-this
         return { statusCode: 200, body: JSON.stringify(ret) };
     }
 
-    dispose() { // eslint-disable-line class-methods-use-this
+    dispose(/* { logger } */) { // eslint-disable-line class-methods-use-this
         // default behaviour is to do nothing
         return Promise.resolve(undefined);
     }
