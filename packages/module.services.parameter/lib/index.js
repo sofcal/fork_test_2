@@ -46,14 +46,15 @@ const getParametersImpl = Promise.method((self, params) => {
     for (const p of response.Parameters) {
       const name = p.Name; // eslint-disable-next-line no-param-reassign
 
-      returnParams[name] = p.Type === 'StringList' ? p.Value.split(',') : p.Value;
+      returnParams[name.replace(self.paramPrefix, '')] = p.Type === 'StringList' ? p.Value.split(',') : p.Value;
     }
 
     return returnParams;
   };
 
+  const Names = params.map(p => `${self.paramPrefix}${p}`);
   const req = {
-    Names: params,
+    Names,
     WithDecryption: true
   };
   return self.ssm.getParameters(req).promise().then(response => mapResponse(response));

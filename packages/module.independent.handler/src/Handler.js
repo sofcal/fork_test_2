@@ -41,13 +41,17 @@ class Handler {
                     })
                     .then(() => {
                         if (this.initialised) {
+                            event.logger.info({ function: func, log: 'skipping services and add-ons' });
                             return undefined;
                         }
 
                         // give the derived instance an opportunity to initialise any services or add-ons that are required for the
                         // running of the function. Since this class should be instantiated once, it gives the ability to cache items
                         event.logger.info({ function: func, log: 'initialising services and add-ons' });
-                        return this.init(event, { logger: event.logger });
+                        return this.init(event, { logger: event.logger })
+                            .then(() => {
+                                this.initialised = true;
+                            });
                     })
                     .then(() => {
                         // now that everything else is set-up and ready to go, call the implementation for handling this request.
@@ -116,7 +120,7 @@ class Handler {
         throw new Error('impl function should be extended');
     }
 
-    buildResponse(ret /*, { logger } */) { // eslint-disable-line class-methods-use-this
+    buildResponse(ret /* , { logger } */) { // eslint-disable-line class-methods-use-this
         return { statusCode: 200, body: JSON.stringify(ret) };
     }
 
