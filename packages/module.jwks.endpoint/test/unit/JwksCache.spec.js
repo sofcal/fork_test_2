@@ -13,6 +13,9 @@ describe('jwks-cache', function () {
 
     };
 
+    const PRIMARY_PUBLICKEY_KEY = '/local/accessToken.primary.publicKey';
+    const SECONDARY_PUBLICKEY_KEY = '/local/accessToken.secondary.publicKey';
+
     const PARAMSTORE_DATA =             {
         '/local/accessToken.primary.publicKey': 'testPrimaryPublicKey',
         '/local/accessToken.secondary.publicKey': 'testSecondaryPublicKey'
@@ -43,7 +46,6 @@ describe('jwks-cache', function () {
     });
 
     beforeEach(() => {
-
         config = {
             paramPrefix: `/${ENV}/`,
             cacheExpiry: CACHE_TTL
@@ -51,12 +53,13 @@ describe('jwks-cache', function () {
 
         clock = sinon.useFakeTimers(new Date().getTime());
 
-        sandbox.stub(paramstore, 'getParameters').resolves(PARAMSTORE_DATA);
+        sandbox.stub(paramstore, 'getParameters')
+            .onCall(0).resolves( PARAMSTORE_DATA )
+            .onCall(1).resolves(CHANGED_PARAMSTORE_DATA);
     });
 
     afterEach(() => {
         clock.restore();
-
         sandbox.restore();
     });
 
@@ -71,8 +74,8 @@ describe('jwks-cache', function () {
         jwksCache = new JwksCache(config, logger, paramstore);
         return jwksCache.getParams().then(() => {
             should(paramstore.getParameters.callCount).eql(1);
-            should(paramstore.getParameters.getCall(0).args[0][0]).eql('/local/accessToken.primary.publicKey');
-            should(paramstore.getParameters.getCall(0).args[0][1]).eql('/local/accessToken.secondary.publicKey');
+            should(paramstore.getParameters.getCall(0).args[0][0]).eql(PRIMARY_PUBLICKEY_KEY);
+            should(paramstore.getParameters.getCall(0).args[0][1]).eql(SECONDARY_PUBLICKEY_KEY);
         });
     });
 
@@ -81,8 +84,8 @@ describe('jwks-cache', function () {
         jwksCache = new JwksCache(config, logger, paramstore);
         return jwksCache.getParams().then((data) => {
             should(paramstore.getParameters.callCount).eql(1);
-            should(paramstore.getParameters.getCall(0).args[0][0]).eql('/local/accessToken.primary.publicKey');
-            should(paramstore.getParameters.getCall(0).args[0][1]).eql('/local/accessToken.secondary.publicKey');
+            should(paramstore.getParameters.getCall(0).args[0][0]).eql(PRIMARY_PUBLICKEY_KEY);
+            should(paramstore.getParameters.getCall(0).args[0][1]).eql(SECONDARY_PUBLICKEY_KEY);
             should(data).eql(expected);
         });
     });
@@ -92,16 +95,13 @@ describe('jwks-cache', function () {
         jwksCache = new JwksCache(config, logger, paramstore);
         return jwksCache.getParams().then((data) => {
             should(paramstore.getParameters.callCount).eql(1);
-            should(paramstore.getParameters.getCall(0).args[0][0]).eql('/local/accessToken.primary.publicKey');
-            should(paramstore.getParameters.getCall(0).args[0][1]).eql('/local/accessToken.secondary.publicKey');
-
-            sandbox.restore();
-            sandbox.stub(paramstore, 'getParameters').resolves(CHANGED_PARAMSTORE_DATA); // Let's change the paramstore value to see whether it is from the or cached
+            should(paramstore.getParameters.getCall(0).args[0][0]).eql(PRIMARY_PUBLICKEY_KEY);
+            should(paramstore.getParameters.getCall(0).args[0][1]).eql(SECONDARY_PUBLICKEY_KEY);
 
             clock.tick(CACHE_TTL * 1000);
 
             return jwksCache.getParams().then((dataTwo) => {
-                should(paramstore.getParameters.callCount).eql(0); // Because of the restore -> it is not called again
+                should(paramstore.getParameters.callCount).eql(1);
                 should(dataTwo).eql(expected);
             })
         });
@@ -113,20 +113,16 @@ describe('jwks-cache', function () {
         jwksCache = new JwksCache(config, logger, paramstore);
         return jwksCache.getParams().then((data) => {
             should(paramstore.getParameters.callCount).eql(1);
-            should(paramstore.getParameters.getCall(0).args[0][0]).eql('/local/accessToken.primary.publicKey');
-            should(paramstore.getParameters.getCall(0).args[0][1]).eql('/local/accessToken.secondary.publicKey');
+            should(paramstore.getParameters.getCall(0).args[0][0]).eql(PRIMARY_PUBLICKEY_KEY);
+            should(paramstore.getParameters.getCall(0).args[0][1]).eql(SECONDARY_PUBLICKEY_KEY);
             should(data).eql(expected);
-
-
-            sandbox.restore();
-            sandbox.stub(paramstore, 'getParameters').resolves(CHANGED_PARAMSTORE_DATA);
 
             clock.tick((CACHE_TTL + 1) * 1000);
 
             return jwksCache.getParams().then((dataTwo) => {
-                should(paramstore.getParameters.callCount).eql(1);  // Because of the restore -> it is called again
-                should(paramstore.getParameters.getCall(0).args[0][0]).eql('/local/accessToken.primary.publicKey');
-                should(paramstore.getParameters.getCall(0).args[0][1]).eql('/local/accessToken.secondary.publicKey');
+                should(paramstore.getParameters.callCount).eql(2);  // Because of the restore -> it is called again
+                should(paramstore.getParameters.getCall(1).args[0][0]).eql(PRIMARY_PUBLICKEY_KEY);
+                should(paramstore.getParameters.getCall(1).args[0][1]).eql(SECONDARY_PUBLICKEY_KEY);
                 should(dataTwo).eql(nextExpected);
             })
         });
