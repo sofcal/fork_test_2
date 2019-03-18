@@ -14,9 +14,7 @@ describe('jwks-endpoint with cache', function() {
 
     let sandbox;
     let config;
-    let context;
     let event;
-    let callback;
     let jwks;
     let paramstore = {
         getParameters: errFunc
@@ -31,16 +29,11 @@ describe('jwks-endpoint with cache', function() {
     });
 
     beforeEach(() => {
-        context = {context: 'context', logGroupName: 'logGroupName'};
         event = {AWS_REGION: REGION, env: ENV};
-        callback = () => {
-        };
 
         config = {
 
         };
-
-        jwks = new JwksEndpoint(config, paramstore);
 
         sandbox.stub(res);
     });
@@ -53,23 +46,35 @@ describe('jwks-endpoint with cache', function() {
 
         beforeEach(() => {
             sandbox.stub(process, 'env').value(_.extend(process.env, Environment));
+            jwks = new JwksEndpoint(config, paramstore);
         });
 
+        afterEach(() => {
+            sandbox.restore();
+        });
 
         it('should return 500 if there is no primary key to use', () => {
             sandbox.stub(paramstore, 'getParameters').rejects();
             return jwks.getJwks(req, res).then(() => {
-                    should(res.send.callCount).eql(1);
-                    should(res.send.getCall(0).args[0]).eql(500);
+                should(res.send.callCount).eql(1);
+                should(res.send.getCall(0).args[0]).eql(500);
+
+                should(paramstore.getParameters.calledOnce);
+                should(paramstore.getParameters.getCall(0).args[0][0]).eql('/local/accessToken.primary.publicKey');
+                should(paramstore.getParameters.getCall(0).args[0][1]).eql('/local/accessToken.secondary.publicKey');
             });
         });
 
         it('should return 500 if there is no primary key to use', () => {
             sandbox.stub(paramstore, 'getParameters').resolves({});
             return jwks.getJwks(req, res).then(() => {
-                    should(res.send.callCount).eql(1);
-                    should(res.send.getCall(0).args[0]).eql(500);
-                    should(res.send.getCall(0).args[1]).eql(new Error('Failed to retrieve primary key'))
+                should(res.send.callCount).eql(1);
+                should(res.send.getCall(0).args[0]).eql(500);
+                should(res.send.getCall(0).args[1]).eql(new Error('Failed to retrieve primary key'));
+
+                should(paramstore.getParameters.calledOnce);
+                should(paramstore.getParameters.getCall(0).args[0][0]).eql('/local/accessToken.primary.publicKey');
+                should(paramstore.getParameters.getCall(0).args[0][1]).eql('/local/accessToken.secondary.publicKey');
             });
         });
 
@@ -79,9 +84,13 @@ describe('jwks-endpoint with cache', function() {
                     '/local/accessToken.primary.publicKey': 'testPublicKey'
                 });
             return jwks.getJwks(req, res).then(() => {
-                    should(res.send.callCount).eql(1);
-                    should(res.send.getCall(0).args[0]).eql(500);
-                    should(res.send.getCall(0).args[1]).eql(new Error('Failed to retrieve secondary key'))
+                should(res.send.callCount).eql(1);
+                should(res.send.getCall(0).args[0]).eql(500);
+                should(res.send.getCall(0).args[1]).eql(new Error('Failed to retrieve secondary key'));
+
+                should(paramstore.getParameters.calledOnce);
+                should(paramstore.getParameters.getCall(0).args[0][0]).eql('/local/accessToken.primary.publicKey');
+                should(paramstore.getParameters.getCall(0).args[0][1]).eql('/local/accessToken.secondary.publicKey');
             });
         });
 
@@ -107,9 +116,13 @@ describe('jwks-endpoint with cache', function() {
                 }]
             };
             return jwks.getJwks(req, res).then(() => {
-                    should(res.send.callCount).eql(1);
-                    should(res.send.getCall(0).args[0]).eql(200);
-                    should(res.send.getCall(0).args[1]).eql(expectedOutput)
+                should(res.send.callCount).eql(1);
+                should(res.send.getCall(0).args[0]).eql(200);
+                should(res.send.getCall(0).args[1]).eql(expectedOutput);
+
+                should(paramstore.getParameters.calledOnce);
+                should(paramstore.getParameters.getCall(0).args[0][0]).eql('/local/accessToken.primary.publicKey');
+                should(paramstore.getParameters.getCall(0).args[0][1]).eql('/local/accessToken.secondary.publicKey');
             });
         });
     });
@@ -119,22 +132,35 @@ describe('jwks-endpoint with cache', function() {
         beforeEach(() => {
             Environment.salt = 'salt';
             sandbox.stub(process, 'env').value(_.extend(process.env, Environment));
+            jwks = new JwksEndpoint(config, paramstore);
+        });
+
+        afterEach(() => {
+            sandbox.restore();
         });
 
         it('should return 500 if there is no primary key to use', () => {
             sandbox.stub(paramstore, 'getParameters').rejects();
             return jwks.getJwks(req, res).then(() => {
-                    should(res.send.callCount).eql(1);
-                    should(res.send.getCall(0).args[0]).eql(500);
+                should(res.send.callCount).eql(1);
+                should(res.send.getCall(0).args[0]).eql(500);
+
+                should(paramstore.getParameters.calledOnce);
+                should(paramstore.getParameters.getCall(0).args[0][0]).eql('/local/accessToken.primary.publicKey');
+                should(paramstore.getParameters.getCall(0).args[0][1]).eql('/local/accessToken.secondary.publicKey');
             });
         });
 
         it('should return 500 if there is no primary key to use', () => {
             sandbox.stub(paramstore, 'getParameters').resolves({});
             return jwks.getJwks(req, res).then(() => {
-                    should(res.send.callCount).eql(1);
-                    should(res.send.getCall(0).args[0]).eql(500);
-                    should(res.send.getCall(0).args[1]).eql(new Error('Failed to retrieve primary key'))
+                should(res.send.callCount).eql(1);
+                should(res.send.getCall(0).args[0]).eql(500);
+                should(res.send.getCall(0).args[1]).eql(new Error('Failed to retrieve primary key'));
+
+                should(paramstore.getParameters.calledOnce);
+                should(paramstore.getParameters.getCall(0).args[0][0]).eql('/local/accessToken.primary.publicKey');
+                should(paramstore.getParameters.getCall(0).args[0][1]).eql('/local/accessToken.secondary.publicKey');
             });
         });
 
@@ -144,9 +170,13 @@ describe('jwks-endpoint with cache', function() {
                     '/local/accessToken.primary.publicKey': 'testPublicKey'
                 });
             return jwks.getJwks(req, res).then(() => {
-                    should(res.send.callCount).eql(1);
-                    should(res.send.getCall(0).args[0]).eql(500);
-                    should(res.send.getCall(0).args[1]).eql(new Error('Failed to retrieve secondary key'))
+                should(res.send.callCount).eql(1);
+                should(res.send.getCall(0).args[0]).eql(500);
+                should(res.send.getCall(0).args[1]).eql(new Error('Failed to retrieve secondary key'));
+
+                should(paramstore.getParameters.calledOnce);
+                should(paramstore.getParameters.getCall(0).args[0][0]).eql('/local/accessToken.primary.publicKey');
+                should(paramstore.getParameters.getCall(0).args[0][1]).eql('/local/accessToken.secondary.publicKey');
             });
         });
 
@@ -172,9 +202,13 @@ describe('jwks-endpoint with cache', function() {
                 }]
             };
             return jwks.getJwks(req, res).then(() => {
-                    should(res.send.callCount).eql(1);
-                    should(res.send.getCall(0).args[0]).eql(200);
-                    should(res.send.getCall(0).args[1]).eql(expectedOutput)
+                should(res.send.callCount).eql(1);
+                should(res.send.getCall(0).args[0]).eql(200);
+                should(res.send.getCall(0).args[1]).eql(expectedOutput);
+
+                should(paramstore.getParameters.calledOnce);
+                should(paramstore.getParameters.getCall(0).args[0][0]).eql('/local/accessToken.primary.publicKey');
+                should(paramstore.getParameters.getCall(0).args[0][1]).eql('/local/accessToken.secondary.publicKey');
             });
         });
     });

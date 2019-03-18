@@ -15,7 +15,6 @@ describe('jwks-endpoint', function() {
 
     let sandbox;
     let config;
-    let context;
     let event;
     let callback;
     let jwks;
@@ -30,7 +29,6 @@ describe('jwks-endpoint', function() {
     });
 
     beforeEach(() => {
-        context = {context: 'context', logGroupName: 'logGroupName'};
         event = {AWS_REGION: REGION, env: ENV};
         callback = () => {
         };
@@ -38,8 +36,6 @@ describe('jwks-endpoint', function() {
         config = {
 
         };
-
-        jwks = new JwksEndpoint(config, paramstore); // TODO
 
         sandbox.stub(res);
     });
@@ -52,8 +48,12 @@ describe('jwks-endpoint', function() {
 
         beforeEach(() => {
             sandbox.stub(process, 'env').value(_.extend(process.env, Environment));
+            jwks = new JwksEndpoint(config, paramstore);
         });
 
+        afterEach(() => {
+            sandbox.restore();
+        });
 
         it('should return 500 if there is no primary key to use', () => {
             sandbox.stub(JwksCache.prototype, 'getParams').rejects();
@@ -119,8 +119,12 @@ describe('jwks-endpoint', function() {
         beforeEach(() => {
             Environment.salt = 'salt';
             sandbox.stub(process, 'env').value(_.extend(process.env, Environment));
+            jwks = new JwksEndpoint(config, paramstore);
         });
 
+        afterEach(() => {
+            sandbox.restore();
+        });
 
         it('should return 500 if there is no primary key to use', () => {
             sandbox.stub(JwksCache.prototype, 'getParams').rejects();

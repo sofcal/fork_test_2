@@ -4,12 +4,13 @@ const BCCache = require('@sage/bc-data-cache');
 
 let self;
 
+const DEFAULT_CACHE_TTL = 600;
+
 class JwksCache {
-    constructor(config, logger, parameterStore) { // TODO: rewrite me
-        const endpoint = config.endpoint;
-        const cacheExpiry = config.cacheExpiry;
+    constructor(config, logger, parameterStore) {
+        const cacheExpiry = config.cacheExpiry || DEFAULT_CACHE_TTL;
         this.cache = new BCCache.Cache({
-            endpoint, // TODO: check me
+            undefined, // TODO: check me
             cacheExpiry,
             logger,
             refreshFunction,
@@ -17,6 +18,7 @@ class JwksCache {
         });
 
         this.parameterStore = parameterStore;
+        this.paramPrefix = config.paramPrefix;
 
         self = this;
     }
