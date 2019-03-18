@@ -58,7 +58,8 @@ utils.refreshFn = function(endpoint) {
 // Mapping function - maps data to internal storage structure
 // returns object
 utils.mappingFn = (res) => {
-    const { keys } = res.body;
+    const { keys = [] } = res.body;
+
     return keys.reduce((final, { kid, x5c }) => {
         return Object.assign(
             {},

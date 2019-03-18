@@ -29,6 +29,7 @@ describe('module-jwt-authenticator', function(){
         exp: (Date.now() / 1000) + cacheExpiry,
         iss: 'sage.serv1',
         kid: 'kid1',
+        customClaim: 'sage',
     };
     const keys = [
         {
@@ -66,7 +67,9 @@ describe('module-jwt-authenticator', function(){
         .get('/serv1')
         .reply(200, {
             keys,
-        });
+        })
+        .get('/serv2')
+        .reply(200, {});
 
     before(() => {
         StoreService = new EndpointsStore({
@@ -214,7 +217,7 @@ describe('module-jwt-authenticator', function(){
 
             const newPayload = Object.assign(
                 {},
-                payload, 
+                payload,
                 { kid: 'unknown' }
             );
 
@@ -226,6 +229,26 @@ describe('module-jwt-authenticator', function(){
                 logger,
             });
             (test.checkAuthorisation()).should.be.rejectedWith(/AuthFailed/);
+        });
+
+        it('should reject promise when ', () => {
+            const secret = certs[payload.kid][0];
+            const newPayload = Object.assign(
+                {},
+                payload,
+                { iss: 'sage.serv3'}
+            );
+
+
+            const authToken = jwt.sign( newPayload, secret);
+            const test = new Authenticate({
+                authToken,
+                validIssuers,
+                StoreService,
+                logger,
+            });
+
+            (test.checkAuthorisation()).should.be.rejectedWith(/Fetch endpoint error/);
         });
     });
 
@@ -266,5 +289,58 @@ describe('module-jwt-authenticator', function(){
                     should.strictEqual(nockcalls.interceptors[0].interceptionCounter, 2);
                 })
         })
+    });
+
+    describe('Authorisation tests', () => {
+        it('should authorise a valid jwt, and return the custom claims', () => {
+            const secret = certs[payload.kid][0];
+
+            const authToken = jwt.sign( payload, secret );
+            const test = new Authenticate({
+                authToken,
+                validIssuers,
+                StoreService,
+                logger,
+            });
+
+            return test.checkAuthorisation()
+                .then((data) => {
+                    should.strictEqual(data.authorised, true);
+                    should.strictEqual(data.claims.customClaim, 'sage');
+                });
+        });
+
+        it('should fail authorisation if no data returned from endpoint', () => {
+            const secret = certs[payload.kid][0];
+
+            const newPayload = Object.assign(
+                {},
+                payload, 
+                { iss: 'sage.serv2' }
+            );
+            const authToken = jwt.sign( newPayload, secret );
+            const test = new Authenticate({
+                authToken,
+                validIssuers,
+                StoreService,
+                logger,
+            });
+
+            (test.checkAuthorisation()).should.be.rejectedWith(/AuthFailed/);
+        });
+
+        it('should fail authorisation if no matching key found', () => {
+            const secret = 'unknownSecret';
+
+            const authToken = jwt.sign( payload, secret );
+            const test = new Authenticate({
+                authToken,
+                validIssuers,
+                StoreService,
+                logger,
+            });
+
+            (test.checkAuthorisation()).should.be.rejectedWith(/AuthFailed/);
+        });
     });
 });

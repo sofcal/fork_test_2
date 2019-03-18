@@ -8,6 +8,8 @@ const {
     validateToken,
     anyValid,
     partial,
+    refreshFn,
+    mappingFn,
 } = utils;
 
 describe('utils', () => {
@@ -185,6 +187,56 @@ describe('utils', () => {
             const fn = partial(testFn, 'dummy1');
             const result = fn('dummy2');
             should.strictEqual(result, 2);
+        });
+    });
+
+    describe('mappingFn', () => {
+        it('should map response object to expected result object', () => {
+            const res =  {
+                body: {
+                        keys : [
+                        {
+                            kid: 'kid1',
+                            x5c: [
+                                'cert1',
+                                'cert2'
+                            ]
+                        },
+                        {
+                            kid: 'kid2',
+                            x5c: [
+                                'cert3',
+                                'cert4'
+                            ]
+                        }
+                    ]
+                },
+            };
+            const expected = {
+                kid1: [
+                    'cert1',
+                    'cert2',
+                ],
+                kid2: [
+                    'cert3',
+                    'cert4',
+                ],
+            };
+            mappingFn(res).should.eql(expected);
+        });
+
+        it('should return empty object if no results returned', () => {
+            const res =  {
+                body: {},
+            };
+            const expected = {};
+            mappingFn(res).should.eql(expected);
+        });
+    });
+
+    describe('refreshFn', () => {
+        it('should be a rejected promise when endpoint invalid', () => {
+            refreshFn(null).should.be.rejected();
         });
     });
 });
