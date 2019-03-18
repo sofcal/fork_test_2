@@ -10,7 +10,7 @@ class JwksCache {
     constructor(config, logger, parameterStore) {
         const cacheExpiry = config.cacheExpiry || DEFAULT_CACHE_TTL;
         this.cache = new BCCache.Cache({
-            undefined, // TODO: check me
+            undefined,
             cacheExpiry,
             logger,
             refreshFunction,

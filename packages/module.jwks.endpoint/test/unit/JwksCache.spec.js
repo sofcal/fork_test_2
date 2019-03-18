@@ -11,7 +11,7 @@ describe('jwks-cache', function () {
 
     const doNothing = () => {
 
-    }
+    };
 
     const PARAMSTORE_DATA =             {
         '/local/accessToken.primary.publicKey': 'testPrimaryPublicKey',
@@ -24,7 +24,6 @@ describe('jwks-cache', function () {
     };
 
     const ENV = 'local';
-    const REGION = 'eu-west-1';
     const CACHE_TTL = 100;
 
     let jwksCache;
