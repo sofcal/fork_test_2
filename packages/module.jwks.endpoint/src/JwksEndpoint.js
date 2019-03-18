@@ -12,7 +12,7 @@ const algorithm = 'RS256';
 class JwksEndpoint {
     constructor(config, parameterStore) {
         this.className = 'JwksEndpoint';
-        this.logger = RequestLogger.Create({ service: 'JwksEndpoint' });
+        this.logger = config.logger || RequestLogger.Create({ service: 'JwksEndpoint' });
         const env = process.env.Environment;
         const cacheExpiry = config.cacheExpiry;
 
@@ -22,7 +22,7 @@ class JwksEndpoint {
         this.salt = process.env.salt;
         const paramPrefix = this.paramPrefix;
 
-        this.tokenCache = new JwksCache({ cacheExpiry , paramPrefix }, this.logger, parameterStore); // TODO: create it somewhere else
+        this.tokenCache = new JwksCache({ cacheExpiry , paramPrefix }, this.logger, parameterStore);
     }
 
     getJwks(...args) {

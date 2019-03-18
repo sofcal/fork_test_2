@@ -2,9 +2,9 @@
 
 const BCCache = require('@sage/bc-data-cache');
 
-let self;
-
 const DEFAULT_CACHE_TTL = 600;
+
+let self;
 
 class JwksCache {
     constructor(config, logger, parameterStore) {
@@ -30,7 +30,7 @@ class JwksCache {
 
 const mappingFunction = (data) => data;
 
-const refreshFunction = () => {  // TODO: check it
+const refreshFunction = () => {
     return self.parameterStore.getParameters([
         `${self.paramPrefix}accessToken.primary.publicKey`,
         `${self.paramPrefix}accessToken.secondary.publicKey`
