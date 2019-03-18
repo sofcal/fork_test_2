@@ -4,7 +4,8 @@
 
 const { Cache } = require('@sage/bc-data-cache');
 
-const identity = ((data) => data);
+// identity function - returns input
+const identityfn = (data) => data;
 
 class EndpointsStore {
     constructor({
@@ -13,7 +14,7 @@ class EndpointsStore {
         logger,
         cacheClass = Cache,
         refreshFunction,
-        mappingFunction = identity
+        mappingFunction = identityfn, // default to identity function
     }) {
         // mapping ID > endpoint
         this.endpointMappings = endpointMappings;
@@ -22,7 +23,7 @@ class EndpointsStore {
         // list of caches by ID
         this.cacheList = {};
 
-        // Cache class requires a refresh function (to retrieve data from endpont), and
+        // Cache class requires a refresh function (to retrieve data from endpoint), and
         // a mapping function (to map results to internal storage)
         this.refreshFunction = refreshFunction;
         this.mappingFunction = mappingFunction;
@@ -30,10 +31,12 @@ class EndpointsStore {
 
         this.logger = logger;
         this.func = 'EndpointsStore.impl';
+
+        validate.call(this);
     }
 
     // get Data for an ID
-    getData(ID) {
+    getCache(ID) {
         return Promise.resolve()
             // check if cache exists for ID - if not, create
             .then(() => {
@@ -45,30 +48,27 @@ class EndpointsStore {
                         function: this.func,
                         log: `Building cache for ${ID}`
                     });
-                    const endPoint = this.getEndPoint(ID);
+                    const endpoint = this.getEndpoint(ID);
 
                     // create new cache
-                    IDCache = this.createCacheEntry(ID, endPoint);
-
-                    // populate the cache
-                    return IDCache.buildCache();
+                    IDCache = this.createCacheEntry(ID, endpoint);
                 }
                 return undefined;
             })
-            // retrieve certs from cache
+            // retrieve data from cache
             .then(() => {
                 this.logger.info({
                     function: this.func,
                     log: `Getting certificates for ${ID}`
                 });
-                return this.cacheList[ID].getCerts();
+                return this.cacheList[ID].getData();
             });
     }
 
     // Create a new cache entry for an ID
-    createCacheEntry(ID, endPoint) {
+    createCacheEntry(ID, endpoint) {
         this.cacheList[ID] = new this.Cache({
-            endPoint,
+            endpoint,
             cacheExpiry: this.cacheExpiry,
             logger: this.logger,
             mappingFunction: this.mappingFunction,
@@ -78,14 +78,40 @@ class EndpointsStore {
     }
 
     // Get endpoint for an ID from endpointMappings
-    getEndPoint(ID) {
-        const endPoint = this.endpointMappings[ID];
+    getEndpoint(ID) {
+        const endpoint = this.endpointMappings[ID];
         // endpoint not known
-        if (!endPoint) {
+        if (!endpoint) {
             console.log(`alert: ID not known - ${ID}`);
             throw new Error('IDInvalid');
         }
-        return endPoint;
+        return endpoint;
+    }
+}
+
+function validate() {
+    const { refreshFunction, mappingFunction, Cache: thisCache, endpointMappings, cacheExpiry, logger } = this;
+
+    if (!refreshFunction || typeof refreshFunction !== 'function') {
+        throw new Error('Invalid argument passed: Refresh function is not a function');
+    }
+    if (!mappingFunction || typeof mappingFunction !== 'function') {
+        throw new Error('Invalid argument passed: Mapping function is not a function');
+    }
+    if (!thisCache || typeof thisCache !== 'function' || !thisCache.prototype.getData) {
+        throw new Error('Invalid argument passed: cacheClass');
+    }
+    if (!endpointMappings || typeof endpointMappings !== 'object') {
+        throw new Error('Invalid argument passed: endpointMappings not an object');
+    }
+    if (!cacheExpiry || typeof cacheExpiry !== 'number') {
+        throw new Error('Invalid argument passed: CacheExpiry not a number');
+    }
+    if (!logger || typeof logger !== 'object') {
+        throw new Error('Invalid argument passed: Logger not an object');
+    }
+    if (!logger.info || !logger.error) {
+        throw new Error('Invalid argument passed: Logger not valid');
     }
 }
 

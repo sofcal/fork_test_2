@@ -1,7 +1,7 @@
 'use strict';
 
-const { EndPointsStore } = require('./endpointsStore');
+const { EndpointsStore } = require('./endpointsStore');
 
 module.exports = {
-    EndPointsStore
+    EndpointsStore
 };

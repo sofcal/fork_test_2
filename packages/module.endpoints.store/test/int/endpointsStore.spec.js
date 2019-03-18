@@ -2,16 +2,16 @@ const should = require('should');
 const sinon = require('sinon');
 const nock = require('nock');
 const needle = require('needle');
-const { JWKSStore } = require('../../src/jwksstore');
-const { JWKSCache } = require('../../src/jwkscache');
+const { EndpointsStore }  = require('../../src/endpointsStore');
+const { Cache } = require('@sage/bc-data-cache');
 
-describe('internal-jwks-store', function(){
-    const serviceMappings = {
+describe('module-endpoints-store', function(){
+    const endpointMappings = {
         serv1: 'https://www.test.com/serv1',
         serv2: 'https://www.test.com/serv2',
         serv3: 'invalid',
     };
-    const jwksDelay = 10;
+    const cacheExpiry = 10;
     const endPointResponse = [
         {
             keys: [
@@ -62,7 +62,31 @@ describe('internal-jwks-store', function(){
         error: (msg) => console.error(msg),
     };
 
-    const test = new JWKSStore(serviceMappings, jwksDelay, logger);
+    const mappingFunction = (res) => {
+        const { keys } = res.body;
+        return keys.reduce((final,{ kid, x5c }) => {
+            final[kid] = x5c;
+            return final;
+        }, {})
+    };
+
+    const refreshFunction = function(endpoint) {
+        return Promise.resolve()
+            .then(() => needle('get', endpoint))
+            .catch((err) => {
+                console.log(`alert: ${err}`);
+                throw new Error(`Fetch endpoint error: ${err.message}`);
+            });
+    }
+
+    const test = new EndpointsStore({
+        endpointMappings,
+        cacheExpiry,
+        logger,
+        Cache,
+        refreshFunction,
+        mappingFunction
+    });
 
     const nockEndPoints = nock('https://www.test.com')
         .persist()
@@ -80,7 +104,7 @@ describe('internal-jwks-store', function(){
 
     before(() => {
         dateStub = sinon.stub(Date, 'now');
-        cacheBuildSpy = sinon.spy(JWKSCache.prototype, 'buildCache');
+        cacheBuildSpy = sinon.spy(Cache.prototype, 'buildCache');
     });
 
     after(() => {
@@ -91,40 +115,40 @@ describe('internal-jwks-store', function(){
        cacheBuildSpy.resetHistory();
     });
 
-    it('should allow new instance of JWKSStore to be created', () => {
-         test.should.be.instanceOf(JWKSStore);
+    it('should allow new instance of EndpointsStore to be created', () => {
+         test.should.be.instanceOf(EndpointsStore);
     });
 
     it('should retrieve and return keys from endpoint', () => {
         dateStub.returns(200000); // 200 seconds
-        return test.getCertList(Object.keys(serviceMappings)[0])
+        return test.getCache(Object.keys(endpointMappings)[0])
             .then((res) => res.should.eql(expectedCertList(0)))
             .then(() => should.strictEqual(cacheBuildSpy.called, true));
     });
 
     it('should return keys from cache when cache not expired', () => {
         dateStub.returns(100000); // 100 seconds
-        return test.getCertList(Object.keys(serviceMappings)[0])
+        return test.getCache(Object.keys(endpointMappings)[0])
             .then((res) => res.should.eql(expectedCertList(0)))
             .then(() => should.strictEqual(cacheBuildSpy.called, false));
     });
 
     it('should refresh keys from endpoint when cache expired', () => {
-        dateStub.returns(300000 + (jwksDelay * 1000 * 2));
-        const serviceID = Object.keys(serviceMappings)[0];
-        return test.getCertList(serviceID)
+        dateStub.returns(300000 + (cacheExpiry * 1000 * 2));
+        const ID = Object.keys(endpointMappings)[0];
+        return test.getCache(ID)
             .then((res) => res.should.eql(expectedCertList(0)))
             .then(() => should.strictEqual(cacheBuildSpy.called, true));
     });
 
     it('should reject when service endpoint not known', () => {
-        const serviceID = 'unknown';
-        return test.getCertList(serviceID).should.be.rejectedWith('authTokenIssuerInvalid');
+        const ID = 'unknown';
+        return test.getCache(ID).should.be.rejectedWith('IDInvalid');
     });
 
     it('should reject when invalid service endpoint', () => {
-        const serviceID = 'serv3';
-        return test.getCertList(serviceID).should.be.rejectedWith(/getaddrinfo ENOTFOUND invalid/);
+        const ID = 'serv3';
+        return test.getCache(ID).should.be.rejectedWith(/getaddrinfo ENOTFOUND invalid/);
     });
 
 });
