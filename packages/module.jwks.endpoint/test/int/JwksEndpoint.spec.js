@@ -95,7 +95,6 @@ describe('jwks-endpoint with cache', function() {
 
     let sandbox;
     let config;
-    let event;
     let jwks;
     let paramstore = {
         getParameters: errFunc
@@ -107,11 +106,9 @@ describe('jwks-endpoint with cache', function() {
 
     before(() => {
         sandbox = sinon.createSandbox();
-        event = {AWS_REGION: REGION, env: ENV};
     });
 
     beforeEach(() => {
-        event = {AWS_REGION: REGION, env: ENV};
 
         config = {
             paramPrefix: `/${ENV}/`,

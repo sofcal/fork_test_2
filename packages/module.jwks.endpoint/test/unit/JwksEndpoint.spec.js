@@ -52,8 +52,6 @@ describe('jwks-endpoint', function() {
 
     let sandbox;
     let config;
-    let event;
-    let callback;
     let jwks;
     let req;
     let paramstore;
@@ -62,14 +60,9 @@ describe('jwks-endpoint', function() {
 
     before(() => {
         sandbox = sinon.createSandbox();
-        event = {AWS_REGION: REGION, env: ENV};
     });
 
     beforeEach(() => {
-        event = {AWS_REGION: REGION, env: ENV};
-        callback = () => {
-        };
-
         config = {
 
         };

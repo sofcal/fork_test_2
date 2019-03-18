@@ -15,7 +15,7 @@ const ParameterService = require('@sage/bc-services-parameter');
 describe('jwt-certificate-rotation', function() {
 
     let sandbox;
-    let config, context, event, callback, now;
+    let config, context, event, now;
     const TEST_DATE = 1552471130970;
 
     const username = 'user';
@@ -52,8 +52,6 @@ describe('jwt-certificate-rotation', function() {
         };
         sandbox.stub(process, 'env').value(_.extend(process.env, {Environment: env, AWS_REGION: region }));
         event = {AWS_REGION: region, env};
-        callback = () => {
-        };
 
         config = {
             'defaultMongo.username': username,
@@ -234,8 +232,6 @@ describe('jwt-certificate-rotation', function() {
         beforeEach(() => {
             sandbox.stub(process, 'env').value(_.extend(process.env, {Environment: env, AWS_REGION: region}));
             event = {AWS_REGION: region, env};
-            callback = () => {
-            };
 
             config = {
                 'defaultMongo.username': username,
@@ -377,7 +373,6 @@ describe('jwt-certificate-rotation', function() {
             sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
             sandbox.stub(dummyParamService, 'getParameters').resolves(primaryKeysResponse);
             sandbox.stub(dummyParamService, 'setParameter').rejects();
-            callback = sandbox.spy();
 
             return Jwt.run(event, context, (first, second) => {
                     should(first).eql(null);
@@ -476,7 +471,6 @@ describe('jwt-certificate-rotation', function() {
             sandbox.stub(dummyParamService, 'getParameters').resolves(primaryKeysResponse);
             sandbox.stub(dummyParamService, 'setParameter').onCall(0).onCall(1).rejects('Failed to save primary keys to param store');
             sandbox.stub(keyPair, 'createKeyPair').resolves({ public: 'newPublicKey', private: 'newPrivateKey' });
-            callback = sandbox.spy();
 
             return Jwt.run(event, context, (first, second) => {
                     should(first).eql(null);
