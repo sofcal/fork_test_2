@@ -12,7 +12,15 @@ const {
 
 describe('utils', () => {
     it('should export the correct modules', (done) => {
-        utils.should.have.only.keys('expired', 'issuerInvalid', 'validateToken', 'anyValid', 'partial');
+        utils.should.have.only.keys(
+            'expired',
+            'issuerInvalid',
+            'validateToken',
+            'anyValid',
+            'partial',
+            'refreshFn',
+            'mappingFn'
+        );
         done();
     });
 

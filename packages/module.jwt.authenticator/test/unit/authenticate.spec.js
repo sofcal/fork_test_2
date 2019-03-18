@@ -1,19 +1,19 @@
-const imported = require('../../src/authenticate');
 const should = require('should');
 const sinon = require('sinon');
 const jwt = require('jsonwebtoken');
+const imported = require('../../src/authenticate');
 const utils  = require('../../src/utils');
 
 const { Authenticate } = imported;
 
-describe('internal-jwt-authenticator.authenticate', function(){
+describe('module-jwt-authenticator.authenticate', function(){
     const logger = {
         info: (msg) => console.log(msg),
         warn: (msg) => console.log(msg),
         error: (msg) => console.error(msg),
     };
     let jwtDecodeStub;
-    let cachingServiceSpy;
+    let storeServiceSpy;
     const certs = {
         kid1: [
             'cert1',
@@ -24,16 +24,16 @@ describe('internal-jwt-authenticator.authenticate', function(){
             'cert4',
         ],
     };
-    const cachingService = {
-        getCertList: () => certs,
+    const storeService = {
+        getCache: () => certs,
     };
-    const cachingServiceErrors = {
-        getCertList: () => {throw new Error('getCertListError')},
+    const storeServiceErrors = {
+        getCache: () => {throw new Error('getCertListError')},
     };
 
     before(() => {
         jwtDecodeStub = sinon.stub(jwt, 'decode');
-        cachingServiceSpy = sinon.spy(cachingService, 'getCertList');
+        storeServiceSpy = sinon.spy(storeService, 'getCache');
     });
 
     afterEach(() => {
@@ -55,12 +55,17 @@ describe('internal-jwt-authenticator.authenticate', function(){
 
         it('should be able to create new authenticate object', () => {
             jwtDecodeStub.returns({
-                exp: 1,
-                iss: 'test',
+                exp: Infinity,
+                iss: 'valid issuer',
                 kid: '12345',
             });
 
-            const test = new Authenticate('authToken', ['valid issuer'], { name: 'caching service'}, logger);
+            const test = new Authenticate({
+                authToken: 'authToken',
+                validIssuers: ['valid issuer'],
+                StoreService: { name: 'store service'},
+                logger
+            });
 
             test.should.be.Object();
             test.should.be.instanceof(Authenticate);
@@ -70,8 +75,12 @@ describe('internal-jwt-authenticator.authenticate', function(){
         it('should throw an error if jwt decode returns null', () => {
             jwtDecodeStub.returns(null);
 
-            should.throws(() => new Authenticate('authToken', ['valid issuer'], { name: 'caching service'}, logger), /invalidAuthToken/);
-
+            should.throws(() => new Authenticate({
+                authToken: 'authToken',
+                validIssuers: ['valid issuer'],
+                StoreService: { name: 'store service'},
+                logger
+            }), /invalidAuthToken/);
             should.strictEqual(jwtDecodeStub.calledOnce, true);
         });
     });
@@ -84,31 +93,42 @@ describe('internal-jwt-authenticator.authenticate', function(){
             validateTokenStub = sinon.stub(utils, 'validateToken');
         });
 
-        it('should resolve to true if validateToken passes ', () => {
+        after(() => {
+            validateTokenStub.reset();
+        })
+
+        it('should return true if validateToken passes ', () => {
             jwtDecodeStub.returns({
-               exp: 1,
+               exp: Infinity,
                iss: 'test',
                kid: '12345',
             });
             validateTokenStub.returns(true);
 
-            const test = new Authenticate('authToken', ['valid issuer'], { name: 'caching service'}, logger);
-
-            return (test.validate()).should.be.fulfilledWith(true);
+            const test = new Authenticate({
+                authToken: 'authToken',
+                validIssuers: ['valid issuer'],
+                StoreService: { name: 'store service'},
+                logger
+            });
+            test.validate().should.be.true();
         });
 
-        it('should reject promise if validateToken fails ', () => {
+        it('should throw error if validate fails ', () => {
             jwtDecodeStub.returns({
-               exp: 1,
+               exp: Infinity,
                iss: 'test',
                kid: '12345',
             });
-            const errMsg = 'failValidateToken';
+            const errMsg = 'failValidate';
             validateTokenStub.throws(() => new Error(errMsg));
 
-            const test = new Authenticate('authToken', ['valid issuer'], { name: 'caching service'}, logger);
-
-            return (test.validate()).should.be.rejectedWith(errMsg);
+            should.throws(() => new Authenticate({
+                authToken: 'authToken',
+                validIssuers: ['valid issuer'],
+                StoreService: { name: 'store service'},
+                logger
+            }), /^Error: failValidate$/);
         });
     });
 
@@ -117,19 +137,24 @@ describe('internal-jwt-authenticator.authenticate', function(){
         const kid = 'kid1';
         before(() => {
             jwtDecodeStub.returns({
-                exp: 1,
+                exp: Infinity,
                 iss: 'test',
                 kid,
             });
 
-            test = new Authenticate('authToken', ['valid issuer'], cachingService, logger);
+            test = new Authenticate({
+                authToken: 'authToken',
+                validIssuers: ['valid issuer'],
+                StoreService: storeService,
+                logger
+            });
         });
 
-        it('should call caching service populateCertList method', () => {
+        it('should call store service populateCertList method', () => {
             const result = test.populateCertList();
 
             result.should.be.Promise();
-            return result.then(() => (cachingServiceSpy.called).should.be.true());
+            return result.then(() => (storeServiceSpy.called).should.be.true());
         });
 
         it('should populate store cert keys', () => {
@@ -140,7 +165,13 @@ describe('internal-jwt-authenticator.authenticate', function(){
         });
 
         it('should reject promise if error thrown', () => {
-            test = new Authenticate('authToken', ['valid issuer'], cachingServiceErrors, logger);
+            test = new Authenticate({
+                authToken: 'authToken',
+                validIssuers: ['valid issuer'],
+                StoreService: storeServiceErrors,
+                logger
+            });
+
             const result = test.populateCertList(true);
             return result.should.be.rejectedWith('getCertListError');
         });
@@ -153,12 +184,17 @@ describe('internal-jwt-authenticator.authenticate', function(){
         const kid = 'kid1';
         before(() => {
             jwtDecodeStub.returns({
-                exp: 1,
+                exp: Infinity,
                 iss: 'test',
                 kid,
             });
 
-            test = new Authenticate('authToken', ['valid issuer'], cachingService, logger);
+            test = new Authenticate({
+                authToken: 'authToken',
+                validIssuers: ['valid issuer'],
+                StoreService: storeService,
+                logger
+            });
 
             anyValidStub = sinon.stub(utils, 'anyValid');
         });
