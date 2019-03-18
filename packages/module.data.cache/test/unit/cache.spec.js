@@ -35,7 +35,7 @@ describe('@sage/bc-data-cache.Cache', function(){
     
             should.strictEqual(test.cacheExpiry, cacheExpiry);
             should.strictEqual(test.endpoint, endpoint);
-            should.strictEqual(test.refreshFunction, refreshFunction);
+            should.strictEqual(test.refreshFunction.name, 'bound refreshFunction');
             should.strictEqual(test.mappingFunction, mappingFunction);
             test.data.should.match({});
         });

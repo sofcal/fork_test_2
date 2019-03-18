@@ -17,13 +17,16 @@ class Cache {
         this.endpoint = endpoint;
         this.cacheExpiry = cacheExpiry;
         this.logger = logger;
-        this.refreshFunction = refreshFunction; // called in fetchEndPoint
+        if (typeof refreshFunction === 'function') {
+            this.refreshFunction = refreshFunction.bind(this, this.endpoint); // called in fetchEndPoint
+        }
         this.mappingFunction = mappingFunction; // called in buildCache
 
         this.func = 'Cache.impl';
 
         this.data = {};
-        this.currentRefresh = 0; // set in getData, reset in buildCache
+        this.currentRefresh = null; // set in getData, reset in buildCache
+        this.refreshTime = 0;
 
         validate.call(this);
     }
@@ -97,7 +100,7 @@ class Cache {
             log: `Fetching data from endpoint ${this.endpoint}`
         });
         return Promise.resolve()
-            .then(() => this.refreshFunction())
+            .then(this.refreshFunction)
             .catch((err) => {
                 console.log(`alert: ${err}`);
                 throw new Error(`Fetch endpoint error: ${err.message}`);
