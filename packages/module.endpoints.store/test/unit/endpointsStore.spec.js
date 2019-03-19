@@ -1,6 +1,6 @@
 const should = require('should');
 const sinon = require('sinon');
-const imported = require('../../src/endpointsStore');
+const imported = require('../../lib/endpointsStore');
 const { Cache } = require('@sage/bc-data-cache');
 
 const { EndpointsStore } = imported;
@@ -22,11 +22,9 @@ describe('module-endpoints-store.endpointsStore', function () {
     const test = new EndpointsStore({
         endpointMappings,
         cacheExpiry,
-        logger,
         cacheClass: Cache,
         refreshFunction: noop,
-        mappingFunction: (a) => a,
-    });
+    }, logger);
 
     const mockData = {
         kid1: [
@@ -67,10 +65,9 @@ describe('module-endpoints-store.endpointsStore', function () {
             const testStore = new EndpointsStore({
                 endpointMappings,
                 cacheExpiry,
-                logger,
                 cacheClass: testClass,
                 refreshFunction: noop,
-            });
+            }, logger);
             should.strictEqual(testStore.Cache.name, 'testClass');
         });
 
@@ -78,61 +75,24 @@ describe('module-endpoints-store.endpointsStore', function () {
             const testStore = new EndpointsStore({
                 endpointMappings,
                 cacheExpiry,
-                logger,
                 refreshFunction: noop,
-            });
-            const myObj = { test: true };
+            }, logger);
 
             should.strictEqual(testStore.Cache.name, 'Cache');
-              // should return same object passed to function
-            (testStore.mappingFunction(myObj)).should.eql(myObj);
-        });
-
-        it('should default mapping function to identity function if not passed', () => {
-            const testStore = new EndpointsStore({
-                endpointMappings,
-                cacheExpiry,
-                logger,
-                refreshFunction: noop,
-            });
-            should.strictEqual(testStore.mappingFunction.name, 'identityfn');
         });
 
         it('should throw when refresh function invalid or missing', () => {
             should.throws(() => new EndpointsStore({
                 endpointMappings,
                 cacheExpiry,
-                logger,
                 cacheClass: Cache,
                 refreshFunction: 'refreshFunction',
-                mappingFunction: (a) => a,
-            }));
+            }, logger));
             should.throws(() => new EndpointsStore({
                 endpointMappings,
                 cacheExpiry,
-                logger,
                 cacheClass: Cache,
-                mappingFunction: (a) => a,
-            }));
-        });
-
-        it('should throw when mapping function invalid or missing', () => {
-            should.throws(() => new EndpointsStore({
-                endpointMappings,
-                cacheExpiry,
-                logger,
-                cacheClass: Cache,
-                refreshFunction: noop,
-                mappingFunction: 'mappingFunction',
-            }));
-            should.throws(() => new EndpointsStore({
-                endpointMappings,
-                cacheExpiry,
-                logger,
-                cacheClass: Cache,
-                refreshFunction: noop,
-                mappingFunction: null,
-            }));
+            }, logger));
         });
 
         it('should throw when cache class invalid or missing', () => {
@@ -140,63 +100,49 @@ describe('module-endpoints-store.endpointsStore', function () {
             should.throws(() => new EndpointsStore({
                 endpointMappings,
                 cacheExpiry,
-                logger,
                 cacheClass: null,
                 refreshFunction: noop,
-                mappingFunction: (a) => a,
-            }));
+            }, logger));
             should.throws(() => new EndpointsStore({
                 endpointMappings,
                 cacheExpiry,
-                logger,
                 cacheClass: 'Cache',
                 refreshFunction,
-                mappingFunction: (a) => a,
-            }));
+            }, logger));
             should.throws(() => new EndpointsStore({
                 endpointMappings,
                 cacheExpiry,
-                logger,
                 cacheClass: dummyCache,
                 refreshFunction: noop,
-                mappingFunction: (a) => a,
-            }));
+            }, logger));
         });
 
         it('should throw when endpointMappings invalid or missing', () => {
             should.throws(() => new EndpointsStore({
                 endpointMappings: '',
                 cacheExpiry,
-                logger,
                 cacheClass: Cache,
                 refreshFunction: noop,
-                mappingFunction: (a) => a,
-            }));
+            }, logger));
             should.throws(() => new EndpointsStore({
                 cacheExpiry,
-                logger,
                 cacheClass: Cache,
                 refreshFunction: noop,
-                mappingFunction: (a) => a,
-            }));
+            }, logger));
         });
 
         it('should throw when cacheExpiry invalid or missing', () => {
             should.throws(() => new EndpointsStore({
                 endpointMappings,
                 cacheExpiry: 'error',
-                logger,
                 cacheClass: Cache,
                 refreshFunction: noop,
-                mappingFunction: (a) => a,
-            }));
+            }, logger));
             should.throws(() => new EndpointsStore({
                 endpointMappings,
-                logger,
                 cacheClass: Cache,
                 refreshFunction: noop,
-                mappingFunction: (a) => a,
-            }));
+            }, logger));
         });
 
         it('should throw when logger invalid or missing', () => {
@@ -204,34 +150,28 @@ describe('module-endpoints-store.endpointsStore', function () {
             should.throws(() => new EndpointsStore({
                 endpointMappings,
                 cacheExpiry,
-                logger: 'logger',
                 cacheClass: Cache,
                 refreshFunction: noop,
-                mappingFunction: (a) => a,
-            }));
+            }, 'logger'));
+            // should.throws(() => new EndpointsStore({
+            //     endpointMappings,
+            //     cacheExpiry,
+            //     cacheClass: Cache,
+            //     refreshFunction: noop,
+            //     mappingFunction: (a) => a,
+            // }));
             should.throws(() => new EndpointsStore({
                 endpointMappings,
                 cacheExpiry,
                 cacheClass: Cache,
                 refreshFunction: noop,
-                mappingFunction: (a) => a,
-            }));
+            }, { info: noop }));
             should.throws(() => new EndpointsStore({
                 endpointMappings,
                 cacheExpiry,
-                logger: { info: noop },
                 cacheClass: Cache,
                 refreshFunction: noop,
-                mappingFunction: (a) => a,
-            }));
-            should.throws(() => new EndpointsStore({
-                endpointMappings,
-                cacheExpiry,
-                logger: { error: noop },
-                cacheClass: Cache,
-                refreshFunction: noop,
-                mappingFunction: (a) => a,
-            }));
+            }, { error: noop }));
         });
 
     });
@@ -297,11 +237,9 @@ describe('module-endpoints-store.endpointsStore', function () {
         const test2 = new EndpointsStore({
             endpointMappings,
             cacheExpiry,
-            logger,
             cacheClass: DummyCache,
             refreshFunction: noop,
-            mappingFunction: (a) => a,
-        });
+        }, logger);
 
         it('should return new cache entry', function () {
             const result = test2.createCacheEntry('ID', 'endPoint');

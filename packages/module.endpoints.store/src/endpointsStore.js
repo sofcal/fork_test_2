@@ -4,18 +4,20 @@
 
 const { Cache } = require('@sage/bc-data-cache');
 
-// identity function - returns input
-const identityfn = (data) => data;
+const noop = () => {};
+const noopLogger = {
+    error: noop,
+    warn: noop,
+    info: noop,
+};
 
 class EndpointsStore {
     constructor({
         endpointMappings,
         cacheExpiry,
-        logger,
         cacheClass = Cache,
         refreshFunction,
-        mappingFunction = identityfn, // default to identity function
-    }) {
+    }, logger = noopLogger) {
         // mapping ID > endpoint
         this.endpointMappings = endpointMappings;
         // cache expiration limit
@@ -23,10 +25,9 @@ class EndpointsStore {
         // list of caches by ID
         this.cacheList = {};
 
-        // Cache class requires a refresh function (to retrieve data from endpoint), and
-        // a mapping function (to map results to internal storage)
+        // Cache class requires a refresh function (to retrieve data from endpoint and
+        // map results to internal storage)
         this.refreshFunction = refreshFunction;
-        this.mappingFunction = mappingFunction;
         this.Cache = cacheClass;
 
         this.logger = logger;
@@ -70,10 +71,8 @@ class EndpointsStore {
         this.cacheList[ID] = new this.Cache({
             endpoint,
             cacheExpiry: this.cacheExpiry,
-            logger: this.logger,
-            mappingFunction: this.mappingFunction,
             refreshFunction: this.refreshFunction,
-        });
+        }, this.logger);
         return this.cacheList[ID];
     }
 
@@ -90,13 +89,10 @@ class EndpointsStore {
 }
 
 function validate() {
-    const { refreshFunction, mappingFunction, Cache: thisCache, endpointMappings, cacheExpiry, logger } = this;
+    const { refreshFunction, Cache: thisCache, endpointMappings, cacheExpiry, logger } = this;
 
     if (!refreshFunction || typeof refreshFunction !== 'function') {
         throw new Error('Invalid argument passed: Refresh function is not a function');
-    }
-    if (!mappingFunction || typeof mappingFunction !== 'function') {
-        throw new Error('Invalid argument passed: Mapping function is not a function');
     }
     if (!thisCache || typeof thisCache !== 'function' || !thisCache.prototype.getData) {
         throw new Error('Invalid argument passed: cacheClass');
