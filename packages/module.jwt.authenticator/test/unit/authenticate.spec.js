@@ -64,8 +64,7 @@ describe('module-jwt-authenticator.authenticate', function(){
                 authToken: 'authToken',
                 validIssuers: ['valid issuer'],
                 StoreService: { name: 'store service'},
-                logger
-            });
+            }, logger);
 
             test.should.be.Object();
             test.should.be.instanceof(Authenticate);
@@ -79,8 +78,7 @@ describe('module-jwt-authenticator.authenticate', function(){
                 authToken: 'authToken',
                 validIssuers: ['valid issuer'],
                 StoreService: { name: 'store service'},
-                logger
-            }), /invalidAuthToken/);
+            }, logger), /invalidAuthToken/);
             should.strictEqual(jwtDecodeStub.calledOnce, true);
         });
     });
@@ -109,8 +107,7 @@ describe('module-jwt-authenticator.authenticate', function(){
                 authToken: 'authToken',
                 validIssuers: ['valid issuer'],
                 StoreService: { name: 'store service'},
-                logger
-            });
+            }, logger);
             test.validate().should.be.true();
         });
 
@@ -127,8 +124,7 @@ describe('module-jwt-authenticator.authenticate', function(){
                 authToken: 'authToken',
                 validIssuers: ['valid issuer'],
                 StoreService: { name: 'store service'},
-                logger
-            }), /^Error: failValidate$/);
+            }, logger), /^Error: failValidate$/);
         });
     });
 
@@ -146,8 +142,7 @@ describe('module-jwt-authenticator.authenticate', function(){
                 authToken: 'authToken',
                 validIssuers: ['valid issuer'],
                 StoreService: storeService,
-                logger
-            });
+            }, logger);
         });
 
         it('should call store service populateCertList method', () => {
@@ -169,8 +164,7 @@ describe('module-jwt-authenticator.authenticate', function(){
                 authToken: 'authToken',
                 validIssuers: ['valid issuer'],
                 StoreService: storeServiceErrors,
-                logger
-            });
+            }, logger);
 
             const result = test.populateCertList(true);
             return result.should.be.rejectedWith('getCertListError');
@@ -193,8 +187,7 @@ describe('module-jwt-authenticator.authenticate', function(){
                 authToken: 'authToken',
                 validIssuers: ['valid issuer'],
                 StoreService: storeService,
-                logger
-            });
+            }, logger);
 
             anyValidStub = sinon.stub(utils, 'anyValid');
         });

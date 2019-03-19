@@ -4,13 +4,19 @@ const jwt = require('jsonwebtoken');
 const utils = require('./utils');
 const { omit } = require('underscore');
 
+const noop = () => {};
+const noopLogger = {
+    error: noop,
+    warn: noop,
+    info: noop,
+};
+
 class Authenticate {
     constructor({
         authToken,
         validIssuers,
         StoreService,
-        logger
-    }) {
+    }, logger = noopLogger) {
         this.func = 'Authenticate.impl';
         this.logger = logger;
 
