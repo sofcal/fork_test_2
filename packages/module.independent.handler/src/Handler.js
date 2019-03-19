@@ -49,8 +49,8 @@ class Handler {
                         // running of the function. Since this class should be instantiated once, it gives the ability to cache items
                         event.logger.info({ function: func, log: 'initialising services and add-ons' });
                         return this.init(event, { logger: event.logger })
-                            .then(() => {
-                                this.initialised = true;
+                            .then((initialised = false) => {
+                                this.initialised = initialised;
                             });
                     })
                     .then(() => {
