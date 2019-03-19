@@ -1,7 +1,7 @@
 'use strict';
 
 const { Authenticate } = require('./authenticate');
-const { utils } = require('./utils');
+const utils = require('./utils');
 
 module.exports = {
     Authenticate,
