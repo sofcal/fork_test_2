@@ -2,7 +2,7 @@ const should = require('should');
 const sinon = require('sinon');
 const nock = require('nock');
 const needle = require('needle');
-const { EndpointsStore }  = require('../../src/endpointsStore');
+const { EndpointsStore }  = require('../../lib/endpointsStore');
 const { Cache } = require('@sage/bc-data-cache');
 
 describe('module-endpoints-store', function(){

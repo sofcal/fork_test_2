@@ -2,26 +2,24 @@
 
 'use strict';
 
-// identity function - returns input
-const identityfn = (data) => data;
+const noop = () => {};
+const noopLogger = {
+    error: noop,
+    warn: noop,
+    info: noop,
+};
 
 // Cache of data for an endpoint
 class Cache {
     constructor({
         endpoint,
         cacheExpiry,
-        logger,
         refreshFunction,
-        mappingFunction = identityfn, // default to identity function
-    }) {
+    }, logger = noopLogger) {
         this.endpoint = endpoint;
         this.cacheExpiry = cacheExpiry;
         this.logger = logger;
-        if (typeof refreshFunction === 'function') {
-            this.refreshFunction = refreshFunction.bind(this, this.endpoint); // called in fetchEndPoint
-        }
-        this.mappingFunction = mappingFunction; // called in buildCache
-
+        this.refreshFunction = refreshFunction; // called in fetchEndPoint
         this.func = 'Cache.impl';
 
         this.data = {};
@@ -45,8 +43,6 @@ class Cache {
             })
             // call endpoint
             .then(() => this.fetchEndPoint())
-            // map respone to data storage using mappingFunction parameter
-            .then(this.mappingFunction)
             // update storage
             .then((data) => {
                 this.data = data;
@@ -100,7 +96,7 @@ class Cache {
             log: `Fetching data from endpoint ${this.endpoint}`
         });
         return Promise.resolve()
-            .then(this.refreshFunction)
+            .then(() => this.refreshFunction(this.endpoint))
             .catch((err) => {
                 console.log(`alert: ${err}`);
                 throw new Error(`Fetch endpoint error: ${err.message}`);
@@ -109,13 +105,10 @@ class Cache {
 }
 
 function validate() {
-    const { refreshFunction, mappingFunction, endpoint, cacheExpiry, logger } = this;
+    const { refreshFunction, endpoint, cacheExpiry, logger } = this;
 
     if (!refreshFunction || typeof refreshFunction !== 'function') {
         throw new Error('Invalid argument passed: Refresh function is not a function');
-    }
-    if (!mappingFunction || typeof mappingFunction !== 'function') {
-        throw new Error('Invalid argument passed: Mapping function is not a function');
     }
     if (!endpoint || typeof endpoint !== 'string') {
         throw new Error('Invalid argument passed: Endpoint not a string');

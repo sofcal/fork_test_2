@@ -1,4 +1,4 @@
-const index = require('../../src/index');
+const index = require('../../lib/index');
 const should = require('should');
 
 describe('module-endpoints-store.index', function(){
