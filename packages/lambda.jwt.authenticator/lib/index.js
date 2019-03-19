@@ -5,8 +5,9 @@ const Promise = require('bluebird');
 const { Handler } = require('@sage/bc-default-lambda-handler');
 const ParameterService = require('@sage/bc-parameterstore-static-loader');
 const { RequestLogger } = require('@sage/bc-request-logger');
-const { Authenticate } = require('@sage/bc-jwt-authenticator');
-const { EndPointsStore } = require('@sage/bc-endpoints-store');
+const { Authenticate, utils: { refreshFn, mappingFn } } = require('@sage/bc-jwt-authenticator');
+const { EndpointsStore } = require('@sage/bc-endpoints-store');
+const { Cache } = require('@sage/bc-data-cache');
 const { ErrorSpecs } = require('@sage/bc-default-lambda-handler');
 const { StatusCodeError } = require('@sage/bc-status-code-error');
 
@@ -31,18 +32,33 @@ class JwtAuth extends Handler {
                 const { Environment: env } = process.env;
                 this.paramPrefix = `/${env}/`;
 
-                // temp hardcoded
+                // ****** temp hardcoded
                 const serviceMappings = [];
-                const jwksDelay = 300;
+                const cacheExpiry = 300;
 
-                const cachingService = new EndPointsStore(serviceMappings, jwksDelay);
-                const validIssuers = serviceMappings.map(s => s.iss);
-                const auth = new Authenticate(event.authToken, validIssuers, cachingService, event.logger);
+                const storeService = new EndpointsStore({
+                    endpointMappings: serviceMappings,
+                    cacheExpiry,
+                    logger: event.logger,
+                    cacheClass: Cache,
+                    refreshFunction: refreshFn,
+                    mappingFunction: mappingFn,
+                });
+                const validIssuers = serviceMappings.map((s) => s.iss);
 
-                return auth.validate()
-                    .then(() => event.logger.info({ function: self.func, log: 'cert structure validated' }))
-                    .then(() => auth.getCertList())
+                const auth = new Authenticate({
+                    authToken: event.authToken,
+                    validIssuers,
+                    storeService,
+                    logger: event.logger,
+                });
+
+                return auth.getCertList()
                     .then(() => auth.checkAuthorisation())
+                    .then((res) => {
+                        event.logger.info({ function: self.func, log: 'ended' });
+                        return res;
+                    })
                     .catch((err) => {
                         throw StatusCodeError.CreateFromSpecs([ErrorSpecs[err]], ErrorSpecs[err].statusCode)
                     });
@@ -53,7 +69,6 @@ class JwtAuth extends Handler {
         const paramPrefix = `/${env}/`;
         this.services.parameter = ParameterService.Create({ env: { region }, paramPrefix });
     }
-
 }
 
 module.exports.run = (event, context, callback) => {
