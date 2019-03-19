@@ -54,8 +54,16 @@ class JwksLambda extends Handler {
 
                 // this will get wrapped in a 200 response
                 return this.cache.getData()
-                    .then((data) => ({ keys: data }));
+                    .then((data) => this.validateData({ keys: data }));
             });
+    }
+
+    validateData( data ) {
+        if (typeof data.keys[`/${process.env.Environment}/accessToken.primary.publicKey`] === 'undefined'
+            && typeof data.keys[`/${process.env.Environment}/accessToken.secondary.publicKey`] === 'undefined') {
+                throw new Error('No valid key');
+            }
+        return data;
     }
 
     cacheRefresh({ logger }) {
