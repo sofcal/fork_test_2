@@ -17,8 +17,6 @@ describe('module-endpoints-store.endpointsStore', function () {
         error: (msg) => console.error(msg),
     };
 
-    const noop = () => { };
-
     const test = new EndpointsStore({
         endpointMappings,
         cacheExpiry,
@@ -128,13 +126,6 @@ describe('module-endpoints-store.endpointsStore', function () {
                 cacheExpiry,
                 cacheClass: Cache,
             }, 'logger'));
-            // should.throws(() => new EndpointsStore({
-            //     endpointMappings,
-            //     cacheExpiry,
-            //     cacheClass: Cache,
-            //     refreshFunction: noop,
-            //     mappingFunction: (a) => a,
-            // }));
             should.throws(() => new EndpointsStore({
                 endpointMappings,
                 cacheExpiry,

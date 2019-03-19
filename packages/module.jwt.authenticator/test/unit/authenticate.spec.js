@@ -81,6 +81,24 @@ describe('module-jwt-authenticator.authenticate', function(){
             }, logger), /invalidAuthToken/);
             should.strictEqual(jwtDecodeStub.calledOnce, true);
         });
+
+        it('should default logger when not passed in', () => {
+            jwtDecodeStub.returns({
+                exp: Infinity,
+                iss: 'valid issuer',
+                kid: '12345',
+            });
+            
+            const test = new Authenticate({
+                authToken: 'authToken',
+                validIssuers: ['valid issuer'],
+                StoreService: { name: 'store service'},
+            });
+    
+            (test.logger).should.be.a.Object();
+            (test.logger).should.have.properties(['info', 'warn', 'error']);
+            should.equal(test.logger.error(), undefined);
+        });
     });
 
 
