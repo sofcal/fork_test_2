@@ -1,36 +1,45 @@
-/* eslint-disable no-console,prefer-template */
 const validate = require('./validators');
-const Promise = require('bluebird');
+const ErrorSpecs = require('./ErrorSpecs');
 
-const { Handler } = require('@sage/bc-default-lambda-handler');
-const ParameterService = require('@sage/bc-parameterstore-static-loader');
-const { RequestLogger } = require('@sage/bc-request-logger');
+const { Handler } = require('@sage/bc-independent-lambda-handler');
+const temp = require('@sage/bc-jwt-authenticator');
 const { Authenticate, utils: { refreshFn, mappingFn } } = require('@sage/bc-jwt-authenticator');
 const { EndpointsStore } = require('@sage/bc-endpoints-store');
 const { Cache } = require('@sage/bc-data-cache');
-const { ErrorSpecs } = require('@sage/bc-default-lambda-handler');
 const { StatusCodeError } = require('@sage/bc-status-code-error');
 
-const keys = require('./params');
+const Promise = require('bluebird');
 
-class JwtAuth extends Handler {
+class JwtAuthenticatorLambda extends Handler {
     constructor() {
-        super({
-            dbName: 'bank_db',
-            keys
-        });
-        this.func = 'JwtAuth.impl';
+        super({ config: process.env });
+
+        this.cache = null;
     }
 
-    impl(event, params, services) {
-        const self = this;
-        return Promise.resolve()
-            .then(() => {
-                event.logger.info({ function: self.func, log: 'started' });
-                validate.process(process);
+    validate(event, { logger }) {
+        // do any additional validation on the environment variables (this.config) or event here
+        validate.event(event);
 
-                const { Environment: env } = process.env;
-                this.paramPrefix = `/${env}/`;
+        return super.validate(event, { logger });
+    }
+
+    init(event, { logger }) {
+        return Promise.resolve(undefined)
+            .then(() => {
+                const func = 'JwtIssuerLambda.impl';
+                // one time instantiation - we'll re-use these
+                logger.info({ function: func, log: 'started' });
+
+                logger.info({ function: func, log: 'ended' });
+            });
+    }
+
+    impl(event) {
+        return Promise.resolve(undefined)
+            .then(() => {
+                const func = 'JwtIssuerLambda.impl';
+                event.logger.info({ function: func, log: 'started' });
 
                 // ****** temp hardcoded
                 const serviceMappings = [];
@@ -56,7 +65,7 @@ class JwtAuth extends Handler {
                 return auth.getCertList()
                     .then(() => auth.checkAuthorisation())
                     .then((res) => {
-                        event.logger.info({ function: self.func, log: 'ended' });
+                        event.logger.info({ function: func, log: 'ended' });
                         return res;
                     })
                     .catch((err) => {
@@ -64,20 +73,6 @@ class JwtAuth extends Handler {
                     });
             });
     }
-
-    loadAdditionalServices({ env, region }) {
-        const paramPrefix = `/${env}/`;
-        this.services.parameter = ParameterService.Create({ env: { region }, paramPrefix });
-    }
 }
 
-module.exports.run = (event, context, callback) => {
-    const eventWithLogger = Object.assign(
-        {},
-        event,
-        {
-            logger: RequestLogger.Create({ service: 'jwt-authenticator' })
-        }
-    );
-    return new JwtAuth().run(eventWithLogger, context, callback);
-};
+module.exports = JwtAuthenticatorLambda;
