@@ -34,7 +34,7 @@ class JwtAuthenticatorLambda extends Handler {
 
                 // ****** temp hardcoded
                 const serviceMappings = {
-                    temp: 'https://gmade6j328.execute-api.eu-west-1.amazonaws.com/test/service1/jwks'
+                    'sage.authentication.test': 'https://gmade6j328.execute-api.eu-west-1.amazonaws.com/test/service1/jwks'
                 };
                 const cacheExpiry = 300;
                 // *********************
