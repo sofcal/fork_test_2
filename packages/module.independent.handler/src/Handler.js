@@ -20,9 +20,9 @@ class Handler {
     }
 
     run(event, context, callback) {
+        const func = 'handler.run';
         return Promise.resolve(undefined)
             .then(() => {
-                const func = 'handler.run';
                 // eslint-disable-next-line no-param-reassign
                 event.logger = RequestLogger.Create({ service: '@sage/bc-default-lambda-handler' });
                 event.logger.info({ function: func, log: 'started' });
@@ -68,33 +68,33 @@ class Handler {
 
                         // first parameter of the callback is the error response, so should be null for valid responses
                         callback(null, response);
-                    })
-                    .catch((err) => {
-                        // if we caught an error; we ensure it's either a valid error we can return, or a 500 internal.
-                        event.logger.error({
-                            function: func,
-                            log: 'an error occurred while processing the request',
-                            error: err.message || err
-                        });
-                        const statusCodeError = StatusCodeError.is(err)
-                            ? err
-                            : StatusCodeError.CreateFromSpecs([ErrorSpecs.internalServer], ErrorSpecs.internalServer.statusCode);
-
-                        const response = statusCodeError.toDiagnoses();
-                        const status = statusCodeError.statusCode;
-
-                        event.logger.info({ function: func, log: `sending failure response: ${status}`, response });
-
-                        // for the most part, we still invoke the callback without an error; however, if we want the lambda to
-                        // automatically retry, passing an error as the first parameter will achieve this
-                        callback(err.failLambda ? err : null, { statusCode: status, body: JSON.stringify(response) });
-                    })
-                    .finally(() => {
-                        // last but not least, give the option to the derived class to cleanup resources it created. E.G database
-                        // connections. Since lambdas can be frozen, we want to allow the derived class the option to cleanup or
-                        // persist.
-                        return this.dispose();
                     });
+            })
+            .catch((err) => {
+                // if we caught an error; we ensure it's either a valid error we can return, or a 500 internal.
+                event.logger.error({
+                    function: func,
+                    log: 'an error occurred while processing the request',
+                    error: err.message || err
+                });
+                const statusCodeError = StatusCodeError.is(err)
+                    ? err
+                    : StatusCodeError.CreateFromSpecs([ErrorSpecs.internalServer], ErrorSpecs.internalServer.statusCode);
+
+                const response = statusCodeError.toDiagnoses();
+                const status = statusCodeError.statusCode;
+
+                event.logger.info({ function: func, log: `sending failure response: ${status}`, response });
+
+                // for the most part, we still invoke the callback without an error; however, if we want the lambda to
+                // automatically retry, passing an error as the first parameter will achieve this
+                callback(err.failLambda ? err : null, { statusCode: status, body: JSON.stringify(response) });
+            })
+            .finally(() => {
+                // last but not least, give the option to the derived class to cleanup resources it created. E.G database
+                // connections. Since lambdas can be frozen, we want to allow the derived class the option to cleanup or
+                // persist.
+                return this.dispose();
             });
     }
 
