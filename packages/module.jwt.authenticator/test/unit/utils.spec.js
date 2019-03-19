@@ -1,6 +1,6 @@
 const should = require('should');
 const sinon = require('sinon');
-const utils = require('../../src/utils');
+const utils = require('../../lib/utils');
 
 const {
     expired,

@@ -1,8 +1,8 @@
 const should = require('should');
 const sinon = require('sinon');
 const jwt = require('jsonwebtoken');
-const imported = require('../../src/authenticate');
-const utils  = require('../../src/utils');
+const imported = require('../../lib/authenticate');
+const utils  = require('../../lib/utils');
 
 const { Authenticate } = imported;
 

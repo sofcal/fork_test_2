@@ -1,9 +1,9 @@
 'use strict';
 
-const { Authenticate } = require('../../src/authenticate');
+const { Authenticate } = require('../../lib/authenticate');
 const { EndpointsStore } = require('@sage/bc-endpoints-store');
 const { Cache } = require('@sage/bc-data-cache');
-const { refreshFn, mappingFn } = require('../../src/utils');
+const { refreshFn, mappingFn } = require('../../lib/utils');
 const should = require('should');
 const jwt = require('jsonwebtoken');
 const sinon = require('sinon');
