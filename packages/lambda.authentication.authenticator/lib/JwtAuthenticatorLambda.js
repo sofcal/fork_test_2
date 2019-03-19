@@ -1,9 +1,10 @@
+/* eslint-disable class-methods-use-this */
+
 const validate = require('./validators');
 const ErrorSpecs = require('./ErrorSpecs');
 
 const { Handler } = require('@sage/bc-independent-lambda-handler');
-const temp = require('@sage/bc-jwt-authenticator');
-const { Authenticate, utils: { refreshFn, mappingFn } } = require('@sage/bc-jwt-authenticator');
+const { Authenticate } = require('@sage/bc-jwt-authenticator');
 const { EndpointsStore } = require('@sage/bc-endpoints-store');
 const { Cache } = require('@sage/bc-data-cache');
 const { StatusCodeError } = require('@sage/bc-status-code-error');
@@ -31,6 +32,27 @@ class JwtAuthenticatorLambda extends Handler {
                 // one time instantiation - we'll re-use these
                 logger.info({ function: func, log: 'started' });
 
+                // ****** temp hardcoded
+                const serviceMappings = {
+                    temp: 'https://gmade6j328.execute-api.eu-west-1.amazonaws.com/test/service1/jwks'
+                };
+                const cacheExpiry = 300;
+                // *********************
+
+                logger.info({ function: func, log: 'creating store service' });
+                const storeService = new EndpointsStore({
+                    endpointMappings: serviceMappings,
+                    cacheExpiry,
+                    cacheClass: Cache,
+                }, logger);
+                const validIssuers = Object.keys(serviceMappings);
+
+                logger.info({ function: func, log: 'creating auth service' });
+                this.auth = new Authenticate({
+                    validIssuers,
+                    storeService,
+                }, logger);
+
                 logger.info({ function: func, log: 'ended' });
             });
     }
@@ -41,35 +63,16 @@ class JwtAuthenticatorLambda extends Handler {
                 const func = 'JwtIssuerLambda.impl';
                 event.logger.info({ function: func, log: 'started' });
 
-                // ****** temp hardcoded
-                const serviceMappings = [];
-                const cacheExpiry = 300;
+                // extract auth token from event
+                const [, token] = event.authorizationToken.split(' ');
 
-                const storeService = new EndpointsStore({
-                    endpointMappings: serviceMappings,
-                    cacheExpiry,
-                    logger: event.logger,
-                    cacheClass: Cache,
-                    refreshFunction: refreshFn,
-                    mappingFunction: mappingFn,
-                });
-                const validIssuers = serviceMappings.map((s) => s.iss);
-
-                const auth = new Authenticate({
-                    authToken: event.authToken,
-                    validIssuers,
-                    storeService,
-                    logger: event.logger,
-                });
-
-                return auth.getCertList()
-                    .then(() => auth.checkAuthorisation())
+                return this.auth.checkAuthorisation(token)
                     .then((res) => {
                         event.logger.info({ function: func, log: 'ended' });
                         return res;
                     })
                     .catch((err) => {
-                        throw StatusCodeError.CreateFromSpecs([ErrorSpecs[err]], ErrorSpecs[err].statusCode)
+                        throw StatusCodeError.CreateFromSpecs([ErrorSpecs[err]], ErrorSpecs[err].statusCode);
                     });
             });
     }
