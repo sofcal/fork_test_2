@@ -13,7 +13,8 @@
     "@babel/code-frame": "^7.0.0-beta.48",
     "@babel/core": "^7.2.2",
     "@babel/preset-env": "^7.0.0-beta.47",
-    "@sage/bc-data-cache": "^1.0.0"
+    "@sage/bc-data-cache": "^1.0.0",
+    "needle": "^2.2.4"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
@@ -28,7 +29,6 @@
     "eslint-stats": "^1.0.0",
     "istanbul": "^1.1.0-alpha.1",
     "mocha": "^4.0.1",
-    "needle": "^2.2.4",
     "nock": "^10.0.6",
     "nyc": "^12.0.2",
     "serverless-webpack": "^4.2.0",

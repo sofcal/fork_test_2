@@ -62,31 +62,11 @@ describe('module-endpoints-store', function(){
         error: (msg) => console.error(msg),
     };
 
-    const mappingFunction = (res) => {
-        const { keys } = res.body;
-        return keys.reduce((final,{ kid, x5c }) => {
-            final[kid] = x5c;
-            return final;
-        }, {})
-    };
-
-    const refreshFunction = function(endpoint) {
-        return Promise.resolve()
-            .then(() => needle('get', endpoint))
-            .catch((err) => {
-                console.log(`alert: ${err}`);
-                throw new Error(`Fetch endpoint error: ${err.message}`);
-            });
-    }
-
     const test = new EndpointsStore({
         endpointMappings,
         cacheExpiry,
-        logger,
-        Cache,
-        refreshFunction,
-        mappingFunction
-    });
+        cacheClass: Cache,
+    }, logger);
 
     const nockEndPoints = nock('https://www.test.com')
         .persist()
@@ -115,40 +95,72 @@ describe('module-endpoints-store', function(){
        cacheBuildSpy.resetHistory();
     });
 
-    it('should allow new instance of EndpointsStore to be created', () => {
-         test.should.be.instanceOf(EndpointsStore);
+    describe('Create new store', () => {
+        it('should allow new instance of EndpointsStore to be created', () => {
+            test.should.be.instanceOf(EndpointsStore);
+        });
+
+        it('should throw when invalid parameters passed', () => {
+            should.throws(() => new EndpointsStore({
+                endpointMappings: null,
+                cacheExpiry,
+                cacheClass: Cache,
+            }, logger));
+            should.throws(() => new EndpointsStore({
+                endpointMappings,
+                cacheExpiry,
+                cacheClass: null,
+            }, logger));
+            should.throws(() => new EndpointsStore({
+                endpointMappings,
+                cacheExpiry: null,
+                cacheClass: Cache,
+            }, logger));
+            should.throws(() => new EndpointsStore({
+                endpointMappings,
+                cacheExpiry,
+                cacheClass: Cache,
+            }, 'logger'));
+            should.throws(() => new EndpointsStore({
+                endpointMappings,
+                cacheExpiry,
+                cacheClass: Cache,
+            }, {invalidLogger: true}));
+        })
     });
 
-    it('should retrieve and return keys from endpoint', () => {
-        dateStub.returns(200000); // 200 seconds
-        return test.getCache(Object.keys(endpointMappings)[0])
-            .then((res) => res.should.eql(expectedCertList(0)))
-            .then(() => should.strictEqual(cacheBuildSpy.called, true));
-    });
+    describe('Get cache processing', () => {
+        it('should retrieve and return keys from endpoint', () => {
+            dateStub.returns(200000); // 200 seconds
+            return test.getCache(Object.keys(endpointMappings)[0])
+                .then((res) => res.should.eql(expectedCertList(0)))
+                .then(() => should.strictEqual(cacheBuildSpy.called, true));
+        });
 
-    it('should return keys from cache when cache not expired', () => {
-        dateStub.returns(100000); // 100 seconds
-        return test.getCache(Object.keys(endpointMappings)[0])
-            .then((res) => res.should.eql(expectedCertList(0)))
-            .then(() => should.strictEqual(cacheBuildSpy.called, false));
-    });
+        it('should return keys from cache when cache not expired', () => {
+            dateStub.returns(100000); // 100 seconds
+            return test.getCache(Object.keys(endpointMappings)[0])
+                .then((res) => res.should.eql(expectedCertList(0)))
+                .then(() => should.strictEqual(cacheBuildSpy.called, false));
+        });
 
-    it('should refresh keys from endpoint when cache expired', () => {
-        dateStub.returns(300000 + (cacheExpiry * 1000 * 2));
-        const ID = Object.keys(endpointMappings)[0];
-        return test.getCache(ID)
-            .then((res) => res.should.eql(expectedCertList(0)))
-            .then(() => should.strictEqual(cacheBuildSpy.called, true));
-    });
+        it('should refresh keys from endpoint when cache expired', () => {
+            dateStub.returns(300000 + (cacheExpiry * 1000 * 2));
+            const ID = Object.keys(endpointMappings)[0];
+            return test.getCache(ID)
+                .then((res) => res.should.eql(expectedCertList(0)))
+                .then(() => should.strictEqual(cacheBuildSpy.called, true));
+        });
 
-    it('should reject when service endpoint not known', () => {
-        const ID = 'unknown';
-        return test.getCache(ID).should.be.rejectedWith('IDInvalid');
-    });
+        it('should reject when service endpoint not known', () => {
+            const ID = 'unknown';
+            return test.getCache(ID).should.be.rejectedWith('IDInvalid');
+        });
 
-    it('should reject when invalid service endpoint', () => {
-        const ID = 'serv3';
-        return test.getCache(ID).should.be.rejectedWith(/getaddrinfo ENOTFOUND invalid/);
-    });
+        it('should reject when invalid service endpoint', () => {
+            const ID = 'serv3';
+            return test.getCache(ID).should.be.rejectedWith(/getaddrinfo ENOTFOUND invalid/);
+        });
+    })
 
 });

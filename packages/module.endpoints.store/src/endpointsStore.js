@@ -2,7 +2,13 @@
 
 'use strict';
 
+const needle = require('needle');
 const { Cache } = require('@sage/bc-data-cache');
+
+// set default user agent
+needle.defaults({
+    user_agent: 'BankDrive'
+});
 
 const noop = () => {};
 const noopLogger = {
@@ -16,7 +22,6 @@ class EndpointsStore {
         endpointMappings,
         cacheExpiry,
         cacheClass = Cache,
-        refreshFunction,
     }, logger = noopLogger) {
         // mapping ID > endpoint
         this.endpointMappings = endpointMappings;
@@ -25,9 +30,6 @@ class EndpointsStore {
         // list of caches by ID
         this.cacheList = {};
 
-        // Cache class requires a refresh function (to retrieve data from endpoint and
-        // map results to internal storage)
-        this.refreshFunction = refreshFunction;
         this.Cache = cacheClass;
 
         this.logger = logger;
@@ -71,7 +73,7 @@ class EndpointsStore {
         this.cacheList[ID] = new this.Cache({
             endpoint,
             cacheExpiry: this.cacheExpiry,
-            refreshFunction: this.refreshFunction,
+            refreshFunction: EndpointsStore.refreshFn,
         }, this.logger);
         return this.cacheList[ID];
     }
@@ -86,14 +88,37 @@ class EndpointsStore {
         }
         return endpoint;
     }
+
+    // Refresh function - calls needle get using endpoint argument
+    // returns promise
+    static refreshFn(endpoint) {
+        return Promise.resolve()
+            .then(() => needle('get', endpoint))
+            .then((res) => EndpointsStore.mappingFn(res))
+            .catch((err) => {
+                console.log(`alert: ${err}`);
+                throw new Error(`Fetch endpoint error: ${err.message}`);
+            });
+    }
+
+    // Mapping function - maps data to internal storage structure
+    // returns object
+    static mappingFn(res) {
+        const { keys = [] } = res.body;
+
+        return keys.reduce((final, { kid, x5c }) => {
+            return Object.assign(
+                {},
+                final,
+                { [kid]: x5c },
+            );
+        }, {});
+    }
 }
 
 function validate() {
-    const { refreshFunction, Cache: thisCache, endpointMappings, cacheExpiry, logger } = this;
+    const { Cache: thisCache, endpointMappings, cacheExpiry, logger } = this;
 
-    if (!refreshFunction || typeof refreshFunction !== 'function') {
-        throw new Error('Invalid argument passed: Refresh function is not a function');
-    }
     if (!thisCache || typeof thisCache !== 'function' || !thisCache.prototype.getData) {
         throw new Error('Invalid argument passed: cacheClass');
     }

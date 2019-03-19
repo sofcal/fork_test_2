@@ -23,7 +23,6 @@ describe('module-endpoints-store.endpointsStore', function () {
         endpointMappings,
         cacheExpiry,
         cacheClass: Cache,
-        refreshFunction: noop,
     }, logger);
 
     const mockData = {
@@ -66,7 +65,6 @@ describe('module-endpoints-store.endpointsStore', function () {
                 endpointMappings,
                 cacheExpiry,
                 cacheClass: testClass,
-                refreshFunction: noop,
             }, logger);
             should.strictEqual(testStore.Cache.name, 'testClass');
         });
@@ -75,24 +73,9 @@ describe('module-endpoints-store.endpointsStore', function () {
             const testStore = new EndpointsStore({
                 endpointMappings,
                 cacheExpiry,
-                refreshFunction: noop,
             }, logger);
 
             should.strictEqual(testStore.Cache.name, 'Cache');
-        });
-
-        it('should throw when refresh function invalid or missing', () => {
-            should.throws(() => new EndpointsStore({
-                endpointMappings,
-                cacheExpiry,
-                cacheClass: Cache,
-                refreshFunction: 'refreshFunction',
-            }, logger));
-            should.throws(() => new EndpointsStore({
-                endpointMappings,
-                cacheExpiry,
-                cacheClass: Cache,
-            }, logger));
         });
 
         it('should throw when cache class invalid or missing', () => {
@@ -101,19 +84,16 @@ describe('module-endpoints-store.endpointsStore', function () {
                 endpointMappings,
                 cacheExpiry,
                 cacheClass: null,
-                refreshFunction: noop,
             }, logger));
             should.throws(() => new EndpointsStore({
                 endpointMappings,
                 cacheExpiry,
                 cacheClass: 'Cache',
-                refreshFunction,
             }, logger));
             should.throws(() => new EndpointsStore({
                 endpointMappings,
                 cacheExpiry,
                 cacheClass: dummyCache,
-                refreshFunction: noop,
             }, logger));
         });
 
@@ -122,12 +102,10 @@ describe('module-endpoints-store.endpointsStore', function () {
                 endpointMappings: '',
                 cacheExpiry,
                 cacheClass: Cache,
-                refreshFunction: noop,
             }, logger));
             should.throws(() => new EndpointsStore({
                 cacheExpiry,
                 cacheClass: Cache,
-                refreshFunction: noop,
             }, logger));
         });
 
@@ -136,12 +114,10 @@ describe('module-endpoints-store.endpointsStore', function () {
                 endpointMappings,
                 cacheExpiry: 'error',
                 cacheClass: Cache,
-                refreshFunction: noop,
             }, logger));
             should.throws(() => new EndpointsStore({
                 endpointMappings,
                 cacheClass: Cache,
-                refreshFunction: noop,
             }, logger));
         });
 
@@ -151,7 +127,6 @@ describe('module-endpoints-store.endpointsStore', function () {
                 endpointMappings,
                 cacheExpiry,
                 cacheClass: Cache,
-                refreshFunction: noop,
             }, 'logger'));
             // should.throws(() => new EndpointsStore({
             //     endpointMappings,
@@ -164,14 +139,24 @@ describe('module-endpoints-store.endpointsStore', function () {
                 endpointMappings,
                 cacheExpiry,
                 cacheClass: Cache,
-                refreshFunction: noop,
             }, { info: noop }));
             should.throws(() => new EndpointsStore({
                 endpointMappings,
                 cacheExpiry,
                 cacheClass: Cache,
-                refreshFunction: noop,
             }, { error: noop }));
+        });
+
+        it('should default logger when not passed in', () => {
+            const testStore = new EndpointsStore({
+                endpointMappings,
+                cacheExpiry,
+                cacheClass: Cache,
+            });
+    
+            (testStore.logger).should.be.a.Object();
+            (testStore.logger).should.have.properties(['info', 'warn', 'error']);
+            should.equal(testStore.logger.error(), undefined);
         });
 
     });
@@ -238,7 +223,6 @@ describe('module-endpoints-store.endpointsStore', function () {
             endpointMappings,
             cacheExpiry,
             cacheClass: DummyCache,
-            refreshFunction: noop,
         }, logger);
 
         it('should return new cache entry', function () {
@@ -259,6 +243,56 @@ describe('module-endpoints-store.endpointsStore', function () {
             const ID = 'unknown';
 
             should.throws(() => test.getEndpoint(ID), /^Error: IDInvalid$/);
+        });
+    });
+
+    describe('EndpointsStore.mappingFn', () => {
+        it('should map response object to expected result object', () => {
+            const res =  {
+                body: {
+                        keys : [
+                        {
+                            kid: 'kid1',
+                            x5c: [
+                                'cert1',
+                                'cert2'
+                            ]
+                        },
+                        {
+                            kid: 'kid2',
+                            x5c: [
+                                'cert3',
+                                'cert4'
+                            ]
+                        }
+                    ]
+                },
+            };
+            const expected = {
+                kid1: [
+                    'cert1',
+                    'cert2',
+                ],
+                kid2: [
+                    'cert3',
+                    'cert4',
+                ],
+            };
+            EndpointsStore.mappingFn(res).should.eql(expected);
+        });
+
+        it('should return empty object if no results returned', () => {
+            const res =  {
+                body: {},
+            };
+            const expected = {};
+            EndpointsStore.mappingFn(res).should.eql(expected);
+        });        
+    });
+
+    describe('EndpointsStore.refreshFn', () => {
+        it('should be a rejected promise when endpoint invalid', () => {
+            EndpointsStore.refreshFn(null).should.be.rejected();
         });
     });
 });
