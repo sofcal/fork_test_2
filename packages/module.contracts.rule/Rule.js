@@ -11,6 +11,7 @@ const Big = require('bignumber.js');
 
 class Rule {
     constructor(data) {
+
         if (data) {
             this.uuid = data.uuid;
             this.ruleName = data.ruleName;                // Custom name for this rule, unique at bank account level
