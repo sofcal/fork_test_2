@@ -15,7 +15,8 @@ const ParameterService = require('@sage/bc-services-parameter');
 describe('jwt-certificate-rotation', function() {
 
     let sandbox;
-    let config, context, event, callback;
+    let config, context, event, now;
+    const TEST_DATE = 1552471130970;
 
     const username = 'user';
     const password = 'pass';
@@ -27,6 +28,10 @@ describe('jwt-certificate-rotation', function() {
 
     const errFunc = () => {
         throw new Error('should be stubbed')
+    };
+    const dummyCloudWatchLogsPromise = {
+        describeSubscriptionFiltersAsync: errFunc,
+        putSubscriptionFilterAsync: errFunc
     };
     const dummyLoader = {load: errFunc};
     const dummyParamService = {
@@ -41,11 +46,12 @@ describe('jwt-certificate-rotation', function() {
     });
 
     beforeEach(() => {
-        context = {context: 'context', logGroupName: 'logGroupName'};
+        context = {context: 'context',
+            logGroupName: 'logGroupName',
+            parameterstore: dummyParamService
+        };
         sandbox.stub(process, 'env').value(_.extend(process.env, {Environment: env, AWS_REGION: region }));
         event = {AWS_REGION: region, env};
-        callback = () => {
-        };
 
         config = {
             'defaultMongo.username': username,
@@ -57,22 +63,20 @@ describe('jwt-certificate-rotation', function() {
         sandbox.stub(DB, 'Create').returns(db);
         sandbox.stub(db, 'connect').resolves();
         sandbox.stub(db, 'disconnect').resolves();
+        now = sinon.useFakeTimers(TEST_DATE);
     });
 
     afterEach(() => {
+        now.restore();
         sandbox.restore();
     });
 
     describe('jwt-certificate-rotation.handler', function () {
-        it('should retrieve params from param-store', (done) => {
+        it('should retrieve params from param-store', () => {
             sandbox.stub(dummyLoader, 'load').resolves(config);
             sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
 
-            // const expected = { value: 'result' };
-            // sandbox.stub(Jwt, 'run').resolves(expected);
-
-            Jwt.run(event, context, () => {
-                try {
+            return Jwt.run(event, context, () => {
                     const paramPrefix = '/local/';
                     const region = 'eu-west-1';
 
@@ -86,23 +90,15 @@ describe('jwt-certificate-rotation', function() {
                     should(dummyLoader.load.calledWith(
                         {}
                     )).eql(true);
-
-                    done();
-                } catch (err) {
-                    done(err instanceof Error ? err : new Error(err));
-                }
             });
         });
 
-        it('should default env and region to test values', (done) => {
+        it('should default env and region to test values', () => {
             sandbox.stub(dummyLoader, 'load').resolves(config);
             sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
             sandbox.stub(process, 'env').value(_.omit(process.env, ['Environment', 'AWS_REGION']));
 
-            // const expected = { value: 'result' };
-            // sandbox.stub(Jwt, 'run').resolves(expected);
-
-            Jwt.run({}, context, () => {
+            return Jwt.run({}, context, () => {
             })
                 .then(() => {
                     const paramPrefix = '/test/';
@@ -118,13 +114,10 @@ describe('jwt-certificate-rotation', function() {
                     should(dummyLoader.load.calledWith(
                         {}
                     )).eql(true);
-
-                    done();
                 })
-                .catch((err) => done(err instanceof Error ? err : new Error(err)));
         });
 
-        it('should connect and disconnect from the db', (done) => {
+        it('should connect and disconnect from the db', () => {
             sandbox.stub(dummyLoader, 'load').callsFake(Promise.method((params) => {
                 _.each(_.keys(config), (key) => {
                     params[key] = config[key];
@@ -135,11 +128,8 @@ describe('jwt-certificate-rotation', function() {
             sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
             sandbox.stub(keyPair, 'createKeyPair').resolves();
 
-            // const expected = { value: 'result' };
-            // sandbox.stub(impl, 'run').resolves(expected);
-
             // we test this by calling the it as a promise, so we can ensure disconnect is called
-            Jwt.run(event, context, () => {
+            return Jwt.run(event, context, () => {
             })
                 .then(() => {
                     should(DB.Create.callCount).eql(1);
@@ -156,32 +146,25 @@ describe('jwt-certificate-rotation', function() {
                     should(db.disconnect.calledWith(
                     )).eql(true);
 
-                    done();
                 })
-                .catch((err) => done(err instanceof Error ? err : new Error(err)))
         });
 
-        it('should not attempt to disconnect from the db if the db was never created', (done) => {
+        it('should not attempt to disconnect from the db if the db was never created', () => {
             sandbox.stub(dummyLoader, 'load').rejects(new Error('params_error'));
             sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
 
-            // const expected = { value: 'result' };
-            // sandbox.stub(impl, 'run').resolves(expected);
-
             // we test this by calling the it as a promise, so we can ensure disconnect is called
-            Jwt.run(event, context, () => {
+            return Jwt.run(event, context, () => {
             })
                 .then(() => {
                     should(DB.Create.callCount).eql(0);
                     should(db.connect.callCount).eql(0);
                     should(db.disconnect.callCount).eql(0);
 
-                    done();
                 })
-                .catch((err) => done(err instanceof Error ? err : new Error(err)))
         });
 
-        it('should call the callback with a default 500 if impl throws an unexpected error', (done) => {
+        it('should call the callback with a default 500 if impl throws an unexpected error', () => {
             sandbox.stub(dummyLoader, 'load').callsFake(Promise.method((params) => {
                 _.each(_.keys(config), (key) => {
                     params[key] = config[key];
@@ -191,11 +174,7 @@ describe('jwt-certificate-rotation', function() {
             sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
             sandbox.stub(Promise, 'map').rejects();
 
-            // const err = new Error('impl.run.error');
-            // sandbox.stub(impl, 'run').rejects(err);
-
-            Jwt.run(event, context, (first, second) => {
-                try {
+            return Jwt.run(event, context, (first, second) => {
                     should(first).eql(null);
 
                     const expected = StatusCodeError.CreateFromSpecs([ErrorSpecs.internalServer], ErrorSpecs.internalServer.statusCode);
@@ -203,19 +182,16 @@ describe('jwt-certificate-rotation', function() {
                         statusCode: 500,
                         body: JSON.stringify(expected.toDiagnoses())
                     });
-
-                    done();
-                } catch (err) {
-                    done(err instanceof Error ? err : new Error(err));
-                }
             });
         });
 
-        it('should fail if any param store values are missing', function (done) {
+        it('should fail if any param store values are missing', function () {
             delete config['defaultMongo.password'];
 
-            Jwt.run(event, context, (first, second) => {
-                try {
+            sandbox.stub(dummyLoader, 'load').resolves(config);
+            sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
+
+            return Jwt.run(event, context, (first, second) => {
                     should(first).eql(null);
 
                     const expected = StatusCodeError.CreateFromSpecs([ErrorSpecs.failedToRetrieveParameters], ErrorSpecs.failedToRetrieveParameters.statusCode);
@@ -223,39 +199,29 @@ describe('jwt-certificate-rotation', function() {
                         statusCode: 500,
                         body: JSON.stringify(expected.toDiagnoses())
                     });
-
-                    done();
-                } catch (err) {
-                    done(err instanceof Error ? err : new Error(err));
-                }
             });
         });
 
-        it('should throw a StatusCodeError if event validation fails', function (done) {
+        it('should throw a StatusCodeError if event validation fails', function () {
             sandbox.stub(dummyLoader, 'load').callsFake(Promise.method((params) => {
                 _.each(_.keys(config), (key) => {
                     params[key] = config[key];
                 });
                 return params;
             }));
+
             sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
             sandbox.stub(ParameterService, 'Create').returns(dummyParamService);
 
             delete(event.env);
 
-            Jwt.run(event, context, (first, second) => {
-                try {
+            return Jwt.run(event, context, (first, second) => {
                     should(first).eql(null);
 
                     should(second).eql({
                         statusCode: 500,
-                        body: '{"$diagnoses":[{"$applicationCode":"@sage/bcServerError","$message":"an error occurred while processing the request","$sdataCode":"ApplicationDiagnosis","$severity":"Error"}]}'
+                        body: '{"$diagnoses":[{"$applicationCode":"InternalServerError","$message":"an error occurred while processing the request","$sdataCode":"ApplicationDiagnosis","$severity":"Error"}]}'
                     });
-
-                    done();
-                } catch (err) {
-                    done(err instanceof Error ? err : new Error(err));
-                }
             });
         });
     });
@@ -264,11 +230,8 @@ describe('jwt-certificate-rotation', function() {
         let primaryKeysResponse;
 
         beforeEach(() => {
-            context = {context: 'context', logGroupName: 'logGroupName'};
             sandbox.stub(process, 'env').value(_.extend(process.env, {Environment: env, AWS_REGION: region}));
             event = {AWS_REGION: region, env};
-            callback = () => {
-            };
 
             config = {
                 'defaultMongo.username': username,
@@ -279,7 +242,8 @@ describe('jwt-certificate-rotation', function() {
 
             primaryKeysResponse = {
                 '/local/accessToken.primary.publicKey': 'aaa',
-                '/local/accessToken.primary.privateKey': 'bbb'
+                '/local/accessToken.primary.privateKey': 'bbb',
+                '/local/accessToken.primary.createdAt': TEST_DATE
             };
         });
 
@@ -287,53 +251,59 @@ describe('jwt-certificate-rotation', function() {
             sandbox.restore();
         });
 
-        it('should fetch the primary crypto keys from param store', (done) => {
-            const primaryKeysResponse = {
-                '/local/accessToken.primary.publicKey': 'aaa',
-                '/local/accessToken.primary.privateKey': 'bbb'
-            };
-
+        it('should fetch the primary crypto keys from param store', () => {
             sandbox.stub(dummyLoader, 'load').callsFake(Promise.method((params) => {
                 _.each(_.keys(config), (key) => {
                     params[key] = config[key];
                 });
                 return params;
             }));
+
+            const testParams = { subscriptionFilters : '' };
+            sandbox.stub(dummyCloudWatchLogsPromise, 'describeSubscriptionFiltersAsync').resolves(testParams);
+            sandbox.stub(dummyCloudWatchLogsPromise, 'putSubscriptionFilterAsync').callsFake(() => {});
+            sandbox.stub(Promise, 'promisifyAll').withArgs().returns(dummyCloudWatchLogsPromise);
+
             sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
             sandbox.stub(dummyParamService, 'getParameters').resolves(primaryKeysResponse);
             sandbox.stub(dummyParamService, 'setParameter').rejects();
             sandbox.stub(ParameterService, 'Create').returns(dummyParamService);
 
-            Jwt.run(event, context, () => {
+            return Jwt.run(event, context, () => {
             })
                 .then(() => {
                     should(dummyLoader.load.callCount).eql(1);
-                    should(ParameterService.Create.callCount).eql(1);
-                    should(dummyParamService.getParameters.callCount).eql(2);
-
-                    done();
-                })
-                .catch((err) => {
-                    done(err instanceof Error ? err : new Error(err));
+                    should(dummyParamService.getParameters.callCount).eql(3);
                 })
         });
 
-        it('should generate identical primary and secondary keys if primary keys do not exist', (done) => {
+        it('should generate identical primary and secondary keys if primary keys do not exist', () => {
             sandbox.stub(dummyLoader, 'load').callsFake(Promise.method((params) => {
                 _.each(_.keys(config), (key) => {
                     params[key] = config[key];
                 });
                 return params;
             }));
+
+            sandbox.stub(keyPair, 'createKeyPair').resolves({
+                public: 'publicKey',
+                private: 'privateKey'
+            });
+
+            const testParams = { subscriptionFilters : '' };
+            sandbox.stub(dummyCloudWatchLogsPromise, 'describeSubscriptionFiltersAsync').resolves(testParams);
+            sandbox.stub(dummyCloudWatchLogsPromise, 'putSubscriptionFilterAsync').callsFake(() => {});
+            sandbox.stub(Promise, 'promisifyAll').withArgs().returns(dummyCloudWatchLogsPromise);
+
             sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
+
+            sandbox.stub(ParameterService, 'Create').returns(dummyParamService);
             sandbox.stub(dummyParamService, 'getParameters').resolves({
                 '/local/accessToken.primary.publicKey': 'aaa'
             });
             sandbox.stub(dummyParamService, 'setParameter').resolves();
-            sandbox.stub(ParameterService, 'Create').returns(dummyParamService);
 
-            Jwt.run(event, context, (first, second) => {
-                try {
+            return Jwt.run(event, context, (first, second) => {
                     should(first).eql(null);
 
                     const expected = StatusCodeError.CreateFromSpecs([ErrorSpecs.internalServer], ErrorSpecs.internalServer.statusCode);
@@ -341,33 +311,32 @@ describe('jwt-certificate-rotation', function() {
                         statusCode: 500,
                         body: JSON.stringify(expected.toDiagnoses())
                     });
-
-                    done();
-                } catch (err) {
-                    done(err instanceof Error ? err : new Error(err));
-                }
             });
         });
 
-        it('should copy primary keys to secondary keys if primary keys already exist', (done) => {
+        it('should copy primary keys to secondary keys if primary keys already exist', () => {
             sandbox.stub(dummyLoader, 'load').callsFake(Promise.method((params) => {
                 _.each(_.keys(config), (key) => {
                     params[key] = config[key];
                 });
                 return params;
             }));
+            const testParams = { subscriptionFilters : '' };
+            sandbox.stub(dummyCloudWatchLogsPromise, 'describeSubscriptionFiltersAsync').resolves(testParams);
+            sandbox.stub(dummyCloudWatchLogsPromise, 'putSubscriptionFilterAsync').callsFake(() => {});
+            sandbox.stub(Promise, 'promisifyAll').withArgs().returns(dummyCloudWatchLogsPromise);
+
             sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
             sandbox.stub(dummyParamService, 'getParameters').resolves(primaryKeysResponse);
             sandbox.stub(dummyParamService, 'setParameter').resolves();
             sandbox.stub(ParameterService, 'Create').returns(dummyParamService);
             sandbox.stub(keyPair, 'createKeyPair').rejects();
 
-            Jwt.run(event, context, () => {
+            return Jwt.run(event, context, () => {
             })
                 .then(() => {
                     should(dummyLoader.load.callCount).eql(1);
-                    should(ParameterService.Create.callCount).eql(1);
-                    should(dummyParamService.setParameter.callCount).eql(2);
+                    should(dummyParamService.setParameter.callCount).eql(3);
                     const firstCallArgs = dummyParamService.setParameter.getCall(0).args[0];
                     should(firstCallArgs).eql({
                         name: '/local/accessToken.secondary.publicKey',
@@ -382,15 +351,18 @@ describe('jwt-certificate-rotation', function() {
                         type: 'SecureString',
                         overwrite: true
                     });
+                    const thirdCallArgs = dummyParamService.setParameter.getCall(2).args[0];
+                    should(thirdCallArgs).eql({
+                        name: `/local/accessToken.secondary.createdAt`,
+                        type: 'SecureString',
+                        value: TEST_DATE,
+                        overwrite: true
+                    });
 
-                    done();
-                })
-                .catch((err) => {
-                    done(err instanceof Error ? err : new Error(err));
                 })
         });
 
-        it('should throw an error if copying to secondary fails', (done) => {
+        it('should throw an error if copying to secondary fails', () => { // TODO: check it
 
             sandbox.stub(dummyLoader, 'load').callsFake(Promise.method((params) => {
                 _.each(_.keys(config), (key) => {
@@ -401,32 +373,19 @@ describe('jwt-certificate-rotation', function() {
             sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
             sandbox.stub(dummyParamService, 'getParameters').resolves(primaryKeysResponse);
             sandbox.stub(dummyParamService, 'setParameter').rejects();
-            sandbox.stub(ParameterService, 'Create').returns(dummyParamService);
-            callback = sandbox.spy();
 
-            Jwt.run(event, context, (first, second) => {
-                try {
+            return Jwt.run(event, context, (first, second) => {
                     should(first).eql(null);
                     const expected = StatusCodeError.CreateFromSpecs([ErrorSpecs.internalServer], ErrorSpecs.internalServer.statusCode);
                     should(second).eql({
                         statusCode: 500,
                         body: JSON.stringify(expected.toDiagnoses())
                     });
-                    done();
-                }
-                catch (err) {
-                    done(err instanceof Error ? err : new Error(err));
-                }
             })
         });
 
-        it('should generate a new AES public/private key pair', function(done) {
+        it('should generate a new AES public/private key pair', function() {
             this.timeout(5000);
-            const primaryKeysResponse = {
-                '/local/accessToken.primary.publicKey': 'aaa',
-                '/local/accessToken.primary.privateKey': 'bbb'
-            };
-            const keyLength = 256;
 
             sandbox.stub(dummyLoader, 'load').callsFake(Promise.method((params) => {
                 _.each(_.keys(config), (key) => {
@@ -434,70 +393,73 @@ describe('jwt-certificate-rotation', function() {
                 });
                 return params;
             }));
+            const testParams = { subscriptionFilters : '' };
+            sandbox.stub(dummyCloudWatchLogsPromise, 'describeSubscriptionFiltersAsync').resolves(testParams);
+            sandbox.stub(dummyCloudWatchLogsPromise, 'putSubscriptionFilterAsync').callsFake(() => {});
+            sandbox.stub(Promise, 'promisifyAll').withArgs().returns(dummyCloudWatchLogsPromise);
+
             sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
+            sandbox.stub(ParameterService, 'Create').returns(dummyParamService);
             sandbox.stub(dummyParamService, 'getParameters').resolves(primaryKeysResponse);
             sandbox.stub(dummyParamService, 'setParameter').resolves();
-            sandbox.stub(ParameterService, 'Create').returns(dummyParamService);
             sandbox.spy(keyPair, 'createKeyPair');
 
-            Jwt.run(event, context, () => {
+            return Jwt.run(event, context, () => {
             })
                 .then(() => {
                     should(keyPair.createKeyPair.callCount).eql(1);
                     should(keyPair.createKeyPair.calledWithExactly()).eql(true);
-                    done();
                 })
-                .catch((err) => {
-                    done(err instanceof Error ? err : new Error(err));
-                });
         });
 
-        it('should overwrite primary keys with new crypto pair', (done) => {
-            const primaryKeysResponse = {
-                '/local/accessToken.primary.publicKey': 'aaa',
-                '/local/accessToken.primary.privateKey': 'bbb'
-            };
-
+        it('should overwrite primary keys with new crypto pair', () => {
             sandbox.stub(dummyLoader, 'load').callsFake(Promise.method((params) => {
                 _.each(_.keys(config), (key) => {
                     params[key] = config[key];
                 });
                 return params;
             }));
+            const testParams = { subscriptionFilters : '' };
+            sandbox.stub(dummyCloudWatchLogsPromise, 'describeSubscriptionFiltersAsync').resolves(testParams);
+            sandbox.stub(dummyCloudWatchLogsPromise, 'putSubscriptionFilterAsync').callsFake(() => {});
+            sandbox.stub(Promise, 'promisifyAll').withArgs().returns(dummyCloudWatchLogsPromise);
+
             sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
+            sandbox.stub(ParameterService, 'Create').returns(dummyParamService);
             sandbox.stub(dummyParamService, 'getParameters').resolves(primaryKeysResponse);
             sandbox.stub(dummyParamService, 'setParameter').resolves();
-            sandbox.stub(ParameterService, 'Create').returns(dummyParamService);
             sandbox.stub(keyPair, 'createKeyPair').resolves({
                 public: 'publicKey',
                 private: 'privateKey'
             });
 
-            Jwt.run(event, context, () => {
+            return Jwt.run(event, context, () => {
             })
                 .then(() => {
                     should(keyPair.createKeyPair.callCount).eql(1);
-                    should(dummyParamService.setParameter.callCount).eql(4); //twice for secondary, twice again for primary
-                    should(dummyParamService.setParameter.getCall(2).args[0]).eql({
+                    should(dummyParamService.setParameter.callCount).eql(6); //3x for secondary, 3x again for primary
+                    should(dummyParamService.setParameter.getCall(3).args[0]).eql({
                         name: `/local/accessToken.primary.publicKey`,
                         type: 'SecureString',
                         value: 'publicKey',
                         overwrite: true
                     });
-                    should(dummyParamService.setParameter.getCall(3).args[0]).eql({
+                    should(dummyParamService.setParameter.getCall(4).args[0]).eql({
                         name: `/local/accessToken.primary.privateKey`,
                         type: 'SecureString',
                         value: 'privateKey',
                         overwrite: true
                     });
-                    done();
+                    should(dummyParamService.setParameter.getCall(5).args[0]).eql({
+                        name: `/local/accessToken.primary.createdAt`,
+                        type: 'SecureString',
+                        value: TEST_DATE,
+                        overwrite: true
+                    });
                 })
-                .catch((err) => {
-                    done(err instanceof Error ? err : new Error(err));
-                });
         });
 
-        it('should throw an error if saving primary keys fails', (done) => {
+        it('should throw an error if saving primary keys fails', () => {
             sandbox.stub(dummyLoader, 'load').callsFake(Promise.method((params) => {
                 _.each(_.keys(config), (key) => {
                     params[key] = config[key];
@@ -505,25 +467,18 @@ describe('jwt-certificate-rotation', function() {
                 return params;
             }));
             sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
+            sandbox.stub(ParameterService, 'Create').returns(dummyParamService);
             sandbox.stub(dummyParamService, 'getParameters').resolves(primaryKeysResponse);
             sandbox.stub(dummyParamService, 'setParameter').onCall(0).onCall(1).rejects('Failed to save primary keys to param store');
-            sandbox.stub(ParameterService, 'Create').returns(dummyParamService);
             sandbox.stub(keyPair, 'createKeyPair').resolves({ public: 'newPublicKey', private: 'newPrivateKey' });
-            callback = sandbox.spy();
 
-            Jwt.run(event, context, (first, second) => {
-                try {
+            return Jwt.run(event, context, (first, second) => {
                     should(first).eql(null);
                     const expected = StatusCodeError.CreateFromSpecs([ErrorSpecs.internalServer], ErrorSpecs.internalServer.statusCode);
                     should(second).eql({
                         statusCode: 500,
                         body: JSON.stringify(expected.toDiagnoses())
                     });
-                    done();
-                }
-                catch (err) {
-                    done(err instanceof Error ? err : new Error(err));
-                }
             })
         });
     });
