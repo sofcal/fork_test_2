@@ -2,6 +2,7 @@ const should = require('should');
 const sinon = require('sinon');
 const imported = require('../../lib/endpointsStore');
 const { Cache } = require('@sage/bc-data-cache');
+const { Jwks } = require('@sage/sfab-s2s-jwt-jwks');
 
 const { EndpointsStore } = imported;
 
@@ -26,11 +27,9 @@ describe('module-endpoints-store.endpointsStore', function () {
     const mockData = {
         kid1: [
             'cert1',
-            'cert2',
         ],
         kid2: [
-            'cert3',
-            'cert4',
+            'cert2',
         ],
     };
 
@@ -238,7 +237,18 @@ describe('module-endpoints-store.endpointsStore', function () {
     });
 
     describe('EndpointsStore.mappingFn', () => {
+        let ConvertX5CToPeStub;
+
+        before(() => {
+            ConvertX5CToPeStub = sinon.stub(Jwks, 'ConvertX5CToPem');
+        });
+
+        after(() => {
+            sinon.restore();
+        });
+
         it('should map response object to expected result object', () => {
+            ConvertX5CToPeStub.returns('cert');
             const res =  {
                 body: {
                         keys : [
@@ -246,14 +256,12 @@ describe('module-endpoints-store.endpointsStore', function () {
                             kid: 'kid1',
                             x5c: [
                                 'cert1',
-                                'cert2'
                             ]
                         },
                         {
                             kid: 'kid2',
                             x5c: [
-                                'cert3',
-                                'cert4'
+                                'cert2',
                             ]
                         }
                     ]
@@ -261,12 +269,10 @@ describe('module-endpoints-store.endpointsStore', function () {
             };
             const expected = {
                 kid1: [
-                    'cert1',
-                    'cert2',
+                    'cert',
                 ],
                 kid2: [
-                    'cert3',
-                    'cert4',
+                    'cert',
                 ],
             };
             EndpointsStore.mappingFn(res).should.eql(expected);

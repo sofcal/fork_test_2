@@ -49,6 +49,10 @@ class Cache {
                 this.refreshTime = Math.floor(Date.now() / 1000);
                 // refresh complete, so reset currentRefresh
                 this.currentRefresh = null;
+                this.logger.info({
+                    function: this.func,
+                    log: `Retrieved ${Object.keys(data).length} kid records`,
+                });
             })
             .catch((err) => {
                 this.logger.error({

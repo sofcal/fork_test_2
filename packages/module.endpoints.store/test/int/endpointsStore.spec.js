@@ -4,6 +4,7 @@ const nock = require('nock');
 const needle = require('needle');
 const { EndpointsStore }  = require('../../lib/endpointsStore');
 const { Cache } = require('@sage/bc-data-cache');
+const { Jwks } = require('@sage/sfab-s2s-jwt-jwks');
 
 describe('module-endpoints-store', function(){
     const endpointMappings = {
@@ -19,14 +20,12 @@ describe('module-endpoints-store', function(){
                     kid: 'kid1',
                     x5c: [
                         'cert1',
-                        'cert2'
                     ]
                 },
                 {
                     kid: 'kid2',
                     x5c: [
-                        'cert3',
-                        'cert4'
+                        'cert2',
                     ]
                 }
 
@@ -36,15 +35,13 @@ describe('module-endpoints-store', function(){
                 {
                     kid: 'kid3',
                     x5c: [
-                        'cert4',
-                        'cert5'
+                        'cert3',
                     ]
                 },
                 {
                     kid: 'kid4',
                     x5c: [
-                        'cert6',
-                        'cert7'
+                        'cert4',
                     ]
                 }
 
@@ -53,7 +50,7 @@ describe('module-endpoints-store', function(){
     ];
     const expectedCertList = n =>
         endPointResponse[n].keys.reduce((final, response) => {
-                final[response.kid] = response.x5c;
+                final[response.kid] = [Jwks.ConvertX5CToPem(response.x5c[0])];
                 return final;
             }
         , {});
@@ -75,9 +72,7 @@ describe('module-endpoints-store', function(){
             keys: endPointResponse[0].keys
         })
         .get('/serv2')
-        .reply(200, {
-            keys: endPointResponse[1]
-        });
+        .reply(200, { });
 
     let dateStub;
     let cacheBuildSpy;
@@ -99,6 +94,18 @@ describe('module-endpoints-store', function(){
         it('should allow new instance of EndpointsStore to be created', () => {
             test.should.be.instanceOf(EndpointsStore);
         });
+
+        it('should set default values when not passed in', () => {
+            const testDefault = new EndpointsStore({
+                endpointMappings,
+                cacheExpiry,
+            });
+            testDefault.should.be.instanceOf(EndpointsStore);
+            should.equal(testDefault.Cache.name,'Cache');
+            testDefault.logger.should.be.Object();
+        });
+
+
 
         it('should throw when invalid parameters passed', () => {
             should.throws(() => new EndpointsStore({
@@ -149,6 +156,14 @@ describe('module-endpoints-store', function(){
             const ID = Object.keys(endpointMappings)[0];
             return test.getCache(ID)
                 .then((res) => res.should.eql(expectedCertList(0)))
+                .then(() => should.strictEqual(cacheBuildSpy.called, true));
+        });
+
+        it('should return empty object when no keys found', () => {
+            dateStub.returns(300000 + (cacheExpiry * 1000 * 2));
+            const ID = Object.keys(endpointMappings)[1];
+            return test.getCache(ID)
+                .then((res) => res.should.eql({}))
                 .then(() => should.strictEqual(cacheBuildSpy.called, true));
         });
 
