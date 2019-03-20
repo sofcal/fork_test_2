@@ -1,8 +1,8 @@
 'use strict';
 
 const jwt = require('jsonwebtoken');
-const utils = require('./utils');
-const { omit } = require('underscore');
+const { validateToken } = require('./utils');
+const { omit, find } = require('underscore');
 
 const noop = () => {};
 const noopLogger = {
@@ -34,11 +34,10 @@ class Authenticate {
                 return this.storeService.getCache(this.iss);
             })
             .then((list) => {
-                this.certKeys = list[this.kid];
+                this.certKeys = list[this.kid] || [];
                 this.logger.info({
                     function: this.func,
-                    log: 'Certificate list populated',
-                    list
+                    log: `Certificate list populated, ${this.certKeys.length} certificates for kid ${this.kid}`
                 });
                 return this.certKeys;
             })
@@ -84,7 +83,7 @@ class Authenticate {
 
     validate() {
         try {
-            utils.validateToken(this.exp, this.iss, this.validIssuers);
+            validateToken(this.exp, this.iss, this.validIssuers);
         } catch (err) {
             this.logger.error({
                 function: this.func,
@@ -99,12 +98,19 @@ class Authenticate {
         return Promise.resolve()
             .then(() => this.populateCertList(token))
             .then(() => {
-                const verifyToken = utils.partial(jwt.verify, this.authToken);
-                const validTokenFound = utils.anyValid(this.certKeys, verifyToken);
+                if (!this.certKeys.length) {
+                    this.logger.error({
+                        function: this.func,
+                        log: `Authorisation failed - no certificates found for issuer ${this.iss} , kid ${this.kid}`
+                    });
+                    throw new Error('AuthFailed');
+                }
+
                 this.logger.info({
                     function: this.func,
                     log: `Validating against certkeys ${this.certKeys}`,
                 });
+                const validTokenFound = find(this.certKeys, (cert) => jwt.verify(this.authToken, cert) !== null);
 
                 if (!validTokenFound) {
                     this.logger.error({
