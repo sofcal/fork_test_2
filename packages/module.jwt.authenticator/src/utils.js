@@ -25,20 +25,4 @@ utils.validateToken = (exp, iss, validIssuers) => {
     return true;
 };
 
-// Returns true when first element passes predicate test
-// returns boolean
-utils.anyValid = (arr = [], predicate) =>
-    arr.some((el) => {
-        try {
-            predicate(el);
-            return true;
-        } catch (e) {
-            return false;
-        }
-    });
-
-// partial function application
-// returns function
-utils.partial = (fn, arg) => (...args) => fn(arg, ...args);
-
 module.exports = utils;
