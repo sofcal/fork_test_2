@@ -39,8 +39,7 @@ class JwtIssuerLambda extends Handler {
                         endpoint: 'deprecated',
                         cacheExpiry: parseInt(cacheExpiry, 10),
                         logger: event.logger,
-                        refreshFunction: () => this.cacheRefresh({ logger }),
-                        mappingFunction: (...args) => this.cacheMap(...args, { logger })
+                        refreshFunction: () => this.cacheRefresh({ logger })
                     };
                     this.cache = new Cache(options);
                 }
