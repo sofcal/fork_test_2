@@ -18,6 +18,10 @@ class JwtAuthenticatorLambda extends Handler {
         this.cache = null;
     }
 
+    static Create(...args) {
+        return new JwtAuthenticatorLambda(...args);
+    }
+
     validate(event, debug) {
         // do any additional validation on the environment variables (this.config) or event here
         validate.config(this.config, debug);

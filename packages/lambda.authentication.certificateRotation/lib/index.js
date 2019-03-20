@@ -116,8 +116,8 @@ class Jwt extends Handler {
 
     saveKeyPairToParams(event, keypair, copyToSecondary) {
         const func = 'saveKeyPairToParams';
-        event.logger.info({function: func, log: 'saving keys to param store', copyToSecondary});
-        const createdAt = new Date().getTime();
+        event.logger.info({ function: func, log: 'saving keys to param store', copyToSecondary });
+        const createdAt = Math.floor(new Date().getTime() / 1000);
         const newParams = [{
             name: `${this.paramPrefix}accessToken.primary.publicKey`,
             type: 'SecureString',

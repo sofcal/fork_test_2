@@ -2,8 +2,8 @@ const validate = require('./validators');
 
 const { Handler } = require('@sage/bc-independent-lambda-handler');
 const { Cache } = require('@sage/bc-data-cache');
-const { JwtIssuer } = require('@sage/sfab-s2s-jwt-issuer');
-const { Kid } = require('@sage/sfab-s2s-jwt-kid');
+const { JwtIssuer, JwtCertInfo } = require('@sage/sfab-s2s-jwt-issuer');
+
 // TODO: tidy this up, make it export { ParameterService }
 const ParameterService = require('@sage/bc-services-parameter');
 
@@ -15,6 +15,10 @@ class JwtIssuerLambda extends Handler {
 
         this.cache = null;
         this.issuer = null;
+    }
+
+    static Create(config) {
+        return new JwtIssuerLambda(config);
     }
 
     validate(event, debug) {
@@ -41,11 +45,11 @@ class JwtIssuerLambda extends Handler {
                         logger: event.logger,
                         refreshFunction: () => this.cacheRefresh({ logger })
                     };
-                    this.cache = new Cache(options);
+                    this.cache = Cache.Create(options);
                 }
 
                 if (!this.issuer) {
-                    this.issuer = new JwtIssuer(this.cache, { iss, newCertDelay: parseInt(newCertDelay, 10) });
+                    this.issuer = JwtIssuer.Create(this.cache, { iss, newCertDelay: parseInt(newCertDelay, 10) });
                 }
 
                 this.services.parameter = ParameterService.Create({ env: { region: this.config.AWS_REGION }, paramPrefix: '/dev01/' });
@@ -75,33 +79,30 @@ class JwtIssuerLambda extends Handler {
         logger.info({ function: func, log: 'started' });
 
         const params = [
-            'accessToken.primary.publicKey', 'accessToken.primary.privateKey', 'accessToken.primary.timestamp',
-            'accessToken.secondary.publicKey', 'accessToken.secondary.privateKey', 'accessToken.secondary.timestamp',
+            'accessToken.primary.publicKey', 'accessToken.primary.privateKey', 'accessToken.primary.createdAt',
+            'accessToken.secondary.publicKey', 'accessToken.secondary.privateKey', 'accessToken.secondary.createdAt',
         ];
 
         return this.services.parameter.getParameters(params)
             .then((data) => {
-                const mapped = [{
-                    status: 'primary',
-                    private: data['accessToken.primary.privateKey'],
-                    public: data['accessToken.primary.publicKey'],
-                    timestamp: parseInt(data['accessToken.primary.timestamp'], 10),
-                    kid: Kid.Generate(data['accessToken.primary.privateKey'])
-                }, {
-                    status: 'secondary',
-                    private: data['accessToken.secondary.privateKey'],
-                    public: data['accessToken.secondary.publicKey'],
-                    timestamp: parseInt(data['accessToken.secondary.timestamp'], 10),
-                    kid: Kid.Generate(data['accessToken.secondary.privateKey'])
-                }];
+                const mapped = [
+                    JwtCertInfo.Generate(
+                        data['accessToken.primary.privateKey'],
+                        data['accessToken.primary.publicKey'],
+                        parseInt(data['accessToken.primary.createdAt'], 10),
+                        true
+                    ),
+                    JwtCertInfo.Generate(
+                        data['accessToken.secondary.privateKey'],
+                        data['accessToken.secondary.publicKey'],
+                        parseInt(data['accessToken.secondary.createdAt'], 10),
+                        true
+                    )
+                ];
 
                 logger.info({ function: func, log: 'ended' });
                 return mapped;
             });
-    }
-
-    cacheMap(input, { logger }) {
-        return input;
     }
 }
 

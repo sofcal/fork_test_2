@@ -15,6 +15,10 @@ class JwtIssuer {
         this.validate();
     }
 
+    static Create(...args) {
+        return new JwtIssuer(...args);
+    }
+
     validate() {
         if (!this.cache || !_.isFunction(this.cache.getData)) {
             throw new Error('invalid cache: expected object with getData function');

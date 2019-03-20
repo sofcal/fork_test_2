@@ -29,6 +29,10 @@ class Cache {
         validate.call(this);
     }
 
+    static Create(...args) {
+        return new Cache(...args);
+    }
+
     // check last refresh time hasn't passed expiry point
     cacheExpired() {
         return Math.floor(Date.now() / 1000) > (this.refreshTime + this.cacheExpiry);

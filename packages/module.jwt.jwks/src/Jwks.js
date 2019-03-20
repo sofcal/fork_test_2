@@ -9,8 +9,7 @@ const alg = 'RS256'; // algorithm
 class Jwks {
     static Generate(publicKey, privateKey) {
         const x5cPublic = Jwks.ConvertPemToX5C(publicKey);
-        const x5cPrivate = privateKey;
-        const kid = Kid.Generate(x5cPrivate);
+        const kid = Kid.Generate(privateKey);
 
         return { kty, alg, use, kid, x5c: [x5cPublic] };
     }
