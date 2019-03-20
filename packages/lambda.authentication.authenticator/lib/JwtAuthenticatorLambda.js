@@ -37,18 +37,15 @@ class JwtAuthenticatorLambda extends Handler {
                 // one time instantiation - we'll re-use these
                 logger.info({ function: func, log: 'started' });
 
-                const { cacheExpiry, serviceMappings } = this.config;
+                const { cacheExpiry, refreshDelay, serviceMappings } = this.config;
                 const endpointMappings = JSON.parse(serviceMappings || '{}');
 
                 logger.info({ function: func, log: 'creating store service' });
-                const storeService = new EndpointsStore({ endpointMappings, cacheExpiry: parseInt(cacheExpiry, 10), cacheClass: Cache, }, logger);
+                const storeService = new EndpointsStore({ endpointMappings, cacheExpiry: parseInt(cacheExpiry, 10), refreshDelay: parseInt(refreshDelay, 10) }, logger);
                 const validIssuers = Object.keys(endpointMappings);
 
                 logger.info({ function: func, log: 'creating auth service' });
-                this.auth = new Authenticate({
-                    validIssuers,
-                    storeService,
-                }, logger);
+                this.auth = new Authenticate({ validIssuers, storeService, }, logger);
 
                 logger.info({ function: func, log: 'ended' });
             });
@@ -67,10 +64,6 @@ class JwtAuthenticatorLambda extends Handler {
                     .then((res) => {
                         event.logger.info({ function: func, log: 'ended' });
                         return res;
-                    })
-                    .catch((err) => {
-                        const code = !ErrorSpecs[err.message] ? 'unknownError' : err.message;
-                        throw StatusCodeError.CreateFromSpecs([ErrorSpecs[code]], ErrorSpecs[code].statusCode);
                     });
             });
     }

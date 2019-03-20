@@ -43,8 +43,7 @@ class JwtIssuer {
                     iss: this.iss
                 };
 
-                const privateKey = certWrap.private;
-
+                const { privateKey } = certWrap;
                 const jwtClaims = Object.assign({ }, claims, defaultClaims);
 
                 return this._jwt.signAsync(jwtClaims, privateKey, { algorithm, expiresIn });

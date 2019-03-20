@@ -32,7 +32,7 @@ class JwtIssuerLambda extends Handler {
     init(event, { logger }) {
         return Promise.resolve(undefined)
             .then(() => {
-                const func = 'JwtIssuerLambda.impl';
+                const func = 'JwtIssuerLambda.init';
                 // one time instantiation - we'll re-use these
                 logger.info({ function: func, log: 'started' });
 
@@ -40,12 +40,10 @@ class JwtIssuerLambda extends Handler {
 
                 if (!this.cache) {
                     const options = {
-                        endpoint: 'deprecated',
                         cacheExpiry: parseInt(cacheExpiry, 10),
-                        logger: event.logger,
                         refreshFunction: () => this.cacheRefresh({ logger })
                     };
-                    this.cache = Cache.Create(options);
+                    this.cache = Cache.Create(options, { logger: event.logger });
                 }
 
                 if (!this.issuer) {
@@ -69,7 +67,7 @@ class JwtIssuerLambda extends Handler {
                 const { expirySeconds } = this.config;
 
                 // this will get wrapped in a 200 response
-                return this.issuer.generate({ claims: {}, expiresIn: parseInt(expirySeconds, 10), algorithm: JwtIssuer.Algortithms.RS256 })
+                return this.issuer.generate({ claims: generateClaims(), expiresIn: parseInt(expirySeconds, 10), algorithm: JwtIssuer.Algortithms.RS256 })
                     .then((jwt) => ({ jwt }));
             });
     }
@@ -105,5 +103,9 @@ class JwtIssuerLambda extends Handler {
             });
     }
 }
+
+const generateClaims = () => {
+    return { test: 'value1' };
+};
 
 module.exports = JwtIssuerLambda;

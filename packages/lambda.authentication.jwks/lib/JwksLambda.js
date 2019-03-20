@@ -41,13 +41,10 @@ class JwksLambda extends Handler {
 
                 if (!this.cache) {
                     const options = {
-                        endpoint: 'deprecated',
                         cacheExpiry: parseInt(cacheExpiry, 10),
-                        logger: event.logger,
-                        refreshFunction: () => this.cacheRefresh({ logger }),
-                        mappingFunction: (...args) => this.cacheMap(...args, { logger })
+                        refreshFunction: () => this.cacheRefresh({ logger })
                     };
-                    this.cache = new Cache(options);
+                    this.cache = new Cache(options, { logger: event.logger });
                 }
 
                 this.services.parameter = ParameterService.Create({ env: { region: this.config.AWS_REGION }, paramPrefix: '/dev01/' });
@@ -144,10 +141,6 @@ class JwksLambda extends Handler {
             .map(p => createPublicKey(p));
 
         return validPublicKeys;
-    }
-
-    cacheMap(input, { logger }) {
-        return input;
     }
 }
 

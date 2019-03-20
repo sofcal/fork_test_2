@@ -12,10 +12,7 @@ const noopLogger = {
 };
 
 class Authenticate {
-    constructor({
-        validIssuers,
-        storeService,
-    }, logger = noopLogger) {
+    constructor({ validIssuers, storeService, }, logger = noopLogger) {
         this.func = 'Authenticate.impl';
         this.logger = logger;
         this.storeService = storeService;
@@ -24,28 +21,23 @@ class Authenticate {
     }
 
     populateCertList(token) {
+        const func = `${Authenticate.name}.populateCertList`;
         return Promise.resolve()
             .then(() => this.decodeToken(token))
             .then(() => {
-                this.logger.info({
-                    function: this.func,
-                    log: `Populating certificates for ${this.iss}`
-                });
+                this.logger.info({ function: func, log: `Populating certificates for ${this.iss}` });
                 return this.storeService.getCache(this.iss);
             })
             .then((list) => {
                 this.certKeys = list[this.kid] || [];
                 this.logger.info({
-                    function: this.func,
+                    function: func,
                     log: `Certificate list populated, ${this.certKeys.length} certificates for kid ${this.kid}`
                 });
                 return this.certKeys;
             })
             .catch((err) => {
-                this.logger.warn({
-                    function: this.func,
-                    log: `Error populating certificate list: ${err.message}`
-                });
+                this.logger.warn({ function: func, log: `Error populating certificate list: ${err.message}` });
                 throw err;
             });
     }
