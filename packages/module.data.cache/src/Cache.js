@@ -79,18 +79,22 @@ class Cache {
         return Promise.resolve(undefined)
             // check if cache needs to be refreshed
             .then(() => {
+                // if a refresh is already in flight, we just await the result of that - this cache isn't lazy, so we always
+                // return the latest results
+                if (this.currentRefresh) {
+                    this.logger.info({ function: func, log: 'existing refresh running, waiting for completion' });
+                    return this.currentRefresh;
+                }
+
+                // otherwise we can check whether or not we should perform a resfresh
                 if (forceRefresh || this.cacheExpired()) {
-                    // check for existing refresh
-                    if (this.currentRefresh) {
-                        this.logger.info({ function: func, log: 'existing refresh running, waiting for completion' });
-                        return this.currentRefresh;
-                    }
                     // otherwise start a new refresh
                     this.logger.info({ function: func, log: 'cache expired, refreshing' });
                     this.currentRefresh = this.buildCache(); // this will return a promise
                     return this.currentRefresh;
                 }
-                // no refresh required
+
+                // and if none of those things, we can just return
                 return undefined;
             })
             // return data

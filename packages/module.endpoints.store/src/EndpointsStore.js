@@ -46,7 +46,7 @@ class EndpointsStore {
             .then(() => {
                 // if no cache for this ID
                 if (!this.cacheList[ID]) {
-                    this.logger.info({ function: func, log: 'Building cache', params: { id: ID } });
+                    this.logger.info({ function: func, log: 'building cache', params: { id: ID } });
                     const endpoint = this.getEndpoint(ID);
 
                     // create new cache
@@ -56,8 +56,13 @@ class EndpointsStore {
             // if kid does not exist in cache
             // retrieve data from cache
             .then(() => {
-                this.logger.info({ function: func, log: 'Getting certificates', params: { id: ID } });
-                const allowRefresh = Math.floor(Date.now() / 1000) > (this.cacheList.refreshTime + this.refreshDelay);
+                const allowRefresh = Math.floor(Date.now() / 1000) > (this.cacheList[ID].refreshTime + this.refreshDelay);
+                this.logger.info({
+                    function: func,
+                    log: 'getting certificates',
+                    params: { id: ID, tryRefresh, allowRefresh, refreshTime: this.cacheList[ID].refreshTime, refreshDelay: this.refreshDelay }
+                });
+
                 const refresh = tryRefresh && allowRefresh;
                 return this.cacheList[ID].getData(refresh);
             });

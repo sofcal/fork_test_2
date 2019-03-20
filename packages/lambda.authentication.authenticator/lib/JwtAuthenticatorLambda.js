@@ -45,6 +45,7 @@ class JwtAuthenticatorLambda extends Handler {
                 this.auth = JwtAuthenticator.Create({ validIssuers, storeService, }, { logger });
 
                 logger.info({ function: func, log: 'ended' });
+                return true;
             });
     }
 
