@@ -12,17 +12,18 @@ const { StatusCodeError } = require('@sage/bc-status-code-error');
 const Promise = require('bluebird');
 
 class JwtAuthenticatorLambda extends Handler {
-    constructor() {
-        super({ config: process.env });
+    constructor(config) {
+        super(config);
 
         this.cache = null;
     }
 
-    validate(event, { logger }) {
+    validate(event, debug) {
         // do any additional validation on the environment variables (this.config) or event here
-        validate.event(event);
+        validate.config(this.config, debug);
+        validate.event(event, debug);
 
-        return super.validate(event, { logger });
+        return super.validate(event, debug);
     }
 
     init(event, { logger }) {
@@ -32,20 +33,12 @@ class JwtAuthenticatorLambda extends Handler {
                 // one time instantiation - we'll re-use these
                 logger.info({ function: func, log: 'started' });
 
-                // ****** temp hardcoded
-                const serviceMappings = {
-                    'sage.authentication.test': 'https://gmade6j328.execute-api.eu-west-1.amazonaws.com/test/service1/jwks'
-                };
-                const cacheExpiry = 300;
-                // *********************
+                const { cacheExpiry, serviceMappings } = this.config;
+                const endpointMappings = JSON.parse(serviceMappings || '{}');
 
                 logger.info({ function: func, log: 'creating store service' });
-                const storeService = new EndpointsStore({
-                    endpointMappings: serviceMappings,
-                    cacheExpiry,
-                    cacheClass: Cache,
-                }, logger);
-                const validIssuers = Object.keys(serviceMappings);
+                const storeService = new EndpointsStore({ endpointMappings, cacheExpiry: parseInt(cacheExpiry, 10), cacheClass: Cache, }, logger);
+                const validIssuers = Object.keys(endpointMappings);
 
                 logger.info({ function: func, log: 'creating auth service' });
                 this.auth = new Authenticate({
@@ -85,7 +78,11 @@ class JwtAuthenticatorLambda extends Handler {
         const policy = generatePolicy('Allow', '*', claims);
         logger.info({ function: func, log: 'ended' });
 
-        return policy;
+        return [null, policy];
+    }
+
+    buildErrorResponse() {
+        return ['Unauthorized'];
     }
 }
 

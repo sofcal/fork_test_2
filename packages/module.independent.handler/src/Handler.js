@@ -8,13 +8,14 @@ const { CloudWatchSubscription } = require('@sage/bc-infrastructure-cloudwatch-s
 const ErrorSpecs = require('./ErrorSpecs');
 
 class Handler {
-    constructor({ config }) {
+    constructor({ config, serviceId = '@sage/base-service-id' }) {
         if (new.target === Handler) {
             throw new Error('Handler should not be instantiated; extend Handler instead.');
         }
 
         this.services = {};
         this.config = config;
+        this.serviceId = serviceId;
 
         this.initialised = false;
     }
@@ -24,7 +25,7 @@ class Handler {
         return Promise.resolve(undefined)
             .then(() => {
                 // eslint-disable-next-line no-param-reassign
-                event.logger = RequestLogger.Create({ service: '@sage/bc-default-lambda-handler' });
+                event.logger = RequestLogger.Create({ service: this.serviceId });
                 event.logger.info({ function: func, log: 'started' });
 
                 this.validate(event, { logger: event.logger });
@@ -67,7 +68,7 @@ class Handler {
                         event.logger.info({ function: func, log: 'ended' });
 
                         // first parameter of the callback is the error response, so should be null for valid responses
-                        callback(null, response);
+                        callback(...response);
                     });
             })
             .catch((err) => {
@@ -77,18 +78,12 @@ class Handler {
                     log: 'an error occurred while processing the request',
                     error: err.message || err
                 });
-                const statusCodeError = StatusCodeError.is(err)
-                    ? err
-                    : StatusCodeError.CreateFromSpecs([ErrorSpecs.internalServer], ErrorSpecs.internalServer.statusCode);
+                const response = this.buildErrorResponse(err, { logger: event.logger });
 
-                const response = statusCodeError.toDiagnoses();
-                const status = statusCodeError.statusCode;
-
-                event.logger.info({ function: func, log: `sending failure response: ${status}`, response });
-
+                event.logger.info({ function: func, log: 'sending failure response' });
                 // for the most part, we still invoke the callback without an error; however, if we want the lambda to
                 // automatically retry, passing an error as the first parameter will achieve this
-                callback(err.failLambda ? err : null, { statusCode: status, body: JSON.stringify(response) });
+                callback(...response);
             })
             .finally(() => {
                 // last but not least, give the option to the derived class to cleanup resources it created. E.G database
@@ -121,7 +116,23 @@ class Handler {
     }
 
     buildResponse(ret /* , { logger } */) { // eslint-disable-line class-methods-use-this
-        return { statusCode: 200, body: JSON.stringify(ret) };
+        return [null, { statusCode: 200, body: JSON.stringify(ret) }];
+    }
+
+    buildErrorResponse(err, { logger }) { // eslint-disable-line class-methods-use-this
+        const func = `${Handler.name}.buildErrorResponse`;
+        // if we caught an error; we ensure it's either a valid error we can return, or a 500 internal.
+        const statusCodeError = StatusCodeError.is(err)
+            ? err
+            : StatusCodeError.CreateFromSpecs([ErrorSpecs.internalServer], ErrorSpecs.internalServer.statusCode);
+
+        const response = statusCodeError.toDiagnoses();
+        const status = statusCodeError.statusCode;
+
+        logger.info({ function: func, log: `building failure response: ${status}`, response });
+        // for the most part, we still invoke the callback without an error; however, if we want the lambda to
+        // automatically retry, passing an error as the first parameter will achieve this
+        return [err.failLambda ? err : null, { statusCode: status, body: JSON.stringify(response) }];
     }
 
     dispose(/* { logger } */) { // eslint-disable-line class-methods-use-this

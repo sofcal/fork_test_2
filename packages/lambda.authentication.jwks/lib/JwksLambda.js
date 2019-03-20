@@ -55,7 +55,7 @@ class JwksLambda extends Handler {
 
                 // this will get wrapped in a 200 response
                 return this.cache.getData()
-                    .then((data) => this.validateData(data))
+                    //.then((data) => this.validateData(data))
                     .then((data) => ({ keys: data }));
             });
     }
