@@ -2,7 +2,6 @@ const sinon = require('sinon');
 const _ = require('underscore');
 const JwksLambda = require('../../lib/JwksLambda');
 const should = require('should');
-const { Cache } = require('@sage/bc-data-cache');
 const ParameterService = require('@sage/bc-services-parameter');
 
 describe('JwksLambda', function () {
@@ -23,6 +22,16 @@ describe('JwksLambda', function () {
         'accessToken.secondary.publicKey': 'testSecondaryPublicKey',
         'accessToken.secondary.privateKey': 'testSecondaryPrivateKey',
         'accessToken.secondary.createdAt': '1553094111'
+    };
+
+    const paramStoreDataChange = {
+        'accessToken.primary.publicKey': 'testPrimaryPublicKeyChanged',
+        'accessToken.primary.privateKey': 'testPrimaryPrivateKeyChanged',
+        'accessToken.primary.createdAt': '1553094112',
+
+        'accessToken.secondary.publicKey': 'testSecondaryPublicKeyChanged',
+        'accessToken.secondary.privateKey': 'testSecondaryPrivateKeyChanged',
+        'accessToken.secondary.createdAt': '1553094112'
     };
 
     const paramStorePrimary = {
@@ -53,9 +62,30 @@ describe('JwksLambda', function () {
         "x5c": ["testSecondaryPublicKey"]
     };
 
+
+    const primaryPublicKeyChanged = {
+        "kty": "RSA",
+        "alg": "RS256",
+        "use": "sig",
+        "kid": "323f3154f3734e29f9536b068ee739b4339d1773ed443c39425ebe6f635e683d",
+        "x5c": ["testPrimaryPublicKeyChanged"]
+    };
+
+    const secondaryPublicKeyChanged = {
+        "kty": "RSA",
+        "alg": "RS256",
+        "use": "sig",
+        "kid": "20167f68866cd47d39fd36788353ee98291a4b9b9bcbbafa64137a3bf2166b66",
+        "x5c": ["testSecondaryPublicKeyChanged"]
+    };
+
     const cachedData = [
         primaryPublicKey, secondaryPublicKey
     ];
+
+    const cachedDataChanged = [
+        primaryPublicKeyChanged, secondaryPublicKeyChanged
+    ]
 
     const env = 'local';
     const region = 'eu-west-1';
@@ -77,6 +107,8 @@ describe('JwksLambda', function () {
     let context;
     let callback;
 
+    let cacheTTL = 100;
+
     before(() => {
         sandbox = sinon.createSandbox();
     });
@@ -86,8 +118,7 @@ describe('JwksLambda', function () {
     beforeEach(() => {
         clock = sinon.useFakeTimers(new Date().getTime());
 
-        config = {Environment: env, AWS_REGION: region, cacheExpiry: 10000 }
-        //sandbox.stub(process, 'env').value(_.extend(process.env, {Environment: env, AWS_REGION: region, cacheExpiry: 10000 }));
+        config = {Environment: env, AWS_REGION: region, cacheExpiry: cacheTTL }
         event = {AWS_REGION: region, env};
 
         sandbox.stub(ParameterService, 'Create').returns(paramstore);
@@ -100,6 +131,7 @@ describe('JwksLambda', function () {
         sandbox.restore();
     });
 
+    //describe('Checking basic functionalities')
     it('should get keys from paramstore if the cache is empty', () => {
         jwksLambda = new JwksLambda({ config });
         sandbox.stub(paramstore, 'getParameters')
@@ -187,4 +219,96 @@ describe('JwksLambda', function () {
         });
     });
 
+    describe('Checking the pass of the time', () => {
+        it('should get the same result if cache is not expired and called immediately again', () => {
+            jwksLambda = new JwksLambda({ config });
+            sandbox.stub(paramstore, 'getParameters')
+                .onCall(0).resolves( paramStoreData )
+                .onCall(1).resolves( paramStoreDataChange );
+            return jwksLambda.run(event, context, callback).then(() => {
+                should(paramstore.getParameters.callCount).eql(1);
+
+                should(callback.callCount).eql(1);
+                should(callback.getCall(0).args[0]).be.null();
+                should(callback.getCall(0).args[1]).eql({
+                    statusCode: 200,
+                    body: JSON.stringify({keys: cachedData})
+                });
+
+                return jwksLambda.run(event, context, callback).then(() => {
+                    should(paramstore.getParameters.callCount).eql(1);
+
+                    should(callback.callCount).eql(2);
+                    should(callback.getCall(1).args[0]).be.null();
+                    should(callback.getCall(1).args[1]).eql({
+                        statusCode: 200,
+                        body: JSON.stringify({keys: cachedData})
+                    });
+
+                });
+            });
+        });
+
+        it('should get the same result if cache is not expired', () => {
+            jwksLambda = new JwksLambda({ config });
+            sandbox.stub(paramstore, 'getParameters')
+                .onCall(0).resolves( paramStoreData )
+                .onCall(1).resolves( paramStoreDataChange );
+            return jwksLambda.run(event, context, callback).then(() => {
+                should(paramstore.getParameters.callCount).eql(1);
+
+                should(callback.callCount).eql(1);
+                should(callback.getCall(0).args[0]).be.null();
+                should(callback.getCall(0).args[1]).eql({
+                    statusCode: 200,
+                    body: JSON.stringify({keys: cachedData})
+                });
+
+                clock.tick((cacheTTL - 1) * 1000);
+
+                return jwksLambda.run(event, context, callback).then(() => {
+                    should(paramstore.getParameters.callCount).eql(1);
+
+                    should(callback.callCount).eql(2);
+                    should(callback.getCall(1).args[0]).be.null();
+                    should(callback.getCall(1).args[1]).eql({
+                        statusCode: 200,
+                        body: JSON.stringify({keys: cachedData})
+                    });
+
+                });
+            });
+        });
+
+        it('should get the same result if cache is not expired', () => {
+            jwksLambda = new JwksLambda({ config });
+            sandbox.stub(paramstore, 'getParameters')
+                .onCall(0).resolves( paramStoreData )
+                .onCall(1).resolves( paramStoreDataChange );
+            return jwksLambda.run(event, context, callback).then(() => {
+                should(paramstore.getParameters.callCount).eql(1);
+
+                should(callback.callCount).eql(1);
+                should(callback.getCall(0).args[0]).be.null();
+                should(callback.getCall(0).args[1]).eql({
+                    statusCode: 200,
+                    body: JSON.stringify({keys: cachedData})
+                });
+
+                clock.tick((cacheTTL + 1) * 1000);
+
+                return jwksLambda.run(event, context, callback).then(() => {
+                    should(paramstore.getParameters.callCount).eql(2);
+
+                    should(callback.callCount).eql(2);
+                    should(callback.getCall(1).args[0]).be.null();
+                    should(callback.getCall(1).args[1]).eql({
+                        statusCode: 200,
+                        body: JSON.stringify({keys: cachedDataChanged})
+                    });
+
+                });
+            });
+        });
+    });
 });

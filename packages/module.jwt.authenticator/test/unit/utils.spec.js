@@ -6,8 +6,6 @@ const {
     expired,
     issuerInvalid,
     validateToken,
-    anyValid,
-    partial,
 } = utils;
 
 describe('utils', () => {
@@ -15,9 +13,7 @@ describe('utils', () => {
         utils.should.have.only.keys(
             'expired',
             'issuerInvalid',
-            'validateToken',
-            'anyValid',
-            'partial'
+            'validateToken'
         );
         done();
     });
@@ -110,79 +106,6 @@ describe('utils', () => {
             issuerInvalidStub.returns(false);
 
             should.strictEqual(validateToken(exp, iss, validIssuers), true);
-        });
-    });
-
-    describe('anyValid', () => {
-        const arr = [1,2,3,4];
-        const predicate = {
-            alwaysThrow : () => {throw new Error('false')},
-            throwIfLessThan3: (x) => {if (x < 3) throw new Error('Less than 3')}
-        };
-        let alwaysThrowSpy;
-        let throwIfLessThan3Spy;
-
-        before(() => {
-            alwaysThrowSpy = sinon.spy(predicate, "alwaysThrow");
-            throwIfLessThan3Spy = sinon.spy(predicate, "throwIfLessThan3");
-        });
-
-        afterEach(() => {
-            alwaysThrowSpy.resetHistory();
-            throwIfLessThan3Spy.resetHistory();
-        });
-
-        after(() => {
-            sinon.restore();
-        });
-
-        it('Should return false when no values pass test', () => {
-            should.strictEqual(anyValid(arr, alwaysThrowSpy), false);
-        });
-
-        it('Should return false when array undefined', () => {
-            should.strictEqual(anyValid(undefined, alwaysThrowSpy), false);
-        });
-
-        it('Should call predicate for each entry when all fail', () => {
-            anyValid(arr, alwaysThrowSpy);
-            should.strictEqual(alwaysThrowSpy.alwaysThrew(), true);
-            should.strictEqual(alwaysThrowSpy.callCount, arr.length);
-        });
-
-        it('Should return true when values pass test', () => {
-            should.strictEqual(anyValid(arr, throwIfLessThan3Spy), true);
-        });
-
-        it('Should call predicate until first value passes', () => {
-            anyValid(arr, throwIfLessThan3Spy);
-            should.strictEqual(throwIfLessThan3Spy.threw(), true);
-            should.strictEqual(throwIfLessThan3Spy.callCount, 3);
-        });
-    });
-
-    describe('partial', () => {
-        const testFn = (...args) => args.length;
-        const testFnSpy = sinon.spy(testFn);
-
-
-        afterEach(() => {
-            testFnSpy.resetHistory();
-        });
-
-        it('Returns a function', () => {
-            (partial(testFn, 'dummy')).should.be.Function();
-        });
-
-        it('Should not call function', () => {
-            partial(testFn, 'dummy');
-            should.strictEqual(testFnSpy.callCount, 0);
-        });
-
-        it('Sets correct number of arguments', () => {
-            const fn = partial(testFn, 'dummy1');
-            const result = fn('dummy2');
-            should.strictEqual(result, 2);
         });
     });
 });

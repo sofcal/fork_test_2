@@ -12,7 +12,15 @@ const noopLogger = {
 };
 
 class Authenticate {
-    constructor({ validIssuers, storeService, }, logger = noopLogger) {
+    constructor(
+        {
+            validIssuers,
+            storeService,
+        },
+        {
+            logger = noopLogger
+        } = {}
+    ) {
         this.func = 'Authenticate.impl';
         this.logger = logger;
         this.storeService = storeService;
@@ -43,7 +51,7 @@ class Authenticate {
     }
 
     decodeToken(authToken) {
-        const decode = jwt.decode(authToken);
+        const decode = jwt.decode(authToken, { complete: true });
 
         if (decode === null) {
             this.logger.error({
@@ -54,9 +62,20 @@ class Authenticate {
         }
 
         this.authToken = authToken;
-        this.exp = decode.exp;
-        this.kid = decode.kid;
-        this.iss = decode.iss;
+
+        const { alg } = decode.header;
+
+        if (alg === 'none') {
+            this.logger.error({
+                function: this.func,
+                log: `JWT has no signature: ${authToken}`
+            });
+            throw new Error('invalidAuthToken');
+        }
+
+        this.exp = decode.payload.exp;
+        this.kid = decode.payload.kid;
+        this.iss = decode.payload.iss;
 
         // store custom claims (drop any Registered Claim Names)
         const registeredClaims = [
@@ -68,7 +87,7 @@ class Authenticate {
             'iat',
             'jti'
         ];
-        this.claims = omit(decode, registeredClaims);
+        this.claims = omit(decode.payload, registeredClaims);
 
         this.validate();
     }
