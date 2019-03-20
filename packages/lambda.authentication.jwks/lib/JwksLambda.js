@@ -9,10 +9,11 @@ const { Jwks } = require('@sage/sfab-s2s-jwt-jwks');
 const ParameterService = require('@sage/bc-services-parameter');
 
 const Promise = require('bluebird');
+const _ = require('underscore');
 
 class JwksLambda extends Handler {
-    constructor() {
-        super({ config: process.env });
+    constructor(config) {
+        super(config);
 
         this.cache = null;
     }
@@ -54,16 +55,29 @@ class JwksLambda extends Handler {
 
                 // this will get wrapped in a 200 response
                 return this.cache.getData()
-                    .then((data) => this.validateData({ keys: data }));
+                    .then((data) => this.validateData(data))
+                    .then((data) => ({ keys: data }));
             });
     }
 
-    validateData( data ) {
-        if (typeof data.keys[`/${process.env.Environment}/accessToken.primary.publicKey`] === 'undefined'
-            && typeof data.keys[`/${process.env.Environment}/accessToken.secondary.publicKey`] === 'undefined') {
+    validateData(data) {
+        const primary = data[0];
+        const secondary = data[1];
+
+        if (!this.isKeyFormat(primary) && !this.isKeyFormat(secondary)) {
                 throw new Error('No valid key');
             }
         return data;
+    }
+
+    isKeyFormat(dataJson) {
+        const availableKeys = ["kty", "alg", "use", "kid", "x5c"];
+
+        let valid = true
+
+        // Object.keys(dataJson).reduce( (accumulator, key) => accumulator && , valid )
+
+        return true; // TODO
     }
 
     cacheRefresh({ logger }) {
