@@ -107,7 +107,7 @@ describe('JwksLambda', function () {
     let context;
     let callback;
 
-    let cacheTTL = 10000;
+    let cacheTTL = 100;
 
     before(() => {
         sandbox = sinon.createSandbox();
@@ -119,7 +119,6 @@ describe('JwksLambda', function () {
         clock = sinon.useFakeTimers(new Date().getTime());
 
         config = {Environment: env, AWS_REGION: region, cacheExpiry: cacheTTL }
-        //sandbox.stub(process, 'env').value(_.extend(process.env, {Environment: env, AWS_REGION: region, cacheExpiry: 10000 }));
         event = {AWS_REGION: region, env};
 
         sandbox.stub(ParameterService, 'Create').returns(paramstore);
@@ -132,6 +131,7 @@ describe('JwksLambda', function () {
         sandbox.restore();
     });
 
+    //describe('Checking basic functionalities')
     it('should get keys from paramstore if the cache is empty', () => {
         jwksLambda = new JwksLambda({ config });
         sandbox.stub(paramstore, 'getParameters')

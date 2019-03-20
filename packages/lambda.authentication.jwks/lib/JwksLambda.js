@@ -64,7 +64,8 @@ class JwksLambda extends Handler {
                 // this will get wrapped in a 200 response
                 return this.cache.getData()
                     //.then((data) => this.filterExpired(data))
-                    .then((data) => Jwks.validateKeyData(data))
+                    //.then((data) => Jwks.validateKeyData(data
+                //                     ))
                     .then((data) => ({ keys: data }));
             });
     }
@@ -73,16 +74,46 @@ class JwksLambda extends Handler {
         const func = 'JwksLambda.cacheRefresh';
         logger.info({ function: func, log: 'started' });
 
-        const params = [
-            'accessToken.primary.privateKey', 'accessToken.primary.publicKey', 'accessToken.primary.createdAt',
-            'accessToken.secondary.privateKey', 'accessToken.secondary.publicKey', 'accessToken.secondary.createdAt'
-        ];
+        const keyD = ['primary', 'secondary'];
+        const params = [];
+        const keyD_map = _.map(keyD, (k) => {
+            const mapped = { privateKey: `accessToken.${k}.privateKey`, publicKey: `accessToken.${k}.publicKey`, createdAt: `accessToken.${k}.createdAt`};
+            params.push(..._.values(mapped));
+            return mapped;
+        });
+
+        // for each keyD, create object with private, public, created enum
+        // for each keyD_map, take values to create params
+
+        // for each keyD_map, get params, send to gen
+        //
+        // const params = [
+        //     'accessToken.primary.privateKey', 'accessToken.primary.publicKey', 'accessToken.primary.createdAt',
+        //     'accessToken.secondary.privateKey', 'accessToken.secondary.publicKey', 'accessToken.secondary.createdAt'
+        // ];
 
         return this.services.parameter.getParameters(params)
             .then((data) => {
+                //const validPublicKeys = Jwks.getListOfValidPublicKeys(data, this.config.cacheExpiry);
 
-                const validPublicKeys = Jwks.getListOfValidPublicKeys(data);
-                const mapped = validPublicKeys.map(k => Jwks.Generate(k.publicKey, k.privateKey));
+                const mapped = _.chain(keyD_map)
+                    .map((k) => {
+                        if (Jwks.isValid(data[k.publicKey], data[k.privateKey], data[k.createdAt])) {
+                            return Jwks.Generate(data[k.publicKey], data[k.privateKey]);
+                        }
+                        return null;
+                    })
+                    .compact()
+                    .value();
+
+                // if (Jwks.isValid(data['accessToken.primary.publicKey'], data['accessToken.primary.privateKey'], data['accessToken.primary.createdAt'])) {
+                //     mapped.push(Jwks.Generate(data['accessToken.primary.publicKey'], data['accessToken.primary.privateKey']));
+                // }
+                // if (Jwks.isValid(data['accessToken.secondary.publicKey'], data['accessToken.secondary.privateKey'], data['accessToken.secondary.createdAt'])) {
+                //     mapped.push(Jwks.Generate(data['accessToken.secondary.publicKey'], data['accessToken.secondary.privateKey']));
+                // }
+
+                //const mapped = validPublicKeys.map(k => Jwks.Generate(k.publicKey, k.privateKey));
                 logger.info({ function: func, log: 'ended' });
                 return mapped;
             });

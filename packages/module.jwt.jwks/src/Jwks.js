@@ -54,6 +54,15 @@ class Jwks {
         });
     }
 
+    static isExpired(createdAt) {
+        return false;
+    }
+
+    static isValid(publicKey, privateKey, createdAt) {
+        const validCreatedAt = !Jwks.isExpired(createdAt);
+        return _.isString(privateKey) && _.isString(publicKey) && validCreatedAt;
+    }
+
     /**
      * Creates a json object which only contains keys whiches allowed and has all the require attributes.
      * @param dataJson
