@@ -64,27 +64,9 @@ class JwksLambda extends Handler {
                 // this will get wrapped in a 200 response
                 return this.cache.getData()
                     //.then((data) => this.filterExpired(data))
-                    .then((data) => this.validateData(data))
+                    .then((data) => Jwks.validateKeyData(data))
                     .then((data) => ({ keys: data }));
             });
-    }
-
-    validateData(data) {
-        const [primary, secondary] = data;
-
-        if (!this.isKeyFormat(primary) && !this.isKeyFormat(secondary)) {
-                throw new Error('No valid key');
-            }
-        return data;
-    }
-
-    isKeyFormat(dataJson) {
-        const availableKeys = ["kty", "alg", "use", "kid", "x5c"];
-
-        let valid = true
-
-        return Object.keys(dataJson).reduce((accumulator, key) => accumulator && availableKeys.includes(key), valid);
-
     }
 
     cacheRefresh({ logger }) {
@@ -99,51 +81,11 @@ class JwksLambda extends Handler {
         return this.services.parameter.getParameters(params)
             .then((data) => {
 
-                const validPublicKeys = this.getListOfValidPublicKeys(data);
+                const validPublicKeys = Jwks.getListOfValidPublicKeys(data);
                 const mapped = validPublicKeys.map(k => Jwks.Generate(k.publicKey, k.privateKey));
                 logger.info({ function: func, log: 'ended' });
                 return mapped;
             });
-    }
-
-    filterExpired(data) {
-        const now = new Date().getTime();
-        return data.filter( (k) => {
-            return now < Number(k.createdAt) + (this.config.delay || 1000);
-        });
-    }
-
-    /**
-     * Creates a json object which only contains keys whiches allowed and has all the require attributes.
-     * @param dataJson
-     * @returns {*[]}
-     */
-    getListOfValidPublicKeys(dataJson) {
-        let validPublicKeys = [];
-
-
-        const allowedPrefixes = ['accessToken.primary.', 'accessToken.secondary.'];
-        const allowedAttributes = ['publicKey', 'privateKey', 'createdAt'];
-
-
-        const hasAllAttributes = (prefix) => {
-            let noAttributeMissing = true;
-            return allowedAttributes.reduce((accumulator, a) => dataJson[prefix + a] && accumulator, noAttributeMissing);
-        }
-
-        const createPublicKey = (prefix) => {
-            let temp = {};
-            allowedAttributes.forEach((a) => {
-                temp[a] = dataJson[prefix + a];
-            });
-            return temp;
-        }
-
-        validPublicKeys = allowedPrefixes
-            .filter(p => hasAllAttributes(p))
-            .map(p => createPublicKey(p));
-
-        return validPublicKeys;
     }
 
     cacheMap(input, { logger }) {
