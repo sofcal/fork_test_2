@@ -19,15 +19,20 @@ const noopLogger = {
 };
 
 class EndpointsStore {
-    constructor({
-        endpointMappings,
-        cacheExpiry,
-        cacheClass = Cache,
-    }, logger = noopLogger) {
+    constructor(
+        {
+            endpointMappings,
+            refreshDelay,
+            cacheClass = Cache,
+        },
+        {
+            logger = noopLogger
+        } = {}
+    ) {
         // mapping ID > endpoint
         this.endpointMappings = endpointMappings;
         // cache expiration limit
-        this.cacheExpiry = cacheExpiry;
+        this.refreshDelay = refreshDelay;
         // list of caches by ID
         this.cacheList = {};
 
@@ -59,6 +64,7 @@ class EndpointsStore {
                 }
                 return undefined;
             })
+            // if kid does not exist in cache
             // retrieve data from cache
             .then(() => {
                 this.logger.info({
@@ -71,11 +77,16 @@ class EndpointsStore {
 
     // Create a new cache entry for an ID
     createCacheEntry(ID, endpoint) {
-        this.cacheList[ID] = new this.Cache({
-            endpoint,
-            cacheExpiry: this.cacheExpiry,
-            refreshFunction: EndpointsStore.refreshFn,
-        }, this.logger);
+        const refreshFunction = EndpointsStore.refreshFn(endpoint);
+        this.cacheList[ID] = new this.Cache(
+            {
+                cacheExpiry: -1, // non-expiring cache
+                refreshFunction,
+            },
+            {
+                logger: this.logger
+            }
+        );
         return this.cacheList[ID];
     }
 
@@ -93,13 +104,15 @@ class EndpointsStore {
     // Refresh function - calls needle get using endpoint argument
     // returns promise
     static refreshFn(endpoint) {
-        return Promise.resolve()
-            .then(() => needle('get', endpoint))
-            .then((res) => EndpointsStore.mappingFn(res))
-            .catch((err) => {
-                console.log(`alert: ${err}`);
-                throw new Error(`Fetch endpoint error: ${err.message}`);
-            });
+        return function() {
+            return Promise.resolve()
+                .then(() => needle('get', endpoint))
+                .then((res) => EndpointsStore.mappingFn(res))
+                .catch((err) => {
+                    console.log(`alert: ${err}`);
+                    throw new Error(`Fetch endpoint error: ${err.message}`);
+                });
+        };
     }
 
     // Mapping function - maps data to internal storage structure
@@ -118,7 +131,7 @@ class EndpointsStore {
 }
 
 function validate() {
-    const { Cache: thisCache, endpointMappings, cacheExpiry, logger } = this;
+    const { Cache: thisCache, endpointMappings, refreshDelay, logger } = this;
 
     if (!thisCache || typeof thisCache !== 'function' || !thisCache.prototype.getData) {
         throw new Error('Invalid argument passed: cacheClass');
@@ -126,8 +139,8 @@ function validate() {
     if (!endpointMappings || typeof endpointMappings !== 'object') {
         throw new Error('Invalid argument passed: endpointMappings not an object');
     }
-    if (!cacheExpiry || typeof cacheExpiry !== 'number') {
-        throw new Error('Invalid argument passed: CacheExpiry not a number');
+    if (!refreshDelay || typeof refreshDelay !== 'number') {
+        throw new Error('Invalid argument passed: refreshDelay not a number');
     }
     if (!logger || typeof logger !== 'object') {
         throw new Error('Invalid argument passed: Logger not an object');
