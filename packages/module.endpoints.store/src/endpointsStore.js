@@ -96,13 +96,6 @@ class EndpointsStore {
         return Promise.resolve()
             .then(() => needle('get', endpoint))
             .then((res) => EndpointsStore.mappingFn(res))
-            .then((data) => {
-                this.logger.info({
-                    function: this.func,
-                    log: `Retrieved ${Object.keys(data).length} kid records`,
-                });
-                return data;
-            })
             .catch((err) => {
                 console.log(`alert: ${err}`);
                 throw new Error(`Fetch endpoint error: ${err.message}`);

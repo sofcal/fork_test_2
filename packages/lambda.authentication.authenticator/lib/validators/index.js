@@ -1,6 +1,6 @@
 'use strict';
 
 const event = require('./event');
-const process = require('./process');
+const config = require('./config');
 
-module.exports = { event, process };
+module.exports = { event, config };

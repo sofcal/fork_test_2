@@ -81,10 +81,13 @@ describe('JwksLambda', function () {
         sandbox = sinon.createSandbox();
     });
 
+    let config;
+
     beforeEach(() => {
         clock = sinon.useFakeTimers(new Date().getTime());
 
-        sandbox.stub(process, 'env').value(_.extend(process.env, {Environment: env, AWS_REGION: region }));
+        config = {Environment: env, AWS_REGION: region, cacheExpiry: 10000 }
+        //sandbox.stub(process, 'env').value(_.extend(process.env, {Environment: env, AWS_REGION: region, cacheExpiry: 10000 }));
         event = {AWS_REGION: region, env};
 
         sandbox.stub(ParameterService, 'Create').returns(paramstore);
@@ -98,7 +101,7 @@ describe('JwksLambda', function () {
     });
 
     it('should get keys from paramstore if the cache is empty', () => {
-        jwksLambda = new JwksLambda({ config: process.env });
+        jwksLambda = new JwksLambda({ config });
         sandbox.stub(paramstore, 'getParameters')
             .onCall(0).resolves( paramStoreData );
         return jwksLambda.run(event, context, callback).then(() => {
@@ -115,7 +118,7 @@ describe('JwksLambda', function () {
     });
 
     it('should get secondary from paramstore (no primary key)', () => {
-        jwksLambda = new JwksLambda({ config: process.env });
+        jwksLambda = new JwksLambda({ config });
         sandbox.stub(paramstore, 'getParameters')
             .onCall(0).resolves( paramStoreSecondary );
         return jwksLambda.run(event, context, callback).then(() => {
@@ -132,7 +135,7 @@ describe('JwksLambda', function () {
     });
 
     it('should get secondary from paramstore (no secondary key)', () => {
-        jwksLambda = new JwksLambda({ config: process.env });
+        jwksLambda = new JwksLambda({ config });
         sandbox.stub(paramstore, 'getParameters')
             .onCall(0).resolves( paramStorePrimary );
         return jwksLambda.run(event, context, callback).then(() => {
@@ -149,7 +152,7 @@ describe('JwksLambda', function () {
     });
 
     it('should return error if the cache is corrupt (empty json)', () => {
-        jwksLambda = new JwksLambda({ config: process.env });
+        jwksLambda = new JwksLambda({ config });
         sandbox.stub(paramstore, 'getParameters')
             .onCall(0).resolves( {} );
         return jwksLambda.run(event, context, callback).then(() => {
@@ -161,7 +164,7 @@ describe('JwksLambda', function () {
     });
 
     it('should return error if the cache is corrupt (undefined)', () => {
-        jwksLambda = new JwksLambda({ config: process.env });
+        jwksLambda = new JwksLambda({ config });
         sandbox.stub(paramstore, 'getParameters')
             .onCall(0).resolves( undefined );
         return jwksLambda.run(event, context, callback).then(() => {
@@ -173,7 +176,7 @@ describe('JwksLambda', function () {
     });
 
     it('should return error if the cache rejects', () => {
-        jwksLambda = new JwksLambda({ config: process.env });
+        jwksLambda = new JwksLambda({ config });
         sandbox.stub(paramstore, 'getParameters')
             .onCall(0).rejects();
         return jwksLambda.run(event, context, callback).then(() => {

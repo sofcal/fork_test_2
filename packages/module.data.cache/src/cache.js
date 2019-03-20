@@ -9,17 +9,20 @@ const noopLogger = {
     info: noop,
 };
 
-// Cache of data for an endpoint
+// Cache of data
 class Cache {
-    constructor({
-        endpoint,
-        cacheExpiry,
-        refreshFunction,
-    }, logger = noopLogger) {
-        this.endpoint = endpoint;
+    constructor(
+        {
+            cacheExpiry,
+            refreshFunction,
+        },
+        {
+            logger = noopLogger
+        } = {}
+    ) {
         this.cacheExpiry = cacheExpiry;
         this.logger = logger;
-        this.refreshFunction = refreshFunction; // called in fetchEndPoint
+        this.refreshFunction = refreshFunction; // called in fetch
         this.func = 'Cache.impl';
 
         this.data = {};
@@ -30,25 +33,30 @@ class Cache {
     }
 
     // check last refresh time hasn't passed expiry point
+    // expiry time of -1 indicates no expiry time
     cacheExpired() {
-        return Math.floor(Date.now() / 1000) > (this.refreshTime + this.cacheExpiry);
+        return this.cacheExpiry === -1 ? false : Math.floor(Date.now() / 1000) > (this.refreshTime + this.cacheExpiry);
     }
 
-    // Empty existing cache, then call endpoint to get new data
+    // Empty existing cache, then call fetch() to get new data
     buildCache() {
         return Promise.resolve()
             // empty old cache
             .then(() => {
                 this.data = {};
             })
-            // call endpoint
-            .then(() => this.fetchEndPoint())
+            // call fetch to refresh data
+            .then(() => this.fetch())
             // update storage
             .then((data) => {
                 this.data = data;
                 this.refreshTime = Math.floor(Date.now() / 1000);
                 // refresh complete, so reset currentRefresh
                 this.currentRefresh = null;
+                this.logger.info({
+                    function: this.func,
+                    log: `Retrieved ${Object.keys(data).length} kid records`,
+                });
             })
             .catch((err) => {
                 this.logger.error({
@@ -61,11 +69,11 @@ class Cache {
 
     // get Data - return from cache if not expired,
     // otherwise check if current in-flight refresh, if not call buildCache to refresh
-    getData() {
+    getData(forceRefresh = false) {
         return Promise.resolve()
             // check if cache needs to be refreshed
             .then(() => {
-                if (this.cacheExpired()) {
+                if (forceRefresh || this.cacheExpired()) {
                     // check for existing refresh
                     if (this.currentRefresh) {
                         this.logger.info({
@@ -77,7 +85,7 @@ class Cache {
                     // otherwise start a new refresh
                     this.logger.info({
                         function: this.func,
-                        log: `endpoint ${this.endpoint} cache expired, refreshing`
+                        log: 'Cache expired, refreshing'
                     });
                     this.currentRefresh = this.buildCache(); // this will return a promise
                     return this.currentRefresh;
@@ -89,29 +97,26 @@ class Cache {
             .then(() => this.data);
     }
 
-    // refresh endpoint - runs refreshFunction parameter
-    fetchEndPoint() {
+    // fetch - runs refreshFunction parameter
+    fetch() {
         this.logger.info({
             function: this.func,
-            log: `Fetching data from endpoint ${this.endpoint}`
+            log: 'Fetching data'
         });
         return Promise.resolve()
-            .then(() => this.refreshFunction(this.endpoint))
+            .then(() => this.refreshFunction())
             .catch((err) => {
                 console.log(`alert: ${err}`);
-                throw new Error(`Fetch endpoint error: ${err.message}`);
+                throw new Error(`Refresh error: ${err.message}`);
             });
     }
 }
 
 function validate() {
-    const { refreshFunction, endpoint, cacheExpiry, logger } = this;
+    const { refreshFunction, cacheExpiry, logger } = this;
 
     if (!refreshFunction || typeof refreshFunction !== 'function') {
         throw new Error('Invalid argument passed: Refresh function is not a function');
-    }
-    if (!endpoint || typeof endpoint !== 'string') {
-        throw new Error('Invalid argument passed: Endpoint not a string');
     }
     if (!cacheExpiry || typeof cacheExpiry !== 'number') {
         throw new Error('Invalid argument passed: CacheExpiry not a number');

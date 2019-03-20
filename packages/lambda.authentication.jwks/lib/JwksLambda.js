@@ -18,11 +18,16 @@ class JwksLambda extends Handler {
         this.cache = null;
     }
 
-    validate(event, { logger }) {
-        // do any additional validation on the environment variables (this.config) or event here
-        validate.event(event);
+    static Create(...args) {
+        return new JwksLambda(...args);
+    }
 
-        return super.validate(event, { logger });
+    validate(event, debug) {
+        // do any additional validation on the environment variables (this.config) or event here
+        validate.event(this.config, debug);
+        validate.event(event, debug);
+
+        return super.validate(event, debug);
     }
 
     init(event, { logger }) {
@@ -31,10 +36,13 @@ class JwksLambda extends Handler {
                 const func = 'JwksLambda.impl';
                 // one time instantiation - we'll re-use these
                 logger.info({ function: func, log: 'started' });
+
+                const { cacheExpiry } = this.config;
+
                 if (!this.cache) {
                     const options = {
                         endpoint: 'deprecated',
-                        cacheExpiry: 10000,
+                        cacheExpiry: parseInt(cacheExpiry, 10),
                         logger: event.logger,
                         refreshFunction: () => this.cacheRefresh({ logger }),
                         mappingFunction: (...args) => this.cacheMap(...args, { logger })
@@ -62,8 +70,7 @@ class JwksLambda extends Handler {
     }
 
     validateData(data) {
-        const primary = data[0];
-        const secondary = data[1];
+        const [primary, secondary] = data;
 
         if (!this.isKeyFormat(primary) && !this.isKeyFormat(secondary)) {
                 throw new Error('No valid key');
