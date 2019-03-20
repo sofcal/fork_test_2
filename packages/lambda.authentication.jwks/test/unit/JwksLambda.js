@@ -33,7 +33,7 @@ describe('JwksLambda', function () {
         "x5c": "testSecondaryPublicKey"
     }
 
-    const PARAMSTORE_DATA = [
+    const cachedData = [
         primaryPublicKey, secondaryPublicKey
     ];
 
@@ -75,7 +75,7 @@ describe('JwksLambda', function () {
         event = {AWS_REGION: region, env};
 
         sandbox.stub(paramstore, 'getParameters')
-            .onCall(0).resolves( PARAMSTORE_DATA );
+            .onCall(0).resolves( cachedData );
 
         callback = sinon.spy();
     });
@@ -88,14 +88,14 @@ describe('JwksLambda', function () {
     it('should get keys from paramstore if the cache is empty', () => {
         jwksLambda = new JwksLambda({ config: process.env });
         sandbox.stub(Cache.prototype, 'getData')
-            .onCall(0).resolves( PARAMSTORE_DATA );
+            .onCall(0).resolves( cachedData );
         return jwksLambda.run(event, context, callback).then(() => {
             should(Cache.prototype.getData.callCount).eql(1);
             should(callback.callCount).eql(1);
             should(callback.getCall(0).args[0]).be.null();
             should(callback.getCall(0).args[1]).eql({
                 statusCode: 200,
-                body: JSON.stringify({ keys: PARAMSTORE_DATA })
+                body: JSON.stringify({ keys: cachedData })
             });
 
         });
