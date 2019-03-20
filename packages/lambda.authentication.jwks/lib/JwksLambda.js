@@ -44,7 +44,7 @@ class JwksLambda extends Handler {
                         cacheExpiry: parseInt(cacheExpiry, 10),
                         refreshFunction: () => this.cacheRefresh({ logger })
                     };
-                    this.cache = new Cache(options, { logger: event.logger });
+                    this.cache = Cache.Create(options, { logger: event.logger });
                 }
 
                 this.services.parameter = ParameterService.Create({ env: { region: this.config.AWS_REGION }, paramPrefix: '/dev01/' });
@@ -60,9 +60,6 @@ class JwksLambda extends Handler {
 
                 // this will get wrapped in a 200 response
                 return this.cache.getData()
-                    //.then((data) => this.filterExpired(data))
-                    //.then((data) => Jwks.validateKeyData(data
-                //                     ))
                     .then((data) => ({ keys: data }));
             });
     }
@@ -71,31 +68,21 @@ class JwksLambda extends Handler {
         const func = 'JwksLambda.cacheRefresh';
         logger.info({ function: func, log: 'started' });
 
-        const keyD = ['primary', 'secondary'];
+        const prefixes = ['accessToken.primary', 'accessToken.secondary'];
         const params = [];
-        const keyD_map = _.map(keyD, (k) => {
-            const mapped = { privateKey: `accessToken.${k}.privateKey`, publicKey: `accessToken.${k}.publicKey`, createdAt: `accessToken.${k}.createdAt`};
+        const keyNameEnums = _.map(prefixes, (k) => {
+            const mapped = { privateKey: `${k}.privateKey`, publicKey: `${k}.publicKey`, createdAt: `${k}.createdAt` };
             params.push(..._.values(mapped));
             return mapped;
         });
 
-        // for each keyD, create object with private, public, created enum
-        // for each keyD_map, take values to create params
-
-        // for each keyD_map, get params, send to gen
-        //
-        // const params = [
-        //     'accessToken.primary.privateKey', 'accessToken.primary.publicKey', 'accessToken.primary.createdAt',
-        //     'accessToken.secondary.privateKey', 'accessToken.secondary.publicKey', 'accessToken.secondary.createdAt'
-        // ];
-
         return this.services.parameter.getParameters(params)
             .then((data) => {
-                //const validPublicKeys = Jwks.getListOfValidPublicKeys(data, this.config.cacheExpiry);
-
-                const mapped = _.chain(keyD_map)
+                // for each keyNameEnum object (which contains the keyIds for our param-store values), check all the properties
+                // are valid, and generate a JWKS
+                const mapped = _.chain(keyNameEnums)
                     .map((k) => {
-                        if (Jwks.isValid(data[k.publicKey], data[k.privateKey], data[k.createdAt])) {
+                        if (Jwks.isValid(data[k.publicKey], data[k.privateKey], parseInt(data[k.createdAt], 10), parseInt(this.config.certExpiry, 10))) {
                             return Jwks.Generate(data[k.publicKey], data[k.privateKey]);
                         }
                         return null;
@@ -103,57 +90,9 @@ class JwksLambda extends Handler {
                     .compact()
                     .value();
 
-                // if (Jwks.isValid(data['accessToken.primary.publicKey'], data['accessToken.primary.privateKey'], data['accessToken.primary.createdAt'])) {
-                //     mapped.push(Jwks.Generate(data['accessToken.primary.publicKey'], data['accessToken.primary.privateKey']));
-                // }
-                // if (Jwks.isValid(data['accessToken.secondary.publicKey'], data['accessToken.secondary.privateKey'], data['accessToken.secondary.createdAt'])) {
-                //     mapped.push(Jwks.Generate(data['accessToken.secondary.publicKey'], data['accessToken.secondary.privateKey']));
-                // }
-
-                //const mapped = validPublicKeys.map(k => Jwks.Generate(k.publicKey, k.privateKey));
                 logger.info({ function: func, log: 'ended' });
                 return mapped;
             });
-    }
-
-    filterExpired(data) {
-        const now = new Date().getTime();
-        return data.filter( (k) => {
-            return now < Number(k.createdAt) + (this.config.delay || 1000);
-        });
-    }
-
-    /**
-     * Creates a json object which only contains keys whiches allowed and has all the require attributes.
-     * @param dataJson
-     * @returns {*[]}
-     */
-    getListOfValidPublicKeys(dataJson) {
-        let validPublicKeys = [];
-
-
-        const allowedPrefixes = ['accessToken.primary.', 'accessToken.secondary.'];
-        const allowedAttributes = ['publicKey', 'privateKey', 'createdAt'];
-
-
-        const hasAllAttributes = (prefix) => {
-            let noAttributeMissing = true;
-            return allowedAttributes.reduce((accumulator, a) => dataJson[prefix + a] && accumulator, noAttributeMissing);
-        }
-
-        const createPublicKey = (prefix) => {
-            let temp = {};
-            allowedAttributes.forEach((a) => {
-                temp[a] = dataJson[prefix + a];
-            });
-            return temp;
-        }
-
-        validPublicKeys = allowedPrefixes
-            .filter(p => hasAllAttributes(p))
-            .map(p => createPublicKey(p));
-
-        return validPublicKeys;
     }
 }
 

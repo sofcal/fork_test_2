@@ -2,6 +2,8 @@
 
 const { Kid } = require('@sage/sfab-s2s-jwt-kid');
 
+const _ = require('underscore');
+
 const kty = 'RSA'; // keyType
 const use = 'sig'; // use
 const alg = 'RS256'; // algorithm
@@ -29,70 +31,13 @@ class Jwks {
         return `-----BEGIN RSA PUBLIC KEY-----\n${split}-----END RSA PUBLIC KEY-----`;
     }
 
-    static validateKeyData(data) {
-        const [primary, secondary] = data;
-
-        if (!Jwks.isKeyFormat(primary) && !Jwks.isKeyFormat(secondary)) {
-            throw new Error('No valid key');
-        }
-        return data;
+    static isExpired(createdAt, maxAgeSeconds) {
+        return (createdAt + maxAgeSeconds) < Math.floor(Date.now() / 1000);
     }
 
-    static isKeyFormat(dataJson) {
-        const availableKeys = ["kty", "alg", "use", "kid", "x5c"];
-
-        let valid = true;
-
-        return Object.keys(dataJson).reduce((accumulator, key) => accumulator && availableKeys.includes(key), valid);
-
-    }
-
-    static filterExpired(data) {
-        const now = new Date().getTime();
-        return data.filter( (k) => {
-            return now < Number(k.createdAt) + (this.config.delay || 1000);
-        });
-    }
-
-    static isExpired(createdAt) {
-        return false;
-    }
-
-    static isValid(publicKey, privateKey, createdAt) {
-        const validCreatedAt = !Jwks.isExpired(createdAt);
-        return _.isString(privateKey) && _.isString(publicKey) && validCreatedAt;
-    }
-
-    /**
-     * Creates a json object which only contains keys whiches allowed and has all the require attributes.
-     * @param dataJson
-     * @returns {*[]}
-     */
-    static getListOfValidPublicKeys(dataJson) {
-        let validPublicKeys = [];
-
-        const allowedPrefixes = ['accessToken.primary.', 'accessToken.secondary.'];
-        const allowedAttributes = ['publicKey', 'privateKey', 'createdAt'];
-
-
-        const hasAllAttributes = (prefix) => {
-            let noAttributeMissing = true;
-            return allowedAttributes.reduce((accumulator, a) => dataJson[prefix + a] && accumulator, noAttributeMissing);
-        }
-
-        const createPublicKey = (prefix) => {
-            let temp = {};
-            allowedAttributes.forEach((a) => {
-                temp[a] = dataJson[prefix + a];
-            });
-            return temp;
-        }
-
-        validPublicKeys = allowedPrefixes
-            .filter(p => hasAllAttributes(p))
-            .map(p => createPublicKey(p));
-
-        return validPublicKeys;
+    static isValid(publicKey, privateKey, createdAt, maxAgeSeconds) {
+        const isExpired = Jwks.isExpired(createdAt, maxAgeSeconds);
+        return _.isString(privateKey) && _.isString(publicKey) && !isExpired;
     }
 }
 
