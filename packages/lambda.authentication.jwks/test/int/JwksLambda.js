@@ -15,10 +15,22 @@ describe('JwksLambda', function () {
 
     };
 
-    const PARAMSTORE_DATA =             {
-        'accessToken.primary.publicKey': 'testPrimaryPublicKey',
-        'accessToken.secondary.publicKey': 'testSecondaryPublicKey'
-    };
+    const PARAMSTORE_DATA = [
+        {
+            "kty": "RSA",
+            "alg": "RS256",
+            "use": "sig",
+            "kid": "26bc2a4b18ad162f9c2e9f1103317fc07bf4fff0908251077e6a9154962d7ad9",
+            "x5c": "testPrimaryPublicKey"
+        },
+        {
+            "kty": "RSA",
+            "alg": "RS256",
+            "use": "sig",
+            "kid": "9751bce2a5126b5910ae48a94fddb5ffbb2f0bc2a1879fc84cd54eed983ec2fc",
+            "x5c": "testSecondaryPublicKey"
+        }
+    ];
 
     const env = 'local';
     const region = 'eu-west-1';

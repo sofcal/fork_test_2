@@ -75,9 +75,8 @@ class JwksLambda extends Handler {
 
         let valid = true
 
-        // Object.keys(dataJson).reduce( (accumulator, key) => accumulator && , valid )
+        return Object.keys(dataJson).reduce((accumulator, key) => accumulator && availableKeys.includes(key) && _.isString(dataJson[key]), valid );
 
-        return true; // TODO
     }
 
     cacheRefresh({ logger }) {
