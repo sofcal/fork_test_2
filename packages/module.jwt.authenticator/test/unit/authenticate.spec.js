@@ -123,35 +123,30 @@ describe('module-jwt-authenticator.authenticate', function(){
         })
 
         it('should return true if validateToken passes ', () => {
-            jwtDecodeStub.returns({
-               exp: Infinity,
-               iss: 'test',
-               kid: '12345',
-            });
             validateTokenStub.returns(true);
 
             const test = new Authenticate({
-                authToken: 'authToken',
-                validIssuers: ['valid issuer'],
+                validIssuers: ['test'],
                 storeService: { name: 'store service'},
             }, logger);
+
             test.validate().should.be.true();
         });
 
         it('should throw error if validate fails ', () => {
-            jwtDecodeStub.returns({
-               exp: Infinity,
-               iss: 'test',
-               kid: '12345',
-            });
+            // jwtDecodeStub.returns({
+            //    exp: Infinity,
+            //    iss: 'test',
+            //    kid: '12345',
+            // });
             const errMsg = 'failValidate';
             validateTokenStub.throws(() => new Error(errMsg));
 
             const test = new Authenticate({
-                authToken: 'authToken',
-                validIssuers: ['valid issuer'],
+                validIssuers: ['test'],
                 storeService: { name: 'store service'},
             }, logger);
+
             should.throws(() => test.validate(), /^Error: failValidate$/);
         });
     });

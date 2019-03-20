@@ -12,7 +12,7 @@ describe('module-endpoints-store', function(){
         serv2: 'https://www.test.com/serv2',
         serv3: 'invalid',
     };
-    const cacheExpiry = 10;
+    const refreshDelay = 10;
     const endPointResponse = [
         {
             keys: [
@@ -59,11 +59,14 @@ describe('module-endpoints-store', function(){
         error: (msg) => console.error(msg),
     };
 
-    const test = new EndpointsStore({
-        endpointMappings,
-        cacheExpiry,
-        cacheClass: Cache,
-    }, logger);
+    const test = new EndpointsStore(
+        {
+            endpointMappings,
+            refreshDelay,
+            cacheClass: Cache,
+        },
+        { logger }
+    );
 
     const nockEndPoints = nock('https://www.test.com')
         .persist()
@@ -96,10 +99,12 @@ describe('module-endpoints-store', function(){
         });
 
         it('should set default values when not passed in', () => {
-            const testDefault = new EndpointsStore({
-                endpointMappings,
-                cacheExpiry,
-            });
+            const testDefault = new EndpointsStore(
+                {
+                    endpointMappings,
+                    refreshDelay,
+                }
+            );
             testDefault.should.be.instanceOf(EndpointsStore);
             should.equal(testDefault.Cache.name,'Cache');
             testDefault.logger.should.be.Object();
@@ -110,29 +115,29 @@ describe('module-endpoints-store', function(){
         it('should throw when invalid parameters passed', () => {
             should.throws(() => new EndpointsStore({
                 endpointMappings: null,
-                cacheExpiry,
+                refreshDelay,
                 cacheClass: Cache,
-            }, logger));
+            }, { logger }));
             should.throws(() => new EndpointsStore({
                 endpointMappings,
-                cacheExpiry,
+                refreshDelay,
                 cacheClass: null,
-            }, logger));
+            }, { logger }));
             should.throws(() => new EndpointsStore({
                 endpointMappings,
-                cacheExpiry: null,
+                refreshDelay: null,
                 cacheClass: Cache,
-            }, logger));
+            }, { logger }));
             should.throws(() => new EndpointsStore({
                 endpointMappings,
-                cacheExpiry,
+                refreshDelay,
                 cacheClass: Cache,
-            }, 'logger'));
+            }, { logger:'logger'}));
             should.throws(() => new EndpointsStore({
                 endpointMappings,
-                cacheExpiry,
+                refreshDelay,
                 cacheClass: Cache,
-            }, {invalidLogger: true}));
+            }, {logger: {invalidLogger: true}}));
         })
     });
 
@@ -152,7 +157,7 @@ describe('module-endpoints-store', function(){
         });
 
         it('should refresh keys from endpoint when cache expired', () => {
-            dateStub.returns(300000 + (cacheExpiry * 1000 * 2));
+            dateStub.returns(300000 + (refreshDelay * 1000 * 2));
             const ID = Object.keys(endpointMappings)[0];
             return test.getCache(ID)
                 .then((res) => res.should.eql(expectedCertList(0)))
@@ -160,7 +165,7 @@ describe('module-endpoints-store', function(){
         });
 
         it('should return empty object when no keys found', () => {
-            dateStub.returns(300000 + (cacheExpiry * 1000 * 2));
+            dateStub.returns(300000 + (refreshDelay * 1000 * 2));
             const ID = Object.keys(endpointMappings)[1];
             return test.getCache(ID)
                 .then((res) => res.should.eql({}))
