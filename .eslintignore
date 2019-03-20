@@ -2,7 +2,8 @@
 
 **/*.json
 **/packages/**/test/*
-**/packages/internal.*/lib/*
+**/packages/runonce.*
+**/packages/module.*/lib/*
 **/packages/**/node_modules/*
 
 build/*

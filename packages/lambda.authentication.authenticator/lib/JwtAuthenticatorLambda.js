@@ -77,6 +77,35 @@ class JwtAuthenticatorLambda extends Handler {
                     });
             });
     }
+
+    buildResponse({ claims }, { logger }) {
+        const func = `${JwtAuthenticatorLambda.name}.buildResponse`;
+
+        logger.info({ function: func, log: 'started' });
+        const policy = generatePolicy('Allow', '*', claims);
+        logger.info({ function: func, log: 'ended' });
+
+        return policy;
+    }
 }
+
+const generatePolicy = (effect, resource, context) => {
+    const authResponse = {};
+
+    if (effect && resource) {
+        const policyDocument = {};
+        policyDocument.Version = '2012-10-17';
+        policyDocument.Statement = [];
+        const statementOne = {};
+        statementOne.Action = 'execute-api:Invoke';
+        statementOne.Effect = effect;
+        statementOne.Resource = resource;
+        policyDocument.Statement[0] = statementOne;
+        authResponse.policyDocument = policyDocument;
+    }
+    // Optional output with custom properties of the String, Number or Boolean type.
+    authResponse.context = context;
+    return authResponse;
+};
 
 module.exports = JwtAuthenticatorLambda;

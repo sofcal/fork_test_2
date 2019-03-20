@@ -3,6 +3,7 @@
 'use strict';
 
 const needle = require('needle');
+const { Jwks } = require('@sage/sfab-s2s-jwt-jwks');
 const { Cache } = require('@sage/bc-data-cache');
 
 // set default user agent
@@ -117,7 +118,7 @@ class EndpointsStore {
             return Object.assign(
                 {},
                 final,
-                { [kid]: x5c },
+                { [kid]: [Jwks.ConvertX5CToPem(x5c[0])] },
             );
         }, {});
     }

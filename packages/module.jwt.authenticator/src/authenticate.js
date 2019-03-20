@@ -110,7 +110,14 @@ class Authenticate {
                     function: this.func,
                     log: `Validating against certkeys ${this.certKeys}`,
                 });
-                const validTokenFound = find(this.certKeys, (cert) => jwt.verify(this.authToken, cert) !== null);
+                const validTokenFound = find(this.certKeys, (cert) => {
+                    try {
+                        return jwt.verify(this.authToken, cert) !== null;
+                    } catch (e) {
+                        this.logger.warn({ function: this.func, log: `verify failed - kid: ${this.kid}`, params: { error: e.message } });
+                        return false;
+                    }
+                });
 
                 if (!validTokenFound) {
                     this.logger.error({

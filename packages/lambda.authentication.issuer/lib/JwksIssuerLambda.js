@@ -85,13 +85,13 @@ class JwtIssuerLambda extends Handler {
                 const mapped = [{
                     status: 'primary',
                     private: data['accessToken.primary.privateKey'],
-                    public: data['accessToken.primary.privateKey'],
+                    public: data['accessToken.primary.publicKey'],
                     timestamp: parseInt(data['accessToken.primary.timestamp'], 10),
                     kid: Kid.Generate(data['accessToken.primary.privateKey'])
                 }, {
                     status: 'secondary',
                     private: data['accessToken.secondary.privateKey'],
-                    public: data['accessToken.secondary.privateKey'],
+                    public: data['accessToken.secondary.publicKey'],
                     timestamp: parseInt(data['accessToken.secondary.timestamp'], 10),
                     kid: Kid.Generate(data['accessToken.secondary.privateKey'])
                 }];

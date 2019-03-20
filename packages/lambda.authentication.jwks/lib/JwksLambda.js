@@ -85,14 +85,15 @@ class JwksLambda extends Handler {
         logger.info({ function: func, log: 'started' });
 
         const params = [
-            'accessToken.primary.publicKey', 'accessToken.secondary.publicKey'
+            'accessToken.primary.privateKey', 'accessToken.primary.publicKey',
+            'accessToken.secondary.privateKey', 'accessToken.secondary.publicKey'
         ];
 
         return this.services.parameter.getParameters(params)
             .then((data) => {
                 const mapped = [
-                    Jwks.Generate(data['accessToken.primary.publicKey']),
-                    Jwks.Generate(data['accessToken.secondary.publicKey'])
+                    Jwks.Generate(data['accessToken.primary.publicKey'], data['accessToken.primary.privateKey']),
+                    Jwks.Generate(data['accessToken.secondary.publicKey'], data['accessToken.secondary.privateKey'])
                 ];
 
                 logger.info({ function: func, log: 'ended' });
