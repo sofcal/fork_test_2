@@ -1,13 +1,10 @@
 /* eslint-disable class-methods-use-this */
 
 const validate = require('./validators');
-const ErrorSpecs = require('./ErrorSpecs');
 
 const { Handler } = require('@sage/bc-independent-lambda-handler');
-const { Authenticate } = require('@sage/bc-jwt-authenticator');
+const { JwtAuthenticator } = require('@sage/bc-jwt-authenticator');
 const { EndpointsStore } = require('@sage/bc-endpoints-store');
-const { Cache } = require('@sage/bc-data-cache');
-const { StatusCodeError } = require('@sage/bc-status-code-error');
 
 const Promise = require('bluebird');
 
@@ -33,7 +30,7 @@ class JwtAuthenticatorLambda extends Handler {
     init(event, { logger }) {
         return Promise.resolve(undefined)
             .then(() => {
-                const func = 'JwtIssuerLambda.impl';
+                const func = `${JwtAuthenticatorLambda.name}.init`;
                 // one time instantiation - we'll re-use these
                 logger.info({ function: func, log: 'started' });
 
@@ -41,11 +38,11 @@ class JwtAuthenticatorLambda extends Handler {
                 const endpointMappings = JSON.parse(serviceMappings || '{}');
 
                 logger.info({ function: func, log: 'creating store service' });
-                const storeService = new EndpointsStore({ endpointMappings, cacheExpiry: parseInt(cacheExpiry, 10), refreshDelay: parseInt(refreshDelay, 10) }, logger);
+                const storeService = EndpointsStore.Create({ endpointMappings, cacheExpiry: parseInt(cacheExpiry, 10), refreshDelay: parseInt(refreshDelay, 10) }, { logger });
                 const validIssuers = Object.keys(endpointMappings);
 
                 logger.info({ function: func, log: 'creating auth service' });
-                this.auth = new Authenticate({ validIssuers, storeService, }, logger);
+                this.auth = JwtAuthenticator.Create({ validIssuers, storeService, }, { logger });
 
                 logger.info({ function: func, log: 'ended' });
             });
@@ -54,7 +51,7 @@ class JwtAuthenticatorLambda extends Handler {
     impl(event) {
         return Promise.resolve(undefined)
             .then(() => {
-                const func = 'JwtIssuerLambda.impl';
+                const func = `${JwtAuthenticatorLambda.name}.impl`;
                 event.logger.info({ function: func, log: 'started' });
 
                 // extract auth token from event

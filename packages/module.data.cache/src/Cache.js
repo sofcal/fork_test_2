@@ -2,6 +2,8 @@
 
 'use strict';
 
+const Promise = require('bluebird');
+
 const noop = () => {};
 const noopLogger = {
     error: noop,
@@ -11,25 +13,33 @@ const noopLogger = {
 
 // Cache of data
 class Cache {
-    constructor(
-        {
-            cacheExpiry,
-            refreshFunction,
-        },
-        {
-            logger = noopLogger
-        } = {}
-    ) {
+    constructor({ cacheExpiry, refreshFunction, }, { logger = noopLogger } = {}) {
         this.cacheExpiry = cacheExpiry;
         this.logger = logger;
         this.refreshFunction = refreshFunction; // called in fetch
-        this.func = 'Cache.impl';
 
         this.data = {};
         this.currentRefresh = null; // set in getData, reset in buildCache
         this.refreshTime = 0;
 
-        validate.call(this);
+        this.validate();
+    }
+
+    validate() {
+        const { refreshFunction, cacheExpiry, logger } = this;
+
+        if (!refreshFunction || typeof refreshFunction !== 'function') {
+            throw new Error('Invalid argument passed: Refresh function is not a function');
+        }
+        if (!cacheExpiry || typeof cacheExpiry !== 'number') {
+            throw new Error('Invalid argument passed: CacheExpiry not a number');
+        }
+        if (!logger || typeof logger !== 'object') {
+            throw new Error('Invalid argument passed: Logger not an object');
+        }
+        if (!logger.info || !logger.error) {
+            throw new Error('Invalid argument passed: Logger not valid');
+        }
     }
 
     static Create(...args) {
@@ -44,11 +54,8 @@ class Cache {
 
     // Empty existing cache, then call fetch() to get new data
     buildCache() {
-        return Promise.resolve()
-            // empty old cache
-            .then(() => {
-                this.data = {};
-            })
+        const func = `${Cache.name}.buildCache`;
+        return Promise.resolve(undefined)
             // call fetch to refresh data
             .then(() => this.fetch())
             // update storage
@@ -57,16 +64,10 @@ class Cache {
                 this.refreshTime = Math.floor(Date.now() / 1000);
                 // refresh complete, so reset currentRefresh
                 this.currentRefresh = null;
-                this.logger.info({
-                    function: this.func,
-                    log: `Retrieved ${Object.keys(data).length} kid records`,
-                });
+                this.logger.info({ function: func, log: 'cache refreshed' });
             })
             .catch((err) => {
-                this.logger.error({
-                    function: this.func,
-                    log: `Error building cache: ${err}`
-                });
+                this.logger.error({ function: func, log: 'error building cache', params: { error: err.message } });
                 throw err;
             });
     }
@@ -74,23 +75,18 @@ class Cache {
     // get Data - return from cache if not expired,
     // otherwise check if current in-flight refresh, if not call buildCache to refresh
     getData(forceRefresh = false) {
-        return Promise.resolve()
+        const func = `${Cache.name}.getData`;
+        return Promise.resolve(undefined)
             // check if cache needs to be refreshed
             .then(() => {
                 if (forceRefresh || this.cacheExpired()) {
                     // check for existing refresh
                     if (this.currentRefresh) {
-                        this.logger.info({
-                            function: this.func,
-                            log: 'Existing refresh running, waiting for completion'
-                        });
+                        this.logger.info({ function: func, log: 'existing refresh running, waiting for completion' });
                         return this.currentRefresh;
                     }
                     // otherwise start a new refresh
-                    this.logger.info({
-                        function: this.func,
-                        log: 'Cache expired, refreshing'
-                    });
+                    this.logger.info({ function: func, log: 'cache expired, refreshing' });
                     this.currentRefresh = this.buildCache(); // this will return a promise
                     return this.currentRefresh;
                 }
@@ -103,36 +99,15 @@ class Cache {
 
     // fetch - runs refreshFunction parameter
     fetch() {
-        this.logger.info({
-            function: this.func,
-            log: 'Fetching data'
-        });
+        const func = `${Cache.name}.fetch`;
+        this.logger.info({ function: func, log: 'fetching data' });
         return Promise.resolve()
             .then(() => this.refreshFunction())
             .catch((err) => {
-                console.log(`alert: ${err}`);
+                this.logger.info({ function: func, log: 'error in refresh function', params: { error: err.message, alert: true } });
                 throw new Error(`Refresh error: ${err.message}`);
             });
     }
 }
 
-function validate() {
-    const { refreshFunction, cacheExpiry, logger } = this;
-
-    if (!refreshFunction || typeof refreshFunction !== 'function') {
-        throw new Error('Invalid argument passed: Refresh function is not a function');
-    }
-    if (!cacheExpiry || typeof cacheExpiry !== 'number') {
-        throw new Error('Invalid argument passed: CacheExpiry not a number');
-    }
-    if (!logger || typeof logger !== 'object') {
-        throw new Error('Invalid argument passed: Logger not an object');
-    }
-    if (!logger.info || !logger.error) {
-        throw new Error('Invalid argument passed: Logger not valid');
-    }
-}
-
-module.exports = {
-    Cache
-};
+module.exports = Cache;

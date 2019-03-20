@@ -1,7 +1,7 @@
 'use strict';
 
-const { Authenticate } = require('./authenticate');
+const JwtAuthenticator = require('./JwtAuthenticator');
 
 module.exports = {
-    Authenticate,
+    JwtAuthenticator,
 };

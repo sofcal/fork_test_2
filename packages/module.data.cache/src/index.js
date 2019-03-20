@@ -1,6 +1,6 @@
 'use strict';
 
-const { Cache } = require('./cache');
+const Cache = require('./Cache');
 
 module.exports = {
     Cache
