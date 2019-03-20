@@ -38,5 +38,10 @@ module.exports = {
         applicationCode: 'ParamStoreError',
         message: 'failed to retrieve all parameters from parameter-store',
         statusCode: 500
-    }
+    },
+    unknownError: {
+        applicationCode: 'InternalServerError',
+        message: 'an error occurred while processing the request',
+        statusCode: 500
+    },
 };

@@ -72,7 +72,8 @@ class JwtAuthenticatorLambda extends Handler {
                         return res;
                     })
                     .catch((err) => {
-                        throw StatusCodeError.CreateFromSpecs([ErrorSpecs[err]], ErrorSpecs[err].statusCode);
+                        const code = !ErrorSpecs[err.message] ? 'unknownError' : err.message;
+                        throw StatusCodeError.CreateFromSpecs([ErrorSpecs[code]], ErrorSpecs[code].statusCode);
                     });
             });
     }
