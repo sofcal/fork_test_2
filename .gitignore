@@ -11,6 +11,8 @@ build
 lerna-debug.json
 lerna-debug.log
 coverage
-.DS_Store
 
 packages/**/npm-debug*
+packages/**/module.*/lib
+
+.DS_Store
