@@ -41,7 +41,7 @@
     "webpack-node-externals": "^1.6.0"
   },
   "scripts": {
-    "clean": "rimraf ./coverage/ && rimraf ./.nyc_output/ && rimraf ./node_modules/",
+    "clean": "rimraf ./coverage/ && rimraf ./.nyc_output/ && rimraf ./node_modules/ && rimraf ./lib/",
     "test": "NODE_ENV=test nyc --cache false --x test/ mocha -b --colors \"./test/unit/**/*.spec.js\"",
     "testwatchunit": "NODE_ENV=test mocha -b -w --colors \"./test/unit/**/*.spec.js\"",
     "testwatchuint": "NODE_ENV=test mocha -b -w --colors \"./test/int/**/*.spec.js\"",

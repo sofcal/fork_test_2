@@ -8,7 +8,7 @@
     "access": "public"
   },
   "scripts": {
-    "clean": "rm -rf ./coverage/ && rm -rf ./.nyc_output/ && rm -rf ./.serverless/ && rm -rf ./node_modules/",
+    "clean": "rm -rf ./coverage/ && rm -rf ./.nyc_output/ && rm -rf ./.serverless/ && rm -rf ./node_modules/ && rimraf ./lib/",
     "test": "NODE_ENV=test nyc --cache false --x test/ mocha -b --colors \"./test/unit/**/*.js\"",
     "cover": "NODE_ENV=test npm run test && nyc report --reporter=lcov",
     "report": "open coverage/lcov-report/index.html",
