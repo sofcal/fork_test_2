@@ -75,9 +75,8 @@ class JwksLambda extends Handler {
 
         let valid = true
 
-        // Object.keys(dataJson).reduce( (accumulator, key) => accumulator && , valid )
+        return Object.keys(dataJson).reduce((accumulator, key) => accumulator && availableKeys.includes(key) && _.isString(dataJson[key]), valid );
 
-        return true; // TODO
     }
 
     cacheRefresh({ logger }) {
@@ -96,9 +95,18 @@ class JwksLambda extends Handler {
                     Jwks.Generate(data['accessToken.secondary.publicKey'], data['accessToken.secondary.privateKey'])
                 ];
 
+                // const validPublicKeys = this.getListOfValidPublicKeys(data);
+                // const mapped = validPublicKeys.map(k => Jwks.Generate(k));
                 logger.info({ function: func, log: 'ended' });
                 return mapped;
             });
+    }
+
+    getListOfValidPublicKeys(dataJson) {
+        const validKeys = ['accessToken.primary.publicKey', 'accessToken.secondary.publicKey'];
+        return Object.keys(dataJson)
+            .filter(key => validKeys.includes(key))
+            .map(key => dataJson[key]);
     }
 
     cacheMap(input, { logger }) {

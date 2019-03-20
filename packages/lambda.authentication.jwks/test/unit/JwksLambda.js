@@ -17,21 +17,24 @@ describe('JwksLambda', function () {
     const PRIMARY_PUBLICKEY_KEY = 'accessToken.primary.publicKey';
     const SECONDARY_PUBLICKEY_KEY = 'accessToken.secondary.publicKey';
 
-    const PARAMSTORE_DATA = [
-        {
-            "kty": "RSA",
-            "alg": "RS256",
-            "use": "sig",
-            "kid": "26bc2a4b18ad162f9c2e9f1103317fc07bf4fff0908251077e6a9154962d7ad9",
-            "x5c": "testPrimaryPublicKey"
-        },
-        {
-            "kty": "RSA",
-            "alg": "RS256",
-            "use": "sig",
-            "kid": "9751bce2a5126b5910ae48a94fddb5ffbb2f0bc2a1879fc84cd54eed983ec2fc",
-            "x5c": "testSecondaryPublicKey"
-        }
+    const primaryPublicKey = {
+        "kty": "RSA",
+        "alg": "RS256",
+        "use": "sig",
+        "kid": "26bc2a4b18ad162f9c2e9f1103317fc07bf4fff0908251077e6a9154962d7ad9",
+        "x5c": "testPrimaryPublicKey"
+    };
+
+    const secondaryPublicKey = {
+        "kty": "RSA",
+        "alg": "RS256",
+        "use": "sig",
+        "kid": "9751bce2a5126b5910ae48a94fddb5ffbb2f0bc2a1879fc84cd54eed983ec2fc",
+        "x5c": "testSecondaryPublicKey"
+    }
+
+    const cachedData = [
+        primaryPublicKey, secondaryPublicKey
     ];
 
     const env = 'local';
@@ -72,7 +75,7 @@ describe('JwksLambda', function () {
         event = {AWS_REGION: region, env};
 
         sandbox.stub(paramstore, 'getParameters')
-            .onCall(0).resolves( PARAMSTORE_DATA );
+            .onCall(0).resolves( cachedData );
 
         callback = sinon.spy();
     });
@@ -85,14 +88,14 @@ describe('JwksLambda', function () {
     it('should get keys from paramstore if the cache is empty', () => {
         jwksLambda = new JwksLambda({ config: process.env });
         sandbox.stub(Cache.prototype, 'getData')
-            .onCall(0).resolves( PARAMSTORE_DATA );
+            .onCall(0).resolves( cachedData );
         return jwksLambda.run(event, context, callback).then(() => {
             should(Cache.prototype.getData.callCount).eql(1);
             should(callback.callCount).eql(1);
             should(callback.getCall(0).args[0]).be.null();
             should(callback.getCall(0).args[1]).eql({
                 statusCode: 200,
-                body: JSON.stringify({ keys: PARAMSTORE_DATA })
+                body: JSON.stringify({ keys: cachedData })
             });
 
         });
@@ -101,14 +104,14 @@ describe('JwksLambda', function () {
     it('should get secondary from paramstore (no primary key)', () => {
         jwksLambda = new JwksLambda({ config: process.env });
         sandbox.stub(Cache.prototype, 'getData')
-            .onCall(0).resolves( { 'accessToken.secondary.publicKey': 'testSecondaryPublicKey' } )
+            .onCall(0).resolves( [secondaryPublicKey]);
         return jwksLambda.run(event, context, callback).then(() => {
             should(Cache.prototype.getData.callCount).eql(1);
             should(callback.callCount).eql(1);
             should(callback.getCall(0).args[0]).be.null();
             should(callback.getCall(0).args[1]).eql({
                 statusCode: 200,
-                body: JSON.stringify({ keys: { 'accessToken.secondary.publicKey': 'testSecondaryPublicKey' } })
+                body: JSON.stringify({ keys: [secondaryPublicKey] })
             });
 
         });
@@ -117,14 +120,14 @@ describe('JwksLambda', function () {
     it('should get primary from paramstore (no secondary key)', () => {
         jwksLambda = new JwksLambda({ config: process.env });
         sandbox.stub(Cache.prototype, 'getData')
-            .onCall(0).resolves( { 'accessToken.primary.publicKey': 'testPrimaryPublicKey' } )
+            .onCall(0).resolves( [primaryPublicKey] )
         return jwksLambda.run(event, context, callback).then(() => {
             should(Cache.prototype.getData.callCount).eql(1);
             should(callback.callCount).eql(1);
             should(callback.getCall(0).args[0]).be.null();
             should(callback.getCall(0).args[1]).eql({
                 statusCode: 200,
-                body: JSON.stringify({ keys: { 'accessToken.primary.publicKey': 'testPrimaryPublicKey' } })
+                body: JSON.stringify({ keys: [primaryPublicKey] })
             });
 
         });

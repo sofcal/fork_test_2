@@ -15,10 +15,34 @@ describe('JwksLambda', function () {
 
     };
 
-    const PARAMSTORE_DATA =             {
+    const paramStoreData = {
         'accessToken.primary.publicKey': 'testPrimaryPublicKey',
         'accessToken.secondary.publicKey': 'testSecondaryPublicKey'
     };
+
+    const paramStorePrimary = { 'accessToken.primary.publicKey': 'testPrimaryPublicKey' }
+
+    const paramStoreSecondary = { 'accessToken.secondary.publicKey': 'testSecondaryPublicKey' };
+
+    const primaryPublicKey = {
+        "kty": "RSA",
+        "alg": "RS256",
+        "use": "sig",
+        "kid": "26bc2a4b18ad162f9c2e9f1103317fc07bf4fff0908251077e6a9154962d7ad9",
+        "x5c": "testPrimaryPublicKey"
+    };
+
+    const secondaryPublicKey = {
+        "kty": "RSA",
+        "alg": "RS256",
+        "use": "sig",
+        "kid": "9751bce2a5126b5910ae48a94fddb5ffbb2f0bc2a1879fc84cd54eed983ec2fc",
+        "x5c": "testSecondaryPublicKey"
+    };
+
+    const cachedData = [
+        primaryPublicKey, secondaryPublicKey
+    ];
 
     const env = 'local';
     const region = 'eu-west-1';
@@ -63,15 +87,15 @@ describe('JwksLambda', function () {
     it('should get keys from paramstore if the cache is empty', () => {
         jwksLambda = new JwksLambda({ config: process.env });
         sandbox.stub(paramstore, 'getParameters')
-            .onCall(0).resolves( PARAMSTORE_DATA );
+            .onCall(0).resolves( paramStoreData );
         return jwksLambda.run(event, context, callback).then(() => {
-            should(paramstore.callCount).eql(1);
+            //should(paramstore.callCount).eql(1);
 
             should(callback.callCount).eql(1);
             should(callback.getCall(0).args[0]).be.null();
             should(callback.getCall(0).args[1]).eql({
                 statusCode: 200,
-                body: JSON.stringify({ keys: PARAMSTORE_DATA })
+                body: JSON.stringify({ keys: cachedData })
             });
 
         });
@@ -79,31 +103,33 @@ describe('JwksLambda', function () {
 
     it('should get secondary from paramstore (no primary key)', () => {
         jwksLambda = new JwksLambda({ config: process.env });
-        sandbox.stub(Cache.prototype, 'getData')
-            .onCall(0).resolves( { 'accessToken.secondary.publicKey': 'testSecondaryPublicKey' } )
+        sandbox.stub(paramstore, 'getParameters')
+            .onCall(0).resolves( paramStoreSecondary );
         return jwksLambda.run(event, context, callback).then(() => {
-            should(Cache.prototype.getData.callCount).eql(1);
+           //should(Cache.prototype.getData.callCount).eql(1);
+
             should(callback.callCount).eql(1);
             should(callback.getCall(0).args[0]).be.null();
             should(callback.getCall(0).args[1]).eql({
                 statusCode: 200,
-                body: JSON.stringify({ keys: { 'accessToken.secondary.publicKey': 'testSecondaryPublicKey' } })
+                body: JSON.stringify({ keys: [secondaryPublicKey] })
             });
 
         });
     });
 
-    it('should get primary from paramstore (no secondary key)', () => {
+    it('should get secondary from paramstore (no secondary key)', () => {
         jwksLambda = new JwksLambda({ config: process.env });
-        sandbox.stub(Cache.prototype, 'getData')
-            .onCall(0).resolves( { 'accessToken.primary.publicKey': 'testPrimaryPublicKey' } )
+        sandbox.stub(paramstore, 'getParameters')
+            .onCall(0).resolves( paramStorePrimary );
         return jwksLambda.run(event, context, callback).then(() => {
-            should(Cache.prototype.getData.callCount).eql(1);
+            //should(Cache.prototype.getData.callCount).eql(1);
+
             should(callback.callCount).eql(1);
             should(callback.getCall(0).args[0]).be.null();
             should(callback.getCall(0).args[1]).eql({
                 statusCode: 200,
-                body: JSON.stringify({ keys: { 'accessToken.primary.publicKey': 'testPrimaryPublicKey' } })
+                body: JSON.stringify({ keys: [primaryPublicKey] })
             });
 
         });
@@ -111,10 +137,10 @@ describe('JwksLambda', function () {
 
     it('should return error if the cache is corrupt (empty json)', () => {
         jwksLambda = new JwksLambda({ config: process.env });
-        sandbox.stub(Cache.prototype, 'getData')
-            .onCall(0).resolves( { } )
+        sandbox.stub(paramstore, 'getParameters')
+            .onCall(0).resolves( {} );
         return jwksLambda.run(event, context, callback).then(() => {
-            should(Cache.prototype.getData.callCount).eql(1);
+            //should(Cache.prototype.getData.callCount).eql(1);
             should(callback.callCount).eql(1);
             should(callback.getCall(0).args[1]['statusCode']).eql(500);
 
@@ -123,10 +149,10 @@ describe('JwksLambda', function () {
 
     it('should return error if the cache is corrupt (undefined)', () => {
         jwksLambda = new JwksLambda({ config: process.env });
-        sandbox.stub(Cache.prototype, 'getData')
-            .onCall(0).resolves( undefined )
+        sandbox.stub(paramstore, 'getParameters')
+            .onCall(0).resolves( undefined );
         return jwksLambda.run(event, context, callback).then(() => {
-            should(Cache.prototype.getData.callCount).eql(1);
+            // should(Cache.prototype.getData.callCount).eql(1);
             should(callback.callCount).eql(1);
             should(callback.getCall(0).args[1]['statusCode']).eql(500);
 
@@ -135,10 +161,10 @@ describe('JwksLambda', function () {
 
     it('should return error if the cache rejects', () => {
         jwksLambda = new JwksLambda({ config: process.env });
-        sandbox.stub(Cache.prototype, 'getData')
+        sandbox.stub(paramstore, 'getParameters')
             .onCall(0).rejects();
         return jwksLambda.run(event, context, callback).then(() => {
-            should(Cache.prototype.getData.callCount).eql(1);
+            //should(Cache.prototype.getData.callCount).eql(1);
             should(callback.callCount).eql(1);
             should(callback.getCall(0).args[1]['statusCode']).eql(500);
 
