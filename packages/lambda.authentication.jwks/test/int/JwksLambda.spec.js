@@ -1,6 +1,6 @@
 const sinon = require('sinon');
 const _ = require('underscore');
-const JwksLambda = require('../../lib/JwksLambda');
+const JwksLambdaSpec = require('../../lib/JwksLambda');
 const should = require('should');
 const ParameterService = require('@sage/bc-services-parameter');
 
@@ -147,7 +147,7 @@ describe('JwksLambda', function () {
 
     //describe('Checking basic functionalities')
     it('should get keys from paramstore if the cache is empty', () => {
-        jwksLambda = new JwksLambda({ config });
+        jwksLambda = new JwksLambdaSpec({ config });
         sandbox.stub(paramstore, 'getParameters')
             .onCall(0).resolves( paramStoreData );
         return jwksLambda.run(event, context, callback).then(() => {
@@ -164,7 +164,7 @@ describe('JwksLambda', function () {
     });
 
     it('should get secondary from paramstore (no primary key)', () => {
-        jwksLambda = new JwksLambda({ config });
+        jwksLambda = new JwksLambdaSpec({ config });
         sandbox.stub(paramstore, 'getParameters')
             .onCall(0).resolves( paramStoreSecondary );
         return jwksLambda.run(event, context, callback).then(() => {
@@ -181,7 +181,7 @@ describe('JwksLambda', function () {
     });
 
     it('should get secondary from paramstore (no secondary key)', () => {
-        jwksLambda = new JwksLambda({ config });
+        jwksLambda = new JwksLambdaSpec({ config });
         sandbox.stub(paramstore, 'getParameters')
             .onCall(0).resolves( paramStorePrimary );
         return jwksLambda.run(event, context, callback).then(() => {
@@ -198,7 +198,7 @@ describe('JwksLambda', function () {
     });
 
     it('should return error if the cache is corrupt (empty json)', () => {
-        jwksLambda = new JwksLambda({ config });
+        jwksLambda = new JwksLambdaSpec({ config });
         sandbox.stub(paramstore, 'getParameters')
             .onCall(0).resolves( {} );
         return jwksLambda.run(event, context, callback).then(() => {
@@ -210,7 +210,7 @@ describe('JwksLambda', function () {
     });
 
     it('should return error if the cache is corrupt (undefined)', () => {
-        jwksLambda = new JwksLambda({ config });
+        jwksLambda = new JwksLambdaSpec({ config });
         sandbox.stub(paramstore, 'getParameters')
             .onCall(0).resolves( undefined );
         return jwksLambda.run(event, context, callback).then(() => {
@@ -222,7 +222,7 @@ describe('JwksLambda', function () {
     });
 
     it('should return error if the cache rejects', () => {
-        jwksLambda = new JwksLambda({ config });
+        jwksLambda = new JwksLambdaSpec({ config });
         sandbox.stub(paramstore, 'getParameters')
             .onCall(0).rejects();
         return jwksLambda.run(event, context, callback).then(() => {
@@ -234,7 +234,7 @@ describe('JwksLambda', function () {
     });
 
     it('should get only the primary key is the secondary is expired', () => {
-        jwksLambda = new JwksLambda({ config });
+        jwksLambda = new JwksLambdaSpec({ config });
         sandbox.stub(paramstore, 'getParameters')
             .onCall(0).resolves( paramStoreExpired );
         return jwksLambda.run(event, context, callback).then(() => {
@@ -252,7 +252,7 @@ describe('JwksLambda', function () {
 
     describe('Checking the pass of the time', () => {
         it('should get the same result if cache is not expired and called immediately again', () => {
-            jwksLambda = new JwksLambda({ config });
+            jwksLambda = new JwksLambdaSpec({ config });
             sandbox.stub(paramstore, 'getParameters')
                 .onCall(0).resolves( paramStoreData )
                 .onCall(1).resolves( paramStoreDataChange );
@@ -281,7 +281,7 @@ describe('JwksLambda', function () {
         });
 
         it('should get the same result if cache is not expired', () => {
-            jwksLambda = new JwksLambda({ config });
+            jwksLambda = new JwksLambdaSpec({ config });
             sandbox.stub(paramstore, 'getParameters')
                 .onCall(0).resolves( paramStoreData )
                 .onCall(1).resolves( paramStoreDataChange );
@@ -312,7 +312,7 @@ describe('JwksLambda', function () {
         });
 
         it('should get the same result if cache is not expired', () => {
-            jwksLambda = new JwksLambda({ config });
+            jwksLambda = new JwksLambdaSpec({ config });
             sandbox.stub(paramstore, 'getParameters')
                 .onCall(0).resolves( paramStoreData )
                 .onCall(1).resolves( paramStoreDataChange );
