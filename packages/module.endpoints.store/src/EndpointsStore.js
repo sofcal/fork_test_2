@@ -17,7 +17,7 @@ const noop = () => {};
 const noopLogger = { error: noop, warn: noop, info: noop, };
 
 class EndpointsStore {
-    constructor({ endpointMappings, refreshDelay, cacheClass = Cache }, { logger = noopLogger }) {
+    constructor({ endpointMappings, refreshDelay, cacheClass = Cache }, { logger = noopLogger } = {}) {
         this.endpointMappings = endpointMappings;       // mapping ID > endpoint
         this.validIds = Object.keys(endpointMappings);  // list of valid Ids
         this.refreshDelay = refreshDelay;               // cache expiration limit

@@ -1,10 +1,8 @@
-const imported = require('../../lib/cache');
+const Cache = require('../../lib/Cache');
 const should = require('should');
 const sinon = require('sinon');
 const nock = require('nock');
 const needle = require('needle');
-
-const { Cache } = imported;
 
 describe('@sage/bc-data-cache.Cache', function(){
     const logger = {
@@ -13,8 +11,20 @@ describe('@sage/bc-data-cache.Cache', function(){
     };
         
     it('should export the correct modules', (done) => {
-        imported.should.have.only.keys('Cache');
+        should.equal(typeof Cache, 'function');
         done();
+    });
+
+    describe('Cache.Create', () => {
+        const cacheExpiry = 100;
+        const refreshFunction = () => 'test';
+
+        it('should be able to create new cache object', () => {
+            const test = Cache.Create({cacheExpiry, refreshFunction}, { logger });
+    
+            test.should.be.Object();
+            test.should.be.instanceof(Cache);
+        });
     });
 
     describe('Cache.constructor', () => {
@@ -152,6 +162,7 @@ describe('@sage/bc-data-cache.Cache', function(){
         });
 
         it('should reject promise if any errors', () => {
+            test.currentRefresh = null;
             cacheExpiredStub.throws(() => new Error('reject'));
 
             return (test.getData()).should.be.rejectedWith('reject');

@@ -60,7 +60,12 @@ class JwksLambda extends Handler {
 
                 // this will get wrapped in a 200 response
                 return this.cache.getData()
-                    .then((data) => ({ keys: data }));
+                    .then((data) => {
+                        if (!data || _.isEmpty(data)) {
+                            throw new Error('No valid JWKS found!');
+                        }
+                        return { keys: data };
+                    });
             });
     }
 

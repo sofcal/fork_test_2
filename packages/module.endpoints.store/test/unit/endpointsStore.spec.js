@@ -1,6 +1,6 @@
 const should = require('should');
 const sinon = require('sinon');
-const imported = require('../../lib/endpointsStore');
+const imported = require('../../lib/EndpointsStore');
 const { Cache } = require('@sage/bc-data-cache');
 const { Jwks } = require('@sage/sfab-s2s-jwt-jwks');
 
@@ -37,8 +37,24 @@ describe('module-endpoints-store.endpointsStore', function () {
     };
 
     it('should export the correct modules', (done) => {
-        imported.should.have.only.keys('EndpointsStore');
+        should.equal(typeof EndpointsStore, 'function');
         done();
+    });
+
+    describe('EndpointsStore.Create', () => {
+        it('should be able to create new EndpointsStore object', () => {
+            const testCreate = EndpointsStore.Create(
+                {
+                    endpointMappings,
+                    refreshDelay,
+                    cacheClass: Cache,
+                },
+                { logger }
+            );
+    
+            test.should.be.Object();
+            test.should.be.instanceof(EndpointsStore);
+        });
     });
 
     describe('EndpointsStore.constructor', () => {
@@ -54,7 +70,7 @@ describe('module-endpoints-store.endpointsStore', function () {
         });
 
         it('should default cache Class if not provided', () => {
-            should.strictEqual(test.Cache, Cache);
+            should.strictEqual(test._Cache, Cache);
         });
 
         it('should allow cache Class to be overwritten', () => {
@@ -69,7 +85,7 @@ describe('module-endpoints-store.endpointsStore', function () {
                 },
                 { logger }
             );
-            should.strictEqual(testStore.Cache.name, 'testClass');
+            should.strictEqual(testStore._Cache.name, 'testClass');
         });
 
         it('should default cache Class to Cache if not passed', () => {
@@ -81,7 +97,7 @@ describe('module-endpoints-store.endpointsStore', function () {
                 { logger }
             );
 
-            should.strictEqual(testStore.Cache.name, 'Cache');
+            should.strictEqual(testStore._Cache.name, 'Cache');
         });
 
         it('should throw when cache class invalid or missing', () => {
@@ -218,6 +234,9 @@ describe('module-endpoints-store.endpointsStore', function () {
         class DummyCache {
             constructor() { this.dummyCache = true }
             getData() { }
+            static Create(...args) {
+                return new DummyCache(...args);
+            }
         }
 
         const test2 = new EndpointsStore(
@@ -301,14 +320,22 @@ describe('module-endpoints-store.endpointsStore', function () {
         });        
     });
 
-    describe('EndpointsStore.refreshFn', () => {
-        it('should return a function', () => {
-            EndpointsStore.refreshFn(null).should.be.Function();
+    describe('EndpointsStore.createRefreshFunction', () => {
+        it('should return a Promise', () => {
+            test.createRefreshFunction(null).should.be.Function();
         });
 
         it('should be a rejected promise when calling returned fucntion with invalid endpoint', () => {
-            const refresh = EndpointsStore.refreshFn(null)
+            const refresh = test.createRefreshFunction(null)
             refresh().should.be.rejected();
+        });
+    });
+
+    describe('EndpointsStore.getValidIds', () => {
+        it('should return array of ids', () => {
+            const ids = test.getValidIds();
+            ids.should.be.an.Array();
+            ids.should.be.eql(Object.keys(endpointMappings));
         });
     });
 });
