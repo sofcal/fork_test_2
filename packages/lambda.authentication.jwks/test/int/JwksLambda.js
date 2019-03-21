@@ -14,36 +14,52 @@ describe('JwksLambda', function () {
 
     };
 
+    const now = new Date().getTime();
+
+    const cacheTTL = 100;
+
+    const certTTL = 200;
+
     const paramStoreData = {
         'accessToken.primary.publicKey': 'testPrimaryPublicKey',
         'accessToken.primary.privateKey': 'testPrimaryPrivateKey',
-        'accessToken.primary.createdAt': '1553094111',
+        'accessToken.primary.createdAt': now,
 
         'accessToken.secondary.publicKey': 'testSecondaryPublicKey',
         'accessToken.secondary.privateKey': 'testSecondaryPrivateKey',
-        'accessToken.secondary.createdAt': '1553094111'
+        'accessToken.secondary.createdAt': now
     };
 
     const paramStoreDataChange = {
         'accessToken.primary.publicKey': 'testPrimaryPublicKeyChanged',
         'accessToken.primary.privateKey': 'testPrimaryPrivateKeyChanged',
-        'accessToken.primary.createdAt': '1553094112',
+        'accessToken.primary.createdAt': now + cacheTTL,
 
         'accessToken.secondary.publicKey': 'testSecondaryPublicKeyChanged',
         'accessToken.secondary.privateKey': 'testSecondaryPrivateKeyChanged',
-        'accessToken.secondary.createdAt': '1553094112'
+        'accessToken.secondary.createdAt': now + cacheTTL
+    };
+
+    const paramStoreExpired = {
+        'accessToken.primary.publicKey': 'testPrimaryPublicKey',
+        'accessToken.primary.privateKey': 'testPrimaryPrivateKey',
+        'accessToken.primary.createdAt': now,
+
+        'accessToken.secondary.publicKey': 'testSecondaryPublicKey',
+        'accessToken.secondary.privateKey': 'testSecondaryPrivateKey',
+        'accessToken.secondary.createdAt': 0
     };
 
     const paramStorePrimary = {
         'accessToken.primary.publicKey': 'testPrimaryPublicKey',
         'accessToken.primary.privateKey': 'testPrimaryPrivateKey',
-        'accessToken.primary.createdAt': '1553094111'
+        'accessToken.primary.createdAt': now
     };
 
     const paramStoreSecondary = {
         'accessToken.secondary.publicKey': 'testSecondaryPublicKey',
         'accessToken.secondary.privateKey': 'testSecondaryPrivateKey',
-        'accessToken.secondary.createdAt': '1553094111'
+        'accessToken.secondary.createdAt': now
     };
 
     const primaryPublicKey = {
@@ -107,8 +123,6 @@ describe('JwksLambda', function () {
     let context;
     let callback;
 
-    let cacheTTL = 100;
-
     before(() => {
         sandbox = sinon.createSandbox();
     });
@@ -118,7 +132,7 @@ describe('JwksLambda', function () {
     beforeEach(() => {
         clock = sinon.useFakeTimers(new Date().getTime());
 
-        config = {Environment: env, AWS_REGION: region, cacheExpiry: cacheTTL }
+        config = {Environment: env, AWS_REGION: region, cacheExpiry: cacheTTL, certExpiry: certTTL }
         event = {AWS_REGION: region, env};
 
         sandbox.stub(ParameterService, 'Create').returns(paramstore);
@@ -215,6 +229,23 @@ describe('JwksLambda', function () {
             should(paramstore.getParameters.callCount).eql(1);
             should(callback.callCount).eql(1);
             should(callback.getCall(0).args[1]['statusCode']).eql(500);
+
+        });
+    });
+
+    it('should get only the primary key is the secondary is expired', () => {
+        jwksLambda = new JwksLambda({ config });
+        sandbox.stub(paramstore, 'getParameters')
+            .onCall(0).resolves( paramStoreExpired );
+        return jwksLambda.run(event, context, callback).then(() => {
+            should(paramstore.getParameters.callCount).eql(1);
+
+            should(callback.callCount).eql(1);
+            should(callback.getCall(0).args[0]).be.null();
+            should(callback.getCall(0).args[1]).eql({
+                statusCode: 200,
+                body: JSON.stringify({ keys: [primaryPublicKey] })
+            });
 
         });
     });
