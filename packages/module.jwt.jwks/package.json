@@ -1,6 +1,6 @@
 {
   "name": "@sage/sfab-s2s-jwt-jwks",
-  "version": "1.1.0",
+  "version": "1.1.2",
   "author": "Sage UK",
   "license": "ISC",
   "description": "",
@@ -16,9 +16,9 @@
     "@babel/code-frame": "^7.0.0-beta.48",
     "@babel/core": "^7.2.2",
     "@babel/preset-env": "^7.0.0-beta.47",
-    "@sage/bc-request-logger": "^1.1.0",
-    "@sage/bc-status-code-error": "^1.1.0",
-    "@sage/sfab-s2s-jwt-kid": "^1.1.0",
+    "@sage/bc-request-logger": "^1.1.2",
+    "@sage/bc-status-code-error": "^1.1.2",
+    "@sage/sfab-s2s-jwt-kid": "^1.1.2",
     "aws-sdk": "^2.220.1",
     "bluebird": "^3.5.1",
     "underscore": "^1.9.0"

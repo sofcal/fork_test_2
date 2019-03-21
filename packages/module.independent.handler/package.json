@@ -1,6 +1,6 @@
 {
   "name": "@sage/bc-independent-lambda-handler",
-  "version": "1.1.0",
+  "version": "1.1.2",
   "author": "Sage UK",
   "license": "ISC",
   "description": "",
@@ -13,9 +13,9 @@
     "lib": "lib"
   },
   "dependencies": {
-    "@sage/bc-infrastructure-cloudwatch-subscription": "^1.1.0",
-    "@sage/bc-request-logger": "^1.1.0",
-    "@sage/bc-status-code-error": "^1.1.0",
+    "@sage/bc-infrastructure-cloudwatch-subscription": "^1.1.2",
+    "@sage/bc-request-logger": "^1.1.2",
+    "@sage/bc-status-code-error": "^1.1.2",
     "aws-sdk": "^2.220.1",
     "bluebird": "^3.5.1",
     "mongodb": "^3.0.5",
