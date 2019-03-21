@@ -18,8 +18,8 @@
     "lint/byWarning": "eslint ./packages/** --format ./node_modules/eslint-stats/byWarning.js",
     "lint/byErrorAndWarning": "eslint ./packages/** --format ./node_modules/eslint-stats/byErrorAndWarningStacked.js",
     "lint/byFolder": "eslint ./packages/** --format ./node_modules/eslint-stats/byFolder.js",
-    "release:ci": "lerna publish from-git --registry=https://sage.myget.org/F/npm_temp/npm/ --yes",
-    "release:local": "lerna publish from-git --registry=https://sage.myget.org/F/npm_temp/npm/",
+    "release:ci": "lerna publish from-git --registry=https://sage.myget.org/F/npm/npm/ --yes",
+    "release:local": "lerna publish from-git --registry=https://sage.myget.org/F/npm/npm/",
     "template": "./templates/generate.sh",
     "version": "lerna version"
   },

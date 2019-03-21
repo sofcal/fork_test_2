@@ -6,7 +6,7 @@
   "description": "",
   "main": "lib/index.js",
   "publishConfig": {
-    "registry": "https://sage.myget.org/F/npm_temp/npm/",
+    "registry": "https://sage.myget.org/F/npm/npm/",
     "access": "public"
   },
   "directories": {
@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@sage/bc-status-code-error": "^1.0.0",
-    "@sage/sfab-s2s-jwt-kid": "1.4.0",
+    "@sage/sfab-s2s-jwt-kid": "^1.0.0",
     "@babel/code-frame": "^7.0.0-beta.48",
     "@babel/core": "^7.2.2",
     "@babel/preset-env": "^7.0.0-beta.47",

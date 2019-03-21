@@ -4,7 +4,7 @@
   "description": "Banking Cloud schemas",
   "main": "index.js",
   "publishConfig": {
-    "registry": "https://sage.myget.org/F/npm_temp/npm/",
+    "registry": "https://sage.myget.org/F/npm/npm/",
     "access": "public"
   },
   "scripts": {
