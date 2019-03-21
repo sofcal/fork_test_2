@@ -8,6 +8,8 @@ const { EndpointsStore } = require('@sage/bc-endpoints-store');
 
 const Promise = require('bluebird');
 
+const FORWARDED_IP_HEADER = 'x-forwarded-for';
+
 class JwtAuthenticatorLambda extends Handler {
     constructor(config) {
         super(config);
@@ -59,17 +61,18 @@ class JwtAuthenticatorLambda extends Handler {
                 const [, token] = event.authorizationToken.split(' ');
 
                 return this.auth.checkAuthorisation(token)
-                    .then((res) => {
+                    .then((result) => {
                         event.logger.info({ function: func, log: 'ended' });
-                        return res;
+                        return { result, headers: event.headers, token };
                     });
             });
     }
 
-    buildResponse({ claims }, { logger }) {
+    buildResponse({ result: { claims }, headers = {}, token }, { logger }) {
         const func = `${JwtAuthenticatorLambda.name}.buildResponse`;
 
         logger.info({ function: func, log: 'started' });
+        Object.assign(claims, { xForwardedFor: headers[FORWARDED_IP_HEADER] }, { token });
         const policy = generatePolicy('Allow', '*', claims);
         logger.info({ function: func, log: 'ended' });
 
