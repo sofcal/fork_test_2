@@ -107,6 +107,31 @@ describe('JwksLambda', function () {
         });
     });
 
+    it('should return the same key after running twice', () => {
+        jwksLambda = JwksLambdaSpec.Create({ config });
+        sandbox.stub(Cache.prototype, 'getData')
+            .resolves( cachedData );
+        return jwksLambda.run(event, context, callback).then(() => {
+            should(Cache.prototype.getData.callCount).eql(1);
+            should(callback.callCount).eql(1);
+            should(callback.getCall(0).args[0]).be.null();
+            should(callback.getCall(0).args[1]).eql({
+                statusCode: 200,
+                body: JSON.stringify({ keys: cachedData })
+            });
+            return jwksLambda.run(event, context, callback).then(() => {
+                should(Cache.prototype.getData.callCount).eql(2);
+                should(callback.callCount).eql(2);
+                should(callback.getCall(1).args[0]).be.null();
+                should(callback.getCall(1).args[1]).eql({
+                    statusCode: 200,
+                    body: JSON.stringify({ keys: cachedData })
+                });
+            });
+
+        });
+    });
+
     it('should get secondary from paramstore (no primary key)', () => {
         jwksLambda = JwksLambdaSpec.Create({ config });
         sandbox.stub(Cache.prototype, 'getData')
