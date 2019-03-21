@@ -85,15 +85,9 @@ class JwksLambda extends Handler {
             .then((data) => {
                 // for each keyNameEnum object (which contains the keyIds for our param-store values), check all the properties
                 // are valid, and generate a JWKS
-                const mapped = _.chain(keyNameEnums)
-                    .map((k) => {
-                        if (Jwks.isValid(data[k.publicKey], data[k.privateKey], parseInt(data[k.createdAt], 10), parseInt(this.config.certExpiry, 10))) {
-                            return Jwks.Generate(data[k.publicKey], data[k.privateKey]);
-                        }
-                        return null;
-                    })
-                    .compact()
-                    .value();
+                const mapped = keyNameEnums
+                    .filter((k) => Jwks.isValid(data[k.publicKey], data[k.privateKey], parseInt(data[k.createdAt], 10), parseInt(this.config.certExpiry, 10)))
+                    .map(k => Jwks.Generate(data[k.publicKey], data[k.privateKey]));
 
                 logger.info({ function: func, log: 'ended' });
                 return mapped;
