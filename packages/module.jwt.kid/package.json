@@ -1,12 +1,12 @@
 {
   "name": "@sage/sfab-s2s-jwt-kid",
-  "version": "1.4.0",
+  "version": "1.0.0",
   "author": "",
   "license": "ISC",
   "description": "Generates a Key Id (Kid) for a specified certificate",
   "main": "lib/index.js",
   "publishConfig": {
-    "registry": "https://sage.myget.org/F/npm/npm/",
+    "registry": "https://sage.myget.org/F/npm_temp/npm/",
     "access": "public"
   },
   "directories": {

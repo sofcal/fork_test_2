@@ -1,12 +1,12 @@
 {
   "name": "@sage/bc-request-logger",
-  "version": "1.3.2",
+  "version": "1.0.0",
   "author": "",
   "license": "ISC",
   "description": "",
   "main": "lib/index.js",
   "publishConfig": {
-    "registry": "https://sage.myget.org/F/npm/npm/",
+    "registry": "https://sage.myget.org/F/npm_temp/npm/",
     "access": "public"
   },
   "directories": {

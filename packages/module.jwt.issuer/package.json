@@ -1,12 +1,12 @@
 {
   "name": "@sage/sfab-s2s-jwt-issuer",
-  "version": "1.4.0",
+  "version": "1.0.0",
   "author": "",
   "license": "ISC",
   "description": "Generates JWT objects by including the provided claims and signing with a specified certificate",
   "main": "lib/index.js",
   "publishConfig": {
-    "registry": "https://sage.myget.org/F/npm/npm/",
+    "registry": "https://sage.myget.org/F/npm_temp/npm/",
     "access": "public"
   },
   "directories": {
@@ -16,7 +16,7 @@
     "@babel/code-frame": "^7.0.0-beta.48",
     "@babel/core": "^7.2.2",
     "@babel/preset-env": "^7.0.0-beta.47",
-    "@sage/sfab-s2s-jwt-kid": "^1.4.0",
+    "@sage/sfab-s2s-jwt-kid": "^1.0.0",
     "bluebird": "^3.5.1",
     "jsonwebtoken": "^8.5.0",
     "underscore": "^1.9.0"

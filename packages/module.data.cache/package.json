@@ -1,6 +1,6 @@
 {
   "name": "@sage/bc-data-cache",
-  "version": "1.0.2",
+  "version": "1.0.0",
   "author": "Sage UK",
   "license": "ISC",
   "description": "Banking Cloud data cache module",
@@ -9,7 +9,7 @@
     "lib": "lib"
   },
   "publishConfig": {
-    "registry": "https://sage.myget.org/F/npm/npm/",
+    "registry": "https://sage.myget.org/F/npm_temp/npm/",
     "access": "public"
   },
   "dependencies": {
