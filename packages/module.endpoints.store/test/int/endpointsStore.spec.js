@@ -2,7 +2,7 @@ const should = require('should');
 const sinon = require('sinon');
 const nock = require('nock');
 const needle = require('needle');
-const { EndpointsStore }  = require('../../lib/endpointsStore');
+const { EndpointsStore }  = require('../../lib/EndpointsStore');
 const { Cache } = require('@sage/bc-data-cache');
 const { Jwks } = require('@sage/sfab-s2s-jwt-jwks');
 
@@ -106,15 +106,13 @@ describe('module-endpoints-store', function(){
                 }
             );
             testDefault.should.be.instanceOf(EndpointsStore);
-            should.equal(testDefault.Cache.name,'Cache');
+            should.equal(testDefault._Cache.name,'Cache');
             testDefault.logger.should.be.Object();
         });
 
-
-
         it('should throw when invalid parameters passed', () => {
             should.throws(() => new EndpointsStore({
-                endpointMappings: null,
+                endpointMappings: 'error',
                 refreshDelay,
                 cacheClass: Cache,
             }, { logger }));
@@ -138,7 +136,20 @@ describe('module-endpoints-store', function(){
                 refreshDelay,
                 cacheClass: Cache,
             }, {logger: {invalidLogger: true}}));
-        })
+        });
+
+        it('should create new instance of EndpointsStore when EndpointsStore.Create called', () => {
+            const testCreate = EndpointsStore.Create(
+                {
+                    endpointMappings,
+                    refreshDelay,
+                    cacheClass: Cache,
+                },
+                { logger }
+            );
+
+            testCreate.should.be.instanceOf(EndpointsStore);
+        });
     });
 
     describe('Get cache processing', () => {
@@ -182,5 +193,14 @@ describe('module-endpoints-store', function(){
             return test.getCache(ID).should.be.rejectedWith(/getaddrinfo ENOTFOUND invalid/);
         });
     })
+
+
+    describe('getValidIds processing', () => {
+        it('should return array of ids', () => {
+            const ids = test.getValidIds();
+            ids.should.be.an.Array();
+            ids.should.be.eql(Object.keys(endpointMappings));
+        });
+    });
 
 });
