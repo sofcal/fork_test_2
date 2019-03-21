@@ -30,7 +30,7 @@ class Authenticate {
     }
 
     validateToken(authToken) {
-        const func = `${Authenticate.name}.decodeToken`;
+        const func = `${Authenticate.name}.validateToken`;
         const decoded = jwt.decode(authToken, { complete: true });
 
         if (!decoded) {
@@ -49,7 +49,7 @@ class Authenticate {
     }
 
     getCertKeys({ iss, kid }) {
-        const func = `${Authenticate.name}.populateCertList`;
+        const func = `${Authenticate.name}.getCertKeys`;
         return Promise.resolve(undefined)
             .then(() => {
                 const doWork = Promise.method((forced = false) => {
