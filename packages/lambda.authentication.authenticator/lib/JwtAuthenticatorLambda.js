@@ -3,8 +3,8 @@
 const validate = require('./validators');
 
 const { Handler } = require('@sage/bc-independent-lambda-handler');
-const { JwtAuthenticator } = require('@sage/bc-jwt-authenticator');
-const { EndpointsStore } = require('@sage/bc-endpoints-store');
+const { JwtAuthenticator } = require('@sage/sfab-s2s-jwt-authenticator');
+const { EndpointsStore } = require('@sage/sfab-s2s-jwt-endpoint-store');
 
 const Promise = require('bluebird');
 

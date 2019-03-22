@@ -15,7 +15,7 @@
     "aws-sdk": "^2.220.1",
     "bluebird": "^3.5.1",
     "emitter": "0.0.5",
-    "mongodb": "^3.0.5"
+    "mongodb": "3.0.5"
   },
   "devDependencies": {
     "eslint": "^4.11.0",

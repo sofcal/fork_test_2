@@ -4,7 +4,7 @@ const sinon = require('sinon');
 const nock = require('nock');
 const needle = require('needle');
 
-describe('@sage/bc-data-cache.Cache', function(){
+describe('@sage/sfab-s2s-jwt-cache.Cache', function(){
     const logger = {
         info: (msg) => console.log(msg),
         error: (msg) => console.error(msg),

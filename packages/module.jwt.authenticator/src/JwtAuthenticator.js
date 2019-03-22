@@ -9,7 +9,7 @@ const Promise = require('bluebird');
 const noop = () => {};
 const noopLogger = { error: noop, warn: noop, info: noop, };
 
-const RegisteredClaims = ['iss', 'sub', 'aud', 'exp', 'nbf', 'iat', 'jti'];
+const RegisteredClaims = ['sub', 'aud', 'exp', 'nbf', 'iat', 'jti'];
 
 class Authenticate {
     constructor({ storeService, }, { logger = noopLogger } = {}) {

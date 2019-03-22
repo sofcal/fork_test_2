@@ -1,7 +1,7 @@
 const validate = require('./validators');
 
 const { Handler } = require('@sage/bc-independent-lambda-handler');
-const { Cache } = require('@sage/bc-data-cache');
+const { Cache } = require('@sage/sfab-s2s-jwt-cache');
 const { JwtIssuer, JwtCertInfo } = require('@sage/sfab-s2s-jwt-issuer');
 
 // TODO: tidy this up, make it export { ParameterService }
