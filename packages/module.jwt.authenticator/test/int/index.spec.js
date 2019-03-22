@@ -332,7 +332,7 @@ describe('module-jwt-authenticator', function(){
                     nockCallCount += 1;
                     should.strictEqual(data.authorised, true);
                     (data.claims).should.have.property('customClaim');
-                    (data.claims).should.not.have.property('iss');
+                    (data.claims).should.not.have.property('exp');
                     should.strictEqual(data.claims.customClaim, payload.customClaim);
                 });         
         });
