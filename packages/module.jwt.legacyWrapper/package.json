@@ -28,7 +28,7 @@
     "eslint-stats": "^1.0.0"
   },
   "scripts": {
-    "clean": "rimraf ./coverage/ && rimraf ./.nyc_output/ && rimraf ./node_modules/ && rimraf ./lib/",
+    "clean": "rimraf ./coverage/ && rimraf ./.nyc_output/ && rimraf ./node_modules/",
     "test": "NODE_ENV=test nyc --cache false --x test/ mocha -b --colors \"./test/unit/**/*.spec.js\"",
     "testwatchunit": "NODE_ENV=test mocha -b -w --colors \"./test/unit/**/*.spec.js\"",
     "testwatchuint": "NODE_ENV=test mocha -b -w --colors \"./test/int/**/*.spec.js\"",
@@ -36,7 +36,7 @@
     "cover": "NODE_ENV=test npm run test && nyc report --reporter=lcov",
     "report": "open coverage/lcov-report/index.html",
     "lint": "eslint ./src/**",
-    "build": "",
+    "build": "cp ",
     "watch": "babel --watch src --out-dir lib --copy-files",
     "unlock": "rimraf package-lock.json"
   }
