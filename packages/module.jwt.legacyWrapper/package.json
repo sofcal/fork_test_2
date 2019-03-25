@@ -1,6 +1,6 @@
 {
   "name": "@sage/sfab-s2s-jwt-legacy-wrapper",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "author": "Sage UK",
   "license": "ISC",
   "description": "Banking Cloud data cache module",
@@ -14,11 +14,11 @@
     "access": "public"
   },
   "dependencies": {
-    "@sage/sfab-s2s-jwt-authenticator": "^1.1.4",
+    "@sage/sfab-s2s-jwt-authenticator": "^1.1.5",
     "@sage/sfab-s2s-jwt-cache": "^1.1.4",
-    "@sage/sfab-s2s-jwt-endpoint-store": "^1.1.4",
-    "@sage/sfab-s2s-jwt-issuer": "^1.1.3",
-    "@sage/sfab-s2s-jwt-jwks": "^1.1.4",
+    "@sage/sfab-s2s-jwt-endpoint-store": "^1.1.5",
+    "@sage/sfab-s2s-jwt-issuer": "^1.1.5",
+    "@sage/sfab-s2s-jwt-jwks": "^1.1.5",
     "@sage/sfab-s2s-jwt-kid": "^1.1.3"
   },
   "devDependencies": {
