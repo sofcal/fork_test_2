@@ -70,7 +70,7 @@ class EndpointsStore {
 
     // Create a new cache entry for an ID
     createCacheEntry(ID, endpoint) {
-        const refreshFunction = this.createRefreshFunction(endpoint);
+        const refreshFunction = this.createRefreshFunction(endpoint, ID);
         return this._Cache.Create({ cacheExpiry: -1, refreshFunction, }, { logger: this.logger });
     }
 
@@ -88,13 +88,13 @@ class EndpointsStore {
 
     // Refresh function - calls needle get using endpoint argument
     // returns promise
-    createRefreshFunction(endpoint) {
+    createRefreshFunction(endpoint, ID) {
         return Promise.method(() => {
             const func = `${EndpointsStore.name}.refreshFunction.${endpoint}`;
             this.logger.info({ function: func, log: 'refreshing cache', params: { endpoint } });
 
             return this._needle.getAsync(endpoint)
-                .then((res) => EndpointsStore.mappingFn(res))
+                .then((res) => EndpointsStore.mappingFn(res, ID))
                 .catch((err) => {
                     this.logger.info({ function: func, log: 'error calling endpoint', params: { endpoint, error: err.message, alert: true } });
                     throw new Error(`Fetch endpoint error: ${err.message}`);
@@ -104,13 +104,13 @@ class EndpointsStore {
 
     // Mapping function - maps data to internal storage structure
     // returns object
-    static mappingFn(res) {
+    static mappingFn(res, ID) {
         const { keys = [] } = res.body;
 
         return keys.reduce((final, { kid, x5c }) => {
             return Object.assign(
                 final,
-                { [kid]: [Jwks.ConvertX5CToPem(x5c[0])] },
+                { [kid]: [Jwks.ConvertX5CToPem(x5c[0], ID === 'wpb-auth')] }, // TODO should determine type from JWKS data
             );
         }, {});
     }

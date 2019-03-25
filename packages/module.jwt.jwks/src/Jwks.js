@@ -25,10 +25,11 @@ class Jwks {
             .trim();
     }
 
-    static ConvertX5CToPem(x5c) {
-        let split = x5c.replace(/(.{64})/g, '$1\n');
+    static ConvertX5CToPem(x5c, hack) {
+        const type = hack ? 'PUBLIC KEY' : 'RSA PUBLIC KEY';
+        let split = x5c.replace(/\n/g, '').replace(/\s/g, '').replace(/(.{64})/g, '$1\n');
         split = split.endsWith('\n') ? split : `${split}\n`;
-        return `-----BEGIN RSA PUBLIC KEY-----\n${split}-----END RSA PUBLIC KEY-----`;
+        return `-----BEGIN ${type}-----\n${split}-----END ${type}-----`;
     }
 
     static isExpired(createdAt, maxAgeSeconds) {

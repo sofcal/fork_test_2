@@ -215,7 +215,7 @@ describe('module-jwt-authenticator.authenticate', function(){
             anyValidStub = sinon.stub(utils, 'anyValid');
         });
 
-        const populateCertListSpy = sinon.spy(Authenticate.prototype, 'populateCertList');
+        //const populateCertListSpy = sinon.spy(Authenticate.prototype, 'populateCertList');
         it('should call populateCertList method', () => {
             anyValidStub.returns(true);
 

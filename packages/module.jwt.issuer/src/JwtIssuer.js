@@ -27,7 +27,7 @@ class JwtIssuer {
         if (!this.iss || !_.isString(this.iss)) {
             throw new Error('invalid iss: expected string');
         }
-        if (!this.newCertDelay || (!_.isNumber(this.newCertDelay) || _.isNaN(this.newCertDelay))) {
+        if ((!_.isNumber(this.newCertDelay) || _.isNaN(this.newCertDelay))) {
             throw new Error('invalid newCertDelay: expected number of seconds');
         }
     }
@@ -54,7 +54,7 @@ class JwtIssuer {
 const getUsableCert = (cached, newCertDelay) => {
     const nowS = Math.ceil(Date.now() / 1000);
 
-    if (cached[0] && (nowS > (cached[0].timestamp + newCertDelay))) {
+    if (cached[0] && (nowS > (cached[0].createdAt + newCertDelay))) {
         return cached[0];
     }
 
