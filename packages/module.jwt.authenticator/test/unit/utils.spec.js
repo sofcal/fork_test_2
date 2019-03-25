@@ -62,12 +62,17 @@ describe('utils', () => {
     });
 
     describe('validateToken', () => {
-        let exp;
-        let iss;
-        let validIssuers;
-
         let expiredStub;
         let issuerInvalidStub;
+
+        const token = {
+            header: { alg: 'RS256'},
+            payload: {
+                iss: 'testa',
+                exp: 0,
+            }
+        }
+        const validIssuers = ['testa', 'testb', 'testc'];
 
         before(() => {
             expiredStub = sinon.stub(utils, 'expired');
@@ -79,33 +84,44 @@ describe('utils', () => {
         });
 
         it('Throws authTokenExpired error when auth token expired', () => {
-            exp = 0;
-            iss = 'a';
-            validIssuers = ['a', 'b', 'c'];
             expiredStub.returns(true);
             issuerInvalidStub.returns(false);
 
-            should.throws(() => validateToken(exp, iss, validIssuers), /^Error: authTokenExpired$/);
+            should.throws(() => validateToken(token, validIssuers), /^Error: authTokenExpired$/);
         });
 
         it('Throws authTokenIssuerInvalid error when issuer invalid', () => {
-            exp = 0;
-            iss = 'a';
-            validIssuers = ['a', 'b', 'c'];
             expiredStub.returns(false);
             issuerInvalidStub.returns(true);
 
-            should.throws(() => validateToken(exp, iss, validIssuers), /^Error: authTokenIssuerInvalid$/);
+            should.throws(() => validateToken(token, validIssuers), /^Error: authTokenIssuerInvalid$/);
         });
 
-        it('Returns true when auth token expired', () => {
-            exp = 0;
-            iss = 'a';
-            validIssuers = ['a', 'b', 'c'];
+        it('Throws invalidAuthToken error when token unsigned', () => {
+            expiredStub.returns(false);
+            issuerInvalidStub.returns(false);
+            const unsignedToken = Object.assign(
+                {},
+                token,
+                {header: {alg: 'none'}}
+            )
+
+            should.throws(() => validateToken(unsignedToken, validIssuers), /^Error: invalidAuthToken$/);
+        });
+
+        // check defaults populated
+        it('should default to unsigned token, and fail validation', () => {
             expiredStub.returns(false);
             issuerInvalidStub.returns(false);
 
-            should.strictEqual(validateToken(exp, iss, validIssuers), true);
+            should.throws(() => validateToken(undefined, validIssuers), /^Error: invalidAuthToken$/);
+        })
+
+        it('Returns true when auth token valid', () => {
+            expiredStub.returns(false);
+            issuerInvalidStub.returns(false);
+
+            should.strictEqual(validateToken(token, validIssuers), true);
         });
     });
 });

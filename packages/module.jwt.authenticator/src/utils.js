@@ -13,15 +13,18 @@ utils.expired = (exp) => {
 // returns boolean
 utils.issuerInvalid = (iss, validIssuers) => !validIssuers.includes(iss);
 
-// check expiry date and issuer
+// Validate token header and payload
 // returns boolean
-utils.validateToken = ({ payload: { exp, iss } = {}, header: { alg } = {} } = {}, validIssuers) => {
+utils.validateToken = ({ payload: { exp, iss } = {}, header: { alg = 'none' } = {} } = {}, validIssuers) => {
+    // check for expired token
     if (utils.expired(exp)) {
         throw new Error('authTokenExpired');
     }
+    // check if issuer recognised
     if (utils.issuerInvalid(iss, validIssuers)) {
         throw new Error('authTokenIssuerInvalid');
     }
+    // check algorithm used to encode - for unsigned tokens this will be set to 'none'
     if (alg === 'none') {
         throw new Error('invalidAuthToken');
     }

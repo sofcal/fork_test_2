@@ -23,6 +23,12 @@ class Authenticate {
 
     validate() {
         // validate this class instance
+        if (!this.storeService || !this.storeService.getValidIds || !this.storeService.getCache) {
+            throw new Error('Invalid argument passed: storeService');
+        }
+        if (!this.logger.info || !this.logger.error) {
+            throw new Error('Invalid argument passed: Logger not valid');
+        }
     }
 
     static Create(...args) {

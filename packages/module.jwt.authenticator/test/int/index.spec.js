@@ -1,13 +1,19 @@
 'use strict';
 
-const { Authenticate } = require('../../lib/authenticate');
+const { JwtAuthenticator } = require('../../lib/index');
 const { EndpointsStore } = require('@sage/bc-endpoints-store');
 const { Cache } = require('@sage/bc-data-cache');
-const { refreshFn, mappingFn } = require('../../lib/utils');
+const { Jwks } = require('@sage/sfab-s2s-jwt-jwks');
 const should = require('should');
 const jwt = require('jsonwebtoken');
 const sinon = require('sinon');
 const nock = require('nock');
+const keypair = require('keypair');
+
+const { public: pub1, private: priv1 } = keypair();
+const { public: pub2, private: priv2 } = keypair();
+
+const algorithm = 'RS256';
 
 describe('module-jwt-authenticator', function(){
 
@@ -18,48 +24,45 @@ describe('module-jwt-authenticator', function(){
     };
 
     const hostname = 'https://www.testjwt.com';
-    const serviceMappings = {
+    const endpointMappings = {
         'sage.serv1': `${hostname}/serv1`,
         'sage.serv2': `${hostname}/serv2`,
         'sage.serv3': 'invalid',
     };
-    const validIssuers = Object.keys(serviceMappings);
-    const cacheExpiry = 50;
+    const validIssuers = Object.keys(endpointMappings);
+    const refreshDelay = 100;
     const payload = {
-        exp: (Date.now() / 1000) + cacheExpiry,
+        exp: (Date.now() / 1000) + refreshDelay,
         iss: 'sage.serv1',
         kid: 'kid1',
         customClaim: 'sage',
     };
+
     const keys = [
         {
             kid: 'kid1',
             x5c: [
-                'cert1',
-                'cert2'
+                Jwks.ConvertPemToX5C(pub1),
             ]
         },
         {
             kid: 'kid2',
             x5c: [
-                'cert3',
-                'cert4'
+                Jwks.ConvertPemToX5C(pub2),
             ]
         }
     ];
     const certs = {
         kid1: [
-            'cert1',
-            'cert2',
+            priv1,
         ],
         kid2: [
-            'cert3',
-            'cert4',
+            priv2,
         ],
     };
 
-    let StoreService;
-    let getCertListSpy;
+    let storeService;
+    let getCacheSpy;
     let getEndpointSpy;
 
     const nockcalls = nock(hostname)
@@ -70,57 +73,75 @@ describe('module-jwt-authenticator', function(){
         })
         .get('/serv2')
         .reply(200, {});
+    let nockCallCount = 0;
 
     before(() => {
-        StoreService = new EndpointsStore({
-            endpointMappings: serviceMappings,
-            cacheExpiry,
-            logger,
-            cacheClass: Cache,
-            refreshFunction: refreshFn,
-            mappingFunction: mappingFn,
-        });
-        getCertListSpy = sinon.spy(StoreService, 'getCache');
-        getEndpointSpy = sinon.spy(StoreService, 'getEndpoint');
+        storeService = new EndpointsStore(
+            {
+                endpointMappings,
+                refreshDelay,
+                cacheClass: Cache,
+            },
+            { logger }
+        );
+        getCacheSpy = sinon.spy(storeService, 'getCache');
+        getEndpointSpy = sinon.spy(storeService, 'getEndpoint');
     });
 
     afterEach(() => {
-        getCertListSpy.resetHistory();
+        getCacheSpy.resetHistory();
         getEndpointSpy.resetHistory();
     });
 
     after(() => {
-        StoreService = null;
+        storeService = null;
         sinon.restore();
     });
 
-    describe('Validation tests', () => {
-        it('should extract correct details from jwt', () => {
-            const secret = certs[payload.kid][0];
-            const authToken = jwt.sign( payload, secret);
-            const test = new Authenticate({
-                authToken,
-                validIssuers,
-                StoreService,
-                logger,
-            });
+    describe('Constructor tests', () => {
+        it('should be able to create new authenticate object', () => {
+            const test = new JwtAuthenticator({
+                storeService,
+            }, {logger});
 
-            should.strictEqual(test.kid, payload.kid);
-            should.strictEqual(test.iss, payload.iss);
-            should.strictEqual(test.exp, payload.exp);
+            test.should.be.Object();
+            test.should.be.instanceof(JwtAuthenticator);
         });
 
-        it('should throw an error if invalid jwt passed in', () => {
+        it('should default logger when not passed in', () => {
+            const test = new JwtAuthenticator({
+                storeService,
+            });
+    
+            (test.logger).should.be.a.Object();
+            (test.logger).should.have.properties(['info', 'warn', 'error']);
+            should.equal(test.logger.error(), undefined);
+        });
+
+        it('should be able to create new authenticate object using Authenticate.create', () => {
+            const test = JwtAuthenticator.Create({
+                storeService,
+            }, {logger});
+
+            test.should.be.Object();
+            test.should.be.instanceof(JwtAuthenticator);
+        });
+    });
+
+    describe('Check authorisation - Early exit tests', () => {
+        it('should reject if invalid jwt passed in', () => {
+            const test = new JwtAuthenticator({
+                storeService,
+            }, {logger});
             const authToken = 'invalid-token';
-            should.throws(() => new Authenticate({
-                authToken,
-                validIssuers,
-                StoreService,
-                logger,
-            }), /invalidAuthToken/);
+
+            return (test.checkAuthorisation(authToken)).should.be.rejectedWith(/invalidAuthToken/);
         });
 
         it('should reject an expired token', () => {
+            const test = new JwtAuthenticator({
+                storeService,
+            }, {logger});
             const secret = certs[payload.kid][0];
             const expiredPayLoad = Object.assign(
                 {},
@@ -129,218 +150,224 @@ describe('module-jwt-authenticator', function(){
             );
             const authToken = jwt.sign( expiredPayLoad, secret);
 
-            should.throws(() => new Authenticate({
-                authToken,
-                validIssuers,
-                StoreService,
-                logger,
-            }), /authTokenExpired/);
+            return (test.checkAuthorisation(authToken)).should.be.rejectedWith(/authTokenExpired/);
         });
 
         it('should reject a token with an invalid issuer', () => {
+            const test = new JwtAuthenticator({
+                storeService,
+            }, {logger});
             const secret = certs[payload.kid][0];
-            const expiredPayLoad = Object.assign(
+            const invalidPayload = Object.assign(
                 {},
                 payload,
                 { iss: 'invalid'}
             );
-            const authToken = jwt.sign( expiredPayLoad, secret);
+            const authToken = jwt.sign( invalidPayload, secret);
 
-            should.throws(() => new Authenticate({
-                authToken,
-                validIssuers,
-                StoreService,
-                logger,
-            }), /authTokenIssuerInvalid/);
+            return (test.checkAuthorisation(authToken)).should.be.rejectedWith(/authTokenIssuerInvalid/);
         });
 
-        it('should return true when calling validate on a valid token', () => {
-            const secret = certs[payload.kid][0];
+        it('should reject an unsigned token', () => {
+            const test = new JwtAuthenticator({
+                storeService,
+            }, {logger});
+            const authToken = jwt.sign( payload, null, { algorithm: 'none'});
 
-            const authToken = jwt.sign( payload, secret);
-            const test = new Authenticate({
-                authToken,
-                validIssuers,
-                StoreService,
-                logger,
-            });
-
-            test.validate().should.be.true();
+            return (test.checkAuthorisation(authToken)).should.be.rejectedWith(/invalidAuthToken/);
         });
     });
 
-    describe('endpoint tests', () => {
-        it('should retrieve certificate lists from jwks endpoint when authorising a new service ID', () => {
-            const secret = certs[payload.kid][1];
+    describe('endpoint fetch tests', () => {
+        it('should retrieve cert lists and authorise when validating a new service ID', () => {
+            const secret = certs[payload.kid][0];       
 
-            const authToken = jwt.sign( payload, secret);
-            const test = new Authenticate({
-                authToken,
-                validIssuers,
-                StoreService,
-                logger,
-            });
+            const authToken = jwt.sign( payload, secret, { algorithm });
+            const test = new JwtAuthenticator({
+                storeService,
+            }, {logger});
 
-            return test.checkAuthorisation()
+            return test.checkAuthorisation(authToken)
                 .then((data) => {
+                    nockCallCount += 1;
                     should.strictEqual(data.authorised, true);
-                    getCertListSpy.calledOnce.should.be.true();
-                    getEndpointSpy.calledOnce.should.be.true();
-                    should.strictEqual(nockcalls.interceptors[0].interceptionCounter, 1);
+                    (data.claims).should.have.property('customClaim');
+                    getCacheSpy.calledTwice.should.be.true(); // should be called twice - once non-forced, then again with force flag
+                    getEndpointSpy.calledOnce.should.be.true(); // call getEndPoint when building new cache entry
+                    should.strictEqual(nockcalls.interceptors[0].interceptionCounter, nockCallCount); // one call out to endpoint
                 });
         });
 
-        it('should retrieve certificate lists from cache when authorising a non-expired service ID', () => {
+        it('should retrieve cached cert list and authorise when validating an existing service ID', () => {
             const secret = certs[payload.kid][0];
 
-            const authToken = jwt.sign( payload, secret);
-            const test = new Authenticate({
-                authToken,
-                validIssuers,
-                StoreService,
-                logger,
-            });
+            const authToken = jwt.sign( payload, secret, { algorithm } );
+            const test = new JwtAuthenticator({
+                storeService,
+            }, {logger});
 
-            return test.checkAuthorisation()
+            return test.checkAuthorisation(authToken)
                 .then((data) => {
                     should.strictEqual(data.authorised, true);
-                    getCertListSpy.calledOnce.should.be.true();
-                    getEndpointSpy.calledOnce.should.be.false();
-                    should.strictEqual(nockcalls.interceptors[0].interceptionCounter, 1);
+                    getCacheSpy.calledOnce.should.be.true(); // should be called once - kid should already be cached
+                    getEndpointSpy.notCalled.should.be.true(); // shouldn't call endpoint when already cached
+                    should.strictEqual(nockcalls.interceptors[0].interceptionCounter, nockCallCount); // zero calls out to endpoint
                 })
         });
     });
 
     describe('Error capture tests', () => {
-        it('should throw an error if auth check fails', () => {
-            const secret = certs[payload.kid][0];
-
-            const newPayload = Object.assign(
-                {},
-                payload,
-                { kid: 'unknown' }
-            );
-
-            const authToken = jwt.sign( newPayload, secret );
-            const test = new Authenticate({
-                authToken,
-                validIssuers,
-                StoreService,
-                logger,
-            });
-            (test.checkAuthorisation()).should.be.rejectedWith(/AuthFailed/);
+        it('Constructor errors - invalid store service', () => {
+            should.throws(() => new JwtAuthenticator({
+                storeService: 'storeService',
+            }, {logger}), /^Error: Invalid argument passed: storeService$/);
         });
 
-        it('should reject promise when ', () => {
-            const secret = certs[payload.kid][0];
-            const newPayload = Object.assign(
-                {},
-                payload,
-                { iss: 'sage.serv3'}
-            );
-
-
-            const authToken = jwt.sign( newPayload, secret);
-            const test = new Authenticate({
-                authToken,
-                validIssuers,
-                StoreService,
-                logger,
-            });
-
-            (test.checkAuthorisation()).should.be.rejectedWith(/Fetch endpoint error/);
-        });
-    });
-
-    describe('expired cache test', () => {
-
-        before(() => {
-            const newTime = Date.now() + (cacheExpiry * 20000);
-            sinon.stub(Date, 'now').returns( newTime );
-        });
-
-        after(() => {
-            sinon.restore();
+        it('Constructor errors - invalid logger', () => {
+            should.throws(() => new JwtAuthenticator({
+                storeService,
+            }, {logger: {}}), /^Error: Invalid argument passed: Logger not valid$/);
         });
 
 
-        it('should refresh certificate lists from endpoint when authorising an expired service ID', () => {
-            const secret = certs[payload.kid][0];
+        it('endpoint read errors', () => {
+            const secret = certs[payload.kid][0];       
 
             const newPayload = Object.assign(
                 {},
                 payload, 
-                { exp: (Date.now() / 1000) + cacheExpiry * 3 }
+                { iss: 'sage.serv3' }
             );
-            const authToken = jwt.sign( newPayload, secret );
-            const test = new Authenticate({
-                authToken,
-                validIssuers,
-                StoreService,
-                logger,
-            });
+            const authToken = jwt.sign( newPayload, secret, { algorithm });
+            const test = new JwtAuthenticator({
+                storeService,
+            }, {logger});
 
-            return test.checkAuthorisation()
-                .then((data) => {
-                    should.strictEqual(data.authorised, true);
-                    getCertListSpy.calledOnce.should.be.true();
-                    getEndpointSpy.calledOnce.should.be.false();
+            return test.checkAuthorisation(authToken).should.be.rejectedWith(/Fetch endpoint error: getaddrinfo ENOTFOUND invalid invalid/); // auth fails 
+        });
+    });
 
-                    should.strictEqual(nockcalls.interceptors[0].interceptionCounter, 2);
+    describe('refresh delay test', () => {
+        const newPayload = Object.assign(
+            {},
+            payload,
+            {kid: 'unknown'}
+        );
+
+        it('should not refresh cert lists from endpoint when unknown kid but within refresh delay limit', () => {
+            const secret = certs[payload.kid][0];
+
+            const authToken = jwt.sign( newPayload, secret, { algorithm } );
+            const newStoreService = new EndpointsStore(
+                {
+                    endpointMappings,
+                    refreshDelay,
+                    cacheClass: Cache,
+                },
+                { logger }
+            );
+            getCacheSpy = sinon.spy(newStoreService, 'getCache');
+            getEndpointSpy = sinon.spy(newStoreService, 'getEndpoint');
+            const test = new JwtAuthenticator({
+                storeService: newStoreService,
+            }, {logger});
+
+            const tokenCerts = test.validateToken(authToken)
+
+            return test.getCertKeys(tokenCerts) //force population of cache
+                .then(() => {nockCallCount += 1})
+                .then(() => test.checkAuthorisation(authToken))
+                .catch((err) => {
+                    should.strictEqual(err.message, 'AuthFailed'); // auth fails 
+                    getCacheSpy.callCount.should.eql(4); // should be called 4 times - twice for first test.getCertKeys call then twice again in test.checkAuthorisation
+                    getEndpointSpy.calledOnce.should.be.true(); // should only call getendpoint on first build of cache
+                    should.strictEqual(nockcalls.interceptors[0].interceptionCounter, nockCallCount); // single call out to endpoint
+                })
+        })
+
+        it('should refresh cert lists from endpoint when unknown kid and outside of refresh delay limit', () => {
+            const secret = certs[payload.kid][0];
+
+            const authToken = jwt.sign( newPayload, secret, { algorithm } );
+            const newStoreService = new EndpointsStore(
+                {
+                    endpointMappings,
+                    refreshDelay: -1,
+                    cacheClass: Cache,
+                },
+                { logger }
+            );
+            getCacheSpy = sinon.spy(newStoreService, 'getCache');
+            getEndpointSpy = sinon.spy(newStoreService, 'getEndpoint');
+            const test = new JwtAuthenticator({
+                storeService: newStoreService,
+            }, {logger});
+
+            const tokenCerts = test.validateToken(authToken)
+
+            return test.getCertKeys(tokenCerts) //force population of cache
+                .then(() => {nockCallCount += 1}) // first call from test.getCertKeys 
+                .then(() => test.checkAuthorisation(authToken))
+                .catch((err) => {
+                    nockCallCount += 1; // second call from test.checkAuthorisation
+                    should.strictEqual(err.message, 'AuthFailed'); // auth fails 
+                    getCacheSpy.callCount.should.eql(4); // should be called 4 times - twice for first test.getCertKeys call then again in test.checkAuthorisation
+                    getEndpointSpy.calledOnce.should.be.true(); // should only call getendpoint on first build of cache
+                    should.strictEqual(nockcalls.interceptors[0].interceptionCounter, nockCallCount); // two calls out to endpoint
                 })
         })
     });
 
     describe('Authorisation tests', () => {
         it('should authorise a valid jwt, and return the custom claims', () => {
-            const secret = certs[payload.kid][0];
+            const secret = certs[payload.kid][0];       
 
-            const authToken = jwt.sign( payload, secret );
-            const test = new Authenticate({
-                authToken,
-                validIssuers,
-                StoreService,
-                logger,
-            });
+            const authToken = jwt.sign( payload, secret, { algorithm });
+            const test = new JwtAuthenticator({
+                storeService,
+            }, {logger});
 
-            return test.checkAuthorisation()
+            return test.checkAuthorisation(authToken)
                 .then((data) => {
+                    nockCallCount += 1;
                     should.strictEqual(data.authorised, true);
-                    should.strictEqual(data.claims.customClaim, 'sage');
-                });
+                    (data.claims).should.have.property('customClaim');
+                    (data.claims).should.not.have.property('exp');
+                    should.strictEqual(data.claims.customClaim, payload.customClaim);
+                });         
         });
 
-        it('should fail authorisation if no data returned from endpoint', () => {
-            const secret = certs[payload.kid][0];
+        it('should fail authorisation if valid certificate not found for kid', () => {
+            const secret = certs['kid2'][0];       
+
+            const authToken = jwt.sign( payload, secret, { algorithm });
+            const test = new JwtAuthenticator({
+                storeService,
+            }, {logger});
+
+            return test.checkAuthorisation(authToken)
+                .catch((err) => {
+                    should.strictEqual(err.message, 'AuthFailed'); // auth fails 
+                })
+        });
+
+        it('should fail authorisation if kid not found for issuer', () => {
+            const secret = certs[payload.kid][0];       
 
             const newPayload = Object.assign(
                 {},
                 payload, 
                 { iss: 'sage.serv2' }
             );
-            const authToken = jwt.sign( newPayload, secret );
-            const test = new Authenticate({
-                authToken,
-                validIssuers,
-                StoreService,
-                logger,
-            });
+            const authToken = jwt.sign( newPayload, secret, { algorithm });
+            const test = new JwtAuthenticator({
+                storeService,
+            }, {logger});
 
-            (test.checkAuthorisation()).should.be.rejectedWith(/AuthFailed/);
-        });
-
-        it('should fail authorisation if no matching key found', () => {
-            const secret = 'unknownSecret';
-
-            const authToken = jwt.sign( payload, secret );
-            const test = new Authenticate({
-                authToken,
-                validIssuers,
-                StoreService,
-                logger,
-            });
-
-            (test.checkAuthorisation()).should.be.rejectedWith(/AuthFailed/);
+            return test.checkAuthorisation(authToken)
+                .catch((err) => {
+                    should.strictEqual(err.message, 'AuthFailed'); // auth fails 
+                })
         });
     });
 });
