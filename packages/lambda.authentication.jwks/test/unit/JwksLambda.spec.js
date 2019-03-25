@@ -2,7 +2,7 @@ const sinon = require('sinon');
 const _ = require('underscore');
 const JwksLambdaSpec = require('../../lib/JwksLambda');
 const should = require('should');
-const { Cache } = require('@sage/bc-data-cache');
+const { Cache } = require('@sage/sfab-s2s-jwt-cache');
 const ParameterService = require('@sage/bc-services-parameter');
 
 describe('JwksLambda', function () {

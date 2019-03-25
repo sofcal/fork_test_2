@@ -4,7 +4,7 @@
 
 const needle = require('needle');
 const { Jwks } = require('@sage/sfab-s2s-jwt-jwks');
-const { Cache } = require('@sage/bc-data-cache');
+const { Cache } = require('@sage/sfab-s2s-jwt-cache');
 
 const Promise = require('bluebird');
 

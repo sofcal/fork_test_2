@@ -58,7 +58,8 @@ class JwtAuthenticatorLambda extends Handler {
                 event.logger.info({ function: func, log: 'started' });
 
                 // extract auth token from event
-                const [, token] = event.authorizationToken.split(' ');
+                const auth = event.authorizationToken || event.headers.Authorization;
+                const [, token] = auth.split(' ');
 
                 return this.auth.checkAuthorisation(token)
                     .then((result) => {

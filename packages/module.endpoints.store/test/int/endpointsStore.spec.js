@@ -3,7 +3,7 @@ const sinon = require('sinon');
 const nock = require('nock');
 const needle = require('needle');
 const { EndpointsStore }  = require('../../lib/EndpointsStore');
-const { Cache } = require('@sage/bc-data-cache');
+const { Cache } = require('@sage/sfab-s2s-jwt-cache');
 const { Jwks } = require('@sage/sfab-s2s-jwt-jwks');
 
 describe('module-endpoints-store', function(){

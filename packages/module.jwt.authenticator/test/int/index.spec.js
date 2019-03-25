@@ -1,8 +1,8 @@
 'use strict';
 
 const { JwtAuthenticator } = require('../../lib/index');
-const { EndpointsStore } = require('@sage/bc-endpoints-store');
-const { Cache } = require('@sage/bc-data-cache');
+const { EndpointsStore } = require('@sage/sfab-s2s-jwt-endpoint-store');
+const { Cache } = require('@sage/sfab-s2s-jwt-cache');
 const { Jwks } = require('@sage/sfab-s2s-jwt-jwks');
 const should = require('should');
 const jwt = require('jsonwebtoken');

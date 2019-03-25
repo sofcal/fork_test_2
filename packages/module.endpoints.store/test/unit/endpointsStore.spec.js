@@ -1,7 +1,7 @@
 const should = require('should');
 const sinon = require('sinon');
 const imported = require('../../lib/EndpointsStore');
-const { Cache } = require('@sage/bc-data-cache');
+const { Cache } = require('@sage/sfab-s2s-jwt-cache');
 const { Jwks } = require('@sage/sfab-s2s-jwt-jwks');
 
 const { EndpointsStore } = imported;
