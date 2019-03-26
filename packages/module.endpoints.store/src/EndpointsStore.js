@@ -93,7 +93,8 @@ class EndpointsStore {
             const func = `${EndpointsStore.name}.refreshFunction.${endpoint}`;
             this.logger.info({ function: func, log: 'refreshing cache', params: { endpoint } });
 
-            return this._needle.getAsync(endpoint)
+            const options = ID === 'wpb-auth' ? { headers: { 'X-Application': 'sage.uki.50.accounts' } } : undefined;
+            return this._needle.getAsync(endpoint, options)
                 .then((res) => EndpointsStore.mappingFn(res, ID))
                 .catch((err) => {
                     this.logger.info({ function: func, log: 'error calling endpoint', params: { endpoint, error: err.message, alert: true } });
