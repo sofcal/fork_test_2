@@ -36,7 +36,7 @@
     "cover": "NODE_ENV=test npm run test && nyc report --reporter=lcov",
     "report": "open coverage/lcov-report/index.html",
     "lint": "eslint ./src/**",
-    "build": "cp ",
+    "build": "",
     "watch": "babel --watch src --out-dir lib --copy-files",
     "unlock": "rimraf package-lock.json"
   }
