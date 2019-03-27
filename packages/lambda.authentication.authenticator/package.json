@@ -21,6 +21,7 @@
     "underscore": "^1.9.0"
   },
   "devDependencies": {
+    "@sage/sfab-s2s-jwt-jwks": "^1.1.5",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.0.3",
@@ -35,6 +36,7 @@
     "eslint-plugin-import": "^2.8.0",
     "eslint-stats": "^1.0.0",
     "istanbul": "^1.1.0-alpha.1",
+    "keypair": "^1.0.1",
     "mocha": "^4.0.1",
     "nyc": "^12.0.2",
     "serverless-webpack": "^4.2.0",
@@ -49,6 +51,7 @@
     "cover": "NODE_ENV=test npm run test && nyc report --reporter=lcov",
     "report": "open coverage/lcov-report/index.html",
     "int": "NODE_ENV=test nyc --x test/ mocha -b --colors --reporter spec \"./test/int/**/*.spec.js\"",
+    "debug": "npm run test -- --inspect-brk",
     "build": "serverless package",
     "postbuild": "mkdir -p ../../build && mv ./.serverless/${PWD##*/}.zip ../../build/${PWD##*/}.zip",
     "unlock": "rimraf package-lock.json",
