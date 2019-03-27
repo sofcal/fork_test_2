@@ -47,7 +47,7 @@ class JwksLambda extends Handler {
                     this.cache = Cache.Create(options, { logger: event.logger });
                 }
 
-                this.services.parameter = ParameterService.Create({ env: { region: this.config.AWS_REGION }, paramPrefix: '/dev/' });
+                this.services.parameter = ParameterService.Create({ env: { region: this.config.AWS_REGION }, paramPrefix: this.config.environment });
                 logger.info({ function: func, log: 'ended' });
             });
     }
@@ -77,12 +77,12 @@ class JwksLambda extends Handler {
             {
                 privateKey: '/wpb-auth/public-key',
                 publicKey: '/wpb-auth/public-key',
-                createdAt: Date.now()
+                createdAt: Math.floor(Date.now() / 1000)
             },
             {
                 privateKey: '/wpb-auth/public-key-last',
                 publicKey: '/wpb-auth/public-key-last',
-                createdAt: Date.now()
+                createdAt: Math.floor(Date.now() / 1000)
             }
         ];
 
@@ -92,7 +92,7 @@ class JwksLambda extends Handler {
                 // are valid, and generate a JWKS
                 const mapped = keyNameEnums
                     .filter((k) => Jwks.isValid(data[k.publicKey], data[k.privateKey], parseInt(data[k.createdAt], 10), parseInt(this.config.certExpiry, 10)))
-                    .map(k => Jwks.Generate(data[k.publicKey], data[k.privateKey]));
+                    .map((k) => Jwks.Generate(data[k.publicKey], data[k.privateKey]));
 
                 logger.info({ function: func, log: 'ended' });
                 return mapped;
