@@ -4,9 +4,9 @@ const Promise = require('bluebird');
 const impl = require('./impl');
 const ErrorSpecs = require('./ErrorSpecs');
 
-const { ParameterStoreStaticLoader } = require('internal-parameterstore-static-loader');
-const { RequestLogger } = require('internal-request-logger');
-const { StatusCodeError } = require('internal-status-code-error');
+const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
+const { RequestLogger } = require('@sage/bc-request-logger');
+const { StatusCodeError } = require('@sage/bc-status-code-error');
 
 const keys = require('./params');
 const AWS = require('aws-sdk');
