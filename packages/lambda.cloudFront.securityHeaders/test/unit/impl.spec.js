@@ -2,7 +2,7 @@ const should = require('should');
 const sinon = require('sinon');
 const impl = require('./../../lib/impl.js');
 
-describe.only('impl', function(){
+describe('impl', function(){
     let sandbox;
     const whiteList = 'https://*.eu.sageone.com,https://*.na.sageone.com,https://*.sageone.biz,https://*.sage.com,https://https://*.intacct.com,https://addons.lvh.me';
     const whiteListNoCommas = whiteList.split(',').join(' ');

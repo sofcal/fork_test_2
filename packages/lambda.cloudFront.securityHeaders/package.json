@@ -12,9 +12,6 @@
     "aws-sdk": "^2.220.1",
     "bluebird": "^3.5.1",
     "install": "^0.12.2",
-    "internal-parameterstore-static-loader": "^1.0.0",
-    "internal-request-logger": "^1.0.0",
-    "internal-status-code-error": "^1.0.0",
     "underscore": "^1.9.0"
   },
   "devDependencies": {

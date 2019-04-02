@@ -5,10 +5,10 @@ const ErrorSpecs = require('../../lib/ErrorSpecs');
 const should = require('should');
 const sinon = require('sinon');
 
-const { ParameterStoreStaticLoader } = require('internal-parameterstore-static-loader');
-const { StatusCodeError, StatusCodeErrorItem } = require('internal-status-code-error');
+const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
+const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-status-code-error');
 
-describe('cloudFront.securityHeaders.handler', function() {
+describe.only('cloudFront.securityHeaders.handler', function() {
     let sandbox;
     let params, context, event;
 
@@ -35,6 +35,16 @@ describe('cloudFront.securityHeaders.handler', function() {
             Records: [{
                 cf: {
                     request: {
+                        origin: {
+                            s3: {
+                                customHeaders: {
+                                    environment: [{
+                                        key: 'Environment',
+                                        value: 'test'
+                                    }]
+                                }
+                            }
+                        },
                         uri: 'https://www.test.com/banking-cloud/dosomething',
                         querystring: ''
                     },
@@ -56,7 +66,7 @@ describe('cloudFront.securityHeaders.handler', function() {
     });
 
     it('should retrieve params from param-store', (done) => {
-        sandbox.stub(process, 'env').value({ AWS_REGION: region, Environment: env });
+        //sandbox.stub(process, 'env').value({ AWS_REGION: region, Environment: env });
         sandbox.stub(dummyLoader, 'load').resolves(params);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
 
@@ -87,7 +97,7 @@ describe('cloudFront.securityHeaders.handler', function() {
     });
 
     it('should call impl.run', (done) => {
-        sandbox.stub(process, 'env').value({ AWS_REGION: region, Environment: env });
+        //sandbox.stub(process, 'env').value({ AWS_REGION: region, Environment: env });
         sandbox.stub(dummyLoader, 'load').resolves(params);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
 
@@ -109,7 +119,7 @@ describe('cloudFront.securityHeaders.handler', function() {
     });
 
     it('should call the callback with the success response', (done) => {
-        sandbox.stub(process, 'env').value({ AWS_REGION: region, Environment: env });
+        //sandbox.stub(process, 'env').value({ AWS_REGION: region, Environment: env });
         sandbox.stub(dummyLoader, 'load').resolves(params);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
 
@@ -131,7 +141,7 @@ describe('cloudFront.securityHeaders.handler', function() {
     });
 
     it('should call the callback with diagnoses', (done) => {
-        sandbox.stub(process, 'env').value({ AWS_REGION: region, Environment: env });
+        //sandbox.stub(process, 'env').value({ AWS_REGION: region, Environment: env });
         sandbox.stub(dummyLoader, 'load').resolves(params);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
 
@@ -155,7 +165,7 @@ describe('cloudFront.securityHeaders.handler', function() {
     });
 
     it('should call the callback with a default 500 if impl throws an unexpected error', (done) => {
-        sandbox.stub(process, 'env').value({ AWS_REGION: region, Environment: env });
+        //sandbox.stub(process, 'env').value({ AWS_REGION: region, Environment: env });
         sandbox.stub(dummyLoader, 'load').resolves(params);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
 
