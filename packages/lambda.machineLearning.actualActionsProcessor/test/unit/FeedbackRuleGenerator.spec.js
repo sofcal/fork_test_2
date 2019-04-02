@@ -7,7 +7,7 @@ const FeedbackRuleGenerator = require('./../../lib/FeedbackRuleGenerator');
 const { Rule } = require('@sage/bc-contracts-rule');
 const sinon = require('sinon');
 
-describe('FeedbackRuleGenerator', function(){
+describe('lambda-machineLearning-actualActionsProcessor.FeedbackRuleGenerator', function(){
     let logger;
    
     before(()=>{

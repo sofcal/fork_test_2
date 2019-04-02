@@ -1,7 +1,7 @@
 'use strict';
 
 const { JwtAuthenticator } = require('../../lib/index');
-const { EndpointsStore } = require('@sage/sfab-s2s-jwt-endpoint-store');
+const { EndpointStore } = require('@sage/sfab-s2s-jwt-endpoint-store');
 const { Cache } = require('@sage/sfab-s2s-jwt-cache');
 const { Jwks } = require('@sage/sfab-s2s-jwt-jwks');
 const should = require('should');
@@ -15,7 +15,7 @@ const { public: pub2, private: priv2 } = keypair();
 
 const algorithm = 'RS256';
 
-describe('@sage/sfab-s2s-jwt-authenticator', function(){
+describe('@sage/sfab-s2s-jwt-authenticator.index', function(){
 
     const logger = {
         info: (msg) => console.log(msg),
@@ -76,7 +76,7 @@ describe('@sage/sfab-s2s-jwt-authenticator', function(){
     let nockCallCount = 0;
 
     before(() => {
-        storeService = new EndpointsStore(
+        storeService = new EndpointStore(
             {
                 endpointMappings,
                 refreshDelay,
@@ -258,7 +258,7 @@ describe('@sage/sfab-s2s-jwt-authenticator', function(){
             const secret = certs[payload.kid][0];
 
             const authToken = jwt.sign( newPayload, secret, { algorithm } );
-            const newStoreService = new EndpointsStore(
+            const newStoreService = new EndpointStore(
                 {
                     endpointMappings,
                     refreshDelay,
@@ -289,7 +289,7 @@ describe('@sage/sfab-s2s-jwt-authenticator', function(){
             const secret = certs[payload.kid][0];
 
             const authToken = jwt.sign( newPayload, secret, { algorithm } );
-            const newStoreService = new EndpointsStore(
+            const newStoreService = new EndpointStore(
                 {
                     endpointMappings,
                     refreshDelay: -1,

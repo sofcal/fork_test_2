@@ -1,5 +1,5 @@
 {
-  "name": "incident-check-quarantine-transactions-dont-exist",
+  "name": "runonce.incident.checkquarantinetransactionsdontexist",
   "version": "1.1.4",
   "author": "",
   "license": "ISC",

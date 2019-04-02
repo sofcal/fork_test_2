@@ -1,6 +1,6 @@
 const should = require('should');
 
-describe('lambda-jwt-authenticator', function() {
+describe('lambda-jwt-jwks', function() {
     it('should do nothing', (done) => {
         done();
     });

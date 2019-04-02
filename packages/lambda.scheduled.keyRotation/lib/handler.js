@@ -6,7 +6,7 @@ const _ = require('underscore');
 const ParameterStoreStaticLoader = require('@sage/bc-parameterstore-static-loader');
 const BcServicesDb = require('@sage/bc-services-db');
 const crypto = require('crypto');
-const { RequestLogger } = require('@sage/bc-request-logger');
+const { RequestLogger } = require('@sage/bc-requestlogger');
 
 const serviceImpls = {
     DB: BcServicesDb

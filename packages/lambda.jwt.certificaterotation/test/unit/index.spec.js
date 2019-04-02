@@ -9,7 +9,7 @@ const _ = require('underscore');
 
 const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
 const DB = require('@sage/bc-services-db');
-const { StatusCodeError } = require('@sage/bc-status-code-error');
+const { StatusCodeError } = require('@sage/bc-statuscodeerror');
 const ParameterService = require('@sage/bc-services-parameter');
 
 describe.skip('lambda-jwt-certificaterotation', function() {

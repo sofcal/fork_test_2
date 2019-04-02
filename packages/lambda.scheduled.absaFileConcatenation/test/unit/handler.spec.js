@@ -9,9 +9,9 @@ const Promise = require('bluebird');
 
 const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
 const DB = require('@sage/bc-services-db');
-const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-status-code-error');
+const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-statuscodeerror');
 
-describe.skip('absa-file-concatenation.handler', function() {
+describe.skip('lambda-scheduled-absafileconcatenation.handler', function() {
     let sandbox;
     let config, context, event;
 

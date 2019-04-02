@@ -2,11 +2,11 @@ const should = require('should');
 const sinon = require('sinon');
 const nock = require('nock');
 const needle = require('needle');
-const { EndpointsStore }  = require('../../lib/EndpointsStore');
+const { EndpointStore }  = require('../../lib/EndpointStore');
 const { Cache } = require('@sage/sfab-s2s-jwt-cache');
 const { Jwks } = require('@sage/sfab-s2s-jwt-jwks');
 
-describe('@sage/sfab-s2s-jwt-endpoint-store', function(){
+describe('@sage/sfab-s2s-jwt-endpoint-store.EndpointStore', function(){
     const endpointMappings = {
         serv1: 'https://www.test.com/serv1',
         serv2: 'https://www.test.com/serv2',
@@ -59,7 +59,7 @@ describe('@sage/sfab-s2s-jwt-endpoint-store', function(){
         error: (msg) => console.error(msg),
     };
 
-    const test = new EndpointsStore(
+    const test = new EndpointStore(
         {
             endpointMappings,
             refreshDelay,
@@ -94,52 +94,52 @@ describe('@sage/sfab-s2s-jwt-endpoint-store', function(){
     });
 
     describe('Create new store', () => {
-        it('should allow new instance of EndpointsStore to be created', () => {
-            test.should.be.instanceOf(EndpointsStore);
+        it('should allow new instance of EndpointStore to be created', () => {
+            test.should.be.instanceOf(EndpointStore);
         });
 
         it('should set default values when not passed in', () => {
-            const testDefault = new EndpointsStore(
+            const testDefault = new EndpointStore(
                 {
                     endpointMappings,
                     refreshDelay,
                 }
             );
-            testDefault.should.be.instanceOf(EndpointsStore);
+            testDefault.should.be.instanceOf(EndpointStore);
             should.equal(testDefault._Cache.name,'Cache');
             testDefault.logger.should.be.Object();
         });
 
         it('should throw when invalid parameters passed', () => {
-            should.throws(() => new EndpointsStore({
+            should.throws(() => new EndpointStore({
                 endpointMappings: 'error',
                 refreshDelay,
                 cacheClass: Cache,
             }, { logger }));
-            should.throws(() => new EndpointsStore({
+            should.throws(() => new EndpointStore({
                 endpointMappings,
                 refreshDelay,
                 cacheClass: null,
             }, { logger }));
-            should.throws(() => new EndpointsStore({
+            should.throws(() => new EndpointStore({
                 endpointMappings,
                 refreshDelay: null,
                 cacheClass: Cache,
             }, { logger }));
-            should.throws(() => new EndpointsStore({
+            should.throws(() => new EndpointStore({
                 endpointMappings,
                 refreshDelay,
                 cacheClass: Cache,
             }, { logger:'logger'}));
-            should.throws(() => new EndpointsStore({
+            should.throws(() => new EndpointStore({
                 endpointMappings,
                 refreshDelay,
                 cacheClass: Cache,
             }, {logger: {invalidLogger: true}}));
         });
 
-        it('should create new instance of EndpointsStore when EndpointsStore.Create called', () => {
-            const testCreate = EndpointsStore.Create(
+        it('should create new instance of EndpointStore when EndpointStore.Create called', () => {
+            const testCreate = EndpointStore.Create(
                 {
                     endpointMappings,
                     refreshDelay,
@@ -148,7 +148,7 @@ describe('@sage/sfab-s2s-jwt-endpoint-store', function(){
                 { logger }
             );
 
-            testCreate.should.be.instanceOf(EndpointsStore);
+            testCreate.should.be.instanceOf(EndpointStore);
         });
     });
 

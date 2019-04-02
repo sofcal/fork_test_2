@@ -7,9 +7,9 @@ const ErrorSpecs = require('./ErrorSpecs');
 const keys = require('./params');
 
 const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
-const { RequestLogger } = require('@sage/bc-request-logger');
+const { RequestLogger } = require('@sage/bc-requestlogger');
 
-const { StatusCodeError } = require('@sage/bc-status-code-error');
+const { StatusCodeError } = require('@sage/bc-statuscodeerror');
 
 const DB = require('@sage/bc-services-db');
 

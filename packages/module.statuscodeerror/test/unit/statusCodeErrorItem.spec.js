@@ -1,7 +1,7 @@
 const StatusCodeErrorItem = require('../../lib/StatusCodeErrorItem');
 const should = require('should');
 
-describe('@sage/bc-status-code-error.StatusCodeErrorItem', function(){
+describe('@sage/bc-statuscodeerror.StatusCodeErrorItem', function(){
     describe('constructor', () => {
         it('should create an instance of StatusCodeErrorItem', (done) => {
             const applicationCode = 'application_code';

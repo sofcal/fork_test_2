@@ -1,10 +1,10 @@
 const { logger: loggerGen } = require('@sage/bc-debug-utils');
 const { ErrorSpecs } = require('@sage/bc-independent-lambda-handler');
-const { StatusCodeError } = require('@sage/bc-status-code-error');
+const { StatusCodeError } = require('@sage/bc-statuscodeerror');
 const should = require('should');
 const validate = require('../../../lib/validators/config');
 
-describe('lambda-jwt-jwks.validators.config', () => {
+describe('@sage/sfab-s2s-jwt-jwks-lambda.validators.config', () => {
 
     const logger = loggerGen(false);
     const expected = StatusCodeError.CreateFromSpecs([ErrorSpecs.invalidConfig], ErrorSpecs.invalidConfig.statusCode);

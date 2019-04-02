@@ -1,12 +1,12 @@
 const should = require('should');
 const sinon = require('sinon');
-const imported = require('../../lib/EndpointsStore');
+const imported = require('../../lib/EndpointStore');
 const { Cache } = require('@sage/sfab-s2s-jwt-cache');
 const { Jwks } = require('@sage/sfab-s2s-jwt-jwks');
 
-const { EndpointsStore } = imported;
+const { EndpointStore } = imported;
 
-describe('@sage/sfab-s2s-jwt-endpoint-store.endpointsStore', function () {
+describe('@sage/sfab-s2s-jwt-endpoint-store.EndpointStore', function () {
     const endpointMappings = {
         serv1: 'endpoint1',
         serv2: 'endpoint2',
@@ -18,7 +18,7 @@ describe('@sage/sfab-s2s-jwt-endpoint-store.endpointsStore', function () {
         error: (msg) => console.error(msg),
     };
 
-    const test = new EndpointsStore(
+    const test = new EndpointStore(
         {
             endpointMappings,
             refreshDelay,
@@ -37,13 +37,13 @@ describe('@sage/sfab-s2s-jwt-endpoint-store.endpointsStore', function () {
     };
 
     it('should export the correct modules', (done) => {
-        should.equal(typeof EndpointsStore, 'function');
+        should.equal(typeof EndpointStore, 'function');
         done();
     });
 
-    describe('EndpointsStore.Create', () => {
-        it('should be able to create new EndpointsStore object', () => {
-            const testCreate = EndpointsStore.Create(
+    describe('EndpointStore.Create', () => {
+        it('should be able to create new EndpointStore object', () => {
+            const testCreate = EndpointStore.Create(
                 {
                     endpointMappings,
                     refreshDelay,
@@ -53,14 +53,14 @@ describe('@sage/sfab-s2s-jwt-endpoint-store.endpointsStore', function () {
             );
     
             test.should.be.Object();
-            test.should.be.instanceof(EndpointsStore);
+            test.should.be.instanceof(EndpointStore);
         });
     });
 
-    describe('EndpointsStore.constructor', () => {
+    describe('EndpointStore.constructor', () => {
         it('should be able to create new store object', () => {
             test.should.be.Object();
-            test.should.be.instanceof(EndpointsStore);
+            test.should.be.instanceof(EndpointStore);
         });
 
         it('should create store object with correct properties', () => {
@@ -77,7 +77,7 @@ describe('@sage/sfab-s2s-jwt-endpoint-store.endpointsStore', function () {
             class testClass {
                 getData() { }
             }
-            const testStore = new EndpointsStore(
+            const testStore = new EndpointStore(
                 {
                     endpointMappings,
                     refreshDelay,
@@ -89,7 +89,7 @@ describe('@sage/sfab-s2s-jwt-endpoint-store.endpointsStore', function () {
         });
 
         it('should default cache Class to Cache if not passed', () => {
-            const testStore = new EndpointsStore(
+            const testStore = new EndpointStore(
                 {
                     endpointMappings,
                     refreshDelay,
@@ -102,17 +102,17 @@ describe('@sage/sfab-s2s-jwt-endpoint-store.endpointsStore', function () {
 
         it('should throw when cache class invalid or missing', () => {
             class dummyCache { }
-            should.throws(() => new EndpointsStore({
+            should.throws(() => new EndpointStore({
                 endpointMappings,
                 refreshDelay,
                 cacheClass: null,
             }, logger));
-            should.throws(() => new EndpointsStore({
+            should.throws(() => new EndpointStore({
                 endpointMappings,
                 refreshDelay,
                 cacheClass: 'Cache',
             }, logger));
-            should.throws(() => new EndpointsStore({
+            should.throws(() => new EndpointStore({
                 endpointMappings,
                 refreshDelay,
                 cacheClass: dummyCache,
@@ -120,24 +120,24 @@ describe('@sage/sfab-s2s-jwt-endpoint-store.endpointsStore', function () {
         });
 
         it('should throw when endpointMappings invalid or missing', () => {
-            should.throws(() => new EndpointsStore({
+            should.throws(() => new EndpointStore({
                 endpointMappings: '',
                 refreshDelay,
                 cacheClass: Cache,
             }, logger));
-            should.throws(() => new EndpointsStore({
+            should.throws(() => new EndpointStore({
                 refreshDelay,
                 cacheClass: Cache,
             }, logger));
         });
 
         it('should throw when refreshDelay invalid or missing', () => {
-            should.throws(() => new EndpointsStore({
+            should.throws(() => new EndpointStore({
                 endpointMappings,
                 refreshDelay: 'error',
                 cacheClass: Cache,
             }, logger));
-            should.throws(() => new EndpointsStore({
+            should.throws(() => new EndpointStore({
                 endpointMappings,
                 cacheClass: Cache,
             }, logger));
@@ -145,17 +145,17 @@ describe('@sage/sfab-s2s-jwt-endpoint-store.endpointsStore', function () {
 
         it('should throw when logger invalid or missing', () => {
             const noop = () => { };
-            should.throws(() => new EndpointsStore({
+            should.throws(() => new EndpointStore({
                 endpointMappings,
                 refreshDelay,
                 cacheClass: Cache,
             }, {logger: 'logger'}));
-            should.throws(() => new EndpointsStore({
+            should.throws(() => new EndpointStore({
                 endpointMappings,
                 refreshDelay,
                 cacheClass: Cache,
             }, {logger: {info: noop }}));
-            should.throws(() => new EndpointsStore({
+            should.throws(() => new EndpointStore({
                 endpointMappings,
                 refreshDelay,
                 cacheClass: Cache,
@@ -163,7 +163,7 @@ describe('@sage/sfab-s2s-jwt-endpoint-store.endpointsStore', function () {
         });
 
         it('should default logger when not passed in', () => {
-            const testStore = new EndpointsStore(
+            const testStore = new EndpointStore(
                 {
                     endpointMappings,
                     refreshDelay,
@@ -178,11 +178,11 @@ describe('@sage/sfab-s2s-jwt-endpoint-store.endpointsStore', function () {
 
     });
 
-    describe('EndpointsStore.getCache', () => {
+    describe('EndpointStore.getCache', () => {
         let createCacheEntryStub;
 
         before(() => {
-            createCacheEntryStub = sinon.stub(EndpointsStore.prototype, 'createCacheEntry');
+            createCacheEntryStub = sinon.stub(EndpointStore.prototype, 'createCacheEntry');
         });
 
         after(() => {
@@ -227,7 +227,7 @@ describe('@sage/sfab-s2s-jwt-endpoint-store.endpointsStore', function () {
         });
     });
 
-    describe('EndpointsStore.createCacheEntry', () => {
+    describe('EndpointStore.createCacheEntry', () => {
         const dummyEntry = {
             dummyCache: true,
         };
@@ -239,7 +239,7 @@ describe('@sage/sfab-s2s-jwt-endpoint-store.endpointsStore', function () {
             }
         }
 
-        const test2 = new EndpointsStore(
+        const test2 = new EndpointStore(
             {
                 endpointMappings,
                 refreshDelay,
@@ -254,7 +254,7 @@ describe('@sage/sfab-s2s-jwt-endpoint-store.endpointsStore', function () {
         });
     });
 
-    describe('EndpointsStore.getEndPoint', () => {
+    describe('EndpointStore.getEndPoint', () => {
         it('should return valid endPoint', function () {
             const ID = Object.keys(endpointMappings)[0];
             const result = test.getEndpoint(ID);
@@ -269,7 +269,7 @@ describe('@sage/sfab-s2s-jwt-endpoint-store.endpointsStore', function () {
         });
     });
 
-    describe('EndpointsStore.mappingFn', () => {
+    describe('EndpointStore.mappingFn', () => {
         let ConvertX5CToPeStub;
 
         before(() => {
@@ -308,7 +308,7 @@ describe('@sage/sfab-s2s-jwt-endpoint-store.endpointsStore', function () {
                     'cert',
                 ],
             };
-            EndpointsStore.mappingFn(res).should.eql(expected);
+            EndpointStore.mappingFn(res).should.eql(expected);
         });
 
         it('should return empty object if no results returned', () => {
@@ -316,11 +316,11 @@ describe('@sage/sfab-s2s-jwt-endpoint-store.endpointsStore', function () {
                 body: {},
             };
             const expected = {};
-            EndpointsStore.mappingFn(res).should.eql(expected);
+            EndpointStore.mappingFn(res).should.eql(expected);
         });        
     });
 
-    describe('EndpointsStore.createRefreshFunction', () => {
+    describe('EndpointStore.createRefreshFunction', () => {
         it('should return a Promise', () => {
             test.createRefreshFunction(null).should.be.Function();
         });
@@ -331,7 +331,7 @@ describe('@sage/sfab-s2s-jwt-endpoint-store.endpointsStore', function () {
         });
     });
 
-    describe('EndpointsStore.getValidIds', () => {
+    describe('EndpointStore.getValidIds', () => {
         it('should return array of ids', () => {
             const ids = test.getValidIds();
             ids.should.be.an.Array();

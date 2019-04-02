@@ -3,7 +3,7 @@ const validate = require('./validators');
 const Promise = require('bluebird');
 
 const {Handler} = require('@sage/bc-default-lambda-handler');
-const {RequestLogger} = require('@sage/bc-request-logger');
+const {RequestLogger} = require('@sage/bc-requestlogger');
 
 const keys = require('./params');
 const keyPair = require('./keyPair');

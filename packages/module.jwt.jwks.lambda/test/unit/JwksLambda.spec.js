@@ -5,7 +5,7 @@ const should = require('should');
 const { Cache } = require('@sage/sfab-s2s-jwt-cache');
 const ParameterService = require('@sage/bc-services-parameter');
 
-describe('lambda-jwt-jwks.JwksLambda', function () {
+describe('@sage/sfab-s2s-jwt-jwks-lambda.JwksLambda', function () {
 
     const errFunc = () => {
         throw new Error('should be stubbed')

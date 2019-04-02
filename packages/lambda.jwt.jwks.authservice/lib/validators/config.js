@@ -1,7 +1,7 @@
 'use strict';
 
 const { ErrorSpecs } = require('@sage/bc-independent-lambda-handler');
-const { StatusCodeError } = require('@sage/bc-status-code-error');
+const { StatusCodeError } = require('@sage/bc-statuscodeerror');
 
 module.exports = (config, { logger }) => {
     // TODO: are we getting these values from process or param-store?

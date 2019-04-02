@@ -1,6 +1,6 @@
 const handler = require('../../lib/handler');
 
-describe('incident.orgInfoFromBAInfo.handler', function(){
+describe('runonce-incident-orginfofrombainfo.handler', function(){
     it('should do nothing', () => {
 
     });

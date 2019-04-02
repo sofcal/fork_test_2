@@ -16,7 +16,7 @@ needle.defaults({
 const noop = () => {};
 const noopLogger = { error: noop, warn: noop, info: noop, };
 
-class EndpointsStore {
+class EndpointStore {
     constructor({ endpointMappings, refreshDelay, cacheClass = Cache }, { logger = noopLogger } = {}) {
         this.endpointMappings = endpointMappings;       // mapping ID > endpoint
         this.validIds = Object.keys(endpointMappings);  // list of valid Ids
@@ -31,7 +31,7 @@ class EndpointsStore {
     }
 
     static Create(...args) {
-        return new EndpointsStore(...args);
+        return new EndpointStore(...args);
     }
 
     getValidIds() {
@@ -40,7 +40,7 @@ class EndpointsStore {
 
     // get Data for an ID
     getCache(ID, tryRefresh = true) {
-        const func = `${EndpointsStore.name}.getCache`;
+        const func = `${EndpointStore.name}.getCache`;
         return Promise.resolve(undefined)
             // check if cache exists for ID - if not, create
             .then(() => {
@@ -76,7 +76,7 @@ class EndpointsStore {
 
     // Get endpoint for an ID from endpointMappings
     getEndpoint(ID) {
-        const func = `${EndpointsStore.name}.getEndpoint`;
+        const func = `${EndpointStore.name}.getEndpoint`;
         const endpoint = this.endpointMappings[ID];
         // endpoint not known
         if (!endpoint) {
@@ -90,12 +90,12 @@ class EndpointsStore {
     // returns promise
     createRefreshFunction(endpoint, ID) {
         return Promise.method(() => {
-            const func = `${EndpointsStore.name}.refreshFunction.${endpoint}`;
+            const func = `${EndpointStore.name}.refreshFunction.${endpoint}`;
             this.logger.info({ function: func, log: 'refreshing cache', params: { endpoint } });
 
             const options = ID === 'wpb-auth' ? { headers: { 'X-Application': 'sage.uki.50.accounts' } } : undefined;
             return this._needle.getAsync(endpoint, options)
-                .then((res) => EndpointsStore.mappingFn(res, ID))
+                .then((res) => EndpointStore.mappingFn(res, ID))
                 .catch((err) => {
                     this.logger.info({ function: func, log: 'error calling endpoint', params: { endpoint, error: err.message, alert: true } });
                     throw new Error(`Fetch endpoint error: ${err.message}`);
@@ -135,6 +135,4 @@ class EndpointsStore {
     }
 }
 
-module.exports = {
-    EndpointsStore
-};
+module.exports = { EndpointStore };

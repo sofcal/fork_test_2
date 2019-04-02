@@ -8,9 +8,9 @@ const Promise = require('bluebird');
 
 const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
 const DB = require('@sage/bc-services-db');
-const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-status-code-error');
+const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-statuscodeerror');
 
-describe('incident-rulesWildcardCheck.handler', function() {
+describe('runonce-incident-ruleswildcardcheck.handler', function() {
     let sandbox;
     let config, context, event;
 

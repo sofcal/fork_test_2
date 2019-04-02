@@ -8,9 +8,9 @@ const Promise = require('bluebird');
 
 const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
 const DB = require('@sage/bc-services-db');
-const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-status-code-error');
+const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-statuscodeerror');
 
-describe('migration-setBankAccountFeatureOptions.handler', function() {
+describe('runonce-migration-setBankAccountFeatureOptions.handler', function() {
     let sandbox;
     let config, context, event;
 

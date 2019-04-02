@@ -4,7 +4,7 @@ const validate = require('./validators');
 
 const { Handler } = require('@sage/bc-independent-lambda-handler');
 const { JwtAuthenticator } = require('@sage/sfab-s2s-jwt-authenticator');
-const { EndpointsStore } = require('@sage/sfab-s2s-jwt-endpoint-store');
+const { EndpointStore } = require('@sage/sfab-s2s-jwt-endpoint-store');
 
 const Promise = require('bluebird');
 
@@ -40,7 +40,7 @@ class JwtAuthenticatorLambda extends Handler {
                 const endpointMappings = JSON.parse(serviceMappings || '{}');
 
                 logger.info({ function: func, log: 'creating store service' });
-                const storeService = EndpointsStore.Create({ endpointMappings, cacheExpiry: parseInt(cacheExpiry, 10), refreshDelay: parseInt(refreshDelay, 10) }, { logger });
+                const storeService = EndpointStore.Create({ endpointMappings, cacheExpiry: parseInt(cacheExpiry, 10), refreshDelay: parseInt(refreshDelay, 10) }, { logger });
                 const validIssuers = Object.keys(endpointMappings);
 
                 logger.info({ function: func, log: 'creating auth service' });

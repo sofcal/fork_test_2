@@ -1,6 +1,6 @@
 const handler = require('../../lib/handler');
 
-describe('incident.verifyBankFiles.handler', function(){
+describe('runonce-incident-verifybankfiles.handler', function(){
     it('should do nothing', () => {
 
     });

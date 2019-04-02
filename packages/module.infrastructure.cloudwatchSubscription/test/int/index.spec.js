@@ -1,6 +1,6 @@
 const should = require('should');
 
-describe('lambda-jwt-authenticator', function() {
+describe('@sage/bc-infrastructure-cloudwatchsubscription.index', function() {
     it('should do nothing', (done) => {
         done();
     });

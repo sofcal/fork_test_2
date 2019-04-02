@@ -17,7 +17,7 @@
     "@babel/core": "^7.2.2",
     "@babel/preset-env": "^7.0.0-beta.47",
     "@sage/bc-jsonschema-to-statuscodeerror": "^1.1.3",
-    "@sage/bc-status-code-error": "^1.1.3",
+    "@sage/bc-statuscodeerror": "^1.1.3",
     "jsonschema": "^1.2.4",
     "underscore": "^1.9.0",
     "underscore.string": "^3.3.4"

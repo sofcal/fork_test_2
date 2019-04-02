@@ -1,6 +1,6 @@
 const should = require('should');
 
-describe('absa-file-concatenation', function(){
+describe('lambda-scheduled-absafileconcatenation', function(){
     it('should do nothing', (done) => {
         done();
     });

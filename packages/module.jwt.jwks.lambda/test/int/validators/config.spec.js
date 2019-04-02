@@ -1,10 +1,10 @@
 const sinon = require('sinon');
 const { ErrorSpecs } = require('@sage/bc-independent-lambda-handler');
-const { StatusCodeError } = require('@sage/bc-status-code-error');
+const { StatusCodeError } = require('@sage/bc-statuscodeerror');
 const should = require('should');
 const validate = require('../../../lib/validators/config');
 
-describe.only('lambda-jwt-jwks.validators.config', () => {
+describe('lambda-jwt-jwks.validators.config', () => {
 
     const doNothing = () => {};
 
@@ -15,7 +15,7 @@ describe.only('lambda-jwt-jwks.validators.config', () => {
         error: doNothing
     };
 
-    const expected = StatusCodeError.CreateFromSpecs([ErrorSpecs.invalidEnvironment], ErrorSpecs.invalidEnvironment.statusCode);
+    const expected = StatusCodeError.CreateFromSpecs([ErrorSpecs.invalidConfig], ErrorSpecs.invalidConfig.statusCode);
 
     beforeEach( () => {
         spyErr = sinon.spy(StatusCodeError, 'CreateFromSpecs');
