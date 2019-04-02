@@ -12,9 +12,6 @@ describe('cloudFront.securityHeaders.handler', function() {
     let sandbox;
     let params, context, event;
 
-    const env = 'local';
-    const region = 'eu-west-1';
-
     const errFunc = () => { throw new Error('should be stubbed') };
     const logFunc = (data) => {console.log(JSON.stringify(data))};
     const dummyLoader = { load: errFunc };
@@ -75,7 +72,7 @@ describe('cloudFront.securityHeaders.handler', function() {
 
         handler.run(event, context, () => {
             try {
-                const paramPrefix = '/local/';
+                const paramPrefix = '/test/';
                 const region = 'eu-west-1';
 
                 should(ParameterStoreStaticLoader.Create.callCount).eql(1);
@@ -97,7 +94,6 @@ describe('cloudFront.securityHeaders.handler', function() {
     });
 
     it('should call impl.run', (done) => {
-        //sandbox.stub(process, 'env').value({ AWS_REGION: region, Environment: env });
         sandbox.stub(dummyLoader, 'load').resolves(params);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
 
@@ -119,7 +115,6 @@ describe('cloudFront.securityHeaders.handler', function() {
     });
 
     it('should call the callback with the success response', (done) => {
-        //sandbox.stub(process, 'env').value({ AWS_REGION: region, Environment: env });
         sandbox.stub(dummyLoader, 'load').resolves(params);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
 
@@ -141,7 +136,6 @@ describe('cloudFront.securityHeaders.handler', function() {
     });
 
     it('should call the callback with diagnoses', (done) => {
-        //sandbox.stub(process, 'env').value({ AWS_REGION: region, Environment: env });
         sandbox.stub(dummyLoader, 'load').resolves(params);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
 
@@ -165,7 +159,6 @@ describe('cloudFront.securityHeaders.handler', function() {
     });
 
     it('should call the callback with a default 500 if impl throws an unexpected error', (done) => {
-        //sandbox.stub(process, 'env').value({ AWS_REGION: region, Environment: env });
         sandbox.stub(dummyLoader, 'load').resolves(params);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
 
@@ -192,7 +185,6 @@ describe('cloudFront.securityHeaders.handler', function() {
     // skipped becase param store static loader uses promisifyAll
     it.skip('should fail if any param store values are missing', function(done) {
 
-        sandbox.stub(process, 'env').value({ AWS_REGION: region, Environment: env });
         sandbox.stub(dummyLoader, 'load').resolves(undefined);
 
         handler.run(event, context, (first, second) => {

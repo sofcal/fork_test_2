@@ -24,8 +24,8 @@ module.exports.run = (event, context, callback) => {
     event.logger.info({ function: func, log: 'started' });
 
     const request = event.Records[0].cf.request; // eslint-disable-line prefer-destructuring
-    const environment = request.origin.s3.customHeaders.environment;
-    const envObj = environment.find(obj => obj.key === 'Environment')
+    const { environment } = request.origin.s3.customHeaders;
+    const envObj = environment.find(obj => obj.key === 'Environment');
     const env = envObj.value;
     const region = 'eu-west-1'; // set to force lambda to get param store values from fixed region and not region it is running in
 
@@ -101,9 +101,8 @@ const getParams = ({ env, region }, logger) => {
 
 const setupLogGroupSubscription = Promise.method((event, context) => {
     const func = 'handler.setupLogGroupSubscription';
-    event.logger.info({ function: func, log: 'started' });
-    const cloudwatchlogs = Promise.promisifyAll(new AWS.CloudWatchLogs());
-    return cloudwatchlogs.describeSubscriptionFiltersAsync({ logGroupName: context.logGroupName })
+    const cloudwatchlogs = new AWS.CloudWatchLogs();
+    return cloudwatchlogs.describeSubscriptionFilters({ logGroupName: context.logGroupName }).promise()
         .then((subFilterDetails) => {
             if (subFilterDetails.subscriptionFilters.length === 0) {
                 event.logger.info({ function: func, log: 'assigning subscription filter' });
@@ -113,8 +112,7 @@ const setupLogGroupSubscription = Promise.method((event, context) => {
                     filterPattern: ' ',
                     logGroupName: context.logGroupName
                 };
-                event.logger.info({ function: func, log: 'completed' });
-                return cloudwatchlogs.putSubscriptionFilterAsync(params);
+                return cloudwatchlogs.putSubscriptionFilter(params).promise();
             }
             event.logger.info({ function: func, log: 'subscription filter already assigned' });
             return null;
