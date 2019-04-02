@@ -8,7 +8,7 @@ const {
     validateToken,
 } = utils;
 
-describe('utils', () => {
+describe('@sage/sfab-s2s-jwt-authenticator.utils', () => {
     it('should export the correct modules', (done) => {
         utils.should.have.only.keys(
             'expired',

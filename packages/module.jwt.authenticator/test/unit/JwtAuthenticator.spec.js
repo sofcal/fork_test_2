@@ -5,7 +5,7 @@ const Authenticate = require('../../lib/JwtAuthenticator');
 const utils  = require('../../lib/utils');
 const _ = require('underscore');
 
-describe('module-jwt-authenticator.authenticate', function(){
+describe('@sage/sfab-s2s-jwt-authenticator.JwtAuthenticator', function(){
     const logger = {
         info: (msg) => console.log(msg),
         warn: (msg) => console.log(msg),

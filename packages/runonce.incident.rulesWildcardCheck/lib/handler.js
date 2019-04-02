@@ -1,20 +1,22 @@
 'use strict';
 
+const AWS = require('aws-sdk');
 const Promise = require('bluebird');
 const impl = require('./impl');
 const ErrorSpecs = require('./ErrorSpecs');
 const serviceLoader = require('./serviceLoader');
+const keys = require('./params');
 
 const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
 const { RequestLogger } = require('@sage/bc-request-logger');
+
 const { StatusCodeError } = require('@sage/bc-status-code-error');
 
 const DB = require('@sage/bc-services-db');
 
 const serviceImpls = { DB };
 
-const keys = require('./params');
-const AWS = require('aws-sdk');
+AWS.config.setPromisesDependency(Promise);
 
 module.exports.run = (event, context, callback) => {
     const func = 'handler.run';
@@ -145,7 +147,7 @@ const disconnectDB = Promise.method((services, logger) => {
 const setupLogGroupSubscription = Promise.method((event, context) => {
     const func = 'handler.setupLogGroupSubscription';
     const cloudwatchlogs = Promise.promisifyAll(new AWS.CloudWatchLogs());
-    return cloudwatchlogs.describeSubscriptionFiltersAsync({ logGroupName: context.logGroupName })
+    return cloudwatchlogs.describeSubscriptionFilters({ logGroupName: context.logGroupName }).promise()
         .then((subFilterDetails) => {
             if (subFilterDetails.subscriptionFilters.length === 0) {
                 event.logger.info({ function: func, log: 'assigning subscription filter' });
@@ -155,7 +157,7 @@ const setupLogGroupSubscription = Promise.method((event, context) => {
                     filterPattern: ' ',
                     logGroupName: context.logGroupName
                 };
-                return cloudwatchlogs.putSubscriptionFilterAsync(params);
+                return cloudwatchlogs.putSubscriptionFilter(params).promise();
             }
             event.logger.info({ function: func, log: 'subscription filter already assigned' });
             return null;

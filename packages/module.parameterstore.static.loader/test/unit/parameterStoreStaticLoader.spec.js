@@ -1,6 +1,7 @@
 'use strict';
 
 const ParameterStoreStaticLoader = require('../../lib/ParameterStoreStaticLoader');
+const Promise = require('bluebird');
 const aws = require('aws-sdk');
 
 const sinon = require('sinon');
@@ -10,7 +11,7 @@ describe('@sage/bc-parameterstore-static-loader.ParameterStoreStaticLoader', fun
     let sandbox;
 
     const errorFunc = () => { throw new Error('should be stubbed') };
-    const ssm = { getParametersAsync: errorFunc };
+    const ssm = { getParameters: errorFunc };
 
     before(() => {
         sandbox = sinon.createSandbox();
@@ -86,7 +87,7 @@ describe('@sage/bc-parameterstore-static-loader.ParameterStoreStaticLoader', fun
             };
 
             loader.keys = ['one', 'two'];
-            sandbox.stub(ssm, 'getParametersAsync').resolves(response);
+            sandbox.stub(ssm, 'getParameters').returns({ promise: Promise.method(() => response)});
 
             const params = {};
             loader.load(params)
@@ -96,8 +97,8 @@ describe('@sage/bc-parameterstore-static-loader.ParameterStoreStaticLoader', fun
                         two: 'parameter_2'
                     });
 
-                    should(ssm.getParametersAsync.callCount).eql(1);
-                    should(ssm.getParametersAsync.calledWithExactly(
+                    should(ssm.getParameters.callCount).eql(1);
+                    should(ssm.getParameters.calledWithExactly(
                         { Names: ['/dev/one', '/dev/two'], WithDecryption: true }
                     )).eql(true);
 
@@ -128,10 +129,10 @@ describe('@sage/bc-parameterstore-static-loader.ParameterStoreStaticLoader', fun
                 ]
             };
 
-            sandbox.stub(ssm, 'getParametersAsync')
-                .onCall(0).returns(Promise.resolve(response1))
-                .onCall(1).returns(Promise.resolve(response2))
-                .onCall(2).returns(Promise.resolve(response3));
+            sandbox.stub(ssm, 'getParameters')
+                .onCall(0).returns({ promise: Promise.method(() => response1) })
+                .onCall(1).returns({ promise: Promise.method(() => response2) })
+                .onCall(2).returns({ promise: Promise.method(() => response3) });
 
             loader.keys = ['one', 'two', 'three', 'four', 'five', 'six'];
 
@@ -151,14 +152,14 @@ describe('@sage/bc-parameterstore-static-loader.ParameterStoreStaticLoader', fun
                         six: 'parameter_6'
                     });
 
-                    should(ssm.getParametersAsync.callCount).eql(3);
-                    should(ssm.getParametersAsync.calledWithExactly(
+                    should(ssm.getParameters.callCount).eql(3);
+                    should(ssm.getParameters.calledWithExactly(
                         { Names: ['/dev/one', '/dev/two'], WithDecryption: true }
                     )).eql(true);
-                    should(ssm.getParametersAsync.calledWithExactly(
+                    should(ssm.getParameters.calledWithExactly(
                         { Names: ['/dev/three', '/dev/four'], WithDecryption: true }
                     )).eql(true);
-                    should(ssm.getParametersAsync.calledWithExactly(
+                    should(ssm.getParameters.calledWithExactly(
                         { Names: ['/dev/five', '/dev/six'], WithDecryption: true }
                     )).eql(true);
 
@@ -177,7 +178,7 @@ describe('@sage/bc-parameterstore-static-loader.ParameterStoreStaticLoader', fun
             };
 
             loader.keys = ['one', '/dev/two'];
-            sandbox.stub(ssm, 'getParametersAsync').returns(Promise.resolve(response));
+            sandbox.stub(ssm, 'getParameters').returns({ promise: Promise.method(() => response) });
 
             loader.paramPrefix = null;
 
@@ -189,9 +190,9 @@ describe('@sage/bc-parameterstore-static-loader.ParameterStoreStaticLoader', fun
                         '/dev/two': 'parameter_2'
                     });
 
-                    should(ssm.getParametersAsync.callCount).eql(1);
-                    console.log(ssm.getParametersAsync.getCall(0).args);
-                    should(ssm.getParametersAsync.calledWithExactly(
+                    should(ssm.getParameters.callCount).eql(1);
+                    console.log(ssm.getParameters.getCall(0).args);
+                    should(ssm.getParameters.calledWithExactly(
                         { Names: ['one', '/dev/two'], WithDecryption: true }
                     )).eql(true);
 
@@ -205,8 +206,8 @@ describe('@sage/bc-parameterstore-static-loader.ParameterStoreStaticLoader', fun
 
             // this different syntax for stubbing is to get around a default logging message for unhandled promise rejections
             //  the message doesn't cause a problem, it's just dirty looking.
-            //ssm.getParametersAsync = sandbox.spy(() => Promise.reject(error));
-            sandbox.stub(ssm, 'getParametersAsync').callsFake(() => Promise.reject(error));
+            //ssm.getParameters = sandbox.spy(() => Promise.reject(error));
+            sandbox.stub(ssm, 'getParameters').returns({ promise: () => Promise.reject(error) });
             loader.keys = ['one', 'two', 'three', 'four', 'five', 'six'];
 
             const params = {};
@@ -222,7 +223,7 @@ describe('@sage/bc-parameterstore-static-loader.ParameterStoreStaticLoader', fun
         it('should throw if the keys is null', (done) => {
 
             loader.keys = null;
-            sandbox.stub(ssm, 'getParametersAsync');
+            sandbox.stub(ssm, 'getParameters');
 
             const params = {};
             loader.load(params)

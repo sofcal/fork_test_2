@@ -12,6 +12,8 @@ const DB = require('@sage/bc-services-db');
 
 const serviceImpls = { DB };
 
+AWS.config.setPromisesDependency(Promise);
+
 class Handler {
     constructor({ dbName, serviceLoader, keys }) {
         if (new.target === Handler) {
@@ -169,8 +171,8 @@ const disconnectDB = Promise.method((services, logger) => {
 
 const setupLogGroupSubscription = Promise.method((event, context) => {
     const func = 'handler.setupLogGroupSubscription';
-    const cloudwatchlogs = Promise.promisifyAll(new AWS.CloudWatchLogs());
-    return cloudwatchlogs.describeSubscriptionFiltersAsync({ logGroupName: context.logGroupName })
+    const cloudwatchlogs = new AWS.CloudWatchLogs();
+    return cloudwatchlogs.describeSubscriptionFilters({ logGroupName: context.logGroupName }).promise()
         .then((subFilterDetails) => {
             if (subFilterDetails.subscriptionFilters.length === 0) {
                 event.logger.info({ function: func, log: 'assigning subscription filter' });
@@ -180,7 +182,7 @@ const setupLogGroupSubscription = Promise.method((event, context) => {
                     filterPattern: ' ',
                     logGroupName: context.logGroupName
                 };
-                return cloudwatchlogs.putSubscriptionFilterAsync(params);
+                return cloudwatchlogs.putSubscriptionFilter(params).promise();
             }
             event.logger.info({ function: func, log: 'subscription filter already assigned' });
             return null;

@@ -19,9 +19,9 @@ const defaultLogger = (logger) => {
 class CloudWatchSubscription {
     static Register(logGroupName, destinationArn, logger = defaultLogger(logger)) {
         const func = 'cloudwatch-subscription.register';
-        const cloudWatchLogs = Promise.promisifyAll(new AWS.CloudWatchLogs());
+        const cloudWatchLogs = new AWS.CloudWatchLogs();
 
-        return cloudWatchLogs.describeSubscriptionFiltersAsync({ logGroupName })
+        return cloudWatchLogs.describeSubscriptionFilters({ logGroupName }).promise()
             .then((subFilterDetails) => {
                 if (subFilterDetails.subscriptionFilters.length > 0) {
                     logger.info({ function: func, log: 'subscription filter already assigned' });
@@ -33,9 +33,9 @@ class CloudWatchSubscription {
                     destinationArn,
                     filterName: 'sumoLogic',
                     filterPattern: ' ',
-                    logGroupName: logGroupName
+                    logGroupName
                 };
-                return cloudWatchLogs.putSubscriptionFilterAsync(params);
+                return cloudWatchLogs.putSubscriptionFilter(params).promise();
             })
             .catch((err) => {
                 logger.error({

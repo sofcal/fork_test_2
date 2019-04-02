@@ -57,7 +57,7 @@ describe ('Rule', () => {
         }
     });
 
-    it.only('should throw an error if an invalid rule is provided', (done) => {
+    it('should throw an error if an invalid rule is provided', (done) => {
         try {
             Rule.validate('bob');
             done(new Error('should have thrown'));

@@ -9,7 +9,7 @@ class ParameterStoreStaticLoader {
             throw new Error('[ParameterStoreStaticLoader] invalid region');
         }
 
-        this.ssm = ssm || Promise.promisifyAll(new AWS.SSM({ region }));
+        this.ssm = ssm || new AWS.SSM({ region });
 
         this.keys = keys;
         this.paramPrefix = paramPrefix;
@@ -41,7 +41,7 @@ const loadImpl = Promise.method((self, params) => {
     const getPage = Promise.method((Names, p) => {
         const req = { Names, WithDecryption: true };
 
-        return self.ssm.getParametersAsync(req)
+        return self.ssm.getParameters(req).promise()
             .then((response) => mapResponse(p, response, prefix));
     });
 

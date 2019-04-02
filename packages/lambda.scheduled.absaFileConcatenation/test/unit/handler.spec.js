@@ -11,7 +11,7 @@ const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-l
 const DB = require('@sage/bc-services-db');
 const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-status-code-error');
 
-describe('absa-file-concatenation.handler', function() {
+describe.skip('absa-file-concatenation.handler', function() {
     let sandbox;
     let config, context, event;
 

@@ -15,7 +15,7 @@ const { public: pub2, private: priv2 } = keypair();
 
 const algorithm = 'RS256';
 
-describe('module-jwt-authenticator', function(){
+describe('@sage/sfab-s2s-jwt-authenticator', function(){
 
     const logger = {
         info: (msg) => console.log(msg),
