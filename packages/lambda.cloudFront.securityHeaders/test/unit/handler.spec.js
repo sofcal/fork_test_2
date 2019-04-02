@@ -8,7 +8,7 @@ const sinon = require('sinon');
 const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
 const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-status-code-error');
 
-describe.only('cloudFront.securityHeaders.handler', function() {
+describe('cloudFront.securityHeaders.handler', function() {
     let sandbox;
     let params, context, event;
 
