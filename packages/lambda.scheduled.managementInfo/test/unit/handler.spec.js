@@ -5,13 +5,13 @@ const keys = require('../../lib/params');
 const ErrorSpecs = require('../../lib/ErrorSpecs');
 const should = require('should');
 const sinon = require('sinon');
-const Promise = require('bluebird');
+const AWS = require('aws-sdk');
 
 const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
 const DB = require('@sage/bc-services-db');
 const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-statuscodeerror');
 
-describe.skip('lambda-scheduled-managementinfo.handler', function() {
+describe('lambda-scheduled-managementinfo.handler', function() {
     let sandbox;
     let config, context, event;
 
@@ -41,6 +41,13 @@ describe.skip('lambda-scheduled-managementinfo.handler', function() {
             'defaultMongo.replicaSet': replicaSet,
             domain
         };
+
+        const CloudWatchLogsStub = sandbox.stub(AWS, 'CloudWatchLogs');
+        CloudWatchLogsStub.returns(new Object({
+            describeSubscriptionFilters: sandbox.stub()
+                .returns({ promise: () => Promise.resolve({ subscriptionFilters: 'test' }) }),
+            putSubscriptionFilter: sandbox.stub().callsFake(() => ({ promise: () => {} })),
+        }));
     });
 
     afterEach(() => {
@@ -282,6 +289,7 @@ describe.skip('lambda-scheduled-managementinfo.handler', function() {
         sandbox.stub(serviceLoader, 'load').returns({});
         sandbox.stub(process, 'env').value({ AWS_REGION: region, Environment: env });
         sandbox.stub(dummyLoader, 'load').resolves(config);
+        sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
 
         handler.run(event, context, (first, second) => {
             try {
