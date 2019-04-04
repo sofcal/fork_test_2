@@ -36,7 +36,7 @@ class JwtIssuerLambda extends Handler {
                 logger.info({ function: func, log: 'started' });
 
                 const { iss, newCertDelay, cacheExpiry, AWS_REGION } = this.config;
-                const paramPrefix = this.config.paramPrefix || `/${this.config.environment}/`
+                const paramPrefix = this.config.paramPrefix || `/${this.config.environment}/`;
 
                 if (!this.cache) {
                     const options = {

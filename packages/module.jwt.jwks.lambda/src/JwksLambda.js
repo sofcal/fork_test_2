@@ -38,6 +38,7 @@ class JwksLambda extends Handler {
                 logger.info({ function: func, log: 'started' });
 
                 const { cacheExpiry } = this.config;
+                const paramPrefix = this.config.paramPrefix || `/${this.config.environment}/`;
 
                 if (!this.cache) {
                     const options = {
@@ -47,7 +48,7 @@ class JwksLambda extends Handler {
                     this.cache = Cache.Create(options, { logger: event.logger });
                 }
 
-                this.services.parameter = ParameterService.Create({ env: { region: this.config.AWS_REGION }, paramPrefix: '/dev01/' });
+                this.services.parameter = ParameterService.Create({ env: { region: this.config.AWS_REGION }, paramPrefix });
                 logger.info({ function: func, log: 'ended' });
             });
     }
