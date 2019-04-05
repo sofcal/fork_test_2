@@ -1,0 +1,126 @@
+{
+	"_id" : "10000000-0000-0000-0000-000000000001",
+	"companies" : [
+		{
+			"_id" : "10000000-0000-0000-0000-100000000002",
+			"bankAccountCount" : 1,
+			"missing" : false
+		},
+		{
+			"_id" : "10000000-0000-0000-0000-100000000001",
+			"bankAccountCount" : 2,
+			"missing" : false
+		}
+	],
+	"products" : [
+		{
+			"_id" : "10000000-0000-0000-0000-000000000001"
+		}
+	],
+	"companyCount" : 2,
+	"bankAccountCount" : 3,
+	"bankAccounts" : [
+		{
+			"region" : "GBR",
+			"deleted" : ISODate("2018-10-01T00:00:00Z"),
+			"_id" : "10000000-0000-0000-0000-999999999999",
+			"missing" : true,
+			"status" : null,
+			"transactionCount" : null,
+			"unresolvedCount" : null,
+			"bankId" : null,
+			"bankName" : null,
+			"aggregatorName" : null,
+			"accountantManaged" : null
+		},
+		{
+			"region" : "GBR",
+			"deleted" : null,
+			"_id" : "10000000-0000-0000-0000-100000000002",
+			"missing" : false,
+			"status" : "pending",
+			"transactionCount" : 2,
+			"unresolvedCount" : 0,
+			"bankId" : "10000000-0000-0000-0000-000000000001",
+			"bankName" : "MI TEST BANK",
+			"aggregatorName" : null,
+			"accountantManaged" : "none"
+		},
+		{
+			"region" : "GBR",
+			"deleted" : null,
+			"_id" : "10000000-0000-0000-0000-100000000001",
+			"missing" : false,
+			"status" : "pending",
+			"transactionCount" : 2,
+			"unresolvedCount" : 0,
+			"bankId" : "10000000-0000-0000-0000-000000000001",
+			"bankName" : "MI TEST BANK",
+			"aggregatorName" : null,
+			"accountantManaged" : "none"
+		}
+	]
+}
+{
+	"_id" : "10000000-0000-0000-0000-000000000003",
+	"companies" : [
+		{
+			"_id" : "10000000-0000-0000-0000-300000000002",
+			"bankAccountCount" : 1,
+			"missing" : false
+		},
+		{
+			"_id" : "10000000-0000-0000-0000-300000000001",
+			"bankAccountCount" : 2,
+			"missing" : false
+		}
+	],
+	"products" : [
+		{
+			"_id" : "10000000-0000-0000-0000-000000000001"
+		}
+	],
+	"companyCount" : 2,
+	"bankAccountCount" : 3,
+	"bankAccounts" : [
+		{
+			"region" : "GBR",
+			"deleted" : ISODate("2018-10-01T00:00:00Z"),
+			"_id" : "10000000-0000-0000-0000-999999999999",
+			"missing" : true,
+			"status" : null,
+			"transactionCount" : null,
+			"unresolvedCount" : null,
+			"bankId" : null,
+			"bankName" : null,
+			"aggregatorName" : null,
+			"accountantManaged" : null
+		},
+		{
+			"region" : "GBR",
+			"deleted" : null,
+			"_id" : "10000000-0000-0000-0000-300000000002",
+			"missing" : false,
+			"status" : "pending",
+			"transactionCount" : 2,
+			"unresolvedCount" : 0,
+			"bankId" : "10000000-0000-0000-0000-000000000001",
+			"bankName" : "MI TEST BANK",
+			"aggregatorName" : null,
+			"accountantManaged" : "none"
+		},
+		{
+			"region" : "GBR",
+			"deleted" : null,
+			"_id" : "10000000-0000-0000-0000-300000000001",
+			"missing" : false,
+			"status" : "pending",
+			"transactionCount" : 2,
+			"unresolvedCount" : 0,
+			"bankId" : "10000000-0000-0000-0000-000000000001",
+			"bankName" : "MI TEST BANK",
+			"aggregatorName" : null,
+			"accountantManaged" : "none"
+		}
+	]
+}

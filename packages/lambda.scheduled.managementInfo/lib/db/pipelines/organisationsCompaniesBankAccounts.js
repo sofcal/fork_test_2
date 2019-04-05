@@ -17,19 +17,42 @@ module.exports = ({ productId, count } = {}) => {
 
     const pipeline = [
         { $match: { 'products.productId': productId } },
+
+        // Unwind products into a result set.
+        { $unwind: { path: '$products' } },
+
+        // strip all but first document
+        { $limit: 1 },
+
+        // lookups for Organisation and OrganisationExt (return arrays)
+        { $lookup: { from: 'Organisation', as: 'Org', localField: 'products.productId', foreignField: 'products.productId' } },
+        { $lookup: { from: 'OrganisationExt', as: 'OrgExt', localField: 'products.productId', foreignField: 'products.productId' } },
+
+        // Join arrays
+        { $project: {
+            _id: 0,
+            Union: { $concatArrays: ['$Org', '$OrgExt'] }
+        } },
+
+        // Unwind the union collection into a result set.
+        { $unwind: { path: '$Union', preserveNullAndEmptyArrays: true } },
+
+        { $match: { 'Union.products.productId': productId } },
+
         // remove properties that we don't care about using a project
-        {
-            $project: {
-                _id: 1,
-                type: 1,
-                // since products is an array, we need the map function to get it into the shape we want (with just an _id field)
-                products: { $map: { input: '$products', as: 'product', in: { _id: '$$product.productId' } } },
-                bankAccountCount: { $size: '$bankAccounts' },
-                bankAccounts: 1,
-                companyCount: { $size: '$companies' },
-                companies: 1
-            }
-        },
+        { $project: {
+            _id: '$Union._id',
+            type: '$Union.type',
+            // since products is an array, we need the map function to get it into the shape we want (with just an _id field)
+            products: { $map: { input: '$Union.products', as: 'product', in: { _id: '$$product.productId' } } },
+            bankAccountCount: { $size: '$Union.bankAccounts' },
+            bankAccounts: '$Union.bankAccounts',
+            companyCount: { $size: '$Union.companies' },
+            companies: '$Union.companies',
+        } },
+
+        // Orig processing
+
         // unwind the bankAccounts array to give us a single document for each bank account
         { $unwind: { path: '$bankAccounts', preserveNullAndEmptyArrays: true } },
         // use the lookup stage and for each document, retrieve the bank account specified by the bankAccountId
@@ -76,8 +99,25 @@ module.exports = ({ productId, count } = {}) => {
 
         // we now go through the same process as for bank accounts, but for companies. Unwinding the array...
         { $unwind: { path: '$companies', preserveNullAndEmptyArrays: true } },
-        // ... retrieving the company objects with a lookup
+
+        // ... retrieving the company objects with lookups
         { $lookup: { from: 'Company', localField: 'companies', foreignField: '_id', as: 'companyLookup' } },
+        { $lookup: { from: 'CompanyExt', localField: 'companies', foreignField: '_id', as: 'companyExtLookup' } },
+
+        // Join arrays
+        {
+            $project: {
+                _id: 1,
+                type: 1,
+                products: 1,
+                bankAccountCount: 1,
+                bankAccounts: 1,
+                companyCount: 1,
+                companies: 1,
+                companyLookup: { $concatArrays: ['$companyLookup', '$companyExtLookup'] },
+            }
+        },
+
         // ... unwinding the documents to create one per company
         { $unwind: { path: '$companyLookup', preserveNullAndEmptyArrays: true } },
         {
