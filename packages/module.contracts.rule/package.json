@@ -1,6 +1,6 @@
 {
   "name": "@sage/bc-contracts-rule",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "Banking Cloud schemas",
   "main": "index.js",
   "publishConfig": {
@@ -18,8 +18,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@sage/bc-jsonschema-to-statuscodeerror": "^1.1.6",
-    "@sage/bc-statuscodeerror": "^1.1.6",
+    "@sage/bc-jsonschema-to-statuscodeerror": "^1.1.7",
+    "@sage/bc-statuscodeerror": "^1.1.7",
     "bignumber.js": "^4.0.0",
     "bluebird": "^3.5.1",
     "emitter": "0.0.5",
