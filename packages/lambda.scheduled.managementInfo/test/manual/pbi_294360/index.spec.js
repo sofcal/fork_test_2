@@ -8,6 +8,8 @@ const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-l
 const serviceLoader = require('../../../lib/serviceLoader');
 const fs = require('fs');
 
+const outputFolder = './test/manual/pbi_294360/result/'
+
 describe('lambda-scheduled-managementinfo.index', function(){
     const callback = (err, pass) => err ? console.log('ERROR => ', err.message) : console.log('COMPLETED => ', pass);
 
@@ -15,6 +17,7 @@ describe('lambda-scheduled-managementinfo.index', function(){
         products: 'ALL',
         concat: 'ALL',
         orphans: true,
+        logLevel: 4,
     };
     const context = { context: 'context' };
     
@@ -36,7 +39,7 @@ describe('lambda-scheduled-managementinfo.index', function(){
         const upload = (key, readable, code, bucket) => {
             return Promise.resolve()
                 .then(() => {
-                    const filename = `./test/manual/pbi_294360/result/${key.replace(/\//g,'_')}`;
+                    const filename = `${outputFolder}${key.replace(/\//g,'_')}`;
                     readable.setEncoding('utf8');
                     const data = readable.read();
                     console.log(`@serviceloader upload filename ${filename}`);
@@ -54,11 +57,12 @@ describe('lambda-scheduled-managementinfo.index', function(){
         const get = (key, bucket) => {
             return Promise.resolve()
                 .then(() => {
-                    const filename = `./${key.replace(/\//g,'_')}`;
+                    const filename = `${outputFolder}${key.replace(/\//g,'_')}`;
                     console.log(`@serviceloader get filename ${filename}`);
                     let result
 
                     try {
+                        // if (bucket === process.env.bucket) {
                         const Body = fs.readFileSync(filename);
                         console.log(`@serviceloader s3 loaded file ${filename}`);
                         result = {

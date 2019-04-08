@@ -1,5 +1,7 @@
 /* eslint-disable */
-var test = db.getCollection('BankAccount').aggregate([
+var count = false;
+
+var pipeline = [
     // with no $match stage, our results will contain all bank accounts in the database
     // so now we attempt to find the organisation for each of them
     { $lookup: { from: 'Organisation', localField: 'organisationId', foreignField: '_id', as: 'organisationLookup' } },
@@ -43,7 +45,14 @@ var test = db.getCollection('BankAccount').aggregate([
 
     // we would now have a document for each bank account with no organisation in this region. It will have some
     // general summary information from the bank account and bank
-]);
+];
+
+
+if (count) {
+    pipeline.push({ $group: { _id: null, count: { $sum: 1 } } });
+}
+
+var test = db.getCollection('BankAccount').aggregate(pipeline);
 
 while ( test.hasNext() ) {
     printjson( test.next() );

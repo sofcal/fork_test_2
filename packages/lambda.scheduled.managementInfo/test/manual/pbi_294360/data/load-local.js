@@ -35,6 +35,7 @@ banks.push(bank);
 const org1ID = '10000000-0000-0000-0000-000000000001';
 const org2ID = '10000000-0000-0000-0000-000000000002';
 const org3ID = '10000000-0000-0000-0000-000000000003';
+const org4ID = '10000000-0000-0000-0000-000000000004';
 
 //#region : setup for organisation 1 - no orgExt / cmpyExt data
 
@@ -67,12 +68,14 @@ const ba1_2 = {
 const comp1_1 = {
     _id: '10000000-0000-0000-0000-100000000001',
     organisationId: org1ID,
+    source: 'Company',
     bankAccounts: [ba1_1._id, ba1_2._id]
 };
 
 const comp1_2 = {
     _id: '10000000-0000-0000-0000-100000000002',
     organisationId: org1ID,
+    source: 'Company',
     bankAccounts: [ba1_1._id]
 };
 
@@ -80,6 +83,7 @@ const org1 = {
     _id: org1ID,
     companies: [comp1_1._id, comp1_2._id],
     products: [{ productId: product._id }],
+    source: 'Organisation',
     bankAccounts: [
         { bankAccountId: ba1_1._id, region: 'GBR', deleted: null },
         { bankAccountId: ba1_2._id, region: 'GBR', deleted: null },
@@ -113,6 +117,7 @@ const ba2 = {
 const comp2 = {
     _id: '10000000-0000-0000-0000-200000000001',
     organisationId: org2ID,
+    source: 'CompanyExt',
     bankAccounts: [ba2._id]
 };
 
@@ -120,6 +125,7 @@ const org2 = {
     _id: org2ID,
     companies: [comp2._id],
     products: [{ productId: product._id }],
+    source: 'OrganisationExt',
     bankAccounts: [
         { bankAccountId: ba2._id, region: 'GBR', deleted: null },
     ]
@@ -178,120 +184,101 @@ const ba3_3 = {
 const comp3_1 = {
     _id: '10000000-0000-0000-0000-300000000001',
     organisationId: org1ID,
+    source: 'Company',
     bankAccounts: [ba3_1._id, ba3_2._id]
 };
+const compExt3_1 = Object.assign( {}, comp3_1, { source: 'CompanyExt' } );
 
 const comp3_2 = {
     _id: '10000000-0000-0000-0000-300000000002',
     organisationId: org1ID,
+    source: 'Company',
     bankAccounts: [ba3_2._id]
 };
+const compExt3_2 = Object.assign( {}, comp3_2, { source: 'CompanyExt' } );
 
 const org3 = {
     _id: org3ID,
     companies: [comp3_1._id, comp3_2._id],
     products: [{ productId: product._id }],
+    source: 'Organisation',
     bankAccounts: [
         { bankAccountId: ba3_1._id, region: 'GBR', deleted: null },
         { bankAccountId: ba3_2._id, region: 'GBR', deleted: null },
         { bankAccountId: '10000000-0000-0000-0000-999999999999', region: 'GBR', deleted: new Date('2018-10-01') }
     ]
 };
+const orgExt3 = Object.assign( {}, org3, { source: 'OrganisationExt' } );
 
 bankAccounts.push(ba3_1, ba3_2);
 companies.push(comp3_1, comp3_2);
 organisations.push(org3);
-companyExts.push(comp3_1, comp3_2);
-organisationExts.push(org3);
+companyExts.push(compExt3_1, compExt3_2);
+organisationExts.push(orgExt3);
 
 
 
 //#endregion organisation 3
 
+//#region : setup for orphaned bank accounts
 
-// const ba13ID = '10000000-0000-0000-0000-000000000013';
-// const ba14ID = '10000000-0000-0000-0000-000000000014';
+// Bank Account doesn't exist on Org, Org exists on Organisation, not OrganisationExt
+const orphanba1 = {
+    _id: '10000000-0000-0000-0000-400000000001',
+    organisationId: org1ID,
+    bankId: bank._id,
+    bankIdentifier: '000000',
+    accountIdentifier: '400000000001',
+    aggregatorName: null,
+    status: 'active',
+    accountant: { accountantManaged: 'none' },
+    lastTransactionId: 2,
+    lastHeldTransactionId: 0
+};
 
-// const comp4 = {
-//     _id: '10000000-0000-0000-0000-000000000004',
-//     organisationId: org3ID,
-//     bankAccounts: [
-//         // bank accounts from region 2
-//         ba13ID, ba14ID
-//     ]
-// };
+// Bank Account doesn't exist on Org, Org exists on OrganisationExt, not Organisation
+const orphanba2 = {
+    _id: '10000000-0000-0000-0000-400000000002',
+    organisationId: org2ID,
+    bankId: bank._id,
+    bankIdentifier: '000000',
+    accountIdentifier: '400000000002',
+    aggregatorName: null,
+    status: 'active',
+    accountant: { accountantManaged: 'none' },
+    lastTransactionId: 2,
+    lastHeldTransactionId: 0
+};
 
-// const org3 = {
-//     _id: org3ID,
-//     companies: [comp4._id],
-//     products: [{ productId: product._id }],
-//     bankAccounts: [
-//         { bankAccountId: ba13ID, region: 'USA', deleted: null },
-//         { bankAccountId: ba14ID, region: 'USA', deleted: null }
-//     ]
-// };
+// Bank Account doesn't exist on Org, Org exists on both Organisation and OrganisationExt
+const orphanba3 = {
+    _id: '10000000-0000-0000-0000-400000000003',
+    organisationId: org1ID,
+    bankId: bank._id,
+    bankIdentifier: '000000',
+    accountIdentifier: '400000000003',
+    aggregatorName: null,
+    status: 'active',
+    accountant: { accountantManaged: 'none' },
+    lastTransactionId: 2,
+    lastHeldTransactionId: 0
+};
 
-// companies.push(comp4);
-// organisations.push(org3);
+// Org doesn't exist
+const orphanba4 = {
+    _id: '10000000-0000-0000-0000-400000000004',
+    organisationId: org4ID,
+    bankId: bank._id,
+    bankIdentifier: '000000',
+    accountIdentifier: '400000000004',
+    aggregatorName: null,
+    status: 'active',
+    accountant: { accountantManaged: 'none' },
+    lastTransactionId: 2,
+    lastHeldTransactionId: 0
+};
 
-// // these bankAccounts belong to the other region, hence their _id fields begin with a 2
-// const orphanba13 = {
-//     // present on org
-//     _id: '20000000-0000-0000-0000-000000000013',
-//     organisationId: otherRegionOrg3Id,
-//     bankId: bank._id,
-//     bankIdentifier: '000000',
-//     accountIdentifier: '000000013',
-//     aggregatorName: null,
-//     status: 'active',
-//     accountant: { accountantManaged: 'none' },
-//     lastTransactionId: 2,
-//     lastHeldTransactionId: 0
-// };
-
-// const orphanba14 = {
-//     // present on org
-//     _id: '20000000-0000-0000-0000-000000000014',
-//     organisationId: otherRegionOrg3Id,
-//     bankId: bank._id,
-//     bankIdentifier: '000000',
-//     accountIdentifier: '000000014',
-//     aggregatorName: null,
-//     status: 'active',
-//     accountant: { accountantManaged: 'none' },
-//     lastTransactionId: 2,
-//     lastHeldTransactionId: 0
-// };
-
-// const orphanba15 = {
-//     // mising on org
-//     _id: '20000000-0000-0000-0000-000000000015',
-//     organisationId: otherRegionOrg3Id,
-//     bankId: bank._id,
-//     bankIdentifier: '000000',
-//     accountIdentifier: '000000015',
-//     aggregatorName: null,
-//     status: 'active',
-//     accountant: { accountantManaged: 'none' },
-//     lastTransactionId: 2,
-//     lastHeldTransactionId: 2
-// };
-
-// const orphanba16 = {
-//     // missing, org does not exist at all
-//     _id: '20000000-0000-0000-0000-000000000016',
-//     organisationId: '20000000-0000-0000-0000-999999999999',
-//     bankId: bank._id,
-//     bankIdentifier: '000000',
-//     accountIdentifier: '000000016',
-//     aggregatorName: 'plaid',
-//     status: 'active',
-//     accountant: { accountantManaged: 'none' },
-//     lastTransactionId: 2,
-//     lastHeldTransactionId: 2
-// };
-
-// bankAccounts.push(orphanba13, orphanba14, orphanba15, orphanba16);
+bankAccounts.push(orphanba1, orphanba2, orphanba3, orphanba4);
 
 const generateTransactions = (bankAccount, unresolved) => {
     const prop = unresolved ? 'lastHeldTransactionId' : 'lastTransactionId';

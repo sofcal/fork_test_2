@@ -1,8 +1,8 @@
 /* eslint-disable */
 var productId = "10000000-0000-0000-0000-000000000001";
+var count = false;
 
-
-var test = db.getCollection('Organisation').aggregate([
+var pipeline = [
     { $match: { 'products.productId': productId } },
     // remove properties that we don't care about using a project
     {
@@ -101,7 +101,14 @@ var test = db.getCollection('Organisation').aggregate([
 
     // we would now have a document per organisation, with some general summary information, an array of companies and an
     // array of bank accounts
-]);
+];
+
+if (count) {
+    // if count was specified, this line will give the total number of organisation documents, rather than return them as is
+    pipeline.push({ $group: { _id: null, count: { $sum: 1 } } });
+}
+
+var test = db.getCollection('Organisation').aggregate(pipeline);
 
 while ( test.hasNext() ) {
     printjson( test.next() );

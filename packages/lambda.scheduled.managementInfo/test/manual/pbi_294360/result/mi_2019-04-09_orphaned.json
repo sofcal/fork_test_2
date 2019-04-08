@@ -1,0 +1,29 @@
+{
+    "orphaned": [
+        {
+            "_id": "10000000-0000-0000-0000-400000000004",
+            "bankId": "10000000-0000-0000-0000-000000000001",
+            "organisationId": "10000000-0000-0000-0000-000000000004",
+            "status": "active",
+            "transactionCount": 2,
+            "unresolvedCount": 0,
+            "aggregatorName": null,
+            "accountantManaged": "none",
+            "missing": true,
+            "bankName": "MI TEST BANK",
+            "transactionSummary": {
+                "creditsTotalCount": 1,
+                "creditsTotalValue": 1,
+                "creditsMaxValue": 1,
+                "debitsTotalCount": 1,
+                "debitsTotalValue": -2,
+                "debitsMaxValue": -2,
+                "absoluteTotalCount": 2,
+                "absoluteTotalValue": 3,
+                "creditsAverageValue": 1,
+                "debitsAverageValue": -2,
+                "absoluteAverageValue": 1
+            }
+        }
+    ]
+}
