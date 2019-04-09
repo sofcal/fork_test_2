@@ -1,9 +1,5 @@
 # PBI 294360 - Banking Cloud: MI post behind auth service
 
-Work In Progress-
-Need to change OrphanedBankAccounts pipeplines
-Need to think of a way to properly test
-
  [Stack Overflow - combine collections](https://stackoverflow.com/questions/5681851/mongodb-combine-data-from-multiple-collections-into-one-how)
 
  ## Loading test data into localhost
@@ -26,7 +22,7 @@ Make sure MongoDB is running first
 
 ## Running pbi_294360 integration test
 
-Run int294360 script
+Run int294360 script:
 
 ```bash
 npm run int294360
@@ -35,6 +31,6 @@ npm run int294360
 which will run the following script:
 ```json
 {
-"int294360": NODE_ENV=test AWS_REGION=eu-west-1 NODE_ENV=test Environment='dev' localhost=true bucket='logs' mocha -b --colors --reporter spec \"./*.spec.js\"
+  "int294360": "NODE_ENV=test AWS_REGION=eu-west-1 NODE_ENV=test Environment='dev' localhost=true bucket='eu-west-1-logs' mocha -b --colors --reporter spec \"./test/manual/pbi_294360/*.spec.js\"",
 }
 ```
