@@ -4,14 +4,16 @@ const sinon = require('sinon');
 const AWS = require('aws-sdk');
 const Promise = require('bluebird');
 const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
-//const { BlobStorage } = require('./blob');
 const serviceLoader = require('../../../lib/serviceLoader');
 const fs = require('fs');
 
 const outputFolder = './test/manual/pbi_294360/result/'
 
 describe('lambda-scheduled-managementinfo.index', function(){
-    const callback = (err, pass) => err ? console.log('ERROR => ', err.message) : console.log('COMPLETED => ', pass);
+    process.env.AWS_REGION = process.env.AWS_REGION ? process.env.AWS_REGION : 'eu-west-1';
+    process.env.Environment = process.env.Environment ? process.env.Environment : 'dev';
+    process.env.localhost = process.env.localhost ? process.env.localhost : true;
+    process.env.bucket = process.env.bucket ? process.env.localbuckethost : 'eu-west-1-logs';
 
     const event = {
         products: 'ALL',
@@ -23,9 +25,11 @@ describe('lambda-scheduled-managementinfo.index', function(){
     
     const errFunc = () => { throw new Error('should be stubbed') };
     const dummyLoader = { load: errFunc };
+    let callbackSpy;
 
     before(() => {
-        sandbox = sinon.createSandbox();   
+        sandbox = sinon.createSandbox();
+        callbackSpy = sinon.spy();
     });
 
     beforeEach(() => {
@@ -62,7 +66,6 @@ describe('lambda-scheduled-managementinfo.index', function(){
                     let result
 
                     try {
-                        // if (bucket === process.env.bucket) {
                         const Body = fs.readFileSync(filename);
                         console.log(`@serviceloader s3 loaded file ${filename}`);
                         result = {
@@ -96,19 +99,47 @@ describe('lambda-scheduled-managementinfo.index', function(){
     });
 
     afterEach(() => {
+        callbackSpy.resetHistory();
         sandbox.restore();
     });
 
-    it('run should be a function', () => {
-        return run.should.be.a.Function();
+    describe('Set up', () => {
+        it('run should be a function', () => {
+            return run.should.be.a.Function();
+        });
     });
 
-    it('should skip everything if no requests', () => {
-        return run({}, context, callback);
+    describe('Failing run', () => {
+        const processEnvironment = process.env.Environment;
+
+        before(() => {
+            delete process.env.Environment;
+        });
+        after(() => {
+            process.env.Environment = processEnvironment;
+        });
+
+        it('should fail if Environment setting not set', () => {
+            return run({}, context, callbackSpy)
+                .then(() => should.equal(callbackSpy.args[0][0], null) )
+                .then(() => should.equal(callbackSpy.args[0][1].statusCode, 400) )
+        })
+    });
+
+    describe('No request run', () => {
+        it('should skip everything if no requests', () => {
+            return run({}, context, callbackSpy)
+                .then(() => should.equal(callbackSpy.args[0][0], null) )
+                .then(() => should.equal(callbackSpy.args[0][1].statusCode, 200) )
+        })
     })
 
-    it('products all?', () => {
-        return run(event, context, callback);
+    describe('Process data run', () => {
+        it('Process all products', () => {
+            return run(event, context, callbackSpy)
+            .then(() => should.equal(callbackSpy.args[0][0], null) )
+            .then(() => should.equal(callbackSpy.args[0][1].statusCode, 200) )
+        })
     })
 
 });
