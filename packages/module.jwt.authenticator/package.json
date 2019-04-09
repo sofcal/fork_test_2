@@ -54,6 +54,7 @@
     "testint": "NODE_ENV=test nyc --x lib/_legacy --x test/ mocha -b --colors --reporter spec \"./test/int/**/*.spec.js\"",
     "cover": "NODE_ENV=test npm run test && nyc report --reporter=lcov",
     "report": "open coverage/lcov-report/index.html",
+    "cover:report": "npm run cover && npm run report",
     "int": "NODE_ENV=test nyc --x lib/_legacy --x test/ mocha -b --colors --reporter spec \"./test/int/**/*.spec.js\"",
     "lint": "eslint ./src/**",
     "build": "babel src -d lib --copy-files",

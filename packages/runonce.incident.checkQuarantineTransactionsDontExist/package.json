@@ -41,6 +41,7 @@
     "clean": "rimraf ./coverage/ && rimraf ./.nyc_output/ && rimraf ./.serverless/ && rimraf ./node_modules/",
     "test": "NODE_ENV=test nyc --cache false --x test/ mocha -b --colors \"./test/unit/**/*.spec.js\"",
     "cover": "NODE_ENV=test npm run test && nyc report --reporter=lcov",
+    "cover:report": "npm run cover && npm run report",
     "report": "open coverage/lcov-report/index.html",
     "int": "NODE_ENV=test nyc --x test/ mocha -b --colors --reporter spec \"./test/int/**/*.spec.js\"",
     "build": "serverless package",
