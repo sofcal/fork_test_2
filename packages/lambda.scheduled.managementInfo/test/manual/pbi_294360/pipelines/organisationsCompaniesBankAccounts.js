@@ -2,6 +2,7 @@
 var productId = "10000000-0000-0000-0000-000000000001";
 var count = false;
 
+// copy of pipeline from db/pipelines/organisationCompaniesBankAccounts.js as cannot use require in Mongo shell
 var pipeline = [ 
     // Organisation details ----
 
@@ -181,6 +182,5 @@ if (count) {
 
 var test = db.getCollection('Organisation').aggregate(pipeline);
 
-while ( test.hasNext() ) {
-    printjson( test.next() );
- }
+// Print results
+printjson( test.toArray() );

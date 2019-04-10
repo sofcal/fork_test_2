@@ -1,6 +1,7 @@
 /* eslint-disable */
 var count = false;
 
+// copy of pipeline from db/pipelines/orphanedBankAccounts.js as cannot use require in Mongo shell
 var pipeline = [
     // with no $match stage, our results will contain all bank accounts in the database
     // so now we attempt to find the organisation for each of them
@@ -82,6 +83,5 @@ if (count) {
 
 var test = db.getCollection('BankAccount').aggregate(pipeline);
 
-while ( test.hasNext() ) {
-    printjson( test.next() );
-}
+// Print results
+printjson( test.toArray() );
