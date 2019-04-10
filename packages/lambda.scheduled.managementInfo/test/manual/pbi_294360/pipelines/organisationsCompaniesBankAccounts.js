@@ -35,16 +35,18 @@ var pipeline = [
     } },
 
     // remove properties that we don't care about using a project
-    { $project: {
-        _id: '$_id',
-        type: '$type',
-        // since products is an array, we need the map function to get it into the shape we want (with just an _id field)
-        products: { $map: { input: '$products', as: 'product', in: { _id: '$$product.productId' } } },
-        bankAccountCount: { $size: '$bankAccounts' },
-        bankAccounts: '$bankAccounts',
-        companyCount: { $size: '$companies' },
-        companies: '$companies',
-    } },
+    {
+        $project: {
+            _id: 1,
+            type: 1,
+            // since products is an array, we need the map function to get it into the shape we want (with just an _id field)
+            products: { $map: { input: '$products', as: 'product', in: { _id: '$$product.productId' } } },
+            bankAccountCount: { $size: '$bankAccounts' },
+            bankAccounts: 1,
+            companyCount: { $size: '$companies' },
+            companies: 1
+        }
+    },
 
     // Bank Account details ----
 
