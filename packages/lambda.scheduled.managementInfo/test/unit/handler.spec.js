@@ -105,7 +105,7 @@ describe('lambda-scheduled-managementinfo.handler', function() {
             .then(() => {
                 should(DB.Create.callCount).eql(1);
                 should(DB.Create.calledWithExactly(
-                    { env, region, domain, username, password, replicaSet, db: 'bank_db' }
+                    { env, region, domain, username, password, replicaSet, db: 'bank_db', localhost: false }
                 )).eql(true);
 
                 should(db.connect.callCount).eql(1);

@@ -137,98 +137,15 @@ organisationExts.push(org2);
 
 //#endregion organisation 2
 
-
-
-
-//#region : setup for organisation 3 - org/cmpy data and orgExt / cmpyExt data
-
-const ba3_1 = {
-    _id: '10000000-0000-0000-0000-300000000001',
-    organisationId: org3ID,
-    bankId: bank._id,
-    bankIdentifier: '000000',
-    accountIdentifier: '300000001',
-    aggregatorName: null,
-    status: 'pending',
-    accountant: { accountantManaged: 'none' },
-    lastTransactionId: 2,
-    lastHeldTransactionId: 0
-};
-
-const ba3_2 = {
-    _id: '10000000-0000-0000-0000-300000000002',
-    organisationId: org3ID,
-    bankId: bank._id,
-    bankIdentifier: '000000',
-    accountIdentifier: '300000002',
-    aggregatorName: null,
-    status: 'pending',
-    accountant: { accountantManaged: 'none' },
-    lastTransactionId: 2,
-    lastHeldTransactionId: 0
-};
-
-const ba3_3 = {
-    _id: '10000000-0000-0000-0000-300000000003',
-    organisationId: org3ID,
-    bankId: bank._id,
-    bankIdentifier: '000000',
-    accountIdentifier: '300000003',
-    aggregatorName: null,
-    status: 'pending',
-    accountant: { accountantManaged: 'none' },
-    lastTransactionId: 2,
-    lastHeldTransactionId: 0
-};
-
-const comp3_1 = {
-    _id: '10000000-0000-0000-0000-300000000001',
-    organisationId: org1ID,
-    source: 'Company',
-    bankAccounts: [ba3_1._id, ba3_2._id]
-};
-const compExt3_1 = Object.assign( {}, comp3_1, { source: 'CompanyExt' } );
-
-const comp3_2 = {
-    _id: '10000000-0000-0000-0000-300000000002',
-    organisationId: org1ID,
-    source: 'Company',
-    bankAccounts: [ba3_2._id]
-};
-const compExt3_2 = Object.assign( {}, comp3_2, { source: 'CompanyExt' } );
-
-const org3 = {
-    _id: org3ID,
-    companies: [comp3_1._id, comp3_2._id],
-    products: [{ productId: product._id }],
-    source: 'Organisation',
-    bankAccounts: [
-        { bankAccountId: ba3_1._id, region: 'GBR', deleted: null },
-        { bankAccountId: ba3_2._id, region: 'GBR', deleted: null },
-        { bankAccountId: '10000000-0000-0000-0000-999999999999', region: 'GBR', deleted: new Date('2018-10-01') }
-    ]
-};
-const orgExt3 = Object.assign( {}, org3, { source: 'OrganisationExt' } );
-
-bankAccounts.push(ba3_1, ba3_2);
-companies.push(comp3_1, comp3_2);
-organisations.push(org3);
-companyExts.push(compExt3_1, compExt3_2);
-organisationExts.push(orgExt3);
-
-
-
-//#endregion organisation 3
-
 //#region : setup for orphaned bank accounts
 
 // Bank Account doesn't exist on Org, Org exists on Organisation, not OrganisationExt
 const orphanba1 = {
-    _id: '10000000-0000-0000-0000-400000000001',
+    _id: '10000000-0000-0000-0000-300000000001',
     organisationId: org1ID,
     bankId: bank._id,
     bankIdentifier: '000000',
-    accountIdentifier: '400000000001',
+    accountIdentifier: '300000000001',
     aggregatorName: null,
     status: 'active',
     accountant: { accountantManaged: 'none' },
@@ -238,11 +155,11 @@ const orphanba1 = {
 
 // Bank Account doesn't exist on Org, Org exists on OrganisationExt, not Organisation
 const orphanba2 = {
-    _id: '10000000-0000-0000-0000-400000000002',
+    _id: '10000000-0000-0000-0000-300000000002',
     organisationId: org2ID,
     bankId: bank._id,
     bankIdentifier: '000000',
-    accountIdentifier: '400000000002',
+    accountIdentifier: '300000000002',
     aggregatorName: null,
     status: 'active',
     accountant: { accountantManaged: 'none' },
@@ -252,11 +169,11 @@ const orphanba2 = {
 
 // Bank Account doesn't exist on Org, Org exists on both Organisation and OrganisationExt
 const orphanba3 = {
-    _id: '10000000-0000-0000-0000-400000000003',
+    _id: '10000000-0000-0000-0000-300000000003',
     organisationId: org1ID,
     bankId: bank._id,
     bankIdentifier: '000000',
-    accountIdentifier: '400000000003',
+    accountIdentifier: '300000000003',
     aggregatorName: null,
     status: 'active',
     accountant: { accountantManaged: 'none' },
@@ -266,11 +183,11 @@ const orphanba3 = {
 
 // Org doesn't exist
 const orphanba4 = {
-    _id: '10000000-0000-0000-0000-400000000004',
+    _id: '10000000-0000-0000-0000-300000000004',
     organisationId: org4ID,
     bankId: bank._id,
     bankIdentifier: '000000',
-    accountIdentifier: '400000000004',
+    accountIdentifier: '300000000004',
     aggregatorName: null,
     status: 'active',
     accountant: { accountantManaged: 'none' },
@@ -279,6 +196,8 @@ const orphanba4 = {
 };
 
 bankAccounts.push(orphanba1, orphanba2, orphanba3, orphanba4);
+
+//#endregion orphaned bank accounts
 
 const generateTransactions = (bankAccount, unresolved) => {
     const prop = unresolved ? 'lastHeldTransactionId' : 'lastTransactionId';

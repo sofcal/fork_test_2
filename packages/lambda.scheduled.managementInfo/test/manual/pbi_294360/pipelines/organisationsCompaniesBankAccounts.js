@@ -3,38 +3,8 @@ var productId = "10000000-0000-0000-0000-000000000001";
 var count = false;
 
 // copy of pipeline from db/pipelines/organisationCompaniesBankAccounts.js as cannot use require in Mongo shell
-var pipeline = [ 
-    // Organisation details ----
-
+var pipeline = [
     { $match: { 'products.productId': productId } },
-
-    // Unwind products into a result set.
-    { $unwind: { path: '$products' } },
-
-    // strip all but first document
-    { $limit: 1 },
-
-    // lookups for Organisation and OrganisationExt (return arrays)
-    { $lookup: { from: 'Organisation', as: 'Org', localField: 'products.productId', foreignField: 'products.productId' } },
-    { $lookup: { from: 'OrganisationExt', as: 'OrgExt', localField: 'products.productId', foreignField: 'products.productId' } },
-
-    // Join arrays
-    { $project: {
-        Union: { $concatArrays: ['$Org', '$OrgExt'] }
-    } },
-
-    // Unwind the union collection into a result set.
-    { $unwind: { path: '$Union', preserveNullAndEmptyArrays: true } },
-
-    // Use Group to remove duplicate ids
-    { $group: {
-        _id: '$Union._id',
-        type: { $first: '$Union.type' },
-        companies: { $first: '$Union.companies' },
-        products: { $first: '$Union.products' },
-        bankAccounts: { $first: '$Union.bankAccounts' },
-    } },
-
     // remove properties that we don't care about using a project
     {
         $project: {
@@ -48,9 +18,6 @@ var pipeline = [
             companies: 1
         }
     },
-
-    // Bank Account details ----
-
     // unwind the bankAccounts array to give us a single document for each bank account
     { $unwind: { path: '$bankAccounts', preserveNullAndEmptyArrays: true } },
     // use the lookup stage and for each document, retrieve the bank account specified by the bankAccountId
@@ -95,8 +62,6 @@ var pipeline = [
     // because we're on mongo 3.2, we have no replaceRoot function, so we have this slightly ugly projection to get rid of our nested _id object field
     { $project: { _id: '$_id._id', type: '$_id.type', products: '$_id.products', companyCount: '$_id.companyCount', companies: '$_id.companies', bankAccountCount: '$_id.bankAccountCount', bankAccounts: '$bankAccounts' } },
 
-    // Company details ----
-
     // we now go through the same process as for bank accounts, but for companies. Unwinding the array...
     { $unwind: { path: '$companies', preserveNullAndEmptyArrays: true } },
 
@@ -117,43 +82,25 @@ var pipeline = [
             companyLookup: { $concatArrays: ['$companyLookup', '$companyExtLookup'] },
         }
     },
-
-    // Unwind the union collection into a result set.
+    // ... unwinding the documents to create one per company
     { $unwind: { path: '$companyLookup', preserveNullAndEmptyArrays: true } },
-
-    // Remove duplicate ids using Group
-    { $group: {
-        _id: {
-            _id: '$_id',
-            type: '$type',
-            products: '$products',
-            bankAccounts: '$bankAccounts',
-            bankAccountCount: '$bankAccountCount',
-            companies: '$companies',
-            companyCount: '$companyCount',
-        },
-        // Get first Company record
-        companyLookup: { $first: '$companyLookup' }
-    } },
-
     {
         // ...projecting it all so the companies object on each document contains the information we want
         $project: {
-            _id: '$_id._id',
-            type: '$_id.type',
-            products: '$_id.products',
-            bankAccountCount: '$_id.bankAccountCount',
-            bankAccounts: '$_id.bankAccounts',
-            companyCount: '$_id.companyCount',
+            _id: 1,
+            type: 1,
+            products: 1,
+            bankAccountCount: 1,
+            bankAccounts: 1,
+            companyCount: 1,
             companies: {
-                _id: '$_id.companies',
+                _id: '$companies',
                 bankAccountCount: { $size: { $cond: [{ $not: ['$companyLookup.bankAccounts'] }, [], '$companyLookup.bankAccounts'] } },
 
                 missing: { $cond: [{ $not: ['$companyLookup'] }, true, false] }
             }
         }
     },
-
     // ...grouping back up so we can push the companies back into an array
     { $group: { _id: { _id: '$_id', type: '$type', products: '$products', bankAccounts: '$bankAccounts', bankAccountCount: '$bankAccountCount', companyCount: '$companyCount' }, companies: { $addToSet: '$companies' } } },
     // ...and projecting against to get rid of the nasty nested _id object
@@ -167,9 +114,7 @@ var pipeline = [
             bankAccountCount: '$_id.bankAccountCount',
             bankAccounts: { $cond: [{ $gt: ['$_id.bankAccountCount', 0] }, '$_id.bankAccounts', []] }
         }
-    },
-
-    { $sort: { _id: 1 } }
+    }
 
     // we would now have a document per organisation, with some general summary information, an array of companies and an
     // array of bank accounts
@@ -180,7 +125,7 @@ if (count) {
     pipeline.push({ $group: { _id: null, count: { $sum: 1 } } });
 }
 
-var test = db.getCollection('Organisation').aggregate(pipeline);
+var test = db.getCollection('OrganisationExt').aggregate(pipeline);
 
 // Print results
 printjson( test.toArray() );

@@ -2,26 +2,26 @@
     "orphaned": {
         "bankAccounts": [
             {
-                "_id": "10000000-0000-0000-0000-400000000004",
-                "bankId": "10000000-0000-0000-0000-000000000001",
+                "_id": "10000000-0000-0000-0000-300000000004",
                 "organisationId": "10000000-0000-0000-0000-000000000004",
+                "bankId": "10000000-0000-0000-0000-000000000001",
+                "aggregatorName": null,
                 "status": "active",
                 "transactionCount": 2,
                 "unresolvedCount": 0,
-                "aggregatorName": null,
                 "accountantManaged": "none",
                 "missing": true,
                 "bankName": "MI TEST BANK",
                 "missingOnOrg": false
             },
             {
-                "_id": "10000000-0000-0000-0000-400000000004",
-                "bankId": "10000000-0000-0000-0000-000000000001",
+                "_id": "10000000-0000-0000-0000-300000000004",
                 "organisationId": "10000000-0000-0000-0000-000000000004",
+                "bankId": "10000000-0000-0000-0000-000000000001",
+                "aggregatorName": null,
                 "status": "active",
                 "transactionCount": 2,
                 "unresolvedCount": 0,
-                "aggregatorName": null,
                 "accountantManaged": "none",
                 "missing": true,
                 "bankName": "MI TEST BANK",
@@ -47,20 +47,20 @@
             "productId": "10000000-0000-0000-0000-000000000001",
             "productName": "MI TEST PRODUCT",
             "organisations": {
-                "total": 6,
+                "total": 4,
                 "companiesMax": 2,
                 "bankAccountsMax": 3
             },
             "companies": {
-                "total": 10,
+                "total": 6,
                 "missing": 0,
                 "bankAccountsMax": 2
             },
             "bankAccounts": {
-                "total": 10,
-                "missing": 4,
+                "total": 6,
+                "missing": 2,
                 "statuses": {
-                    "pending": 8,
+                    "pending": 4,
                     "active": 2,
                     "authRequired": 0,
                     "verifyingAuth": 0,
@@ -74,19 +74,19 @@
                 "unresolvedMax": 0
             },
             "transactions": {
-                "creditsTotalCount": 110,
-                "creditsTotalValue": 5210,
+                "creditsTotalCount": 106,
+                "creditsTotalValue": 5206,
                 "creditsMaxValue": 101,
-                "debitsTotalCount": 108,
-                "debitsTotalValue": -5116,
+                "debitsTotalCount": 104,
+                "debitsTotalValue": -5108,
                 "debitsMaxValue": -100,
-                "absoluteTotalCount": 218,
-                "absoluteTotalValue": 10326,
-                "creditsAverageValue": 47.36,
-                "debitsAverageValue": -47.37,
-                "absoluteAverageValue": 47.37
+                "absoluteTotalCount": 210,
+                "absoluteTotalValue": 10314,
+                "creditsAverageValue": 49.11,
+                "debitsAverageValue": -49.12,
+                "absoluteAverageValue": 49.11
             }
         }
     ],
-    "csv": "Product,Organisations,Companies,BankAccounts,ActiveBankAccounts,Transactions,TotalCredit,TotalDebit,TotalAbsolute\nMI TEST PRODUCT,6,10,10,2,218,52.10,-51.16,103.26"
+    "csv": "Product,Organisations,Companies,BankAccounts,ActiveBankAccounts,Transactions,TotalCredit,TotalDebit,TotalAbsolute\nMI TEST PRODUCT,4,6,6,2,210,52.06,-51.08,103.14"
 }

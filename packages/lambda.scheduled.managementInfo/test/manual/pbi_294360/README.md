@@ -22,15 +22,18 @@ Make sure MongoDB is running first
 
 ## Running pbi_294360 integration test
 
-Run int294360 script:
+First remove .skip from manual/pbi_294360/index.spec.js to make sure it runs.
+Start local mongodb session.
+Load test data (see above).
+Run manualtest script:
 
 ```bash
-npm run int294360
+npm run manualtest
 ```
 
 which will run the following script:
 ```json
 {
-  "int294360": "NODE_ENV=test AWS_REGION=eu-west-1 NODE_ENV=test Environment='dev' localhost=true bucket='eu-west-1-logs' mocha -b --colors --reporter spec \"./test/manual/pbi_294360/*.spec.js\"",
+  "manualtest": "NODE_ENV=test AWS_REGION=eu-west-1 NODE_ENV=test Environment='dev' localhost=true bucket='eu-west-1-logs' mocha -b --colors --reporter spec \"./test/manual/**/*.spec.js\"",
 }
 ```

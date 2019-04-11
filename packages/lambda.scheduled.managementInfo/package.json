@@ -48,7 +48,7 @@
     "cover": "NODE_ENV=test npm run test && nyc report --reporter=lcov",
     "report": "open coverage/lcov-report/index.html",
     "int": "NODE_ENV=test nyc --x test/ mocha -b --colors --reporter spec \"./test/int/**/*.spec.js\"",
-    "int294360": "NODE_ENV=test nyc --cache false --x test/ mocha -b --colors --reporter spec \"./test/manual/pbi_294360/*.spec.js\"",
+    "manualtest": "NODE_ENV=test nyc --cache false --x test/ mocha -b --colors --reporter spec \"./test/manual/**/*.spec.js\"",
     "build": "serverless package",
     "postbuild": "mkdir -p ../../build && mv ./.serverless/${PWD##*/}.zip ../../build/${PWD##*/}.zip",
     "unlock": "rimraf package-lock.json",

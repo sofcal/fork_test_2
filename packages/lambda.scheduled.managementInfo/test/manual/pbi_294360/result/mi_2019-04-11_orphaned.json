@@ -1,13 +1,13 @@
 {
     "orphaned": [
         {
-            "_id": "10000000-0000-0000-0000-400000000004",
-            "bankId": "10000000-0000-0000-0000-000000000001",
+            "_id": "10000000-0000-0000-0000-300000000004",
             "organisationId": "10000000-0000-0000-0000-000000000004",
+            "bankId": "10000000-0000-0000-0000-000000000001",
+            "aggregatorName": null,
             "status": "active",
             "transactionCount": 2,
             "unresolvedCount": 0,
-            "aggregatorName": null,
             "accountantManaged": "none",
             "missing": true,
             "bankName": "MI TEST BANK",

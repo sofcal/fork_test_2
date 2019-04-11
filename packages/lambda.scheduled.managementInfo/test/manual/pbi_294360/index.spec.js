@@ -9,7 +9,9 @@ const fs = require('fs');
 
 const outputFolder = './test/manual/pbi_294360/result/'
 
-describe('lambda-scheduled-managementinfo.index', function(){
+// requires local MongoDB session to be started first
+
+describe.skip('lambda-scheduled-managementinfo.index', function(){
     process.env.AWS_REGION = process.env.AWS_REGION ? process.env.AWS_REGION : 'eu-west-1';
     process.env.Environment = process.env.Environment ? process.env.Environment : 'dev';
     process.env.localhost = process.env.localhost ? process.env.localhost : true;
@@ -20,6 +22,7 @@ describe('lambda-scheduled-managementinfo.index', function(){
         concat: 'ALL',
         orphans: true,
         logLevel: 4,
+        count: true,
     };
     const context = { context: 'context' };
     
