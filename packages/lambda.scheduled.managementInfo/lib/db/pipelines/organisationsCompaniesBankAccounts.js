@@ -11,7 +11,7 @@ const _ = require('underscore');
 
 module.exports = ({ productId, count } = {}) => {
     if (!productId) {
-        const spec = _.extend({ params: { productId } }, ErrorSpecs.pipeline.invalidPropertiesOCB);
+        const spec = _.extend({ params: { productId } }, ErrorSpecs.pipelines.invalidPropertiesOCB);
         throw StatusCodeError.CreateFromSpecs([spec], spec.statusCode);
     }
 
