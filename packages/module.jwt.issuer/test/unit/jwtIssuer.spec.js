@@ -1,13 +1,12 @@
 'use strict';
 
-const JWTIssuer = require('../../lib/JWTIssuer');
+const JwtIssuer = require('../../lib/JwtIssuer');
 const jwt = require('jsonwebtoken');
 const Promise = require('bluebird');
 const sinon = require('sinon');
 const should = require('should');
 
-describe('@sage/sfab-s2s-jwt-issuer.JWTIssuer', function() {
-
+describe('@sage/sfab-s2s-jwt-issuer.JwtIssuer', function() {
     const sandbox = sinon.sandbox.create();
     sandbox.useFakeTimers(101); // to ensure our newCertDelay of 100 allows the primary cert to be used
 
@@ -37,46 +36,90 @@ describe('@sage/sfab-s2s-jwt-issuer.JWTIssuer', function() {
         sandbox.restore();
     });
 
-    describe('constructor', () => {
-        it('should create an instance of JWTIssuer', () => {
-            const actual = new JWTIssuer(cache, { iss: serviceId, newCertDelay } );
-            should(actual).be.an.instanceof(JWTIssuer);
+    describe('Create', () => {
+        it('should create an instance of JwtIssuer', () => {
+            const actual = JwtIssuer.Create(cache, { iss: serviceId, newCertDelay } );
+            should(actual).be.an.instanceof(JwtIssuer);
         });
 
         it('should assign properties', () => {
-            const actual = new JWTIssuer(cache, { iss: serviceId, newCertDelay } );
+            const actual = JwtIssuer.Create(cache, { iss: serviceId, newCertDelay } );
             should(actual.cache).eql(cache);
             should(actual.newCertDelay).eql(100);
             should(actual.iss).eql(serviceId);
         });
 
         it('should throw an error if cache is not set', () => {
-            should(() => new JWTIssuer(null, { iss: serviceId, newCertDelay } ))
+            should(() => JwtIssuer.Create(null, { iss: serviceId, newCertDelay } ))
                 .throwError(new Error('invalid cache: expected object with getData function'));
         });
 
         it('should throw an error if cache does not contain a getData function', () => {
-            should(() => new JWTIssuer({ }, { iss: serviceId, newCertDelay } ))
+            should(() => JwtIssuer.Create({ }, { iss: serviceId, newCertDelay } ))
                 .throwError(new Error('invalid cache: expected object with getData function'));
         });
 
         it('should throw an error if iss is not set', () => {
-            should(() => new JWTIssuer(cache, { iss: null, newCertDelay } ))
+            should(() => JwtIssuer.Create(cache, { iss: null, newCertDelay } ))
                 .throwError(new Error('invalid iss: expected string'));
         });
 
         it('should throw an error if iss is not a string', () => {
-            should(() => new JWTIssuer(cache, { iss: 9, newCertDelay } ))
+            should(() => JwtIssuer.Create(cache, { iss: 9, newCertDelay } ))
                 .throwError(new Error('invalid iss: expected string'));
         });
 
         it('should throw and error if newCertDelay is not set', () => {
-            should(() => new JWTIssuer(cache, { iss: serviceId, newCertDelay: null } ))
+            should(() => JwtIssuer.Create(cache, { iss: serviceId, newCertDelay: null } ))
                 .throwError(new Error('invalid newCertDelay: expected number of seconds'));
         });
 
         it('should throw and error if newCertDelay is not a number', () => {
-            should(() => new JWTIssuer(cache, { iss: serviceId, newCertDelay: 'string' } ))
+            should(() => JwtIssuer.Create(cache, { iss: serviceId, newCertDelay: 'string' } ))
+                .throwError(new Error('invalid newCertDelay: expected number of seconds'));
+        });
+    });
+
+    describe('constructor', () => {
+        it('should create an instance of JwtIssuer', () => {
+            const actual = new JwtIssuer(cache, { iss: serviceId, newCertDelay } );
+            should(actual).be.an.instanceof(JwtIssuer);
+        });
+
+        it('should assign properties', () => {
+            const actual = new JwtIssuer(cache, { iss: serviceId, newCertDelay } );
+            should(actual.cache).eql(cache);
+            should(actual.newCertDelay).eql(100);
+            should(actual.iss).eql(serviceId);
+        });
+
+        it('should throw an error if cache is not set', () => {
+            should(() => new JwtIssuer(null, { iss: serviceId, newCertDelay } ))
+                .throwError(new Error('invalid cache: expected object with getData function'));
+        });
+
+        it('should throw an error if cache does not contain a getData function', () => {
+            should(() => new JwtIssuer({ }, { iss: serviceId, newCertDelay } ))
+                .throwError(new Error('invalid cache: expected object with getData function'));
+        });
+
+        it('should throw an error if iss is not set', () => {
+            should(() => new JwtIssuer(cache, { iss: null, newCertDelay } ))
+                .throwError(new Error('invalid iss: expected string'));
+        });
+
+        it('should throw an error if iss is not a string', () => {
+            should(() => new JwtIssuer(cache, { iss: 9, newCertDelay } ))
+                .throwError(new Error('invalid iss: expected string'));
+        });
+
+        it('should throw and error if newCertDelay is not set', () => {
+            should(() => new JwtIssuer(cache, { iss: serviceId, newCertDelay: null } ))
+                .throwError(new Error('invalid newCertDelay: expected number of seconds'));
+        });
+
+        it('should throw and error if newCertDelay is not a number', () => {
+            should(() => new JwtIssuer(cache, { iss: serviceId, newCertDelay: 'string' } ))
                 .throwError(new Error('invalid newCertDelay: expected number of seconds'));
         });
     });
@@ -92,8 +135,8 @@ describe('@sage/sfab-s2s-jwt-issuer.JWTIssuer', function() {
             const claims = {};
             const expiresIn = 1000;
 
-            const issuer = new JWTIssuer(cache, { iss: serviceId, newCertDelay } );
-            return issuer.generate({ claims, expiresIn, algorithm: JWTIssuer.Algortithms.RS256 })
+            const issuer = new JwtIssuer(cache, { iss: serviceId, newCertDelay } );
+            return issuer.generate({ claims, expiresIn, algorithm: JwtIssuer.Algortithms.RS256 })
                 .then((actual) => {
                     const decoded = jwt.decode(actual);
                     const nowS = Math.floor(now / 1000);
@@ -111,8 +154,8 @@ describe('@sage/sfab-s2s-jwt-issuer.JWTIssuer', function() {
             const claims = {};
             const expiresIn = 1000;
 
-            const issuer = new JWTIssuer(cache, { iss: serviceId, newCertDelay });
-            return issuer.generate({ claims, expiresIn, algorithm: JWTIssuer.Algortithms.RS256 })
+            const issuer = new JwtIssuer(cache, { iss: serviceId, newCertDelay });
+            return issuer.generate({ claims, expiresIn, algorithm: JwtIssuer.Algortithms.RS256 })
                 .then((actual) => {
                     const decoded = jwt.decode(actual);
                     const nowS = Math.floor(now / 1000);
@@ -130,8 +173,8 @@ describe('@sage/sfab-s2s-jwt-issuer.JWTIssuer', function() {
             const claims = {};
             const expiresIn = 1000;
 
-            const issuer = new JWTIssuer(cache, { iss: serviceId, newCertDelay });
-            return issuer.generate({ claims, expiresIn, algorithm: JWTIssuer.Algortithms.RS256 })
+            const issuer = new JwtIssuer(cache, { iss: serviceId, newCertDelay });
+            return issuer.generate({ claims, expiresIn, algorithm: JwtIssuer.Algortithms.RS256 })
                 .then((actual) => {
                     const decoded = jwt.decode(actual);
                     should(decoded.iss).eql(serviceId);
@@ -148,8 +191,8 @@ describe('@sage/sfab-s2s-jwt-issuer.JWTIssuer', function() {
             const claims = {};
             const expiresIn = 1000;
 
-            const issuer = new JWTIssuer(cache, { iss: serviceId, newCertDelay });
-            return issuer.generate({ claims, expiresIn, algorithm: JWTIssuer.Algortithms.RS256 })
+            const issuer = new JwtIssuer(cache, { iss: serviceId, newCertDelay });
+            return issuer.generate({ claims, expiresIn, algorithm: JwtIssuer.Algortithms.RS256 })
                 .then((actual) => {
                     const decoded = jwt.decode(actual);
                     should(decoded.kid).eql(defaultData[0].kid);
@@ -166,8 +209,8 @@ describe('@sage/sfab-s2s-jwt-issuer.JWTIssuer', function() {
             const claims = { claim1: 'claim_1', claim2: 'claim_2' };
             const expiresIn = 1000;
 
-            const issuer = new JWTIssuer(cache, { iss: serviceId, newCertDelay });
-            return issuer.generate({ claims, expiresIn, algorithm: JWTIssuer.Algortithms.RS256 })
+            const issuer = new JwtIssuer(cache, { iss: serviceId, newCertDelay });
+            return issuer.generate({ claims, expiresIn, algorithm: JwtIssuer.Algortithms.RS256 })
                 .then((actual) => {
                     const decoded = jwt.decode(actual);
                     should(decoded.claim1).eql('claim_1');
@@ -185,8 +228,8 @@ describe('@sage/sfab-s2s-jwt-issuer.JWTIssuer', function() {
             const claims = { };
             const expiresIn = 1000;
 
-            const issuer = new JWTIssuer(cache, { iss: serviceId, newCertDelay });
-            return issuer.generate({ claims, expiresIn, algorithm: JWTIssuer.Algortithms.RS256 })
+            const issuer = new JwtIssuer(cache, { iss: serviceId, newCertDelay });
+            return issuer.generate({ claims, expiresIn, algorithm: JwtIssuer.Algortithms.RS256 })
                 .then(() => {
                     should(cache.getData.callCount).eql(1);
                 });
@@ -204,8 +247,8 @@ describe('@sage/sfab-s2s-jwt-issuer.JWTIssuer', function() {
 
             const claims = { };
             const expiresIn = 1000;
-            const issuer = new JWTIssuer(cache, { iss: serviceId, newCertDelay });
-            return issuer.generate({ claims, expiresIn, algorithm: JWTIssuer.Algortithms.RS256 })
+            const issuer = new JwtIssuer(cache, { iss: serviceId, newCertDelay });
+            return issuer.generate({ claims, expiresIn, algorithm: JwtIssuer.Algortithms.RS256 })
                 .then((actual) => {
                     const decoded = jwt.decode(actual);
                     should(decoded.kid).eql(defaultData[1].kid); // secondary should have been used
@@ -213,8 +256,6 @@ describe('@sage/sfab-s2s-jwt-issuer.JWTIssuer', function() {
         });
     });
 });
-
-
 
 /*
 It MUST include an exp claim which contains the expiration timestamp of the token

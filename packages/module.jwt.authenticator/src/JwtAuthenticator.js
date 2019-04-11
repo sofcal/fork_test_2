@@ -9,7 +9,7 @@ const Promise = require('bluebird');
 const noop = () => {};
 const noopLogger = { error: noop, warn: noop, info: noop, };
 
-const RegisteredClaims = ['sub', 'aud', 'exp', 'nbf', 'iat', 'jti'];
+const ClaimsToFilter = ['sub', 'aud', 'exp', 'nbf', 'iat', 'jti'];
 
 class Authenticate {
     constructor({ storeService, }, { logger = noopLogger } = {}) {
@@ -119,7 +119,7 @@ class Authenticate {
                         }
 
                         this.logger.info({ function: func, log: 'filtering claim' });
-                        const filteredClaims = _.omit(claims, RegisteredClaims);
+                        const filteredClaims = _.omit(claims, ClaimsToFilter);
 
                         this.logger.info({ function: func, log: 'token authorised' });
                         return { authorised: true, claims: filteredClaims, };

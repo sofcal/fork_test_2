@@ -33,7 +33,8 @@ class Jwks {
     }
 
     static ConvertX5CToPem(x5c) {
-        let split = x5c.replace(/\n/g, '').replace(/\s/g, '').replace(/(.{64})/g, '$1\n');
+        // ensure the param is definitely in the x5c format before trying to convert
+        let split = Jwks.ConvertPemToX5C(x5c).replace(/(.{64})/g, '$1\n');
         split = split.endsWith('\n') ? split : `${split}\n`;
         return `-----BEGIN RSA PUBLIC KEY-----\n${split}-----END RSA PUBLIC KEY-----`;
     }
