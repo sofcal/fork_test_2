@@ -1,10 +1,12 @@
 # /node_modules/* and /bower_components/* ignored by default
 
 **/*.json
-**/packages/**/test/*
-**/packages/runonce.*
-**/packages/module.*/lib/*
-**/packages/**/node_modules/*
+packages/**/test/*
+packages/runonce.*
+packages/module.*/lib/**/*.js
+packages/**/coverage/*
+packages/**/nyc_output/*
+packages/**/node_modules/*
 
 build/*
 reports/*

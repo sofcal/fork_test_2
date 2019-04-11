@@ -7,10 +7,11 @@
   "private": true,
   "main": "lib/handler.js",
   "dependencies": {
-    "@sage/sfab-s2s-jwt-issuer-lambda": "^1.1.7"
+    "@sage/sfab-s2s-jwt-issuer-lambda": "^1.1.7",
+    "aws-sdk": "^2.220.1",
+    "bluebird": "^3.5.1"
   },
   "devDependencies": {
-    "aws-sdk": "^2.220.1",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.0.3",
@@ -20,7 +21,6 @@
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-preset-env": "^1.6.1",
     "babel-preset-flow": "^6.23.0",
-    "bluebird": "^3.5.1",
     "eslint": "^4.11.0",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-plugin-import": "^2.8.0",
