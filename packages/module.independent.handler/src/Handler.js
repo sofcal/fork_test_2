@@ -97,7 +97,7 @@ class Handler {
     }
 
     validate(/* event, { logger } */) { // eslint-disable-line class-methods-use-this
-        throw new Error('not implemented');
+        return this.config;
     }
 
     init(/* event, { logger } */) { // eslint-disable-line class-methods-use-this

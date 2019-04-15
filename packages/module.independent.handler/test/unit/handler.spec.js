@@ -5,7 +5,6 @@ const { CloudWatchSubscription } = require('@sage/bc-infrastructure-cloudwatchsu
 const { RequestLogger } = require('@sage/bc-requestlogger');
 const { logger: loggerGen } = require('@sage/bc-debug-utils');
 
-const Promise = require('bluebird');
 const should = require('should');
 const sinon = require('sinon');
 
@@ -201,12 +200,10 @@ describe('@sage/bc-independent-lambda-handler.Handler', function(){
     });
 
     describe('validate', () => {
-        it('should throw', () => {
+        it('should do nothing', () => {
             const uut = new Derived({ environment: 'env', AWS_REGION: 'region'});
 
-            should(
-                () => uut.validate(null, { logger })
-            ).throwError(new Error('not implemented'));
+            should(uut.validate(null, { logger })).eql({ environment: 'env', AWS_REGION: 'region'});
         });
     });
 
