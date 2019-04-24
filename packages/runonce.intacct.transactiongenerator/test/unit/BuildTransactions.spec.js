@@ -1,5 +1,5 @@
 const sinon = require('sinon');
-const BuildTransactions = require('../../src/BuildTransactions');
+const BuildTransactions = require('../../lib/BuildTransactions');
 const should = require('should');
 const uuid = require('uuid/v4');
 const _ = require('underscore');

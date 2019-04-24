@@ -2,7 +2,7 @@ const Promise = require('bluebird');
 const should = require('should');
 const _ = require('underscore');
 const DB =  require('@sage/bc-services-db');
-const DbQueries = require('../../src/DbQueries');
+const DbQueries = require('../../lib/DbQueries');
 
 describe('module.transactions.generator..DbQueries',()=>{
     let db;

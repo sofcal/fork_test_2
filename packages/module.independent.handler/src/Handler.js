@@ -92,7 +92,7 @@ class Handler {
                 // last but not least, give the option to the derived class to cleanup resources it created. E.G database
                 // connections. Since lambdas can be frozen, we want to allow the derived class the option to cleanup or
                 // persist.
-                return this.dispose();
+                return this.dispose({ logger: event.logger });
             });
     }
 

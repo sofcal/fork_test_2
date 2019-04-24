@@ -1,6 +1,6 @@
 const sinon = require('sinon');
 const _ = require('underscore');
-const CreateTransactions = require('../../src/CreateTransactions');
+const CreateTransactions = require('../../lib/CreateTransactions');
 const DB = require('../../../module.services.db/lib/index');
 
 describe('module.transactions.generator.CreateTransactions', function () {
