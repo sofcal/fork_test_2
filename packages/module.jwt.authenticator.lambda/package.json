@@ -25,7 +25,8 @@
     "bluebird": "^3.5.1",
     "jsonwebtoken": "^8.5.0",
     "needle": "^2.2.4",
-    "underscore": "^1.9.0"
+    "underscore": "^1.9.0",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
