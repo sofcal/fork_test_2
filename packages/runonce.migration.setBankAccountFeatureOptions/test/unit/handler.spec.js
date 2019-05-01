@@ -8,6 +8,7 @@ const Promise = require('bluebird');
 
 const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
 const DB = require('@sage/bc-services-db');
+const S3 = require('@sage/bc-services-s3');
 const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-statuscodeerror');
 
 describe('runonce-migration-setBankAccountFeatureOptions.handler', function() {
@@ -21,16 +22,19 @@ describe('runonce-migration-setBankAccountFeatureOptions.handler', function() {
 
     const env = 'local';
     const region = 'eu-west-1';
+    const bucket = 's3-bucket';
 
     const errFunc = () => { throw new Error('should be stubbed') };
     const dummyLoader = { load: errFunc };
     const db = { connect: errFunc, disconnect: errFunc };
+    const s3 = { };
 
     before(() => {
         sandbox = sinon.createSandbox();
     });
 
     beforeEach(() => {
+        sandbox.stub(process, 'env').value({ Environment: env, AWS_REGION: region, bucket });
         context = { context: 'context' };
         event = { AWS_REGION: region, env };
 
@@ -50,6 +54,7 @@ describe('runonce-migration-setBankAccountFeatureOptions.handler', function() {
         sandbox.stub(dummyLoader, 'load').resolves(config);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
         sandbox.stub(DB, 'Create').returns(db);
+        sandbox.stub(S3, 'Create').returns(s3);
         sandbox.stub(db, 'connect').resolves();
         sandbox.stub(db, 'disconnect').resolves();
 
@@ -83,6 +88,7 @@ describe('runonce-migration-setBankAccountFeatureOptions.handler', function() {
         sandbox.stub(dummyLoader, 'load').resolves(config);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
         sandbox.stub(DB, 'Create').returns(db);
+        sandbox.stub(S3, 'Create').returns(s3);
         sandbox.stub(db, 'connect').resolves();
         sandbox.stub(db, 'disconnect').resolves();
 
@@ -91,8 +97,8 @@ describe('runonce-migration-setBankAccountFeatureOptions.handler', function() {
 
         handler.run({}, context, () => {
             try {
-                const paramPrefix = '/test/';
-                const region = 'local';
+                const paramPrefix = '/local/';
+                const region = 'eu-west-1';
 
                 should(ParameterStoreStaticLoader.Create.callCount).eql(1);
                 should(ParameterStoreStaticLoader.Create.calledWithExactly(
@@ -116,6 +122,7 @@ describe('runonce-migration-setBankAccountFeatureOptions.handler', function() {
         sandbox.stub(dummyLoader, 'load').resolves(config);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
         sandbox.stub(DB, 'Create').returns(db);
+        sandbox.stub(S3, 'Create').returns(s3);
         sandbox.stub(db, 'connect').resolves();
         sandbox.stub(db, 'disconnect').resolves();
 
@@ -127,12 +134,11 @@ describe('runonce-migration-setBankAccountFeatureOptions.handler', function() {
             .then(() => {
                 should(DB.Create.callCount).eql(1);
                 should(DB.Create.calledWithExactly(
-                    { env, region, domain, username, password, replicaSet }
+                    { env, region, domain, username, password, replicaSet, db: 'bank_db' }
                 )).eql(true);
 
                 should(db.connect.callCount).eql(1);
                 should(db.connect.calledWith(
-                    'bank_db'
                 )).eql(true);
 
                 should(db.disconnect.callCount).eql(1);
@@ -148,6 +154,7 @@ describe('runonce-migration-setBankAccountFeatureOptions.handler', function() {
         sandbox.stub(dummyLoader, 'load').rejects(new Error('params_error'));
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
         sandbox.stub(DB, 'Create').returns(db);
+        sandbox.stub(S3, 'Create').returns(s3);
         sandbox.stub(db, 'connect').resolves();
         sandbox.stub(db, 'disconnect').resolves();
 
@@ -170,6 +177,7 @@ describe('runonce-migration-setBankAccountFeatureOptions.handler', function() {
         sandbox.stub(dummyLoader, 'load').resolves(config);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
         sandbox.stub(DB, 'Create').returns(db);
+        sandbox.stub(S3, 'Create').returns(s3);
         sandbox.stub(db, 'connect').resolves();
         sandbox.stub(db, 'disconnect').resolves();
 
@@ -180,7 +188,7 @@ describe('runonce-migration-setBankAccountFeatureOptions.handler', function() {
             try {
                 should(impl.run.callCount).eql(1);
                 should(impl.run.calledWithExactly(
-                    event, config, { db }
+                    event, config, { db, s3 }
                 )).eql(true);
 
                 done();
@@ -194,6 +202,7 @@ describe('runonce-migration-setBankAccountFeatureOptions.handler', function() {
         sandbox.stub(dummyLoader, 'load').resolves(config);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
         sandbox.stub(DB, 'Create').returns(db);
+        sandbox.stub(S3, 'Create').returns(s3);
         sandbox.stub(db, 'connect').resolves();
         sandbox.stub(db, 'disconnect').resolves();
 
@@ -220,6 +229,7 @@ describe('runonce-migration-setBankAccountFeatureOptions.handler', function() {
         sandbox.stub(dummyLoader, 'load').resolves(config);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
         sandbox.stub(DB, 'Create').returns(db);
+        sandbox.stub(S3, 'Create').returns(s3);
         sandbox.stub(db, 'connect').resolves();
         sandbox.stub(db, 'disconnect').resolves();
 
@@ -246,6 +256,7 @@ describe('runonce-migration-setBankAccountFeatureOptions.handler', function() {
         sandbox.stub(dummyLoader, 'load').resolves(config);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
         sandbox.stub(DB, 'Create').returns(db);
+        sandbox.stub(S3, 'Create').returns(s3);
         sandbox.stub(db, 'connect').resolves();
         sandbox.stub(db, 'disconnect').resolves();
 

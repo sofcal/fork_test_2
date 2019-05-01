@@ -4,7 +4,7 @@ const should = require('should');
 const uuid = require('uuid/v4');
 const _ = require('underscore');
 
-describe('BuildTransactions', () => {
+describe('runonce-intacct-transactiongenerator.BuildTransactions', () => {
 
     let sandbox;
     let clock;

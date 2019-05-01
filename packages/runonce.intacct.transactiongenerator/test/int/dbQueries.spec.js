@@ -4,7 +4,7 @@ const _ = require('underscore');
 const DB =  require('@sage/bc-services-db');
 const DbQueries = require('../../lib/DbQueries');
 
-describe('module.transactions.generator..DbQueries',()=>{
+describe('runonce-intacct-transactiongenerator.DbQueries',()=>{
     let db;
     let dbConnection;
     let queries;

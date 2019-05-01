@@ -56,6 +56,7 @@ module.exports.run = (event, context, callback) => {
             callback(null, response);
         })
         .catch((err) => {
+            console.log(err.stack)
             event.logger.error({ function: func, log: 'an error occurred while processing the request', error: err.message || err });
 
             const statusCodeError = StatusCodeError.is(err)
@@ -146,7 +147,7 @@ const disconnectDB = Promise.method((services, logger) => {
 
 const setupLogGroupSubscription = Promise.method((event, context) => {
     const func = 'handler.setupLogGroupSubscription';
-    const cloudwatchlogs = Promise.promisifyAll(new AWS.CloudWatchLogs());
+    const cloudwatchlogs = new AWS.CloudWatchLogs();
     return cloudwatchlogs.describeSubscriptionFilters({ logGroupName: context.logGroupName }).promise()
         .then((subFilterDetails) => {
             if (subFilterDetails.subscriptionFilters.length === 0) {

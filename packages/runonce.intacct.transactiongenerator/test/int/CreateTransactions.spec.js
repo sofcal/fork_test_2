@@ -3,7 +3,7 @@ const _ = require('underscore');
 const CreateTransactions = require('../../lib/CreateTransactions');
 const DB = require('../../../module.services.db/lib/index');
 
-describe('module.transactions.generator.CreateTransactions', function () {
+describe('runonce-intacct-transactiongenerator.CreateTransactions', function () {
 
     const env = 'local';
     const region = 'eu-west-1';
