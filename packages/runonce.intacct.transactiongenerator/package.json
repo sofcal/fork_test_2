@@ -23,6 +23,7 @@
     "uuid": "^3.3.2"
   },
   "devDependencies": {
+    "@sage/bc-debug-utils": "^1.1.7",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.0.3",

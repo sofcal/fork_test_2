@@ -309,6 +309,9 @@ describe('runonce-incident-bankAccountsByProduct.handler', function() {
     it('should fail if any param store values are missing', function(done) {
         delete config['defaultMongo.password'];
 
+        sandbox.stub(dummyLoader, 'load').resolves(config);
+        sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
+
         handler.run(event, context, (first, second) => {
             try {
                 should(first).eql(null);

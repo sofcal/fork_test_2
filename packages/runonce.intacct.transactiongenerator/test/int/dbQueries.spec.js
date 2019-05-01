@@ -2,13 +2,15 @@ const Promise = require('bluebird');
 const should = require('should');
 const _ = require('underscore');
 const DB =  require('@sage/bc-services-db');
-const DbQueries = require('../../lib/DbQueries');
+const { logger: loggerGen } = require('@sage/bc-debug-utils');
+const DbQueries = require('../../lib/db/DbQueries');
 
 describe('runonce-intacct-transactiongenerator.DbQueries',()=>{
     let db;
     let dbConnection;
     let queries;
     const bankAccountId = '241a3c4a-333c-4c2d-9c79-ccdf734082b1';
+    const logger = loggerGen(true);
 
     before(()=>{
         db = new DB({ localhost: true, db: 'bank_db' });
@@ -51,7 +53,7 @@ describe('runonce-intacct-transactiongenerator.DbQueries',()=>{
 
     describe('getBankAccount', () =>{
         it.only('Should return the bankAccount', () =>{
-            return queries.getBankAccount(bankAccountId)
+            return queries.getBankAccountsById({ bankAccountId, all: true }, { logger })
                 .then((result)=>{
                     should(result.length).eql(1);
                 })
@@ -61,7 +63,7 @@ describe('runonce-intacct-transactiongenerator.DbQueries',()=>{
     describe('updateBankAccount', () => {
         it('Should update the bank account', () => {
             const bankAccount = {};
-            return queries.getBankAccount(bankAccount)
+            return queries.getBankAccountsById({ bankAccountId, all: true }, { logger })
                 .then((result)=>{
 
                 })
