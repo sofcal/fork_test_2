@@ -1,6 +1,6 @@
 {
   "name": "@sage/bc-contracts-narrativedictionary",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "author": "Sage UK",
   "license": "ISC",
   "description": "",
@@ -16,8 +16,8 @@
     "@babel/code-frame": "^7.0.0-beta.48",
     "@babel/core": "^7.2.2",
     "@babel/preset-env": "^7.0.0-beta.47",
-    "@sage/bc-jsonschema-to-statuscodeerror": "^1.1.7",
-    "@sage/bc-statuscodeerror": "^1.1.7",
+    "@sage/bc-jsonschema-to-statuscodeerror": "^1.1.8",
+    "@sage/bc-statuscodeerror": "^1.1.8",
     "jsonschema": "^1.2.4",
     "underscore": "^1.9.0",
     "underscore.string": "^3.3.4"
@@ -25,7 +25,7 @@
   "devDependencies": {
     "@babel/cli": "^7.0.0",
     "@babel/register": "^7.0.0",
-    "@sage/bc-debug-utils": "^1.1.7",
+    "@sage/bc-debug-utils": "^1.1.8",
     "babel-eslint": "^8.0.3",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-istanbul": "^4.1.6",
