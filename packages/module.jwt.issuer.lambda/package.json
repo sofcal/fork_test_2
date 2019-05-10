@@ -1,6 +1,6 @@
 {
   "name": "@sage/sfab-s2s-jwt-issuer-lambda",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "author": "",
   "license": "ISC",
   "description": "",
@@ -21,7 +21,7 @@
     "@sage/bc-services-parameter": "^1.1.8",
     "@sage/bc-statuscodeerror": "^1.1.8",
     "@sage/sfab-s2s-jwt-cache": "^1.1.8",
-    "@sage/sfab-s2s-jwt-issuer": "^1.1.8",
+    "@sage/sfab-s2s-jwt-issuer": "^1.1.9",
     "bluebird": "^3.5.1",
     "jsonwebtoken": "^8.5.0",
     "underscore": "^1.9.0"
