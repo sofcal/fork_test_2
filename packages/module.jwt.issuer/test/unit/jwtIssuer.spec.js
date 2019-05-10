@@ -7,8 +7,7 @@ const sinon = require('sinon');
 const should = require('should');
 
 describe('@sage/sfab-s2s-jwt-issuer.JwtIssuer', function() {
-    const sandbox = sinon.sandbox.create();
-    sandbox.useFakeTimers(101); // to ensure our newCertDelay of 100 allows the primary cert to be used
+    const sandbox = sinon.createSandbox();
 
     const cache = {
         getData: () => Promise.reject(new Error('not implemented'))

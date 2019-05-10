@@ -1,6 +1,6 @@
 const should = require('should');
 
-describe('lambda-jwt-certificaterotation.index', function(){
+describe('@sage/sfab-s2s-jwt-certificaterotation-lambda.index', function(){
     it('should do nothing', (done) => {
         done();
     });
