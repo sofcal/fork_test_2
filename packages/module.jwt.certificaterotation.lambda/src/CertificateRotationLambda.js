@@ -56,8 +56,7 @@ class CertificateRotationLambda extends Handler {
                 const keyNames = [
                     resources.keyNames.primary.public,
                     resources.keyNames.primary.private,
-                    resources.keyNames.secondary.public,
-                    resources.keyNames.secondary.private
+                    resources.keyNames.primary.createdAt
                 ];
 
                 return this.services.parameter.getParameters(keyNames)
@@ -68,7 +67,8 @@ class CertificateRotationLambda extends Handler {
                         // assign the current primary values to our secondary
                         const secondaryKeyPair = {
                             public: values[resources.keyNames.primary.public],
-                            private: values[resources.keyNames.primary.private]
+                            private: values[resources.keyNames.primary.private],
+                            createdAt: values[resources.keyNames.primary.createdAt]
                         };
 
                         event.logger.info({ function: func, log: 'creating new primary key pair' });

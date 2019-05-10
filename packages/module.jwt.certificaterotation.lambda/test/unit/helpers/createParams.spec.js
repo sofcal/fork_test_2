@@ -29,7 +29,7 @@ describe('@sage/sfab-s2s-jwt-certificaterotation-lambda.helpers.createKeyPair', 
             name: 'accessToken.primary.createdAt',
             overwrite: true,
             type: 'SecureString',
-            value: 1
+            value: 2
         }]),
         secondary: Object.freeze([{
             name: 'accessToken.secondary.publicKey',
@@ -50,16 +50,16 @@ describe('@sage/sfab-s2s-jwt-certificaterotation-lambda.helpers.createKeyPair', 
     });
 
     beforeEach(() => {
-        sandbox.useFakeTimers(1000);
-
         primaryKeyPair = {
             private: 'primary_private',
             public: 'primary_public',
+            createdAt: 2
         };
 
         secondaryKeyPair = {
             private: 'secondary_private',
             public: 'secondary_public',
+            createdAt: 1
         };
     });
 
@@ -107,7 +107,7 @@ describe('@sage/sfab-s2s-jwt-certificaterotation-lambda.helpers.createKeyPair', 
                 name: 'accessToken.primary.createdAt',
                 overwrite: true,
                 type: 'SecureString',
-                value: 1
+                value: 2
             }]),
             secondary: Object.freeze([{
                 name: 'accessToken.secondary.publicKey',
@@ -123,7 +123,7 @@ describe('@sage/sfab-s2s-jwt-certificaterotation-lambda.helpers.createKeyPair', 
                 name: 'accessToken.secondary.createdAt',
                 overwrite: true,
                 type: 'SecureString',
-                value: 1
+                value: 2
             }])
         });
 
@@ -146,7 +146,7 @@ describe('@sage/sfab-s2s-jwt-certificaterotation-lambda.helpers.createKeyPair', 
                 name: 'accessToken.primary.createdAt',
                 overwrite: true,
                 type: 'SecureString',
-                value: 1
+                value: 2
             }]),
             secondary: Object.freeze([{
                 name: 'accessToken.secondary.publicKey',
@@ -162,7 +162,7 @@ describe('@sage/sfab-s2s-jwt-certificaterotation-lambda.helpers.createKeyPair', 
                 name: 'accessToken.secondary.createdAt',
                 overwrite: true,
                 type: 'SecureString',
-                value: 1
+                value: 2
             }])
         });
 
@@ -186,7 +186,7 @@ describe('@sage/sfab-s2s-jwt-certificaterotation-lambda.helpers.createKeyPair', 
                 name: 'accessToken.primary.createdAt',
                 overwrite: true,
                 type: 'SecureString',
-                value: 1
+                value: 2
             }]),
             secondary: Object.freeze([{
                 name: 'accessToken.secondary.publicKey',
@@ -202,7 +202,7 @@ describe('@sage/sfab-s2s-jwt-certificaterotation-lambda.helpers.createKeyPair', 
                 name: 'accessToken.secondary.createdAt',
                 overwrite: true,
                 type: 'SecureString',
-                value: 1
+                value: 2
             }])
         });
 

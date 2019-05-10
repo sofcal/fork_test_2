@@ -6,6 +6,7 @@ module.exports = ({ logger }) => {
     const func = 'createKeyPair';
     try {
         const keyPair = keyPairWrapper.keypair(); // defaults to 2048, shorter keys cause problems due to length of digest
+        keyPair.createdAt = Math.floor(new Date().getTime() / 1000);
 
         logger.info({ function: func, log: 'returning new key pair' });
         return keyPair;

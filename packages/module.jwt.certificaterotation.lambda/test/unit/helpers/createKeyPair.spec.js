@@ -25,6 +25,28 @@ describe('@sage/sfab-s2s-jwt-certificaterotation-lambda.helpers.createKeyPair', 
         should(createKeyPair({ logger })).match(regex);
     });
 
+    it('should generate a keypair (stubbed)', () => {
+        const expected = {
+            private: 'generated_private',
+            public: 'generated_public',
+            createdAt: 1
+        };
+        sandbox.useFakeTimers(1000);
+        sandbox.stub(keyPairWrapper, 'keypair').returns(expected);
+        should(createKeyPair({ logger })).eql(expected);
+    });
+
+    it('should generate a keypair (stubbed/boundary)', () => {
+        const expected = {
+            private: 'generated_private',
+            public: 'generated_public',
+            createdAt: 1
+        };
+        sandbox.useFakeTimers(1999);
+        sandbox.stub(keyPairWrapper, 'keypair').returns(expected);
+        should(createKeyPair({ logger })).eql(expected);
+    });
+
     it('should throw if the generator throws', () => {
         const expected = new Error('generator_error');
         sandbox.stub(keyPairWrapper, 'keypair').throws(expected);

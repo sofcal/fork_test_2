@@ -143,8 +143,7 @@ describe('@sage/sfab-s2s-jwt-certificaterotation-lambda.CertificateRotationLambd
                         [
                             'accessToken.primary.publicKey',
                             'accessToken.primary.privateKey',
-                            'accessToken.secondary.publicKey',
-                            'accessToken.secondary.privateKey'
+                            'accessToken.primary.createdAt'
                         ]
                     )).eql(true);
                 });

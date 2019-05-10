@@ -14,14 +14,13 @@ module.exports = (primaryKeyPair, secondaryKeyPair, { logger }) => {
         throw new Error('invalid primary key pair');
     }
 
-    const createdAt = Math.floor(new Date().getTime() / 1000);
     const ret = {};
 
     logger.info({ function: func, log: 'creating primary values', params: { hasPrimaryKeyPair, hasSecondaryKeyPair } });
     ret.primary = [
         param(resources.keyNames.primary.public, primaryKeyPair.public),
         param(resources.keyNames.primary.private, primaryKeyPair.private),
-        param(resources.keyNames.primary.createdAt, createdAt)
+        param(resources.keyNames.primary.createdAt, primaryKeyPair.createdAt)
     ];
 
     const toUseAsSecondary = hasSecondaryKeyPair ? secondaryKeyPair : primaryKeyPair;
@@ -30,7 +29,7 @@ module.exports = (primaryKeyPair, secondaryKeyPair, { logger }) => {
     ret.secondary = [
         param(resources.keyNames.secondary.public, toUseAsSecondary.public),
         param(resources.keyNames.secondary.private, toUseAsSecondary.private),
-        param(resources.keyNames.secondary.createdAt, createdAt)
+        param(resources.keyNames.secondary.createdAt, toUseAsSecondary.createdAt)
     ];
 
     logger.info({ function: func, log: 'returning parameter store values', params: { hasPrimaryKeyPair, hasSecondaryKeyPair } });
