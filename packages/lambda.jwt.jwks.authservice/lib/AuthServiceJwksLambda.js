@@ -35,7 +35,10 @@ class AuthServiceJwksLambda extends JwksLambda {
                 // are valid, and generate a JWKS
                 const mapped = keyNameEnums
                     .filter((k) => Jwks.isValid(data[k.publicKey], data[k.keyToUseForKid], defaultCreatedAt, parseInt(this.config.certExpiry, 10)))
-                    .map((k) => Jwks.Generate(data[k.publicKey], AuthServiceJwksLambda.adjustToMatchAuthService(data[k.keyToUseForKid]), true));
+                    .map((k) => {
+                        const keyToUseForKeyId = this.config.USEOLDFORMAT ? AuthServiceJwksLambda.adjustToMatchAuthService(data[k.keyToUseForKid]) : data[k.keyToUseForKid];
+                        return Jwks.Generate(data[k.publicKey], keyToUseForKeyId, true);
+                    });
 
                 logger.info({ function: func, log: 'ended' });
                 return mapped;
