@@ -36,7 +36,7 @@ class AuthServiceJwksLambda extends JwksLambda {
                 const mapped = keyNameEnums
                     .filter((k) => Jwks.isValid(data[k.publicKey], data[k.keyToUseForKid], defaultCreatedAt, parseInt(this.config.certExpiry, 10)))
                     .map((k) => {
-                        const keyToUseForKeyId = this.config.USEOLDFORMAT ? AuthServiceJwksLambda.adjustToMatchAuthService(data[k.keyToUseForKid]) : data[k.keyToUseForKid];
+                        const keyToUseForKeyId = AuthServiceJwksLambda.adjustToMatchAuthService(data[k.keyToUseForKid], this.config.USEOLDFORMAT);
                         return Jwks.Generate(data[k.publicKey], keyToUseForKeyId, true);
                     });
 
@@ -45,8 +45,13 @@ class AuthServiceJwksLambda extends JwksLambda {
             });
     }
 
-    static adjustToMatchAuthService(key) {
+    static adjustToMatchAuthService(key, useOldFormat) {
         const der = Jwks.ConvertPemToX5C(key);
+
+        if (!useOldFormat) {
+            return der;
+        }
+
         return der.replace(/(.{64})/g, '$1\r');
     }
 }
