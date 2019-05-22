@@ -1,6 +1,7 @@
 'use strict';
 
 const Promise = require('bluebird');
+const _ = require('underscore');
 
 class DBQueries {
     constructor(db) {
@@ -62,21 +63,70 @@ const updateBankAccountImpl = Promise.method((self, { bankAccount }, { logger })
     return promise;
 });
 
-const updateTransactionsImpl = Promise.method((self, { buckets }, { logger }) => {
+const updateTransactionsImpl = Promise.method((self, { bankAccount, transactions }, { logger }) => {
     const func = `${consts.LOG_PREFIX}.updateBankAccount`;
     logger.debug({ function: func, log: 'started', params: { } });
 
     const collection = self.db.collection('Transaction');
+    const query = { bankAccountId: bankAccount._id, numberOfTransactions: { $lt: consts.MAX_BUCKET_SIZE } };
 
-    const promise = collection.insertMany(buckets);
+    const now = new Date();
+    const nowString = now.toISOString();
 
-    logger.debug({ function: func, log: 'ended', params: { } });
-    return promise;
+    return collection.find(query).toArray()
+        .then((buckets = []) => {
+            let promise = Promise.resolve(undefined);
+
+            if (buckets.length > 1) {
+                logger.debug({ function: func, log: 'multiple unfilled buckets', params: { } });
+                throw new Error('multiple unfilled buckets');
+            } else if (buckets.length === 1) {
+                const first = _.first(buckets);
+                const toAdd = transactions.splice(0, consts.MAX_BUCKET_SIZE - first.numberOfTransactions);
+                first.transactions.push(...toAdd);
+                first.numberOfTransactions += toAdd.length;
+                first.endIncrementedId = _.last(toAdd).incrementedId;
+                first.endDate = nowString;
+
+                promise = collection.replaceOne({ _id: first._id }, first);
+            }
+
+            const toInsert = _.chain(transactions)
+                .groupBy((e, i) => Math.floor(i / consts.MAX_BUCKET_SIZE))
+                .toArray()
+                .map((b) => {
+                    return {
+                        bankAccountId: bankAccount._id,
+                        startIncrementedId: b[0].incrementedId,
+                        endIncrementedId: _.last(b).incrementedId,
+                        startDate: nowString,
+                        endDate: nowString,
+                        numberOfTransactions: b.length,
+                        region: bankAccount.region,
+                        transactions: b
+                    };
+                })
+                .value();
+
+            return promise
+                .then(() => {
+                    if (!toInsert.length) {
+                        return undefined;
+                    }
+
+                    return collection.insertMany(toInsert, { ordered: true });
+                })
+                .then(() => {
+                    logger.debug({ function: func, log: 'ended', params: { } });
+                })
+        });
 });
+
 
 const consts = {
     DEFAULT_OPTIONS: Object.freeze({ readPreference: 'secondary' }),
-    LOG_PREFIX: DBQueries.name
+    LOG_PREFIX: DBQueries.name,
+    MAX_BUCKET_SIZE: 100
 };
 
 module.exports = DBQueries;

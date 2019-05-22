@@ -1,14 +1,19 @@
 const sinon = require('sinon');
-const BuildTransactions = require('../../lib/BuildTransactions');
+const TransactionBuilder = require('../../lib/TransactionBuilder');
 const should = require('should');
 const uuid = require('uuid/v4');
 const _ = require('underscore');
 
 describe('runonce-intacct-transactiongenerator.BuildTransactions', () => {
-
     let sandbox;
     let clock;
     const now = new Date('2019-04-08T12:59:41.804Z');
+
+    const bankAccount = {
+        _id: '1',
+        lastTransactionId: 0
+    };
+
     const expectedTrx = [
         {
             _id: 'stubbed',
@@ -137,78 +142,12 @@ describe('runonce-intacct-transactiongenerator.BuildTransactions', () => {
     });
 
     it('should build transactions', (done) => {
-
-
-        const buildTransactions = BuildTransactions.Create();
-        const transactions = buildTransactions.buildTransactionsforBucket('1', 1, 2);
+        const transactionBuilder = TransactionBuilder.Create();
+        const transactions = transactionBuilder.buildTransactions({ bankAccount, numTrxToCreate: 2 });
         _.each(transactions, (transaction) => {
             transaction._id = 'stubbed';
         });
         should(transactions).eql(expectedTrx);
-        done();
-    });
-
-    it('should build a bucket of transactions', (done) => {
-
-        const expected = {
-            _id: 'stubbed',
-            region: "USA",
-            bankAccountId: '1',
-            startIncrementedId: 1,
-            endIncrementedId: 2,
-            numberOfTransactions: 2,
-            transactions: expectedTrx,
-            created: '2019-04-08T12:59:41.804Z',
-            startDate: '2019-04-08T12:59:41.804Z',
-            endDate: '2019-04-08T12:59:41.804Z'
-        };
-
-        const buildTransactions = BuildTransactions.Create();
-        const bucket = buildTransactions.buildTransactionBucket('1', 1, 2);
-        bucket._id = 'stubbed';
-        _.each(bucket.transactions, (transaction) => {
-            transaction._id = 'stubbed';
-        });
-        should(bucket).eql(expected);
-        done();
-    });
-
-    it('should build 2 buckets, one full and on with 1 in', (done) => {
-
-        const expected = [{
-            _id: 'stubbed',
-            region: "USA",
-            bankAccountId: '1',
-            startIncrementedId: 1,
-            endIncrementedId: 100,
-            numberOfTransactions: 100,
-            transactions: [],
-            created: '2019-04-08T12:59:41.804Z',
-            startDate: '2019-04-08T12:59:41.804Z',
-            endDate: '2019-04-08T12:59:41.804Z'
-        },
-        {
-            _id: 'stubbed',
-            region: "USA",
-            bankAccountId: '1',
-            startIncrementedId: 101,
-            endIncrementedId: 101,
-            numberOfTransactions: 1,
-            transactions: [],
-            created: '2019-04-08T12:59:41.804Z',
-            startDate: '2019-04-08T12:59:41.804Z',
-            endDate: '2019-04-08T12:59:41.804Z'
-        }];
-
-
-        const buildTransactions = BuildTransactions.Create();
-        sandbox.stub(buildTransactions, 'buildTransactionsforBucket').returns([]);
-        const buckets = buildTransactions.buildBuckets('1', 1, 101);
-        _.each(buckets, (bucket) => {
-            bucket._id = 'stubbed';
-            bucket.transactions = [];
-        });
-        should(buckets).eql(expected);
         done();
     });
 });

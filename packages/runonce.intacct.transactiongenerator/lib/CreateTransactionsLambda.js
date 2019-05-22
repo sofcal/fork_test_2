@@ -1,16 +1,18 @@
 'use strict';
 
-const Promise = require('bluebird');
-
 const validate = require('./validators');
+const ErrorSpecs = require('./ErrorSpecs');
+const keys = require('./params');
+const TransactionBuilder = require('./TransactionBuilder');
+const { DBQueries } = require('./db');
+
 const { StatusCodeError } = require('@sage/bc-statuscodeerror');
 const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
-const ErrorSpecs = require('./ErrorSpecs');
 const DB = require('@sage/bc-services-db');
 const { Handler } = require('@sage/bc-independent-lambda-handler');
-const keys = require('./params');
-const BuildTransactions = require('./BuildTransactions');
-const { DBQueries } = require('./db');
+
+const Promise = require('bluebird');
+const _ = require('underscore');
 
 const serviceImpls = { DB };
 const dbName = 'bank_db';
@@ -65,10 +67,12 @@ class CreateTransactionsLambda extends Handler {
                 const [bankAccount] = bankAccounts;
                 logger.info({function: func, log: 'retrieved bankAccounts from db', params: { lastTransactionId: bankAccount.lastTransactionId }});
 
-                const startTrxNo = bankAccount.lastTransactionId + 1;
-                const buildTransactions = new BuildTransactions();
-                const buckets = buildTransactions.buildBuckets(bankAccountId, startTrxNo, numTrxToCreate);
-                return dbQueries.updateTransactions({ buckets }, { logger })
+                const transactionBuilder = new TransactionBuilder();
+                const transactions = transactionBuilder.buildTransactions({ bankAccount, numTrxToCreate });
+
+                logger.info({function: func, log: 'created transactions', params: { first: _.first(transactions).incrementedId, last: _.last(transactions).incrementedId }});
+
+                return dbQueries.updateTransactions({ bankAccount, transactions }, { logger })
                     .then(() => {
                         logger.info({function: func, log: 'added transactions to database' });
 

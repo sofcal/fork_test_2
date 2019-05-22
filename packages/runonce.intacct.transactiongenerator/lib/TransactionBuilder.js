@@ -1,70 +1,33 @@
 'use strict';
 
-const uuid = require('uuid/v4');
 const rawBucket = require('./rawBucket.json');
 const rawTransaction = require('./rawTransaction.json');
 
+const uuid = require('uuid/v4');
+const _ = require('underscore');
 
-class BuildTransactions {
+
+class TransactionBuilder {
     constructor() {
         // do nothing
     }
 
     static Create() {
-        return new BuildTransactions();
+        return new TransactionBuilder();
     }
 
-    buildBuckets(...args) {
-        return buildBucketsImpl(this, ...args);
-    }
-
-    buildTransactionBucket(...args) {
-        return buildTransactionBucketImpl(this, ...args);
-    }
-
-    buildTransactionsforBucket(...args) {
-        return buildTransactionsforBucketImpl(this, ...args);
+    buildTransactions(...args) {
+        return buildTransactionsImpl(this, ...args);
     }
 }
 
-const buildBucketsImpl = ((self, bankAccountId, startNum, numTrx) => {
-    const buckets = [];
-    const bucketSize = 100;
-    const quotient = Math.floor(numTrx / bucketSize);
-    const remainder = numTrx % bucketSize;
-    let startVal = startNum;
-    // create buckets full of transactions
-    for (let i = 0; i < quotient; i++) {
-        buckets.push(buildTransactionBucketImpl(self, bankAccountId, startVal, bucketSize));
-        startVal += bucketSize;
-    }
-    // create remainder transactions
-    if (remainder && remainder > 0) {
-        buckets.push(buildTransactionBucketImpl(self, bankAccountId, startVal, remainder));
-    }
-    return buckets;
-});
+const buildTransactionsImpl = (self, { bankAccount, numTrxToCreate}) => {
+    const bankAccountId = bankAccount._id;
+    const startNum = bankAccount.lastTransactionId + 1;
 
-const buildTransactionBucketImpl = ((self, bankAccountId, startNum, numTrx) => {
-    const date = new Date().toISOString();
-    let bucket = JSON.parse(JSON.stringify(rawBucket));
-    bucket._id = uuid();
-    bucket.region = 'USA'; // Where?
-    bucket.bankAccountId = bankAccountId;
-    bucket.startIncrementedId = startNum;
-    bucket.endIncrementedId = startNum + (numTrx - 1);
-    bucket.numberOfTransactions = numTrx;
-    bucket.transactions = buildTransactionsforBucketImpl(self, bankAccountId, startNum, numTrx);
-    bucket.created = date;
-    bucket.startDate = date;
-    bucket.endDate = new Date().toISOString();
-    return bucket;
-});
-
-const buildTransactionsforBucketImpl = (self, bankAccountId, startNum, numTrx) => {
-    const rawTransactions = [];
-    for (let i = startNum; i <= numTrx; i++) {
-        let transaction = JSON.parse(JSON.stringify(rawTransaction));
+    return _.times(numTrxToCreate, (n) => {
+        const i = startNum + n;
+        const transaction = JSON.parse(JSON.stringify(rawTransaction));
         transaction._id = uuid();
         transaction.bankAccountId = bankAccountId;
         transaction.datePosted = new Date().toISOString();
@@ -76,9 +39,13 @@ const buildTransactionsforBucketImpl = (self, bankAccountId, startNum, numTrx) =
         transaction.referenceNumber = `ref ${i}`;
         transaction.narrative1 = `Invoice ${i}`;
         // transaction.transactionHash = getHash(GetS)
-        rawTransactions.push(transaction);
-    }
-    return rawTransactions;
+
+        if (bankAccount.defaultCurrency) {
+            transaction.currency = bankAccount.defaultCurrency;
+        }
+
+        return transaction;
+    });
 };
 
 // const GetStringForHashing = (self, transaction, bankAccountNum, bankIdentifier) => {
@@ -121,4 +88,4 @@ const buildTransactionsforBucketImpl = (self, bankAccountId, startNum, numTrx) =
 //     return JSON.stringify(dataFields);
 // };
 
-module.exports = BuildTransactions;
+module.exports = TransactionBuilder;
