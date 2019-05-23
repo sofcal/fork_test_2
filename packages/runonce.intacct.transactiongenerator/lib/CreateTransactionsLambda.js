@@ -52,7 +52,7 @@ class CreateTransactionsLambda extends Handler {
     impl(event, { logger }) {
         const func = `${CreateTransactionsLambda.name}.impl`;
         // get details from event
-        const { bankAccountId, numTrxToCreate, triggerAuth } = event.parsed;
+        const { bankAccountId, numTrxToCreate, triggerAuth, randomSignage } = event.parsed;
         logger.info({function: func, log: 'started', params: { bankAccountId }});
 
         const dbQueries = DBQueries.Create(this.services.db.getConnection());
@@ -69,12 +69,12 @@ class CreateTransactionsLambda extends Handler {
                 logger.info({function: func, log: 'retrieved bankAccounts from db', params: { lastTransactionId: bankAccount.lastTransactionId }});
 
                 const transactionBuilder = new TransactionBuilder();
-                const transactions = transactionBuilder.buildTransactions({ bankAccount, numTrxToCreate });
+                const transactions = transactionBuilder.buildTransactions({ bankAccount, numTrxToCreate, randomSignage });
 
                 logger.info({function: func, log: 'created transactions', params: { first: _.first(transactions).incrementedId, last: _.last(transactions).incrementedId }});
 
                 const trxTotal = _.reduce(transactions, (memo, t) => memo.add(t.transactionAmount), new Big(0)).round(2).toNumber();
-                const balance = new Big(bankAccount.availableBalanceAmount).add(trxTotal).;
+                const balance = new Big(bankAccount.availableBalanceAmount).add(trxTotal).round(2).toNumber();
 
                 logger.info({function: func, log: 'calculated balances', params: { trxTotal, previousBalance: bankAccount.availableBalanceAmount, newBalance: balance } });
 

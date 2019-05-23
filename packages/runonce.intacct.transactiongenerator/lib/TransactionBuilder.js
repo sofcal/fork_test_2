@@ -21,14 +21,14 @@ class TransactionBuilder {
     }
 }
 
-const buildTransactionsImpl = (self, { bankAccount, numTrxToCreate}) => {
+const buildTransactionsImpl = (self, { bankAccount, numTrxToCreate, randomSignage = false }) => {
     const bankAccountId = bankAccount._id;
     const startNum = bankAccount.lastTransactionId + 1;
 
     const now = new Date().toISOString();
     return _.times(numTrxToCreate, (n) => {
         const rand = Math.floor(Math.random() * 100);
-        const debit = rand >= 50;
+        const debit = randomSignage && rand >= 50;
         const i = startNum + n;
         const transaction = JSON.parse(JSON.stringify(rawTransaction));
         transaction._id = uuid();
