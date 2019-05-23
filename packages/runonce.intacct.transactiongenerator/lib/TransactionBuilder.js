@@ -1,7 +1,8 @@
 'use strict';
 
-const rawBucket = require('./rawBucket.json');
 const rawTransaction = require('./rawTransaction.json');
+
+const crypto = require('crypto');
 
 const uuid = require('uuid/v4');
 const _ = require('underscore');
@@ -44,7 +45,7 @@ const buildTransactionsImpl = (self, { bankAccount, numTrxToCreate, randomSignag
         transaction.referenceNumber = `ref ${i}`;
 
         transaction.narrative1 = `Invoice ${i}`;
-        // transaction.transactionHash = getHash(GetS)
+        transaction.transactionHash = generateHash(bankAccount, transaction);
 
         if (bankAccount.defaultCurrency) {
             transaction.currency = bankAccount.defaultCurrency;
@@ -54,44 +55,24 @@ const buildTransactionsImpl = (self, { bankAccount, numTrxToCreate, randomSignag
     });
 };
 
-// const GetStringForHashing = (self, transaction, bankAccountNum, bankIdentifier) => {
-//     const checkField = (fieldName, fieldValue) => {
-//         if (_.isUndefined(fieldValue)) {
-//             const message = format(resources.services.transaction.InvalidHashComponentMessage, fieldName);
-//             const typeItem = new StatusCodeErrorItem(resources.services.transaction.InvalidHashComponent, message);
-//             throw new StatusCodeError([typeItem], 400);
-//         }
-//     };
-//
-//     const dataFields = {
-//         bankAccountNum,
-//         bankIdentifier,
-//         datePosted: transaction.datePosted,
-//         transactionAmount: transaction.transactionAmount,
-//         transactionType: transaction.transactionType,
-//         transactionIndex: transaction.transactionIndex
-//     };
-//
-//     if (transaction.aggregatorTransactionId !== undefined) {
-//         dataFields.aggregatorTransactionId = transaction.aggregatorTransactionId;
-//     } else {
-//         dataFields.fileIdentificationNumber = transaction.fileIdentificationNumber;
-//     }
-//
-//     checkField('bankAccountNum', dataFields.bankAccountNum);
-//     checkField('bankIdentifier', dataFields.bankIdentifier);
-//     checkField('datePosted', dataFields.datePosted);
-//     checkField('transactionAmount', dataFields.transactionAmount);
-//     checkField('transactionType', dataFields.transactionType);
-//     checkField('transactionIndex', dataFields.transactionIndex);
-//
-//     if (transaction.aggregatorTransactionId !== undefined) {
-//         checkField('aggregatorTransactionId', dataFields.aggregatorTransactionId);
-//     } else {
-//         checkField('fileIdentificationNumber', dataFields.fileIdentificationNumber);
-//     }
-//
-//     return JSON.stringify(dataFields);
-// };
+const generateHash = (bankAccount, transaction) => {
+    const dataFields = {
+        bankAccountNum: bankAccount.accountIdentifier,
+        bankIdentifier: bankAccount.bankIdentifier,
+        datePosted: transaction.datePosted,
+        transactionAmount: transaction.transactionAmount,
+        transactionType: transaction.transactionType,
+        transactionIndex: transaction.transactionIndex
+    };
+
+    if (transaction.aggregatorTransactionId !== undefined) {
+        dataFields.aggregatorTransactionId = transaction.aggregatorTransactionId;
+    } else {
+        dataFields.fileIdentificationNumber = transaction.fileIdentificationNumber;
+    }
+
+    const stringified = JSON.stringify(dataFields);
+    return crypto.createHash('sha256').update(stringified).digest('hex');
+};
 
 module.exports = TransactionBuilder;
