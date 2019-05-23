@@ -25,18 +25,24 @@ const buildTransactionsImpl = (self, { bankAccount, numTrxToCreate}) => {
     const bankAccountId = bankAccount._id;
     const startNum = bankAccount.lastTransactionId + 1;
 
+    const now = new Date().toISOString();
     return _.times(numTrxToCreate, (n) => {
+        const rand = Math.floor(Math.random() * 100);
+        const debit = rand >= 50;
         const i = startNum + n;
         const transaction = JSON.parse(JSON.stringify(rawTransaction));
         transaction._id = uuid();
         transaction.bankAccountId = bankAccountId;
-        transaction.datePosted = new Date().toISOString();
-        transaction.dateUserInitiated = new Date().toISOString();
+        transaction.datePosted = now;
+        transaction.dateUserInitiated = now;
+        transaction.dateFundsAvailable = now;
         transaction.transactionIndex = 0;
         transaction.fileIdentificationNumber = 0;
         transaction.incrementedId = i;
-        transaction.transactionAmount = i / 100;
+        transaction.transactionType = debit ? 'DEBIT' : 'CREDIT';
+        transaction.transactionAmount = (debit ? -1 : 1) * (i / 100);
         transaction.referenceNumber = `ref ${i}`;
+
         transaction.narrative1 = `Invoice ${i}`;
         // transaction.transactionHash = getHash(GetS)
 

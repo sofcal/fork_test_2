@@ -50,14 +50,7 @@ const updateBankAccountImpl = Promise.method((self, { bankAccount }, { logger })
     const collection = self.db.collection('BankAccount');
 
     const where = { _id: bankAccount._id };
-    const set = {
-        bankAuthorisationToken: bankAccount.bankAuthorisationToken,
-        clientAuthorisationToken: bankAccount.clientAuthorisationToken,
-        lastTransactionId: bankAccount.lastTransactionId,
-        status: bankAccount.status,
-        authAlwaysRequired: bankAccount.authAlwaysRequired
-    };
-    const promise = collection.update(where, { $set: set });
+    const promise = collection.replaceOne(where, bankAccount);
 
     logger.debug({ function: func, log: 'ended', params: { } });
     return promise;

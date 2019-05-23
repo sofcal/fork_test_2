@@ -11,6 +11,7 @@ const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-l
 const DB = require('@sage/bc-services-db');
 const { Handler } = require('@sage/bc-independent-lambda-handler');
 
+const Big = require('bignumber.js');
 const Promise = require('bluebird');
 const _ = require('underscore');
 
@@ -72,9 +73,23 @@ class CreateTransactionsLambda extends Handler {
 
                 logger.info({function: func, log: 'created transactions', params: { first: _.first(transactions).incrementedId, last: _.last(transactions).incrementedId }});
 
+                const trxTotal = _.reduce(transactions, (memo, t) => memo.add(t.transactionAmount), new Big(0)).round(2).toNumber();
+                const balance = new Big(bankAccount.availableBalanceAmount).add(trxTotal).;
+
+                logger.info({function: func, log: 'calculated balances', params: { trxTotal, previousBalance: bankAccount.availableBalanceAmount, newBalance: balance } });
+
                 return dbQueries.updateTransactions({ bankAccount, transactions }, { logger })
                     .then(() => {
                         logger.info({function: func, log: 'added transactions to database' });
+
+                        bankAccount.availableBalanceAmount = balance;       // eslint-disable-line no-param-reassign
+                        bankAccount.openingBalanceAmount = balance;         // eslint-disable-line no-param-reassign
+                        bankAccount.ledgerBalanceAmount = balance;          // eslint-disable-line no-param-reassign
+
+                        const now = new Date().toISOString();
+                        bankAccount.lastTransactionsReceived = now;
+                        bankAccount.ledgerBalanceDate = now;                // eslint-disable-line no-param-reassign
+                        bankAccount.availableBalanceDate = now;             // eslint-disable-line no-param-reassign
 
                         bankAccount.bankAuthorisationToken = 'AUTO';        // eslint-disable-line no-param-reassign
                         bankAccount.clientAuthorisationToken = 'AUTO';      // eslint-disable-line no-param-reassign
