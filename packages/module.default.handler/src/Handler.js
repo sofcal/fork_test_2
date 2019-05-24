@@ -88,7 +88,7 @@ class Handler {
         throw new Error('impl function should be extended');
     }
 
-    loadAdditionalServices() {
+    loadAdditionalServices() { // eslint-disable-line class-methods-use-this
         throw new Error('loadAdditionalServices function should be extended');
     }
 

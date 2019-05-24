@@ -1,0 +1,55 @@
+{
+  "_id": "",
+  "transactionType": "CASH",
+  "transactionStatus": "posted",
+  "datePosted": null,
+  "dateUserInitiated": null,
+  "dateFundsAvailable": null,
+  "transactionAmount": 0,
+  "transactionId": null,
+  "incrementedId": 0,
+  "correctionId": null,
+  "correctionAction": null,
+  "checkNum": "1",
+  "referenceNumber": "776028360",
+  "name": "Cash",
+  "extendedName": null,
+  "payee": {
+    "payeeId": null,
+    "city": null,
+    "state": null,
+    "postalCode": null,
+    "country": null
+  },
+  "coordinates": {
+    "lat": 0,
+    "long": 0
+  },
+  "narrative1": null,
+  "narrative2": "Deposit",
+  "currency": "USD",
+  "category": {
+    "topLevelCategory": "Deposits",
+    "subCategory": "INCOME",
+    "categoryId": 27
+  },
+  "bankAccountId": "",
+  "transactionIndex": 0,
+  "fileIdentificationNumber": 0,
+  "dateFileArrived": null,
+  "transactionHash": "",
+  "accountsPostings": [],
+  "transactionNarrative": "",
+  "internalProcessingStatus": null,
+  "raw": {
+    "transactionCode": "aggregator",
+    "lineNumberFirst": 0,
+    "lineNumberLast": 0,
+    "lineContent": "aggregator",
+    "fileName": "aggregator"
+  },
+  "validationStatus": "notValidated",
+  "aggregatorTransactionId": "776028360",
+  "predictedActions": [],
+  "providerAdditionalFields": []
+}

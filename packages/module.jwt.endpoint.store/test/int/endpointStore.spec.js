@@ -1,8 +1,7 @@
 const should = require('should');
 const sinon = require('sinon');
 const nock = require('nock');
-const needle = require('needle');
-const { EndpointStore }  = require('../../lib/EndpointStore');
+const EndpointStore = require('../../lib/EndpointStore');
 const { Cache } = require('@sage/sfab-s2s-jwt-cache');
 const { Jwks } = require('@sage/sfab-s2s-jwt-jwks');
 
@@ -67,15 +66,6 @@ describe('@sage/sfab-s2s-jwt-endpoint-store.EndpointStore', function(){
         },
         { logger }
     );
-
-    const nockEndPoints = nock('https://www.test.com')
-        .persist()
-        .get('/serv1')
-        .reply(200, {
-            keys: endPointResponse[0].keys
-        })
-        .get('/serv2')
-        .reply(200, { });
 
     let dateStub;
     let cacheBuildSpy;
@@ -192,7 +182,7 @@ describe('@sage/sfab-s2s-jwt-endpoint-store.EndpointStore', function(){
             const ID = 'serv3';
             return test.getCache(ID).should.be.rejectedWith(/getaddrinfo ENOTFOUND invalid/);
         });
-    })
+    });
 
 
     describe('getValidIds processing', () => {

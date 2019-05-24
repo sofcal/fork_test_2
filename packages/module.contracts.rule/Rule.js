@@ -3,7 +3,7 @@
 const jsonschema = require('jsonschema');
 const ruleSchema = require('./schemas/ruleSchema');
 const { utils, httpMethod } = require('./_bankDrive');
-const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError } = require('@sage/bc-statuscodeerror');
 const { toStatusCodeError, toStatusCodeErrorItems } = require('@sage/bc-jsonschema-to-statuscodeerror');
 const access = require('safe-access');
 const _ = require('underscore');
@@ -11,7 +11,6 @@ const Big = require('bignumber.js');
 
 class Rule {
     constructor(data) {
-
         if (data) {
             this.uuid = data.uuid;
             this.ruleName = data.ruleName;                // Custom name for this rule, unique at bank account level
@@ -31,9 +30,9 @@ class Rule {
         return new Rule(...args);
     }
 
-    static createFromActualAction(...args){
+    static createFromActualAction(...args) {
         return createFromActualActionImpl(...args);
-    };
+    }
 
     validate(noThrow = false) {
         return Rule.validate(this, noThrow);
@@ -58,7 +57,6 @@ class Rule {
     static sortRulesByRank(...args) {
         return sortRulesByRankImpl(...args);
     }
-
 }
 
 const filterImpl = function(data) {
@@ -79,62 +77,57 @@ const sortRulesByRankImpl = function(rules) {
 };
 
 const validateImpl = function(rule, noThrow) {
-
     const typeItem = utils.validateTypeNoThrow(rule, Rule);
-    if(typeItem)
+    if (typeItem) {
         throw new StatusCodeError([typeItem], 400);
+    }
 
-    let result = jsonschema.validate(rule, ruleSchema, { propertyName: Rule.name });
+    const result = jsonschema.validate(rule, ruleSchema, { propertyName: Rule.name });
     if (result.errors.length > 0) {
         if (noThrow) {
-            return toStatusCodeErrorItems(result, Rule, rule)//createErrorItems(result.errors, rule)
-        } else {
-            console.log('_____RULE', rule);
-            const util = require('util');
-            console.log('_____RESULT', util.inspect(result, false, null, 1));
-            const error = toStatusCodeError(result, Rule, rule);//createError(result.errors, rule);
-            console.log('______ERROR', error);
-            throw error;
+            return toStatusCodeErrorItems(result, Rule, rule);
         }
+        throw toStatusCodeError(result, Rule, rule);
     }
+
     return true;
 };
 
-const createError = (errCollection, rule) => {
-    return new StatusCodeError(createErrorItems(errCollection, rule), 400);
-};
+// const createError = (errCollection, rule) => {
+//     return new StatusCodeError(createErrorItems(errCollection, rule), 400);
+// };
 
-const createErrorItems = (errCollection, rule) => {
-    const errorItems = [];
-    _.each(errCollection, (err) => {
-        let invalidValue = {};
-        const dotSeparated = buildDotSeparatedString(err.property);
-        const prop = resolvePath(dotSeparated, rule);
-        if (_.isArray(prop)) {
-            invalidValue[dotSeparated] = prop[0];
-        } else {
-            invalidValue[dotSeparated] = prop;
-        }
-        const errorText = `Rule.${dotSeparated}: ${invalidValue[dotSeparated]}`;
-        errorItems.push(new StatusCodeErrorItem('InvalidProperties', errorText, invalidValue));
-    });
-    return errorItems;
-};
+// const createErrorItems = (errCollection, rule) => {
+//     const errorItems = [];
+//     _.each(errCollection, (err) => {
+//         const invalidValue = {};
+//         const dotSeparated = buildDotSeparatedString(err.property);
+//         const prop = resolvePath(dotSeparated, rule);
+//         if (_.isArray(prop)) {
+//             invalidValue[dotSeparated] = prop[0]; // eslint-disable-line prefer-destructuring
+//         } else {
+//             invalidValue[dotSeparated] = prop;
+//         }
+//         const errorText = `Rule.${dotSeparated}: ${invalidValue[dotSeparated]}`;
+//         errorItems.push(new StatusCodeErrorItem('InvalidProperties', errorText, invalidValue));
+//     });
+//     return errorItems;
+// };
 
-const resolvePath = (path, obj=self, separator='.') => {
-    var properties = Array.isArray(path) ? path : path.split(separator)
-    return properties.reduce((prev, curr) => prev && prev[curr], obj)
-};
-
-const buildDotSeparatedString = (dotSeparated) => {
-    dotSeparated = dotSeparated.split('instance.').join('');
-    dotSeparated = dotSeparated.split('[').join('.');
-    dotSeparated = dotSeparated.split(']').join('');
-    if (dotSeparated.indexOf('.') > 0) {
-        dotSeparated = dotSeparated.substring(0, dotSeparated.indexOf('.'));
-    }
-    return dotSeparated;
-};
+// const resolvePath = (path, obj = self, separator = '.') => {
+//     const properties = Array.isArray(path) ? path : path.split(separator);
+//     return properties.reduce((prev, curr) => prev && prev[curr], obj);
+// };
+//
+// const buildDotSeparatedString = (dotSeparated) => {
+//     dotSeparated = dotSeparated.split('instance.').join('');
+//     dotSeparated = dotSeparated.split('[').join('.');
+//     dotSeparated = dotSeparated.split(']').join('');
+//     if (dotSeparated.indexOf('.') > 0) {
+//         dotSeparated = dotSeparated.substring(0, dotSeparated.indexOf('.'));
+//     }
+//     return dotSeparated;
+// };
 
 const extendImpl = (destination, source, method) => {
     return utils.extend(destination, source, method, (method === httpMethod.post ? postKeys : updateKeys), readOnlyKeys);
@@ -175,7 +168,7 @@ const getRuleTypesToProcessImpl = (bankAccount) => {
 };
 
 const createFromActualActionImpl = (transaction, narrativeCriteria) => {
-    const actualAccountsPostings = access(transaction,'actualAction.action.accountsPosting.accountsPostings');
+    const actualAccountsPostings = access(transaction, 'actualAction.action.accountsPosting.accountsPostings');
     if ((actualAccountsPostings === null) || actualAccountsPostings.length === 0) {
         return null;
     }

@@ -1,9 +1,12 @@
-const { Handler } = require('../../lib/index');
+const index = require('../../lib/index')
+const Handler = require('../../lib/Handler');
+const ErrorSpecs = require('../../lib/ErrorSpecs');
 const should = require('should');
 
 describe('@sage/bc-independent-lambda-handler.index', function(){
-    // placeholder
-    it('should throw if Handler instantiated directly', () => {
-        should(() => new Handler({})).throwError(new Error('Handler should not be instantiated; extend Handler instead.'));
+    it('should export the correct modules', () => {
+        should(index).eql({
+            Handler, ErrorSpecs
+        });
     });
 });

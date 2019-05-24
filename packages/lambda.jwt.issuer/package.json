@@ -1,16 +1,17 @@
 {
   "name": "lambda-jwt-issuer",
-  "version": "1.1.5",
+  "version": "1.1.9",
   "author": "",
   "license": "ISC",
   "description": "",
   "private": true,
   "main": "lib/handler.js",
   "dependencies": {
-    "@sage/sfab-s2s-jwt-issuer-lambda": "^1.1.5"
+    "@sage/sfab-s2s-jwt-issuer-lambda": "^1.1.9",
+    "aws-sdk": "^2.220.1",
+    "bluebird": "^3.5.1"
   },
   "devDependencies": {
-    "aws-sdk": "^2.220.1",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.0.3",
@@ -20,7 +21,6 @@
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-preset-env": "^1.6.1",
     "babel-preset-flow": "^6.23.0",
-    "bluebird": "^3.5.1",
     "eslint": "^4.11.0",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-plugin-import": "^2.8.0",
@@ -39,6 +39,7 @@
     "test": "NODE_ENV=test nyc --cache false --x test/ mocha -b --colors \"./test/unit/**/*.spec.js\"",
     "cover": "NODE_ENV=test npm run test && nyc report --reporter=lcov && npm run report",
     "report": "open coverage/lcov-report/index.html",
+    "cover:report": "npm run cover && npm run report",
     "int": "NODE_ENV=test nyc --x test/ mocha -b --colors --reporter spec \"./test/int/**/*.spec.js\"",
     "build": "serverless package",
     "postbuild": "mkdir -p ../../build && mv ./.serverless/${PWD##*/}.zip ../../build/${PWD##*/}.zip",

@@ -1,0 +1,12 @@
+{
+  "_id": "",
+  "region": "REG",
+  "bankAccountId": "",
+  "startIncrementedId": 0,
+  "endIncrementedId": 0,
+  "numberOfTransactions": 0,
+  "transactions": [],
+  "created": null,
+  "startDate": null,
+  "endDate": null
+}

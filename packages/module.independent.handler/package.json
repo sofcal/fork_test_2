@@ -1,6 +1,6 @@
 {
   "name": "@sage/bc-independent-lambda-handler",
-  "version": "1.1.4",
+  "version": "1.1.8",
   "author": "Sage UK",
   "license": "ISC",
   "description": "",
@@ -13,9 +13,9 @@
     "lib": "lib"
   },
   "dependencies": {
-    "@sage/bc-infrastructure-cloudwatch-subscription": "^1.1.3",
-    "@sage/bc-requestlogger": "^1.1.3",
-    "@sage/bc-statuscodeerror": "^1.1.3",
+    "@sage/bc-infrastructure-cloudwatchsubscription": "^1.1.8",
+    "@sage/bc-requestlogger": "^1.1.8",
+    "@sage/bc-statuscodeerror": "^1.1.8",
     "aws-sdk": "^2.220.1",
     "bluebird": "^3.5.1",
     "mongodb": "3.0.5",
@@ -24,6 +24,7 @@
   "devDependencies": {
     "@babel/cli": "^7.0.0",
     "@babel/register": "^7.0.0",
+    "@sage/bc-debug-utils": "^1.1.8",
     "babel-eslint": "^8.0.3",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-istanbul": "^4.1.6",
@@ -46,6 +47,7 @@
     "test": "NODE_ENV=test nyc --cache false --x test/ mocha -b --colors \"./test/unit/**/*.spec.js\"",
     "cover": "NODE_ENV=test npm run test && nyc report --reporter=lcov",
     "report": "open coverage/lcov-report/index.html",
+    "cover:report": "npm run cover && npm run report",
     "int": "NODE_ENV=test nyc --x lib/_legacy --x test/ mocha -b --colors --reporter spec \"./test/int/**/*.spec.js\"",
     "lint": "eslint ./src/**",
     "build": "babel src -d lib --copy-files",

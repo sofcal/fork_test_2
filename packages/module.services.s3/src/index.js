@@ -4,13 +4,9 @@ const AWS = require('aws-sdk');
 const Promise = require('bluebird');
 
 class S3 {
-    constructor({ region, bucket }) {
-        const s3 = new AWS.S3({
-            region,
-            params: { Bucket: bucket }
-        });
+    constructor({ region, bucket, s3 }) {
         this.bucket = bucket;
-        this._s3 = Promise.promisifyAll(s3);
+        this._s3 = s3 || new AWS.S3({ region, params: { Bucket: bucket } });
     }
 
     put(...args) {
@@ -43,7 +39,7 @@ const uploadImpl = Promise.method((self, key, stream, encryption, bucket = self.
         options.ServerSideEncryption = encryption;
     }
 
-    return self._s3.uploadAsync(options)
+    return self._s3.upload(options).promise()
         .then((response) => response.Key);
 });
 
@@ -56,14 +52,14 @@ const putImpl = Promise.method((self, key, buffer, encryption, bucket = self.buc
         options.ServerSideEncryption = encryption;
     }
 
-    return self._s3.putObjectAsync(options)
+    return self._s3.putObject(options).promise()
         .then((response) => response.VersionId);
 });
 
 const getImpl = Promise.method((self, key, bucket = self.bucket) => {
     const options = { Key: key, Bucket: bucket };
 
-    return self._s3.getObjectAsync(options)
+    return self._s3.getObject(options).promise()
         .then((data) => data);
 });
 
@@ -81,7 +77,7 @@ const listImpl = Promise.method((self, bucket = self.bucket, prefix) => {
             options.ContinuationToken = token;
         }
 
-        return self._s3.listObjectsV2Async(options)
+        return self._s3.listObjectsV2(options).promise()
             .then((data) => {
                 keys.push(...data.Contents);
 
