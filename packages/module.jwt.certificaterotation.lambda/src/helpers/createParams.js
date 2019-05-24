@@ -29,7 +29,7 @@ module.exports = (primaryKeyPair, secondaryKeyPair, { logger }) => {
     ret.secondary = [
         param(resources.keyNames.secondary.public, toUseAsSecondary.public),
         param(resources.keyNames.secondary.private, toUseAsSecondary.private),
-        param(resources.keyNames.secondary.createdAt, toUseAsSecondary.createdAt)
+        param(resources.keyNames.secondary.createdAt, toUseAsSecondary.createdAt || primaryKeyPair.createdAt) // if the previous primary didn't have a created at stamp, we use the new time
     ];
 
     logger.info({ function: func, log: 'returning parameter store values', params: { hasPrimaryKeyPair, hasSecondaryKeyPair } });

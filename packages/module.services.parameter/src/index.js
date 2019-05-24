@@ -46,7 +46,7 @@ const getParametersImpl = Promise.method((self, params) => {
 });
 
 const setParameterImpl = Promise.method((self, { name: Name, value: Value, type: Type, keyId: KeyId, overwrite: Overwrite = true }) => {
-    const options = { Name, Type, Value, Overwrite, KeyId };
+    const options = { Name: `${self.paramPrefix}${Name}`, Type, Value, Overwrite, KeyId };
 
     return self.ssm.putParameter(options).promise()
         .then((data) => data);
