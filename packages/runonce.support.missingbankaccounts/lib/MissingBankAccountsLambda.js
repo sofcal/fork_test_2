@@ -52,36 +52,31 @@ class MissingBankAccountsLambda extends Handler {
     impl(event, { logger }) {
         const func = `${MissingBankAccountsLambda.name}.impl`;
         // get details from event
-        const { bankAccountId, numTrxToCreate, triggerAuth, randomSignage } = event.parsed;
-        logger.info({function: func, log: 'started', params: { bankAccountId }});
+        const { bucket, key } = event.parsed;
+        logger.info({function: func, log: 'started', params: { bucket, key }});
 
         const dbQueries = DBQueries.Create(this.services.db.getConnection());
         
-        const bucket = event.bucket;
-        const key = event.key;
-
-
         const s3 = new serviceImpls.S3({key, bucket});
-        const testFile = s3.get(key, bucket);
-        console.log('testFile: ', testFile);
+        const rawBankFile = s3.get(key, bucket);
 
-        return testFile
-            .then(newTestFile => {
-                const textData = newTestFile.Body.toString('ascii');
+        return rawBankFile
+            .then(bankFile => {
                 const regExHSBC = /(?<=^03,)([0-9]{6})([0-9]{8})/gm;
+                const bankFileString = bankFile.Body.toString();
+                const accountIdentifiers = bankFileString.match(regExHSBC);
 
-                const accountIdentifiers = textData.match(regExHSBC);
-                // console.log('textData: ', textData);
-                // const array = newTestFile.Body.toString().split("\n");
-                console.log('array: ', accountIdentifiers);
-                return { 'array': accountIdentifiers };
+                const accountDetailsObject = accountIdentifiers.map(value => {
+                    return {    
+                        "Account Identifier": value.slice(6),
+                        "Branch Identifier": value.slice(0,6)
+                    }
+                })
+                console.log('account details: ', accountDetailsObject);
+
+                logger.info({function: func, log: 'ended'});
+                return accountDetailsObject;
             });
-
-
-
-        logger.info({function: func, log: 'ended'});
-
-        
     }
 
     dispose({ logger }) { // eslint-disable-line class-methods-use-this
