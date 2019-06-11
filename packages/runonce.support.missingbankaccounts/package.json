@@ -15,6 +15,7 @@
     "@sage/bc-parameterstore-static-loader": "^1.1.8",
     "@sage/bc-requestlogger": "^1.1.8",
     "@sage/bc-services-db": "^1.1.8",
+    "@sage/bc-services-s3": "^1.1.8",
     "@sage/bc-statuscodeerror": "^1.1.8",
     "aws-sdk": "^2.220.1",
     "bignumber.js": "^4.0.0",

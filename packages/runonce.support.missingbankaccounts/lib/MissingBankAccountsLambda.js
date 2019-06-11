@@ -8,12 +8,14 @@ const { DBQueries } = require('./db');
 const { StatusCodeError } = require('@sage/bc-statuscodeerror');
 const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
 const DB = require('@sage/bc-services-db');
+const S3 = require('@sage/bc-services-s3');
 const { Handler } = require('@sage/bc-independent-lambda-handler');
 
 const Promise = require('bluebird');
 const _ = require('underscore');
+const fs = require('fs');
 
-const serviceImpls = { DB };
+const serviceImpls = { DB, S3 };
 const dbName = 'bank_db';
 
 class MissingBankAccountsLambda extends Handler {
@@ -55,9 +57,31 @@ class MissingBankAccountsLambda extends Handler {
 
         const dbQueries = DBQueries.Create(this.services.db.getConnection());
         
+        const bucket = event.bucket;
+        const key = event.key;
+
+
+        const s3 = new serviceImpls.S3({key, bucket});
+        const testFile = s3.get(key, bucket);
+        console.log('testFile: ', testFile);
+
+        return testFile
+            .then(newTestFile => {
+                const textData = newTestFile.Body.toString('ascii');
+                const regExHSBC = /(?<=^03,)([0-9]{6})([0-9]{8})/gm;
+
+                const accountIdentifiers = textData.match(regExHSBC);
+                // console.log('textData: ', textData);
+                // const array = newTestFile.Body.toString().split("\n");
+                console.log('array: ', accountIdentifiers);
+                return { 'array': accountIdentifiers };
+            });
+
+
+
         logger.info({function: func, log: 'ended'});
 
-        return { value: 'hello world!' };
+        
     }
 
     dispose({ logger }) { // eslint-disable-line class-methods-use-this
