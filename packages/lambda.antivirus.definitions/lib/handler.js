@@ -16,7 +16,7 @@ const serviceImpls = { DB };
 const keys = require('./params');
 
 class Handler {
-    static run(event,context,callback) {
+    static run(event, context, callback) {
         const func = 'handler.run';
         const { Environment: env = 'test', AWS_REGION: region = 'local' } = process.env;
         const services = {};
@@ -36,7 +36,7 @@ class Handler {
                             .then(() => params);
                     });
             })
-            .then((params) => impl.run(event, params, services))
+            .then((params) => impl.run(event, context, params, services))
             .then((ret) => {
                 const response = {
                     statusCode: 200,
