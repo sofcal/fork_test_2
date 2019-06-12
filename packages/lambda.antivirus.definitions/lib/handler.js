@@ -33,10 +33,7 @@ class Handler {
                 return getParams({ env, region }, event.logger)
                     .then((params) => {
                         return populateServices(services, { env, region, params }, event.logger)
-                            .then(() => {
-                                return connectDB(services, { env, region }, params, event.logger)
-                                    .then(() => params);
-                            });
+                            .then(() => params);
                     });
             })
             .then((params) => impl.run(event, params, services))
@@ -63,7 +60,6 @@ class Handler {
                 callback(err.failLambda ? err : null, { statusCode: status, body: JSON.stringify(response) });
             })
             .finally(() => {
-                return disconnectDB(services, event.logger);
             });
     }
 

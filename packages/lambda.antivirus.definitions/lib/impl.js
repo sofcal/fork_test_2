@@ -5,23 +5,24 @@ const validate = require('./validators');
 const AntiVirusService = require('rtx.services.antivirus').AntivirusService;
 
 module.exports.run = Promise.method((event, params, services) => {
-        const func = 'impl.run';
-event.logger.info({ function: func, log: 'started' });
-const { env, region } = event;
+    const func = 'impl.run';
+    event.logger.info({ function: func, log: 'started' });
 
-validate.event(event);
+    const defintionFiles = ['main.cvd', 'daily.cvd', 'bytecode.cvd', 'mirrors.dat'];
+    const definitionBucket = 'bnkc-dev03-s3-eu-west-1-app';
 
-const av = new AntiVirusService({}, event.logger);
 
-return av.scanFile('/var/task/package.json')
+    validate.event(event);
+    const av = new AntiVirusService({}, event.logger);
+
+    return av.updateDefinitions()
         .then((result) => {
-        console.log('result:'. result);
-})
-.catch((err) => {
-    consoel.log('err', err);
-})
+            console.log('Result:', result);
+        })
+        .catch((err) => {
+            console.log('ERR', err);
+        });
 
-/*
- event.logger.info({ function: func, log: 'ended' });
- return { value: 'sample body' };*/
 });
+
+
