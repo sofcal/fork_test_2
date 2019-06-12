@@ -2,20 +2,26 @@
 
 const Promise = require('bluebird');
 const validate = require('./validators');
+const AntiVirusService = require('rtx.services.antivirus').AntivirusService;
 
-class Impl {
-    static run(event, params, services) {
-        return Promise.method(() => {
-            const func = 'impl.run';
-            event.logger.info({ function: func, log: 'started' });
+module.exports.run = Promise.method((event, params, services) => {
+    const func = 'impl.run';
+    event.logger.info({ function: func, log: 'started' });
+    const { env, region } = event;
 
-            const { env, region } = event;
+    validate.event(event);
 
-            validate.event(event);
+    const av = new AntiVirusService({}, event.logger);
 
-            return { value: 'sample body' };
+    return av.scanFile('/var/task/package.json')
+        .then((result) => {
+            console.log('result:'. result);
         })
-    }
-}
+        .catch((err) => {
+            consoel.log('err', err);
+        })
 
-module.exports.run = Impl.run;
+/*
+    event.logger.info({ function: func, log: 'ended' });
+    return { value: 'sample body' };*/
+});
