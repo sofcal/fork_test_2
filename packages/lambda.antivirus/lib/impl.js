@@ -24,13 +24,11 @@ module.exports.run = Promise.method((event, params, services) => {
     const definitionFiles = params['antiVirus.definitionFiles'] || ['main.cvd', 'daily.cvd', 'bytecode.cvd', 'mirrors.dat'];
 
     event.logger.info({ function: func, log: 'Definition details', params: {definitionBucket, definitionFiles}});
-
-    const fileToCheck = path.basename(event.scanS3Key);
-    const destinationFilePathToCheck = `/tmp/${fileToCheck}`;
+    const destinationFilePathToCheck = `/tmp/${event.fileName}`;
 
     return Promise.resolve()
         .then(()=> {
-            return downloadS3File(event.logger, event.scanS3Bucket, event.scanS3Key, destinationFilePathToCheck)
+            return downloadS3File(event.logger, event.bucket, `${event.prefix}${event.fileName}`, destinationFilePathToCheck)
                 .then(()=>{
                     return Promise.each(definitionFiles, (defFile) => downloadS3File(event.logger, definitionBucket, path.join('AntiVirusDefinitions', defFile), `/tmp/${defFile}`));
                 })
@@ -39,7 +37,7 @@ module.exports.run = Promise.method((event, params, services) => {
         .then(() => {
             event.logger.info({ function: func, log: 'AV Checking', params: {destinationFilePathToCheck}});
             const av = new AntiVirusService({}, event.logger);
-            return av.scanFile(fileToCheck)
+            return av.scanFile(event.fileName)
                 .then((result) => {
                   return { avResponse: result};
                 });
