@@ -20,12 +20,16 @@ module.exports.run = Promise.method((event, context, params, services) => {
     const definitionBucket = 'bnkc-dev03-s3-eu-west-1-app'; // TODO: Resolve from Param Store
     const definitionFiles = ['main.cvd', 'daily.cvd', 'bytecode.cvd', 'mirrors.dat'];
 
-    event.logger.info({ function: func, log: 'Boostrapping freshclam into /tmp' });
-    execSync('/var/task/bin/freshClamBootstrap.sh', {stdio: 'inherit'});
-
-    const av = new AntiVirusService({}, event.logger);
-    return av.updateDefinitions()
+    return Promise.resolve()
         .then(() => {
+            event.logger.info({ function: func, log: 'Boostrapping freshclam into /tmp' });
+            execSync('/var/task/bin/freshClamBootstrap.sh', {stdio: 'inherit'});
+
+            const av = new AntiVirusService({}, event.logger);
+            return av.updateDefinitions();
+        })
+        .then((result) => {
+            event.logger.info({ function: func, log: 'updateDefinition result', params: {result} });
             return Promise.each(definitionFiles, (defFile) => {
                 let file = path.join('/tmp/', defFile);
                 if (fs.existsSync(file)) {
