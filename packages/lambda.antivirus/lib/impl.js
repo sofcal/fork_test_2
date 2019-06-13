@@ -9,6 +9,7 @@ const AWS = require('aws-sdk');
 const s3 = new AWS.S3({signatureVersion: 'v4'});
 
 const AntiVirusService = require('rtx.services.antivirus').AntivirusService;
+const avResources = require('rtx.services.antivirus').resources;
 const validate = require('./validators');
 
 module.exports.run = Promise.method((event, params, services) => {
@@ -17,40 +18,47 @@ module.exports.run = Promise.method((event, params, services) => {
     const { env, region } = event;
 
     validate.event(event);
+    event.logger.info({ function: func, log: 'event', params: JSON.stringify(event) });
 
-    const definitionBucket = 'bnkc-dev03-s3-eu-west-1-app'; // TODO: Resolve from Param Store
+    // TODO: Resolve from Param Store
+    const definitionBucket = 'bnkc-dev03-s3-eu-west-1-app';
     const definitionFiles = ['main.cvd', 'daily.cvd', 'bytecode.cvd', 'mirrors.dat'];
 
-    execSync('cp /var/task/bin/caf.pdf /tmp/caf.pdf', {stdio: 'inherit'});
+    const fileToCheck = path.basename(event.scanS3Key);
+    const destinationFilePathToCheck = `/tmp/${fileToCheck}`;
 
     return Promise.resolve()
-        .then(()=>{
-            return Promise.each(definitionFiles, (defFile) => {
-                const params = {Bucket: definitionBucket, Key: path.join('AntiVirusDefinitions', defFile)};
-                return s3.getObject(params).promise()
-                    .then((response) => {
-                        const buffer = new Buffer(response.Body, 'base64');
-                        const destinationFile = `/tmp/${defFile}`;
-                        fs.writeFileSync(destinationFile, buffer);
-                        event.logger.info({ function: func, log: `Download ${defFile} to ${destinationFile}` });
-                    })
-            });
+        .then(()=> {
+            return downloadS3File(event.logger, event.scanS3Bucket, event.scanS3Key, destinationFilePathToCheck)
+                .then(()=>{
+                    return Promise.each(definitionFiles, (defFile) => downloadS3File(event.logger, definitionBucket, path.join('AntiVirusDefinitions', defFile), `/tmp/${defFile}`));
+                })
+
         })
         .then(() => {
+            event.logger.info({ function: func, log: 'AV Checking', params: {destinationFilePathToCheck}});
             const av = new AntiVirusService({}, event.logger);
-            return av.scanFile('caf.pdf')
+            return av.scanFile(fileToCheck)
                 .then((result) => {
-                    console.log('result:'. result);
-
-
-                    return av.scanFile('caf.pdf')
-                        .then((result) => {
-                            console.log('result:'. result);
-                        })
+                  return { avResponse: result};
                 });
         })
         .catch((err) => {
             console.log('*** Error', err);
             event.logger.error({ function: func, alert: `Virus Scan Failed.`, error: err });
+            return { avResponse: avResources.exitCodes.Error};
         });
+});
+
+const downloadS3File = Promise.method((logger, bucket, key, destinationFilePath) => {
+    const func = 'impl.downloadS3File';
+    logger.info({ function: func, log: `Downloading ${bucket}/${key} to ${destinationFilePath}` });
+    const params = {Bucket: bucket, Key: key};
+    return s3.getObject(params).promise()
+        .then((response) => {
+            const buffer = new Buffer(response.Body, 'base64');
+            fs.writeFileSync(destinationFilePath, buffer);
+            logger.info({ function: func, log: `Downloaded ${bucket}/${key} to ${destinationFilePath}` });
+        })
+
 });
