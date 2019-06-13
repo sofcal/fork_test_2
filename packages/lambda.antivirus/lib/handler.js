@@ -33,6 +33,7 @@ class Handler {
                 return getParams({ env, region }, event.logger)
                     .then((params) => {
                         return populateServices(services, { env, region, params }, event.logger)
+                            .then(() => params)
                     });
             })
             .then((params) => impl.run(event, params, services))
@@ -81,9 +82,11 @@ const getParams = ({ env, region }, logger) => {
 
             logger.info({ function: func, log: 'finished retrieving param-store keys', requested: keys.length, retrieved: retrievedCount });
 
-            if (!retrievedCount || retrievedCount < keys.length) {
-                throw StatusCodeError.CreateFromSpecs([ErrorSpecs.failedToRetrieveParameters], ErrorSpecs.failedToRetrieveParameters.statusCode);
-            }
+            // intentional - have param store overrides
+
+            //if (!retrievedCount || retrievedCount < keys.length) {
+            //    throw StatusCodeError.CreateFromSpecs([ErrorSpecs.failedToRetrieveParameters], ErrorSpecs.failedToRetrieveParameters.statusCode);
+            //}
 
             logger.info({ function: func, log: 'ended' });
             return params;

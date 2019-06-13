@@ -17,8 +17,9 @@ module.exports.run = Promise.method((event, context, params, services) => {
 
     validate.event(event);
 
-    const definitionBucket = 'bnkc-dev03-s3-eu-west-1-app'; // TODO: Resolve from Param Store
-    const definitionFiles = ['main.cvd', 'daily.cvd', 'bytecode.cvd', 'mirrors.dat'];
+    const { Environment: env = 'test', AWS_REGION: region = 'local' } = process.env;
+    const definitionBucket = params['antiVirus.definitionBucket'] || `bnkc-${env}-s3-${region}-app`;
+    const definitionFiles = params['antiVirus.definitionFiles'] || ['main.cvd', 'daily.cvd', 'bytecode.cvd', 'mirrors.dat'];
 
     return Promise.resolve()
         .then(() => {
@@ -47,13 +48,13 @@ module.exports.run = Promise.method((event, context, params, services) => {
                 const params = {Bucket: definitionBucket, Key: path.join('AntiVirusDefinitions', defFile), Body: new Buffer(fileContents, 'binary')};
                 return s3.putObject(params).promise()
                     .then(() => {
-                        event.logger.info({ function: func, log: `Copied ${file} to ${params.Bucket}${params.Key}` });
+                        event.logger.info({ function: func, log: `Copied ${file} to ${params.Bucket}/${params.Key}` });
                     })
             });
         })
         .catch((err) => {
             console.log('*** Error', err);
-            event.logger.error({ function: func, alert: `Schedule Virus Definition Refresh Failed.`, error: err });
+            event.logger.error({ function: func, alert: `Scheduled Virus Definition Refresh Failed.`, error: err });
         });
 
 });

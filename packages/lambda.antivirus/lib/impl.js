@@ -15,14 +15,15 @@ const validate = require('./validators');
 module.exports.run = Promise.method((event, params, services) => {
     const func = 'impl.run';
     event.logger.info({ function: func, log: 'started' });
-    const { env, region } = event;
 
     validate.event(event);
     event.logger.info({ function: func, log: 'event', params: JSON.stringify(event) });
 
-    // TODO: Resolve from Param Store
-    const definitionBucket = 'bnkc-dev03-s3-eu-west-1-app';
-    const definitionFiles = ['main.cvd', 'daily.cvd', 'bytecode.cvd', 'mirrors.dat'];
+    const { Environment: env = 'test', AWS_REGION: region = 'local' } = process.env;
+    const definitionBucket = params['antiVirus.definitionBucket'] || `bnkc-${env}-s3-${region}-app`;
+    const definitionFiles = params['antiVirus.definitionFiles'] || ['main.cvd', 'daily.cvd', 'bytecode.cvd', 'mirrors.dat'];
+
+    event.logger.info({ function: func, log: 'Definition details', params: {definitionBucket, definitionFiles}});
 
     const fileToCheck = path.basename(event.scanS3Key);
     const destinationFilePathToCheck = `/tmp/${fileToCheck}`;

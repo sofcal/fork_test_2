@@ -81,9 +81,11 @@ const getParams = ({ env, region }, logger) => {
 
             logger.info({ function: func, log: 'finished retrieving param-store keys', requested: keys.length, retrieved: retrievedCount });
 
-            if (!retrievedCount || retrievedCount < keys.length) {
-                throw StatusCodeError.CreateFromSpecs([ErrorSpecs.failedToRetrieveParameters], ErrorSpecs.failedToRetrieveParameters.statusCode);
-            }
+            // intentional - have param store overrides
+
+            //if (!retrievedCount || retrievedCount < keys.length) {
+            //    throw StatusCodeError.CreateFromSpecs([ErrorSpecs.failedToRetrieveParameters], ErrorSpecs.failedToRetrieveParameters.statusCode);
+            //}
 
             logger.info({ function: func, log: 'ended' });
             return params;
