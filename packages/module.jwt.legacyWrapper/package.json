@@ -19,7 +19,8 @@
     "@sage/sfab-s2s-jwt-endpoint-store": "^1.1.8",
     "@sage/sfab-s2s-jwt-issuer": "^1.1.9",
     "@sage/sfab-s2s-jwt-jwks": "^1.1.8",
-    "@sage/sfab-s2s-jwt-kid": "^1.1.8"
+    "@sage/sfab-s2s-jwt-kid": "^1.1.8",
+    "@sage/bc-services-step": "^1.1.8"
   },
   "devDependencies": {
     "@sage/bc-debug-utils": "^1.1.8",
