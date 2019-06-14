@@ -62,21 +62,28 @@ class MissingBankAccountsLambda extends Handler {
 
         return rawBankFile
             .then(bankFile => {
-                const regExHSBC = /(?<=^03,)([0-9]{6})([0-9]{8})/gm;
+                const regExHSBC = /(?<=^03,)([0-9]{14})/gm;
                 const bankFileString = bankFile.Body.toString();
                 const accountIdentifiers = bankFileString.match(regExHSBC);
 
-                const accountDetailsObject = accountIdentifiers.map(value => {
+                const accountDetailsFromBankFile = accountIdentifiers.map(value => {
                     return {    
-                        "Account Identifier": value.slice(6),
-                        "Branch Identifier": value.slice(0,6)
+                        "accountIdentifier": value.slice(6),
+                        "BankIdentifier": value.slice(0,6)
                     }
                 })
-                console.log('account details: ', accountDetailsObject);
+
+                const accountDetailsTestObject = [{accountIdentifier: '34990232', bankIdentifier: '17521492'}, {accountIdentifier: '35312500', bankIdentifier: '17657712'}];
+                console.log('accountDetailsTestObject: ', accountDetailsTestObject);
+                return accountDetailsTestObject;
+            })
+            .then((accoundDetails) => {
+                const testFind = dbQueries.getBankAccountsByAccountDetails(accoundDetails, { logger });
 
                 logger.info({function: func, log: 'ended'});
-                return accountDetailsObject;
-            });
+                return testFind;
+            })
+            
     }
 
     dispose({ logger }) { // eslint-disable-line class-methods-use-this

@@ -11,6 +11,14 @@ class DBQueries {
     static Create(...args) {
         return new DBQueries(...args);
     }
+
+    // getBankAccountsById(...args) {
+    //     return getBankAccountsByIdImpl(this, ...args);
+    // }
+
+    getBankAccountsByAccountDetails(...args) {
+        return getBankAccountsByAccountDetailsImpl(this, ...args);
+    }
 }
 
 // const getBankAccountsByIdImpl = Promise.method((self, { bankAccountId, all = false }, { logger }) => {
@@ -30,6 +38,15 @@ class DBQueries {
 //     logger.debug({ function: func, log: 'ended - all specified; returning entire array', params: { all } });
 //     return promise.toArray();
 // });
+
+const getBankAccountsByAccountDetailsImpl = Promise.method((self, bankAccountDetails, { logger }) => {
+    const func = `${consts.LOG_PREFIX}.getBankAccountsById`;
+    logger.debug({ function: func, log: 'started', params: { all } });
+
+    const collection = self.db.collection('BankAccount');
+    const promise = collection.find({$or: bankAccountDetails}).project({accountIdentifier: 1, bankIdentifier: 1, _id: 0});
+    return promise.toArray();;
+});
 
 const consts = {
     DEFAULT_OPTIONS: Object.freeze({ readPreference: 'secondary' }),
