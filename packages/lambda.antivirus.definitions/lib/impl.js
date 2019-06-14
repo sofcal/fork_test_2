@@ -8,7 +8,7 @@ const Promise = require('bluebird');
 const AWS = require('aws-sdk');
 const s3 = new AWS.S3({signatureVersion: 'v4'});
 
-const AntiVirusService = require('rtx.services.antivirus').AntivirusService;
+const { AntivirusService: AntiVirusService } = require('@sage/rtx.services.antivirus');
 const validate = require('./validators');
 
 module.exports.run = Promise.method((event, context, params, services) => {
