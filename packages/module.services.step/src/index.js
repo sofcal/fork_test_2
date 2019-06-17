@@ -17,45 +17,34 @@ class Step {
         return describeImpl(this, ...args);
     }
 
+    stop(...args) {
+        return stopImpl(this, ...args);
+    }
+
     static Create(...args) {
         return new Step(...args);
     }
 }
 
-const startImpl = Promise.method((self, { id: stateMachineArn, input, name = uuid.v4() }, { logger }) => {
-    console.log('Invoking step');
-    // const pullParams = { FunctionName, InvocationType, LogType: 'None', Payload: JSON.stringify({ key1: 'value1' }) };
+const startImpl = Promise.method((self, { id: stateMachineArn, input, name = uuid.v4() }) => {
     const params = { stateMachineArn, input, name };
 
     return self._step.startExecution(params).promise()
-        .then((result) => {
-            console.log('____result');
-            console.log(result);
-
-            return result.executionArn;
-        });
+        .then((result) => (result.executionArn));
 });
 
-const describeImpl = Promise.method((self, { id: executionArn }, { logger }) => {
-    console.log('Invoking describe', executionArn);
+const describeImpl = Promise.method((self, { id: executionArn }) => {
     const params = { executionArn };
 
     return self._step.describeExecution(params).promise()
-        .then((result) => {
-            console.log('____result');
-            console.log(result);
-        });
+        .then((result) => ({ status: result.status, output: result.output, input: result.input }));
 });
 
-const stopImpl = Promise.method((self, { id: executionArn, cause, error }, { logger }) => {
-    console.log('Invoking stop', executionArn);
+const stopImpl = Promise.method((self, { id: executionArn, cause, error }) => {
     const params = { executionArn, cause, error };
 
     return self._step.stopExecution(params).promise()
-        .then((result) => {
-            console.log('____result');
-            console.log(result);
-        });
+        .then((result) => (result));
 });
 
 module.exports = Step;
