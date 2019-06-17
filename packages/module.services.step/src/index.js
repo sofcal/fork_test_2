@@ -3,6 +3,7 @@
 const AWS = require('aws-sdk');
 const Promise = require('bluebird');
 const uuid = require('uuid');
+const _ = require('underscore');
 
 class Step {
     constructor({ region, step }) {
@@ -27,7 +28,7 @@ class Step {
 }
 
 const startImpl = Promise.method((self, { id: stateMachineArn, input, name = uuid.v4() }) => {
-    const params = { stateMachineArn, input, name };
+    const params = { stateMachineArn, input: _.isString(input) ? input : JSON.stringify(input), name };
 
     return self._step.startExecution(params).promise()
         .then((result) => (result.executionArn));
