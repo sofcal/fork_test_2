@@ -1,6 +1,6 @@
 const slsw = require('serverless-webpack');
 const webpack = require('webpack');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
+const WebpackPluginCopy = require('webpack-plugin-copy');
 
 const config = {
     entry: slsw.lib.entries,
@@ -24,21 +24,11 @@ const config = {
         // }],
     },
     plugins: [
-        new CopyWebpackPlugin([
-            {from: 'bin', to: 'bin'},
-            {from: 'lib64', to: 'lib64'}
+        new WebpackPluginCopy([
+            { from: 'bin', to: 'bin', copyPermissions: true },
+            { from: 'lib64', to: 'lib64', copyPermissions: true },
         ])
-
-        // new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-        // new webpack.optimize.UglifyJsPlugin({
-        //     compress: {
-        //         unused: true,
-        //         dead_code: true,
-        //         warnings: false,
-        //         drop_debugger: true
-        //     }
-        // })
-    ],
+    ]
 };
 
 console.log('_____CONFIG', config);

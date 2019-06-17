@@ -9,12 +9,13 @@
     "@sage/bc-parameterstore-static-loader": "^1.0.0",
     "@sage/bc-request-logger": "^1.0.0",
     "@sage/bc-services-db": "^1.0.0",
+    "@sage/rtx.services.antivirus": "^0.0.1",
     "aws-sdk": "^2.220.1",
     "bluebird": "^3.5.1",
     "copy-webpack-plugin": "^4.6.0",
     "mongodb": "3.0.5",
     "underscore": "^1.9.0",
-    "@sage/rtx.services.antivirus": "^0.0.1"
+    "webpack-plugin-copy": "^1.0.1"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
