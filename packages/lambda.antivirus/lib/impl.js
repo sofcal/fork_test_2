@@ -37,16 +37,25 @@ module.exports.run = Promise.method((event, params, services) => {
             event.logger.info({ function: func, log: 'AV Checking', params: {destinationFilePathToCheck}});
             const av = new AntiVirusService({}, event.logger);
             return av.scanFile(event.fileName)
-                .then((result) => {
-                  return { avResponse: result};
-                });
+                .then((scanResult) => buildResponse(event,scanResult))
         })
         .catch((err) => {
             console.log('*** Error', err);
             event.logger.error({ function: func, alert: `Virus Scan Failed.`, error: err });
-            return { avResponse: avResources.exitCodes.Error};
+            return buildResponse(event, avResources.exitCodes.Error);
         });
 });
+
+const buildResponse = (event, avResponse) => {
+    const response  ={
+        bucket: event.bucket,
+        prefix: event.prefix,
+        fileName: event.fileName,
+        scanStatus: avResponse
+    }
+
+    return response;
+}
 
 const downloadS3File = Promise.method((logger, bucket, key, destinationFilePath) => {
     const func = 'impl.downloadS3File';
