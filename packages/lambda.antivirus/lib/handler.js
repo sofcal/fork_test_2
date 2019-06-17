@@ -38,10 +38,7 @@ class Handler {
             })
             .then((params) => impl.run(event, params, services))
             .then((ret) => {
-                const response = {
-                    statusCode: 200,
-                    body: JSON.stringify(ret)
-                };
+                const response = ret;
 
                 event.logger.info({ function: func, log: 'sending success response: 200' });
                 callback(null, response);
