@@ -1,5 +1,6 @@
 'use strict';
 
+const AWS = require('aws-sdk');
 const Promise = require('bluebird');
 const impl = require('./impl');
 const ErrorSpecs = require('./ErrorSpecs');
@@ -30,7 +31,8 @@ class Handler {
                     throw StatusCodeError.CreateFromSpecs([ErrorSpecs.invalidEvent], ErrorSpecs.invalidEvent.statusCode);
                 }
 
-                return getParams({ env, region }, event.logger)
+                return setupLogGroupSubscription(event, context)
+                    .then(() => getParams({ env, region }, event.logger))
                     .then((params) => {
                         return populateServices(services, { env, region, params }, event.logger)
                             .then(() => params)
@@ -98,6 +100,29 @@ const populateServices = Promise.method((services, { env, region, params }, logg
 
     logger.info({ function: func, log: 'ended' });
     return services;
+});
+
+const setupLogGroupSubscription = Promise.method((event, context) => {
+    const func = 'handler.setupLogGroupSubscription';
+    const cloudwatchlogs = new AWS.CloudWatchLogs();
+    return cloudwatchlogs.describeSubscriptionFilters({ logGroupName: context.logGroupName }).promise()
+        .then((subFilterDetails) => {
+            if (subFilterDetails.subscriptionFilters.length === 0) {
+                event.logger.info({ function: func, log: 'assigning subscription filter' });
+                const params = {
+                    destinationArn: process.env.SumoLogicLambdaARN,
+                    filterName: 'sumoLogic',
+                    filterPattern: ' ',
+                    logGroupName: context.logGroupName
+                };
+                return cloudwatchlogs.putSubscriptionFilter(params).promise();
+            }
+            event.logger.info({ function: func, log: 'subscription filter already assigned' });
+            return null;
+        })
+        .catch((err) => {
+            event.logger.error({ function: func, log: 'failed to configure logging subscription filter.', err: err.message });
+        });
 });
 
 
