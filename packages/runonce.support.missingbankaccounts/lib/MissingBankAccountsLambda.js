@@ -56,10 +56,10 @@ class MissingBankAccountsLambda extends Handler {
         logger.info({function: func, log: 'started', params: { bucket, key }});
 
         const dbQueries = DBQueries.Create(this.services.db.getConnection());
-        
         const s3 = new serviceImpls.S3({key, bucket});
-        const rawBankFile = s3.get(key, bucket);
+        let extractedBankFileData;
 
+        const rawBankFile = s3.get(key, bucket);
         return rawBankFile
             .then(bankFile => {
                 const regExHSBC = /(?<=^03,)([0-9]{14})/gm;
@@ -69,21 +69,23 @@ class MissingBankAccountsLambda extends Handler {
                 const accountDetailsFromBankFile = accountIdentifiers.map(value => {
                     return {    
                         "accountIdentifier": value.slice(6),
-                        "BankIdentifier": value.slice(0,6)
+                        "bankIdentifier": value.slice(0,6)
                     }
                 })
-
-                const accountDetailsTestObject = [{accountIdentifier: '34990232', bankIdentifier: '17521492'}, {accountIdentifier: '35312500', bankIdentifier: '17657712'}];
-                console.log('accountDetailsTestObject: ', accountDetailsTestObject);
-                return accountDetailsTestObject;
+                this.extractedBankFileData = accountDetailsFromBankFile;
+                return accountDetailsFromBankFile;
             })
-            .then((accoundDetails) => {
-                const testFind = dbQueries.getBankAccountsByAccountDetails(accoundDetails, { logger });
-
-                logger.info({function: func, log: 'ended'});
-                return testFind;
+            .then(accountDetails => {
+                const matchingAccountDetails = dbQueries.getBankAccountsByAccountDetails(accountDetails);
+                return matchingAccountDetails;
             })
-            
+            .then(dbQueryResults => {
+            const filteredResult = this.extractedBankFileData.filter(bankFileAccount => !dbQueryResults.some(dbAccount => _.isEqual(bankFileAccount, dbAccount)));
+            return filteredResult;
+            })
+            logger.info({function: func, log: 'ended'});
+
+        
     }
 
     dispose({ logger }) { // eslint-disable-line class-methods-use-this
