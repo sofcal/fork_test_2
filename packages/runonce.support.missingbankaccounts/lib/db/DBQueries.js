@@ -39,10 +39,7 @@ class DBQueries {
 //     return promise.toArray();
 // });
 
-const getBankAccountsByAccountDetailsImpl = Promise.method((self, bankAccountDetails, { logger }) => {
-    const func = `${consts.LOG_PREFIX}.getBankAccountsById`;
-    logger.debug({ function: func, log: 'started', params: { all } });
-
+const getBankAccountsByAccountDetailsImpl = Promise.method((self, bankAccountDetails) => {
     const collection = self.db.collection('BankAccount');
     const promise = collection.find({$or: bankAccountDetails}).project({accountIdentifier: 1, bankIdentifier: 1, _id: 0});
     return promise.toArray();;
