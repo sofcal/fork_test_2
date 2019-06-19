@@ -7,7 +7,7 @@ const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-l
 const serviceLoader = require('../../../lib/serviceLoader');
 const fs = require('fs');
 
-const outputFolder = './test/manual/pbi_294360/result/'
+const outputFolder = './test/manual/localhost/result/'
 
 // requires local MongoDB session to be started first
 
