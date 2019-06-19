@@ -80,8 +80,18 @@ class MissingBankAccountsLambda extends Handler {
                 return matchingAccountDetails;
             })
             .then(dbQueryResults => {
-            const filteredResult = this.extractedBankFileData.filter(bankFileAccount => !dbQueryResults.some(dbAccount => _.isEqual(bankFileAccount, dbAccount)));
-            return filteredResult;
+                const filteredResult = this.extractedBankFileData.filter(bankFileAccount => !dbQueryResults.some(dbAccount => _.isEqual(bankFileAccount, dbAccount)));
+                // .then ?
+
+                let missingAccounts = 'Bank Identifier, Account Identifier';
+                filteredResult.forEach(element => {
+                    missingAccounts += `\n${element.bankIdentifier}, ${element.accountIdentifier}`;
+                });
+                console.log('lineString: ', missingAccounts);
+                return missingAccounts;
+            })
+            .then(missingAccounts => {
+                return s3.put('missingBankFiles.txt', missingAccounts, 'AES256')
             })
             logger.info({function: func, log: 'ended'});
 
