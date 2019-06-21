@@ -1,6 +1,6 @@
 'use strict';
 
-const JwksLambda = require('./JwksLambda');
+const AuthServiceJwksLambda = require('./AuthServiceJwksLambda');
 
-const issuer = JwksLambda.Create({ config: process.env });
+const issuer = AuthServiceJwksLambda.Create({ config: process.env });
 module.exports.run = (event, context, callback) => issuer.run(event, context, callback);

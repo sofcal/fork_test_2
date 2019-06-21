@@ -17,7 +17,7 @@ const noop = () => {};
 const noopLogger = { error: noop, warn: noop, info: noop, };
 
 class EndpointStore {
-    constructor({ endpointMappings, refreshDelay, cacheClass = Cache }, { logger = noopLogger } = {}) {
+    constructor({ endpointMappings = {}, refreshDelay, cacheClass = Cache }, { logger = noopLogger } = {}) {
         this.endpointMappings = endpointMappings;       // mapping ID > endpoint
         this.validIds = Object.keys(endpointMappings);  // list of valid Ids
         this.refreshDelay = refreshDelay;               // cache expiration limit
@@ -50,17 +50,18 @@ class EndpointStore {
                     const endpoint = this.getEndpoint(ID);
 
                     // create new cache
-                    this.cacheList[ID] = this.createCacheEntry(ID, endpoint);
+                    this.cacheList[ID] = this.createCacheEntry(endpoint);
                 }
             })
             // if kid does not exist in cache
             // retrieve data from cache
             .then(() => {
-                const allowRefresh = Math.floor(Date.now() / 1000) > (this.cacheList[ID].refreshTime + this.refreshDelay);
+                const now = Math.floor(Date.now() / 1000);
+                const allowRefresh = now > (this.cacheList[ID].refreshTime + this.refreshDelay);
                 this.logger.info({
                     function: func,
                     log: 'getting certificates',
-                    params: { id: ID, tryRefresh, allowRefresh, refreshTime: this.cacheList[ID].refreshTime, refreshDelay: this.refreshDelay }
+                    params: { id: ID, tryRefresh, allowRefresh, refreshTime: this.cacheList[ID].refreshTime, refreshDelay: this.refreshDelay, now }
                 });
 
                 const refresh = tryRefresh && allowRefresh;
@@ -69,8 +70,8 @@ class EndpointStore {
     }
 
     // Create a new cache entry for an ID
-    createCacheEntry(ID, endpoint) {
-        const refreshFunction = this.createRefreshFunction(endpoint, ID);
+    createCacheEntry(endpoint) {
+        const refreshFunction = this.createRefreshFunction(endpoint);
         return this._Cache.Create({ cacheExpiry: -1, refreshFunction, }, { logger: this.logger });
     }
 
@@ -88,14 +89,13 @@ class EndpointStore {
 
     // Refresh function - calls needle get using endpoint argument
     // returns promise
-    createRefreshFunction(endpoint, ID) {
+    createRefreshFunction(endpoint) {
         return Promise.method(() => {
             const func = `${EndpointStore.name}.refreshFunction.${endpoint}`;
             this.logger.info({ function: func, log: 'refreshing cache', params: { endpoint } });
 
-            const options = ID === 'wpb-auth' ? { headers: { 'X-Application': 'sage.uki.50.accounts' } } : undefined;
-            return this._needle.getAsync(endpoint, options)
-                .then((res) => EndpointStore.mappingFn(res, ID))
+            return this._needle.getAsync(endpoint)
+                .then(({ body }) => EndpointStore.MappingFn(body.keys))
                 .catch((err) => {
                     this.logger.info({ function: func, log: 'error calling endpoint', params: { endpoint, error: err.message, alert: true } });
                     throw new Error(`Fetch endpoint error: ${err.message}`);
@@ -105,13 +105,11 @@ class EndpointStore {
 
     // Mapping function - maps data to internal storage structure
     // returns object
-    static mappingFn(res, ID) {
-        const { keys = [] } = res.body;
-
-        return keys.reduce((final, { kid, x5c }) => {
+    static MappingFn(keys = []) {
+        return keys.reduce((memo, { kid, x5c }) => {
             return Object.assign(
-                final,
-                { [kid]: [Jwks.ConvertX5CToPem(x5c[0], ID === 'wpb-auth')] }, // TODO should determine type from JWKS data
+                memo,
+                { [kid]: [Jwks.ConvertX5CToPem(x5c[0])] }
             );
         }, {});
     }
@@ -126,13 +124,10 @@ class EndpointStore {
         if (!this.refreshDelay || typeof this.refreshDelay !== 'number') {
             throw new Error('Invalid argument passed: refreshDelay not a number');
         }
-        if (!this.logger || typeof this.logger !== 'object') {
-            throw new Error('Invalid argument passed: Logger not an object');
-        }
-        if (!this.logger.info || !this.logger.error) {
+        if (!this.logger || typeof this.logger !== 'object' || !this.logger.info || !this.logger.error) {
             throw new Error('Invalid argument passed: Logger not valid');
         }
     }
 }
 
-module.exports = { EndpointStore };
+module.exports = EndpointStore;

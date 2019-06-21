@@ -5,8 +5,10 @@ const validate = require('./validators');
 const { Handler } = require('@sage/bc-independent-lambda-handler');
 const { JwtAuthenticator } = require('@sage/sfab-s2s-jwt-authenticator');
 const { EndpointStore } = require('@sage/sfab-s2s-jwt-endpoint-store');
+const generatePrincipalId = require('./helpers/generatePrincipalId');
 
 const Promise = require('bluebird');
+const uuid = require('uuid/v4');
 
 const FORWARDED_IP_HEADER = 'x-forwarded-for';
 
@@ -75,7 +77,8 @@ class JwtAuthenticatorLambda extends Handler {
             .then(() => {
                 logger.info({ function: func, log: 'started' });
                 Object.assign(claims, { xForwardedFor: headers[FORWARDED_IP_HEADER] }, { token });
-                const policy = generatePolicy('Allow', '*', claims);
+                const principalId = generatePrincipalId(this.config.principalIdTemplate, claims, uuid());
+                const policy = generatePolicy('Allow', '*', claims, principalId);
                 logger.info({ function: func, log: 'ended' });
 
                 return [null, policy];
@@ -90,7 +93,7 @@ class JwtAuthenticatorLambda extends Handler {
     }
 }
 
-const generatePolicy = (effect, resource, context) => {
+const generatePolicy = (effect, resource, context, principalId) => {
     const authResponse = {};
 
     if (effect && resource) {
@@ -106,6 +109,11 @@ const generatePolicy = (effect, resource, context) => {
     }
     // Optional output with custom properties of the String, Number or Boolean type.
     authResponse.context = context;
+
+    if (principalId) {
+        authResponse.principalId = principalId;
+    }
+
     return authResponse;
 };
 

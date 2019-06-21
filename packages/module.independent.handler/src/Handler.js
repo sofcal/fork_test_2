@@ -4,7 +4,7 @@ const Promise = require('bluebird');
 
 const { RequestLogger } = require('@sage/bc-requestlogger');
 const { StatusCodeError } = require('@sage/bc-statuscodeerror');
-const { CloudWatchSubscription } = require('@sage/bc-infrastructure-cloudwatch-subscription');
+const { CloudWatchSubscription } = require('@sage/bc-infrastructure-cloudwatchsubscription');
 const ErrorSpecs = require('./ErrorSpecs');
 
 class Handler {
@@ -38,7 +38,7 @@ class Handler {
 
                         event.logger.info({ function: func, log: 'initialising CloudWatch Subscription' });
                         // initialise the CloudWatchSubscription which pushes logs to the sumo logic lambda
-                        return CloudWatchSubscription.Register(event.logger, SumoLogicLambdaARN, context.logGroupName);
+                        return CloudWatchSubscription.Register(context.logGroupName, SumoLogicLambdaARN, event.logger);
                     })
                     .then(() => {
                         if (this.initialised) {
@@ -92,20 +92,11 @@ class Handler {
                 // last but not least, give the option to the derived class to cleanup resources it created. E.G database
                 // connections. Since lambdas can be frozen, we want to allow the derived class the option to cleanup or
                 // persist.
-                return this.dispose();
+                return this.dispose({ logger: event.logger });
             });
     }
 
-    validate(event, { logger }) {
-        const func = 'Handler.validate';
-        const { Environment: env = 'test', AWS_REGION: region = 'local' } = this.config;
-
-        if (!env || !region) {
-            const log = `invalid parameters - env: ${env}; region: ${region};`;
-            logger.error({ function: func, log });
-            throw StatusCodeError.CreateFromSpecs([ErrorSpecs.invalidEnvironment], ErrorSpecs.invalidEnvironment.statusCode);
-        }
-
+    validate(/* event, { logger } */) { // eslint-disable-line class-methods-use-this
         return this.config;
     }
 
@@ -115,12 +106,16 @@ class Handler {
     }
 
     impl(/* event, { logger } */) { // eslint-disable-line class-methods-use-this
-        throw new Error('impl function should be extended');
+        return Promise.reject(new Error('not implemented'));
     }
 
-    buildResponse(ret /* , { logger } */) { // eslint-disable-line class-methods-use-this
+    buildResponse(ret, { logger }) { // eslint-disable-line class-methods-use-this
         return Promise.resolve(undefined)
-            .then(() => ([null, { statusCode: 200, body: JSON.stringify(ret) }]));
+            .then(() => {
+                const func = `${Handler.name}.buildResponse`;
+                logger.info({ function: func, log: 'building success response: 200' });
+                return [null, { statusCode: 200, body: JSON.stringify(ret) }];
+            });
     }
 
     buildErrorResponse(err, { logger }) { // eslint-disable-line class-methods-use-this
@@ -135,7 +130,7 @@ class Handler {
                 const response = statusCodeError.toDiagnoses();
                 const status = statusCodeError.statusCode;
 
-                logger.info({ function: func, log: `building failure response: ${status}`, response });
+                logger.info({ function: func, log: `building failure response: ${status}` });
                 // for the most part, we still invoke the callback without an error; however, if we want the lambda to
                 // automatically retry, passing an error as the first parameter will achieve this
                 return [err.failLambda ? err : null, { statusCode: status, body: JSON.stringify(response) }];

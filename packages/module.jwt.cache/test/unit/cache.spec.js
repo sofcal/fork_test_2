@@ -1,290 +1,415 @@
 const Cache = require('../../lib/Cache');
+const { logger: loggerGen } = require('@sage/bc-debug-utils');
+const Promise = require('bluebird');
 const should = require('should');
 const sinon = require('sinon');
-const nock = require('nock');
-const needle = require('needle');
 
 describe('@sage/sfab-s2s-jwt-cache.Cache', function(){
-    const logger = {
-        info: (msg) => console.log(msg),
-        error: (msg) => console.error(msg),
-    };
+    const logger = loggerGen(true);
+    const sandbox = sinon.createSandbox();
+
+    afterEach(() => {
+        sandbox.restore();
+    });
         
-    it('should export the correct modules', (done) => {
+    it('should export the correct modules', () => {
         should.equal(typeof Cache, 'function');
-        done();
     });
 
-    describe('Cache.Create', () => {
+    describe('Create', () => {
         const cacheExpiry = 100;
         const refreshFunction = () => 'test';
 
         it('should be able to create new cache object', () => {
-            const test = Cache.Create({cacheExpiry, refreshFunction}, { logger });
-    
-            test.should.be.Object();
-            test.should.be.instanceof(Cache);
+            const uut = Cache.Create({cacheExpiry, refreshFunction}, { logger });
+
+            should(uut).be.Object();
+            should(uut).be.instanceof(Cache);
         });
     });
 
-    describe('Cache.constructor', () => {
+    describe('constructor', () => {
         const cacheExpiry = 100;
         const refreshFunction = () => 'test';
 
         it('should be able to create new cache object', () => {
-            const test = new Cache({cacheExpiry, refreshFunction}, { logger });
-    
-            test.should.be.Object();
-            test.should.be.instanceof(Cache);
+            const uut = new Cache({cacheExpiry, refreshFunction}, { logger });
+
+            should(uut).be.Object();
+            should(uut).be.instanceof(Cache);
         });
     
         it('should create cache object with correct properties', () => {
-            const test = new Cache({cacheExpiry, refreshFunction}, { logger });
+            const uut = new Cache({cacheExpiry, refreshFunction}, { logger });
     
-            should.strictEqual(test.cacheExpiry, cacheExpiry);
-            should.strictEqual(test.refreshFunction, refreshFunction);
-            test.data.should.match({});
+            should(uut.cacheExpiry).eql(cacheExpiry);
+            should(uut.refreshFunction).eql(refreshFunction);
+            should(uut.data).eql({});
         });
 
         it('should throw when refresh function invalid or missing', () => {
-            should.throws( () => new Cache({ cacheExpiry, refreshFunction: 'refreshFunction' }, { logger }) );
-            should.throws( () => new Cache({ cacheExpiry }, { logger }) );
+            should(
+                () => new Cache({ cacheExpiry, refreshFunction: 'refreshFunction' }, { logger })
+            ).throw(new Error('Invalid argument passed: Refresh function is not a function'));
+            should(
+                () => new Cache({ cacheExpiry }, { logger })
+            ).throw('Invalid argument passed: Refresh function is not a function')
         });
 
         it('should throw when cacheExpiry invalid or missing', () => {
-            should.throws( () => new Cache({ cacheExpiry: 'cacheExpiry', refreshFunction }, { logger }) );
-            should.throws( () => new Cache({ refreshFunction }, { logger }) );
+            should(
+                () => new Cache({ cacheExpiry: 'cacheExpiry', refreshFunction }, { logger })
+            ).throw(new Error('Invalid argument passed: CacheExpiry not a number'));
+            should(
+                () => new Cache({ refreshFunction }, { logger })
+            ).throw(new Error('Invalid argument passed: CacheExpiry not a number'));
         });
 
         it('should throw when logger invalid', () => {
             const noop = () => {};
-            should.throws( () => new Cache({ cacheExpiry, refreshFunction }, { logger: 'logger'}) );
-            should.throws( () => new Cache({ cacheExpiry, refreshFunction }, { logger: {info: noop} }) );
-            should.throws( () => new Cache({ cacheExpiry, refreshFunction }, { logger: {error: noop} }) );
+            should(
+                () => new Cache({ cacheExpiry, refreshFunction }, { logger: 'logger'})
+            ).throw(new Error('Invalid argument passed: Logger not valid'));
+            should(
+                () => new Cache({ cacheExpiry, refreshFunction }, { logger: {info: noop} })
+            ).throw(new Error('Invalid argument passed: Logger not valid'));
+            should(
+                () => new Cache({ cacheExpiry, refreshFunction }, { logger: {error: noop} })
+            ).throw(new Error('Invalid argument passed: Logger not valid'));
         });
 
         it('should default logger when not passed in', () => {
-            const test = new Cache({cacheExpiry, refreshFunction});
+            const uut = new Cache({cacheExpiry, refreshFunction});
     
-            (test.logger).should.be.a.Object();
-            (test.logger).should.have.properties(['info', 'warn', 'error']);
-            should.equal(test.logger.error(), undefined);
+            should(uut.logger).be.a.Object();
+            should(uut.logger).have.properties(['info', 'warn', 'error']);
+            should(uut.logger.error()).eql(undefined);
         });
     });
 
-    describe('Cache.cacheExpired() ', () => {
+    describe('cacheExpired ', () => {
         const cacheExpiry = 50;
         const refreshFunction = () => 'test';
 
-        before(() => {
-            sinon.stub(Date, 'now').returns(100000); // 100 seconds
-        });
-
-        after(() => {
-            sinon.restore();
+        beforeEach(() => {
+            sandbox.useFakeTimers(100000);
         });
 
         it('should return false if non-expiring', () => {
-            const test = new Cache({cacheExpiry: -1, refreshFunction}, { logger });
-            test.refreshTime = 0;
+            const uut = new Cache({ cacheExpiry: -1, refreshFunction }, { logger });
+            uut.refreshTime = 0;
 
-            should.strictEqual(test.cacheExpired(), false);
+            should(uut.cacheExpired()).eql(false);
         });
 
         it('should return true if cache expired', () => {
-            const test = new Cache({cacheExpiry, refreshFunction}, { logger });
-            test.refreshTime = 0;
+            const uut = new Cache({cacheExpiry, refreshFunction}, { logger });
+            uut.refreshTime = 0;
 
-            should.strictEqual(test.cacheExpired(), true);
+            should(uut.cacheExpired()).eql(true);
         });
 
         it('should return false if cache still valid', () => {
-            const test = new Cache({cacheExpiry, refreshFunction}, { logger });
-            test.refreshTime = 100;
+            const uut = new Cache({cacheExpiry, refreshFunction}, { logger });
+            uut.refreshTime = 100;
 
-            should.strictEqual(test.cacheExpired(), false);
+            should(uut.cacheExpired()).eql(false);
         });
 
-        it('should return false if cache still valid - boundary test', () => {
-            const test = new Cache({cacheExpiry, refreshFunction}, { logger });
-            test.refreshTime = 50;
+        it('should return false if cache still valid (boundary)', () => {
+            const uut = new Cache({cacheExpiry, refreshFunction}, { logger });
+            uut.refreshTime = 50;
 
-            should.strictEqual(test.cacheExpired(), false);
+            should(uut.cacheExpired()).eql(false);
         });
     });
 
-    describe('Cache.getData ', () => {
+    describe('getData ', () => {
         const cacheExpiry = 50;
-        const refreshFunction = () => 'test';
-        const data = {
-            test: true,
-        };
-        let test = new Cache({cacheExpiry, refreshFunction}, { logger });
+        let clock;
 
-        let cacheExpiredStub;
-        let buildCacheStub;
-
-        before(() => {
-            cacheExpiredStub = sinon.stub(Cache.prototype, 'cacheExpired');
-            buildCacheStub = sinon.stub(Cache.prototype, 'buildCache')
-        });
-
-        afterEach(() => {
-            cacheExpiredStub.reset();
-            buildCacheStub.reset();
-        })
-
-        after(() => {
-            sinon.restore();
+        beforeEach(() => {
+            clock = sandbox.useFakeTimers();
         });
 
         it('should return a promise', () => {
-            cacheExpiredStub.returns(false);
+            const refreshFunction = sandbox.stub();
+            const uut = new Cache({cacheExpiry, refreshFunction}, { logger });
 
-            (test.getData()).should.be.Promise();
+            should(uut.getData()).be.Promise();
         });
 
-        it('should call cacheExpired method if not force refresh', () => {
-            cacheExpiredStub.returns(false);
+        it('should await the current refresh if one is in progress', () => {
+            const data = { value: 'refreshInProgress' };
+            const refreshFunction = sandbox.stub();
+            const uut = new Cache({cacheExpiry, refreshFunction}, { logger });
+            uut.currentRefresh = Promise.resolve(undefined).then(() => uut.data = data);
 
-            return test.getData()
-                .then(() => should.strictEqual(cacheExpiredStub.called, true));
-        });
+            return uut.getData()
+                .then((actual) => {
+                    should(actual).eql({ value: 'refreshInProgress' });
 
-        it('should not call cacheExpired method if force refresh', () => {
-            cacheExpiredStub.returns(false);
-            buildCacheStub.returns(Promise.resolve());
-            test.currentRefresh = null;
-
-            return test.getData(true)
-                .then(() => should.strictEqual(cacheExpiredStub.called, false))
-                .then(() => should.strictEqual(buildCacheStub.called, true));
-        });
-
-        it('should reject promise if any errors', () => {
-            test.currentRefresh = null;
-            cacheExpiredStub.throws(() => new Error('reject'));
-
-            return (test.getData()).should.be.rejectedWith('reject');
-        });
-
-        it('should call build Cache if cache expired and no in-flight refresh', () => {
-            cacheExpiredStub.returns(true);
-            buildCacheStub.returns(Promise.resolve());
-            test.currentRefresh = null;
-
-            return test.getData()
-                .then(() => should.strictEqual(buildCacheStub.called, true));
-        });
-
-        it('should not call build Cache if cache expired and current in-flight refresh', () => {
-            cacheExpiredStub.returns(true);
-
-            test.currentRefresh = Promise.resolve()
-                .then(() => {
-                    this.data = data;
-                    this.refreshTime = Math.floor(Date.now() / 1000);
-                    this.currentRefresh = null;
+                    should(refreshFunction.callCount).eql(0);
                 })
-
-            return test.getData()
-                .then(() => should.strictEqual(buildCacheStub.called, false));
         });
 
-        it('should wait for any in-flight refresh to complete before returning', () => {
-            cacheExpiredStub.returns(true);
+        it('should not refresh if the cache has not expired and forceRefresh is false', () => {
+            const data = { value: 'default' };
+            const refreshFunction = sandbox.stub();
+            const uut = new Cache({ cacheExpiry, refreshFunction }, { logger });
 
-            test.currentRefresh = Promise.resolve()
+            uut.data = data;
+
+            return uut.getData(false)
+                .then((actual) => {
+                    should(actual).eql({ value: 'default' });
+
+                    should(refreshFunction.callCount).eql(0);
+                });
+        });
+
+        it('should not refresh if the cache has not expired and forceRefresh is false (boundary)', () => {
+            const data = { value: 'default' };
+            const refreshFunction = sandbox.stub();
+            const uut = new Cache({ cacheExpiry, refreshFunction }, { logger });
+
+            uut.data = data;
+            clock.tick(50999); // tick to the edge of our expiry (50.999 seconds)
+
+            return uut.getData(false)
+                .then((actual) => {
+                    should(actual).eql({ value: 'default' });
+
+                    should(refreshFunction.callCount).eql(0);
+                });
+        });
+
+        it('should refresh if the cache has not expired, but forceRefresh is true' , () => {
+            const data = { value: 'default' };
+            const refreshData = { value: 'refreshed' };
+            const refreshFunction = sandbox.stub();
+            refreshFunction.resolves(refreshData);
+
+            const uut = new Cache({ cacheExpiry, refreshFunction }, { logger });
+            uut.data = data;
+
+            return uut.getData(true)
+                .then((actual) => {
+                    should(actual).eql({ value: 'refreshed' });
+
+                    should(refreshFunction.callCount).eql(1);
+                });
+        });
+
+        it('should refresh if the cache has expired', () => {
+            const data = { value: 'default' };
+            const refreshData = { value: 'refreshed' };
+            const refreshFunction = sandbox.stub();
+            refreshFunction.resolves(refreshData);
+
+            const uut = new Cache({ cacheExpiry, refreshFunction }, { logger });
+            uut.data = data;
+
+            clock.tick(51000); // tick past our cache expiry
+
+            return uut.getData(false)
+                .then((actual) => {
+                    should(actual).eql({ value: 'refreshed' });
+
+                    should(refreshFunction.callCount).eql(1);
+                });
+        });
+
+        it('should throw if the refreshFunction throws', () => {
+            const data = { value: 'default' };
+            const expected = new Error('error_refresh');
+            const refreshFunction = sandbox.stub();
+            refreshFunction.callsFake(() => Promise.reject(expected));
+
+            const uut = new Cache({ cacheExpiry, refreshFunction }, { logger });
+            uut.data = data;
+
+            clock.tick(51000); // tick past our cache expiry
+
+            should(uut.getData(false)).be.rejectedWith(expected);
+        });
+
+        it('should set the refreshTime on a successful refresh', () => {
+            const data = { value: 'default' };
+            const refreshData = { value: 'refreshed' };
+            const refreshFunction = sandbox.stub();
+            refreshFunction.resolves(refreshData);
+
+            const uut = new Cache({ cacheExpiry, refreshFunction }, { logger });
+            uut.data = data;
+
+            clock.tick(51000); // tick past our cache expiry
+
+            should(uut.refreshTime).eql(0);
+            return uut.getData(false)
                 .then(() => {
-                    test.data = data;
-                    test.refreshTime = Math.floor(Date.now() / 1000);
-                    test.currentRefresh = null;
-                })
-
-            return test.getData()
-                .then((res) => res.should.be.eql(data));
+                    should(uut.refreshTime).eql(51);
+                });
         });
 
-        it('should return cache list', () => {
-            cacheExpiredStub.returns(false);
-            test.data = data;
+        it('should reset currentRefresh on a successful refresh', () => {
+            const data = { value: 'default' };
+            const refreshData = { value: 'refreshed' };
+            const refreshFunction = sandbox.stub();
+            refreshFunction.resolves(refreshData);
 
-            return test.getData()
-                .then((res) => res.should.be.eql(data));
+            const uut = new Cache({ cacheExpiry, refreshFunction }, { logger });
+            uut.data = data;
+
+            clock.tick(51000); // tick past our cache expiry
+
+            return uut.getData(false)
+                .then(() => {
+                    should(uut.currentRefresh).eql(null);
+                });
+        });
+
+        it('should not set the refreshTime on a failed refresh', (done) => {
+            const data = { value: 'default' };
+            const expected = new Error('error_refresh');
+            const refreshFunction = sandbox.stub();
+            refreshFunction.callsFake(() => Promise.reject(expected));
+
+            const uut = new Cache({ cacheExpiry, refreshFunction }, { logger });
+            uut.data = data;
+
+            clock.tick(51000); // tick past our cache expiry
+
+            should(uut.refreshTime).eql(0);
+
+            // deliberately not returned as we're using the done callback
+            uut.getData(false)
+                .then(() => {
+                    done(new Error('should have thrown'));
+                })
+                .catch(() => {
+                    should(uut.refreshTime).eql(0);
+                    done();
+                })
+                .catch((err) => done(err instanceof Error ? err : new Error(err)))
+        });
+
+        it('should reset currentRefresh on a failed refresh', (done) => {
+            const data = { value: 'default' };
+            const expected = new Error('error_refresh');
+            const refreshFunction = sandbox.stub();
+            refreshFunction.callsFake(() => Promise.reject(expected));
+
+            const uut = new Cache({ cacheExpiry, refreshFunction }, { logger });
+            uut.data = data;
+
+            clock.tick(51000); // tick past our cache expiry
+
+            // deliberately not returned as we're using the done callback
+            uut.getData(false)
+                .then(() => {
+                    done(new Error('should have thrown'));
+                })
+                .catch(() => {
+                    should(uut.currentRefresh).eql(null);
+                    done();
+                })
+                .catch((err) => done(err instanceof Error ? err : new Error(err)))
         });
     });
 
-    describe('Cache.buildCache ', () => {
+    describe('buildCache ', () => {
         const cacheExpiry = 50;
 
-        const data = {
-            test: true,
-        };
+        const data = { test: true };
 
         const refreshFunction = () => data;
 
-        const test = new Cache({cacheExpiry, refreshFunction}, { logger });
-
-        let fetchStub;
-
-        before(() => {
-            sinon.stub(Date, 'now').returns(100000); // 100 seconds
-            fetchStub = sinon.stub(Cache.prototype, 'fetch');
-        });
-
-        after(() => {
-            sinon.restore();
-        });
-
-        afterEach(() => {
-            fetchStub.reset();
+        beforeEach(() => {
+            sandbox.useFakeTimers(100 * 1000);
         });
 
         it('should return a promise', () => {
-            fetchStub.returns(Promise.resolve(data));
+            const uut = new Cache({ cacheExpiry, refreshFunction }, { logger });
+            sandbox.stub(uut, 'fetch').resolves(data);
 
-            (test.buildCache()).should.be.Promise();
+            should(uut.buildCache()).be.Promise();
         });
 
         it('should reject promise if fetch throws any errors', () => {
-            fetchStub.throws(() => new Error('reject'));
+            const uut = new Cache({ cacheExpiry, refreshFunction }, { logger });
+            sandbox.stub(uut, 'fetch').callsFake(() => Promise.reject(new Error('reject')));
 
-            return (test.buildCache()).should.be.rejectedWith('reject');
+            should(uut.buildCache()).be.rejectedWith(new Error('reject'));
         });
 
-        it('should reject promise if fetch promise rejects', () => {
-            fetchStub.returns(Promise.reject(new Error('reject')));
+        it('should persist data', () => {
+            const uut = new Cache({ cacheExpiry, refreshFunction }, { logger });
+            sandbox.stub(uut, 'fetch').resolves(data);
 
-            return (test.buildCache()).should.be.rejectedWith('reject');
+            uut.data = null;
+
+            return uut.buildCache()
+                .then(() => {
+                    should(uut.data).eql(data);
+                })
         });
 
-        it('should set data', function() {
-            fetchStub.returns(Promise.resolve(data));
+        it('should update refreshTime on success', () => {
+            const uut = new Cache({ cacheExpiry, refreshFunction }, { logger });
+            sandbox.stub(uut, 'fetch').resolves(data);
 
-            return test.buildCache()
-                .then(() => test.data.should.be.eql(data));
+            uut.refeshTime = 0;
+            return uut.buildCache()
+                .then(() => {
+                    should(uut.refreshTime).eql(100);
+                })
         });
 
-        it('should update refreshtime', function() {
-            fetchStub.returns(Promise.resolve(data));
+        it('should not update refreshTime on failure', (done) => {
+            const uut = new Cache({ cacheExpiry, refreshFunction }, { logger });
+            sandbox.stub(uut, 'fetch').callsFake(() => Promise.reject(new Error('rejected')));
 
-            return test.buildCache()
-                .then(() => test.refreshTime.should.be.eql(100))
+            uut.refeshTime = 0;
+
+            // deliberately not returning as we're using the done callback
+            uut.buildCache()
+                .then(() => {
+                    done(new Error('should have thrown'));
+                })
+                .catch(() => {
+                    should(uut.refreshTime).eql(0);
+                    done();
+                })
+                .catch((err) => done(err instanceof Error ? err : new Error(err)))
         });
 
-        it('should reset currentRefresh', function() {
-            fetchStub.returns(Promise.resolve(data));
-            test.currentRefresh = 'test';
+        it('should reset currentRefresh on success', () => {
+            const uut = new Cache({ cacheExpiry, refreshFunction }, { logger });
+            sandbox.stub(uut, 'fetch').resolves(data);
 
-            return test.buildCache()
-                .then(() => should.not.exist(test.currentRefresh))
+            uut.currentRefresh = 'test';
+
+            return uut.buildCache()
+                .then(() => {
+                    should(uut.currentRefresh).eql(null);
+                })
         });
 
-        it('should populate data from fetch response', function() {
-            fetchStub.callThrough();
+        it('should reset currentRefresh on failure', (done) => {
+            const uut = new Cache({ cacheExpiry, refreshFunction }, { logger });
+            sandbox.stub(uut, 'fetch').callsFake(() => Promise.reject(new Error('rejected')));
 
-            return test.buildCache()
-                .then(() => test.data.should.be.eql(data));
+            // deliberately not returning as we're using the done callback
+            uut.buildCache()
+                .then(() => {
+                    done(new Error('should have thrown'));
+                })
+                .catch(() => {
+                    should(uut.currentRefresh).eql(null);
+                    done();
+                })
+                .catch((err) => done(err instanceof Error ? err : new Error(err)))
         });
     });
 

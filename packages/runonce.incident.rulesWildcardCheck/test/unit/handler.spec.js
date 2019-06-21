@@ -8,6 +8,7 @@ const Promise = require('bluebird');
 
 const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
 const DB = require('@sage/bc-services-db');
+const S3 = require('@sage/bc-services-s3');
 const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-statuscodeerror');
 
 describe('runonce-incident-ruleswildcardcheck.handler', function() {
@@ -21,16 +22,19 @@ describe('runonce-incident-ruleswildcardcheck.handler', function() {
 
     const env = 'local';
     const region = 'eu-west-1';
+    const bucket = 's3-bucket';
 
     const errFunc = () => { throw new Error('should be stubbed') };
     const dummyLoader = { load: errFunc };
     const db = { connect: errFunc, disconnect: errFunc };
+    const s3 = { };
 
     before(() => {
         sandbox = sinon.createSandbox();
     });
 
     beforeEach(() => {
+        sandbox.stub(process, 'env').value({ AWS_REGION: region, Environment: env, bucket });
         context = { context: 'context' };
         event = { AWS_REGION: region, env };
 
@@ -50,6 +54,7 @@ describe('runonce-incident-ruleswildcardcheck.handler', function() {
         sandbox.stub(dummyLoader, 'load').resolves(config);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
         sandbox.stub(DB, 'Create').returns(db);
+        sandbox.stub(S3, 'Create').returns(s3);
         sandbox.stub(db, 'connect').resolves();
         sandbox.stub(db, 'disconnect').resolves();
 
@@ -65,7 +70,6 @@ describe('runonce-incident-ruleswildcardcheck.handler', function() {
                 should(ParameterStoreStaticLoader.Create.calledWithExactly(
                     { keys, paramPrefix, env: { region } }
                 )).eql(true);
-
 
                 should(dummyLoader.load.callCount).eql(1);
                 should(dummyLoader.load.calledWith(
@@ -83,6 +87,7 @@ describe('runonce-incident-ruleswildcardcheck.handler', function() {
         sandbox.stub(dummyLoader, 'load').resolves(config);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
         sandbox.stub(DB, 'Create').returns(db);
+        sandbox.stub(S3, 'Create').returns(s3);
         sandbox.stub(db, 'connect').resolves();
         sandbox.stub(db, 'disconnect').resolves();
 
@@ -91,8 +96,8 @@ describe('runonce-incident-ruleswildcardcheck.handler', function() {
 
         handler.run({}, context, () => {
             try {
-                const paramPrefix = '/test/';
-                const region = 'local';
+                const paramPrefix = '/local/';
+                const region = 'eu-west-1';
 
                 should(ParameterStoreStaticLoader.Create.callCount).eql(1);
                 should(ParameterStoreStaticLoader.Create.calledWithExactly(
@@ -116,6 +121,7 @@ describe('runonce-incident-ruleswildcardcheck.handler', function() {
         sandbox.stub(dummyLoader, 'load').resolves(config);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
         sandbox.stub(DB, 'Create').returns(db);
+        sandbox.stub(S3, 'Create').returns(s3);
         sandbox.stub(db, 'connect').resolves();
         sandbox.stub(db, 'disconnect').resolves();
 
@@ -127,12 +133,11 @@ describe('runonce-incident-ruleswildcardcheck.handler', function() {
             .then(() => {
                 should(DB.Create.callCount).eql(1);
                 should(DB.Create.calledWithExactly(
-                    { env, region, domain, username, password, replicaSet }
+                    { env, region, domain, username, password, replicaSet, db: 'bank_db' }
                 )).eql(true);
 
                 should(db.connect.callCount).eql(1);
                 should(db.connect.calledWith(
-                    'bank_db'
                 )).eql(true);
 
                 should(db.disconnect.callCount).eql(1);
@@ -148,6 +153,7 @@ describe('runonce-incident-ruleswildcardcheck.handler', function() {
         sandbox.stub(dummyLoader, 'load').rejects(new Error('params_error'));
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
         sandbox.stub(DB, 'Create').returns(db);
+        sandbox.stub(S3, 'Create').returns(s3);
         sandbox.stub(db, 'connect').resolves();
         sandbox.stub(db, 'disconnect').resolves();
 
@@ -170,6 +176,7 @@ describe('runonce-incident-ruleswildcardcheck.handler', function() {
         sandbox.stub(dummyLoader, 'load').resolves(config);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
         sandbox.stub(DB, 'Create').returns(db);
+        sandbox.stub(S3, 'Create').returns(s3);
         sandbox.stub(db, 'connect').resolves();
         sandbox.stub(db, 'disconnect').resolves();
 
@@ -180,7 +187,7 @@ describe('runonce-incident-ruleswildcardcheck.handler', function() {
             try {
                 should(impl.run.callCount).eql(1);
                 should(impl.run.calledWithExactly(
-                    event, config, { db }
+                    event, config, { db, s3 }
                 )).eql(true);
 
                 done();
@@ -194,6 +201,7 @@ describe('runonce-incident-ruleswildcardcheck.handler', function() {
         sandbox.stub(dummyLoader, 'load').resolves(config);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
         sandbox.stub(DB, 'Create').returns(db);
+        sandbox.stub(S3, 'Create').returns(s3);
         sandbox.stub(db, 'connect').resolves();
         sandbox.stub(db, 'disconnect').resolves();
 
@@ -220,6 +228,7 @@ describe('runonce-incident-ruleswildcardcheck.handler', function() {
         sandbox.stub(dummyLoader, 'load').resolves(config);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
         sandbox.stub(DB, 'Create').returns(db);
+        sandbox.stub(S3, 'Create').returns(s3);
         sandbox.stub(db, 'connect').resolves();
         sandbox.stub(db, 'disconnect').resolves();
 
@@ -246,6 +255,7 @@ describe('runonce-incident-ruleswildcardcheck.handler', function() {
         sandbox.stub(dummyLoader, 'load').resolves(config);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
         sandbox.stub(DB, 'Create').returns(db);
+        sandbox.stub(S3, 'Create').returns(s3);
         sandbox.stub(db, 'connect').resolves();
         sandbox.stub(db, 'disconnect').resolves();
 
@@ -272,6 +282,8 @@ describe('runonce-incident-ruleswildcardcheck.handler', function() {
 
     it('should fail if any param store values are missing', function(done) {
         delete config['defaultMongo.password'];
+        sandbox.stub(dummyLoader, 'load').resolves(config);
+        sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
 
         handler.run(event, context, (first, second) => {
             try {

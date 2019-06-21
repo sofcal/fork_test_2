@@ -4,11 +4,8 @@ const AWS = require('aws-sdk');
 const Promise = require('bluebird');
 
 class Key {
-    constructor({ region }) {
-        const kms = new AWS.KMS({
-            region
-        });
-        this._kms = Promise.promisifyAll(kms);
+    constructor({ region, kms }) {
+        this._kms = kms || new AWS.KMS({ region });
     }
 
     generateDataKey(...args) {
@@ -25,7 +22,7 @@ const decryptImpl = Promise.method((self, message) => {
         CiphertextBlob: message.payload
     };
 
-    return self._kms.decryptAsync(params)
+    return self._kms.decrypt(params).promise()
         .then((data) => data);
 });
 
@@ -35,7 +32,7 @@ const generateDataKeyImpl = Promise.method((self, message) => {
         KeySpec: message.keySpec
     };
 
-    return self._kms.generateDataKeyAsync(params)
+    return self._kms.generateDataKey(params).promise()
         .then((data) => data);
 });
 

@@ -35,7 +35,7 @@ module.exports.run = (event, context, callback) => {
                 event.logger.error({ function: func, log });
                 throw StatusCodeError.CreateFromSpecs([ErrorSpecs.invalidEvent], ErrorSpecs.invalidEvent.statusCode);
             }
-console.log('LOGGING GROUP');
+
             return setupLogGroupSubscription(event, context)
                 .then(() => getParams({ env, region }, event.logger))
                 .then((params) => {
@@ -75,12 +75,10 @@ console.log('LOGGING GROUP');
 const getParams = ({ env, region }, logger) => {
     const func = 'handler.getParams';
     logger.info({ function: func, log: 'started' });
-    console.log('____getParams');
     const paramPrefix = `/${env}/`;
     const params = {};
 
     logger.info({ function: func, log: 'retrieving keys', keys, paramPrefix });
-console.log('______CREATING PARAMSTORE STATIC')
     const loader = ParameterStoreStaticLoader.Create({ keys, paramPrefix, env: { region } });
     return loader.load(params)
         .then((updated) => {
