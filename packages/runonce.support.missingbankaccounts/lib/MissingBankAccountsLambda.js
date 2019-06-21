@@ -13,7 +13,6 @@ const { Handler } = require('@sage/bc-independent-lambda-handler');
 
 const Promise = require('bluebird');
 const _ = require('underscore');
-const fs = require('fs');
 
 const serviceImpls = { DB, S3 };
 const dbName = 'bank_db';
@@ -52,15 +51,14 @@ class MissingBankAccountsLambda extends Handler {
     impl(event, { logger }) {
         const func = `${MissingBankAccountsLambda.name}.impl`;
         // get details from event
-        const { bucket, key } = event.parsed;
-        logger.info({function: func, log: 'started', params: { bucket, key }});
+        const { bucket, key, destination } = event.parsed;
+        logger.info({function: func, log: 'started', params: { bucket, key, destination }});
 
         const dbQueries = DBQueries.Create(this.services.db.getConnection());
         const s3 = new serviceImpls.S3({key, bucket});
         let extractedBankFileData;
 
-        const rawBankFile = s3.get(key, bucket);
-        return rawBankFile
+        return s3.get(key, bucket)
             .then(bankFile => {
                 const regExHSBC = /(?<=^03,)([0-9]{14})/gm;
                 const bankFileString = bankFile.Body.toString();
@@ -71,31 +69,27 @@ class MissingBankAccountsLambda extends Handler {
                         "accountIdentifier": value.slice(6),
                         "bankIdentifier": value.slice(0,6)
                     }
-                })
+                });
+
                 this.extractedBankFileData = accountDetailsFromBankFile;
-                return accountDetailsFromBankFile;
-            })
-            .then(accountDetails => {
-                const matchingAccountDetails = dbQueries.getBankAccountsByAccountDetails(accountDetails);
-                return matchingAccountDetails;
+                return dbQueries.getBankAccountsByAccountDetails(accountDetailsFromBankFile);
             })
             .then(dbQueryResults => {
                 const filteredResult = this.extractedBankFileData.filter(bankFileAccount => !dbQueryResults.some(dbAccount => _.isEqual(bankFileAccount, dbAccount)));
-                // .then ?
-
                 let missingAccounts = 'Bank Identifier, Account Identifier';
+
                 filteredResult.forEach(element => {
                     missingAccounts += `\n${element.bankIdentifier}, ${element.accountIdentifier}`;
                 });
-                console.log('lineString: ', missingAccounts);
-                return missingAccounts;
-            })
-            .then(missingAccounts => {
-                return s3.put('missingBankFiles.txt', missingAccounts, 'AES256')
-            })
-            logger.info({function: func, log: 'ended'});
 
-        
+                return s3.put(`missing-accounts-from-${key}.txt`, missingAccounts, 'AES256', destination) 
+            })
+            .then(() => {
+                logger.info({ function: func, log: 'ended' });
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     }
 
     dispose({ logger }) { // eslint-disable-line class-methods-use-this

@@ -12,13 +12,15 @@ class DBQueries {
         return new DBQueries(...args);
     }
 
+    getBankAccountsByAccountDetails(...args) {
+        return getBankAccountsByAccountDetailsImpl(this, ...args);
+    }
+
     // getBankAccountsById(...args) {
     //     return getBankAccountsByIdImpl(this, ...args);
     // }
 
-    getBankAccountsByAccountDetails(...args) {
-        return getBankAccountsByAccountDetailsImpl(this, ...args);
-    }
+
 }
 
 // const getBankAccountsByIdImpl = Promise.method((self, { bankAccountId, all = false }, { logger }) => {
