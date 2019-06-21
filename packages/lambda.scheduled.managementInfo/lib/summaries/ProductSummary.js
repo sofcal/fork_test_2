@@ -18,7 +18,6 @@ class ProductSummary {
             missing: 0,
             bankAccountsMax: 0
         };
-
         this.bankAccounts = {
             total: 0,
             missing: 0,
@@ -29,8 +28,9 @@ class ProductSummary {
                 verifyingAuth: 0,
                 inactiveFeed: 0,
                 inactiveClient: 0,
-                cancelled: 0,
-                invalid: 0
+                cancelled: 0, // Canceled by the user.
+                invalid: 0,
+                autoCancelled: 0 // Cancelled by out automatic mechanism. It is not a valid status, just a metric.
             },
             accountantManaged: 0,
             transactionsMax: 0,
@@ -59,12 +59,33 @@ class ProductSummary {
                 this.bankAccounts.missing += 1;
             } else {
                 this.bankAccounts.total += 1;
-                this.bankAccounts.statuses[bankAccount.status] += 1;
+                this.bankAccounts.statuses = this.incrementStatus(this.bankAccounts.statuses, bankAccount);
                 this.bankAccounts.accountantManaged += bankAccount.accountantManaged === 'none' ? 0 : 1;
                 this.bankAccounts.transactionsMax = Math.max(this.bankAccounts.transactionsMax, bankAccount.transactionCount);
                 this.bankAccounts.unresolvedMax = Math.max(this.bankAccounts.unresolvedMax, bankAccount.unresolvedCount);
             }
         });
+    }
+
+    incrementStatus(bankAccountStatuses, bankAccount) {
+        let statuses = bankAccountStatuses;
+        if (bankAccount.status === "cancelled" && this.isAutoCancelled(bankAccount)) {
+            statuses.autoCancelled += 1;
+        } else if (bankAccount.status === "cancelled") {
+            statuses.cancelled += 1;
+        } else {
+            statuses[bankAccount.status] += 1;
+        }
+        return statuses;
+    }
+
+    /**
+     * A cancelled status is automatically cancelled if we have an additional field explaining the cancellation circumstances.
+     * @param bankAccount
+     * @returns {*}
+     */
+    isAutoCancelled(bankAccount) {
+        return bankAccount.otherInfo && bankAccount.otherInfo.cancellationReason;
     }
 
     toCSV() {
