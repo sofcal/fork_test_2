@@ -64,6 +64,11 @@ class MissingBankAccountsLambda extends Handler {
                 const bankFileString = bankFile.Body.toString();
                 const accountIdentifiers = bankFileString.match(regExHSBC);
 
+                if (!accountIdentifiers || accountIdentifiers.length === 0) {
+                    logger.info({function: func, log: 'No accounts found in file' });
+                    throw StatusCodeError.CreateFromSpecs([ErrorSpecs.notFound.accountIdentifiers], ErrorSpecs.notFound.accountIdentifiers.statusCode);
+                }
+
                 const accountDetailsFromBankFile = accountIdentifiers.map(value => {
                     return {    
                         "accountIdentifier": value.slice(6),
