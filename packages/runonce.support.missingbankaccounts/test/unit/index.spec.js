@@ -1,9 +1,9 @@
-const CreateTransactionsLambda = require('../../lib/CreateTransactionsLambda');
+const MissingBankAccountsLambda = require('../../lib/MissingBankAccountsLambda');
 const should = require('should');
 
-describe('runonce-intacct-transactiongenerator.index', function(){
+describe('runonce-support-missingbankaccounts.index', function(){
     // placeholder
-    it('should create an instance of CreateTransactionsLambda', () => {
-        should(new CreateTransactionsLambda({})).be.an.instanceOf(CreateTransactionsLambda);
+    it('should create an instance of MissingBankAccountsLambda', () => {
+        should(new MissingBankAccountsLambda({})).be.an.instanceOf(MissingBankAccountsLambda);
     });
 });
