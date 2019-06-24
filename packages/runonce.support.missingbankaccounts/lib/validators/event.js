@@ -16,9 +16,9 @@ module.exports = (event, { logger }) => {
         throw StatusCodeError.CreateFromSpecs([ErrorSpecs.invalidEvent.key], ErrorSpecs.invalidEvent.key.statusCode);
     }
 
-    if (!parsed.destination) {
-        logger.error({ function: 'validate.event', msg: 'invalid event: missing destination', params: { parsed } });
-        throw StatusCodeError.CreateFromSpecs([ErrorSpecs.invalidEvent.destination], ErrorSpecs.invalidEvent.destination.statusCode);
+    if (!parsed.bank) {
+        logger.error({ function: 'validate.event', msg: 'invalid event: missing bank', params: { parsed } });
+        throw StatusCodeError.CreateFromSpecs([ErrorSpecs.invalidEvent.bank], ErrorSpecs.invalidEvent.bank.statusCode);
     }
 
     return event.body ? JSON.parse(event.body) : event;

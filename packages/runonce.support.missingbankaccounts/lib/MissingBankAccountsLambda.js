@@ -4,6 +4,7 @@ const validate = require('./validators');
 const ErrorSpecs = require('./ErrorSpecs');
 const keys = require('./params');
 const { DBQueries } = require('./db');
+const extractors = require('./extractors');
 
 const { StatusCodeError } = require('@sage/bc-statuscodeerror');
 const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
@@ -37,12 +38,12 @@ class MissingBankAccountsLambda extends Handler {
     init(event, { logger }) {
         const func = `${MissingBankAccountsLambda.name}.init`;
         logger.info({function: func, log: 'started'});
-        const {Environment: env = 'test', AWS_REGION: region = 'local'} = process.env;
-
+        const {OutputBucket: outputBucket, Environment: env = 'test', AWS_REGION: region = 'local'} = process.env;
+        console.log('>>>>>>  outputbucket: ', outputBucket);
         return Promise.resolve(undefined)
             .then(() => getParams({env, region}, event.logger))
             .then((params) => {
-                populateServices(this.services, {env, region, params}, event.logger);
+                populateServices(this.services, {env, region, outputBucket, params}, event.logger);
                 return connectDB(this.services, event.logger)
                     .then(() => false);
             });
@@ -51,51 +52,46 @@ class MissingBankAccountsLambda extends Handler {
     impl(event, { logger }) {
         const func = `${MissingBankAccountsLambda.name}.impl`;
         // get details from event
-        const { bucket, key, destination } = event.parsed;
-        logger.info({function: func, log: 'started', params: { bucket, key, destination }});
+        const { bucket, key, bank } = event.parsed;
+        logger.info({function: func, log: 'started', params: { bucket, key, bank }});
 
         const dbQueries = DBQueries.Create(this.services.db.getConnection());
-        const s3 = new serviceImpls.S3({key, bucket});
-        let extractedBankFileData;
-
-        return s3.get(key, bucket)
-            .then(bankFile => {
-                const regExHSBC = /(?<=^03,)([0-9]{14})/gm;
-                const bankFileString = bankFile.Body.toString();
-                const accountIdentifiers = bankFileString.match(regExHSBC);
-
-                if (!accountIdentifiers || accountIdentifiers.length === 0) {
-                    logger.info({function: func, log: 'No accounts found in file' });
-                    throw StatusCodeError.CreateFromSpecs([ErrorSpecs.notFound.accountIdentifiers], ErrorSpecs.notFound.accountIdentifiers.statusCode);
-                }
-
-                const accountDetailsFromBankFile = accountIdentifiers.map(value => {
-                    return {    
-                        "accountIdentifier": value.slice(6),
-                        "bankIdentifier": value.slice(0,6)
+        
+        return Promise.resolve(undefined)
+            .then(() => {
+                return this.services.s3.get(key, bucket)
+                .then(bankFile => {
+                    const accountIdentifiers = extractors[bank](bankFile);
+    
+                    if (!accountIdentifiers || accountIdentifiers.length === 0) {
+                        logger.info({function: func, log: 'No accounts found in file' });
+                        throw StatusCodeError.CreateFromSpecs([ErrorSpecs.notFound.accountIdentifiers], ErrorSpecs.notFound.accountIdentifiers.statusCode);
                     }
-                });
 
-                this.extractedBankFileData = accountDetailsFromBankFile;
-                return dbQueries.getBankAccountsByAccountDetails(accountDetailsFromBankFile);
+                    return accountIdentifiers;
+                })
             })
-            .then(dbQueryResults => {
-                const filteredResult = this.extractedBankFileData.filter(bankFileAccount => !dbQueryResults.some(dbAccount => _.isEqual(bankFileAccount, dbAccount)));
-                let missingAccounts = 'Bank Identifier, Account Identifier';
+            .then((accountDetailsFromBankFile) => {
+                return dbQueries.getBankAccountsByAccountDetails(accountDetailsFromBankFile)
+                .then(dbQueryResults => {
+                    const filteredResult = accountDetailsFromBankFile.filter(bankFileAccount => !dbQueryResults.some(dbAccount => _.isEqual(bankFileAccount, dbAccount)));
+                    let missingAccounts = 'Bank Identifier, Account Identifier';
+    
+                    // TODO use _.reduce
+                    filteredResult.forEach(element => {
+                        missingAccounts += `\n${element.bankIdentifier}, ${element.accountIdentifier}`;
+                    });
 
-                filteredResult.forEach(element => {
-                    missingAccounts += `\n${element.bankIdentifier}, ${element.accountIdentifier}`;
-                });
-
-                return s3.put(`missing-accounts-from-${key}.txt`, missingAccounts, 'AES256', destination) 
+                    return missingAccounts;
+                })
+            })
+            .then((fileContents) => {
+                return this.services.s3.put(`missing-accounts-from-${key}.txt`, fileContents, 'AES256', process.env.OutputBucket) 
             })
             .then(() => {
                 logger.info({ function: func, log: 'ended' });
-            })
-            .catch((err) => {
-                console.log(err);
             });
-    }
+        }
 
     dispose({ logger }) { // eslint-disable-line class-methods-use-this
         return disconnectDB(this.services, logger);
@@ -127,7 +123,7 @@ const getParams = ({ env, region }, logger) => {
         });
 };
 
-const populateServices = (services, { env, region, params }, logger) => {
+const populateServices = (services, { env, region, outputBucket, params }, logger) => {
     const func = 'handler.getServices';
     logger.info({ function: func, log: 'started' });
 
@@ -140,7 +136,7 @@ const populateServices = (services, { env, region, params }, logger) => {
 
     // eslint-disable-next-line no-param-reassign
     services.db = serviceImpls.DB.Create({ env, region, domain, username, password, replicaSet, db: 'bank_db' });
-
+    services.s3 = serviceImpls.S3.Create({ outputBucket });
     // add any additional services that are created by the serviceLoader for the lambda
 
     // Object.assign(services, serviceLoader.load({ env, region, params }));
@@ -155,9 +151,6 @@ const connectDB = (services, logger) => {
     return services.db.connect()
         .then(() => {
             logger.info({ function: func, log: 'ended' });
-        })
-        .catch((err) => {
-            console.log(err);
         });
 };
 

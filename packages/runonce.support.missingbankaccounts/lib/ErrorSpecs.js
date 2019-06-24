@@ -3,7 +3,7 @@ module.exports = {
     invalidEvent: {
         bucket: { applicationCode: 'InvalidEvent', message: 'invalid event properties: missing bucket', statusCode: 400 },
         key: { applicationCode: 'InvalidEvent', message: 'invalid event properties: missing key', statusCode: 400 },
-        destination: { applicationCode: 'InvalidEvent', message: 'invalid event properties: missing destination', statusCode: 400 }
+        bank: { applicationCode: 'InvalidEvent', message: 'invalid event properties: missing bank', statusCode: 400 }
     },
     notFound: {
         accountIdentifiers: { applicationCode: 'NotFound', message: 'account identifiers not found', statusCode: 404 }

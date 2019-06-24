@@ -15,36 +15,12 @@ class DBQueries {
     getBankAccountsByAccountDetails(...args) {
         return getBankAccountsByAccountDetailsImpl(this, ...args);
     }
-
-    // getBankAccountsById(...args) {
-    //     return getBankAccountsByIdImpl(this, ...args);
-    // }
-
-
 }
-
-// const getBankAccountsByIdImpl = Promise.method((self, { bankAccountId, all = false }, { logger }) => {
-//     const func = `${consts.LOG_PREFIX}.getBankAccountsById`;
-//     logger.debug({ function: func, log: 'started', params: { all } });
-
-//     const collection = self.db.collection('BankAccount');
-
-//     const promise = collection.find({_id: bankAccountId}, consts.DEFAULT_OPTIONS);
-
-//     if (!all) {
-//         logger.debug({ function: func, log: 'ended - all not specified, returning cursor', params: { all } });
-//         return promise;
-//     }
-
-//     logger.debug({ function: func, log: 'WARNING: requesting all results without a cursor could present a performance issue', params: { all } });
-//     logger.debug({ function: func, log: 'ended - all specified; returning entire array', params: { all } });
-//     return promise.toArray();
-// });
 
 const getBankAccountsByAccountDetailsImpl = Promise.method((self, bankAccountDetails) => {
     const collection = self.db.collection('BankAccount');
     const promise = collection.find({$or: bankAccountDetails}).project({accountIdentifier: 1, bankIdentifier: 1, _id: 0});
-    return promise.toArray();;
+    return promise.toArray();
 });
 
 const consts = {
