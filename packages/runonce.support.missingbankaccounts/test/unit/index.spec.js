@@ -3,7 +3,7 @@ const should = require('should');
 
 describe('runonce-support-missingbankaccounts.index', function(){
     // placeholder
-    it('should create an instance of MissingBankAccountsLambda', () => {
-        should(new MissingBankAccountsLambda({})).be.an.instanceOf(MissingBankAccountsLambda);
+    it('should export the right modules', () => {
+        should(index).eql({ MissingBankAccountsLambda });
     });
 });
