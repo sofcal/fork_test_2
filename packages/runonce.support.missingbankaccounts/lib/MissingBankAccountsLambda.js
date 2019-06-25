@@ -17,6 +17,8 @@ const _ = require('underscore');
 
 const serviceImpls = { DB, S3 };
 const dbName = 'bank_db';
+const missingAccountsHeader = 'Bank Identifier, Account Identifier';
+const outputFilePrefix = 'missing-accounts-from-';
 
 class MissingBankAccountsLambda extends Handler {
     constructor({ config }) {
@@ -38,8 +40,7 @@ class MissingBankAccountsLambda extends Handler {
     init(event, { logger }) {
         const func = `${MissingBankAccountsLambda.name}.init`;
         logger.info({function: func, log: 'started'});
-        const {OutputBucket: outputBucket, Environment: env = 'test', AWS_REGION: region = 'local'} = process.env;
-        console.log('>>>>>>  outputbucket: ', outputBucket);
+        const { OutputBucket: outputBucket, Environment: env = 'test', AWS_REGION: region = 'local' } = this.config;
         return Promise.resolve(undefined)
             .then(() => getParams({env, region}, event.logger))
             .then((params) => {
@@ -75,18 +76,12 @@ class MissingBankAccountsLambda extends Handler {
                 return dbQueries.getBankAccountsByAccountDetails(accountDetailsFromBankFile)
                 .then(dbQueryResults => {
                     const filteredResult = accountDetailsFromBankFile.filter(bankFileAccount => !dbQueryResults.some(dbAccount => _.isEqual(bankFileAccount, dbAccount)));
-                    let missingAccounts = 'Bank Identifier, Account Identifier';
-    
-                    // TODO use _.reduce
-                    filteredResult.forEach(element => {
-                        missingAccounts += `\n${element.bankIdentifier}, ${element.accountIdentifier}`;
-                    });
 
-                    return missingAccounts;
+                    return _.reduce(filteredResult, (memo, element) => (`${memo}\n${element.bankIdentifier}, ${element.accountIdentifier}`), missingAccountsHeader);
                 })
             })
             .then((fileContents) => {
-                return this.services.s3.put(`missing-accounts-from-${key}.txt`, fileContents, 'AES256', process.env.OutputBucket) 
+                return this.services.s3.put((outputFilePrefix + key + '.txt'), fileContents, 'AES256') 
             })
             .then(() => {
                 logger.info({ function: func, log: 'ended' });
@@ -119,7 +114,7 @@ const getParams = ({ env, region }, logger) => {
             }
 
             logger.info({ function: func, log: 'ended' });
-            return updated;
+            return updated;          
         });
 };
 
@@ -136,7 +131,7 @@ const populateServices = (services, { env, region, outputBucket, params }, logge
 
     // eslint-disable-next-line no-param-reassign
     services.db = serviceImpls.DB.Create({ env, region, domain, username, password, replicaSet, db: 'bank_db' });
-    services.s3 = serviceImpls.S3.Create({ outputBucket });
+    services.s3 = serviceImpls.S3.Create({ bucket: outputBucket });
     // add any additional services that are created by the serviceLoader for the lambda
 
     // Object.assign(services, serviceLoader.load({ env, region, params }));
