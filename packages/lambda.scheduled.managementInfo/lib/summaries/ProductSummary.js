@@ -68,10 +68,10 @@ class ProductSummary {
     }
 
     incrementStatus(bankAccountStatuses, bankAccount) {
-        let statuses = bankAccountStatuses;
-        if (bankAccount.status === "cancelled" && this.isAutoCancelled(bankAccount)) {
+        const statuses = bankAccountStatuses;
+        if (bankAccount.status === 'cancelled' && this.isAutoCancelled(bankAccount)) {
             statuses.autoCancelled += 1;
-        } else if (bankAccount.status === "cancelled") {
+        } else if (bankAccount.status === 'cancelled') {
             statuses.cancelled += 1;
         } else {
             statuses[bankAccount.status] += 1;
@@ -85,7 +85,7 @@ class ProductSummary {
      * @returns {*}
      */
     isAutoCancelled(bankAccount) {
-        return bankAccount.otherInfo && bankAccount.otherInfo.cancellationReason;
+        return bankAccount.internal && bankAccount.internal.cancellationReason && bankAccount.internal.cancellationReason.code === 'auto';
     }
 
     toCSV() {
