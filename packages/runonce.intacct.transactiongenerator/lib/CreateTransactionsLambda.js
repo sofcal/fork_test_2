@@ -86,7 +86,7 @@ class CreateTransactionsLambda extends Handler {
                         bankAccount.openingBalanceAmount = balance;         // eslint-disable-line no-param-reassign
                         bankAccount.ledgerBalanceAmount = balance;          // eslint-disable-line no-param-reassign
 
-                        const now = new Date().toISOString();
+                        const now = new Date();
                         bankAccount.lastTransactionsReceived = now;
                         bankAccount.ledgerBalanceDate = now;                // eslint-disable-line no-param-reassign
                         bankAccount.availableBalanceDate = now;             // eslint-disable-line no-param-reassign
