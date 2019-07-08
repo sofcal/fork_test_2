@@ -70,7 +70,8 @@ const organisationsCompaniesBankAccountsImpl = Promise.method((self, { organisat
 
     // Return all Organisation and OrganisationExt results
     return Promise.all([OrgPromise.toArray(), OrgExtPromise.toArray()])
-        .then(([org, orgExt]) => [...org, ...orgExt]);
+        .then(([org, orgExt]) => [...org, ...orgExt])
+        .then((data) => data.sort((a, b) => { return a._id < b._id ? -1 : 1; }));
 });
 
 const transactionSummariesImpl = Promise.method((self, { unresolved = false, bankAccountIds = null, all = false } = {}, { logger }) => {
@@ -113,7 +114,8 @@ const orphanedBankAccountsImpl = Promise.method((self, { all = false }, { logger
 
     // We only want to report orhpaned bank accounts if they are reported on both Organisation and OrganisationExt queries
     return Promise.all([OrgPromise.toArray(), OrgExtPromise.toArray()])
-        .then((res) => intersection('_id', ...res));
+        .then((res) => intersection('_id', ...res))
+        .then((data) => data.sort((a, b) => { return a._id < b._id ? -1 : 1; }));
 });
 
 // consts
