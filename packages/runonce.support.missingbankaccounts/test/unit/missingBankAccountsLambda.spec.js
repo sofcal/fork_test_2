@@ -137,7 +137,7 @@ describe('runonce-support-missingbankaccounts.MissingBankAccountsLambda', functi
         
     });
 
-    describe.skip('impl', () => {
+    describe('impl', () => {
         let uut;
 
         const services = {
@@ -190,7 +190,7 @@ describe('runonce-support-missingbankaccounts.MissingBankAccountsLambda', functi
         });
 
         it('should write a file to s3 containing an array of bank accounts that are present in the file and missing in the database', () => {
-            const expected = 'Bank Identifier, Account Identifier\n000001, 00000001\n000002, 00000002';
+            const expected = 'Bank Identifier,Account Identifier\n000001,00000001\n000002,00000002';
             const s3FileContent = '03,00000100000001,23452523\n03,00000200000001,234293984982342\n03,00000200000002';
             const event = { parsed: { bucket: 'test_bucket', key: 'test_key', bank: 'tester' }}
 
@@ -217,7 +217,7 @@ describe('runonce-support-missingbankaccounts.MissingBankAccountsLambda', functi
         });
 
         it('should write a file to s3 containing only csv headers if all bank accounts are present in the database', () => {
-            const expected = 'Bank Identifier, Account Identifier';
+            const expected = 'Bank Identifier,Account Identifier';
             const s3FileContent = '03,00000100000001,23452523\n03,00000200000001,234293984982342\n03,00000200000002';
             const event = { parsed: { bucket: 'test_bucket', key: 'test_key', bank: 'tester' }}
 
@@ -246,7 +246,7 @@ describe('runonce-support-missingbankaccounts.MissingBankAccountsLambda', functi
         });
 
         it('should write a file to s3 containing a csv list of all bank accounts if none are present in the database', () => {
-            const expected = 'Bank Identifier, Account Identifier\n000001, 00000001\n000002, 00000001\n000002, 00000002';
+            const expected = 'Bank Identifier,Account Identifier\n000001,00000001\n000002,00000001\n000002,00000002';
             const s3FileContent = '03,00000100000001,23452523\n03,00000200000001,234293984982342\n03,00000200000002';
             const event = { parsed: { bucket: 'test_bucket', key: 'test_key', bank: 'tester' }}
 
@@ -276,6 +276,24 @@ describe('runonce-support-missingbankaccounts.MissingBankAccountsLambda', functi
 
         it('should throw an error if the file is missing in s3', () => {
             throw new Error('not implemented yet');
+        });
+
+        it('should validate and throw if the input has no Body', () => {
+            
+            throw new Error('incomplete implementation');
+            
+            const bankFileNoBody = {
+                AcceptRanges: 'bytes',
+                LastModified: '2019-06-17T11:11:43.000Z',
+                ContentLength: 75448,
+                ETag: '"d723470fd74d56b9e2fdea9aa9aff9e1"',
+                ContentType: 'text/plain',
+                Metadata: {}
+            }
+    
+            should(
+                () => hsbc(bankFileNoBody)
+            ).throwError(StatusCodeError.CreateFromSpecs([ErrorSpecs.invalidExtractorInput.body], ErrorSpecs.invalidExtractorInput.body.statusCode));
         });
 
         it('should throw an error if it cannot write the file to s3', () => {
