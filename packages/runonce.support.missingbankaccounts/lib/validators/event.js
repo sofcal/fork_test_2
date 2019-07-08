@@ -4,6 +4,12 @@ const ErrorSpecs = require('../ErrorSpecs');
 const { StatusCodeError } = require('@sage/bc-statuscodeerror');
 
 module.exports = (event, { logger }) => {
+
+    if (!event) {
+        logger.error({ function: 'validate.event', msg: 'invalid event: missing event', params: { event } });
+        throw StatusCodeError.CreateFromSpecs([ErrorSpecs.invalidEvent.event], ErrorSpecs.invalidEvent.event.statusCode);
+    }
+
     const parsed = event.body ? JSON.parse(event.body) : event;
     
     if (!parsed.bucket) {
