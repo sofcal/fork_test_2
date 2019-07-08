@@ -17,7 +17,7 @@ const _ = require('underscore');
 
 const serviceImpls = { DB, S3 };
 const dbName = 'bank_db';
-const missingAccountsHeader = 'Bank Identifier, Account Identifier';
+const missingAccountsHeader = 'Bank Identifier,Account Identifier';
 const outputFilePrefix = 'missing-accounts-from-';
 
 class MissingBankAccountsLambda extends Handler {
@@ -62,7 +62,12 @@ class MissingBankAccountsLambda extends Handler {
             .then(() => {
                 return this.services.s3.get(key, bucket)
                 .then(bankFile => {
-                    const accountIdentifiers = extractors[bank](bankFile);
+                    if (!bankFile.Body) {
+                        throw StatusCodeError.CreateFromSpecs([ErrorSpecs.invalidExtractorInput.body], ErrorSpecs.invalidExtractorInput.body.statusCode);
+                    }
+                    
+                    const bankFileString = bankFile.Body.toString();
+                    const accountIdentifiers = extractors[bank](bankFileString);
     
                     if (!accountIdentifiers || accountIdentifiers.length === 0) {
                         logger.info({function: func, log: 'No accounts found in file' });
@@ -77,7 +82,7 @@ class MissingBankAccountsLambda extends Handler {
                 .then(dbQueryResults => {
                     const filteredResult = accountDetailsFromBankFile.filter(bankFileAccount => !dbQueryResults.some(dbAccount => _.isEqual(bankFileAccount, dbAccount)));
 
-                    return _.reduce(filteredResult, (memo, element) => (`${memo}\n${element.bankIdentifier}, ${element.accountIdentifier}`), missingAccountsHeader);
+                    return _.reduce(filteredResult, (memo, element) => (`${memo}\n${element.bankIdentifier},${element.accountIdentifier}`), missingAccountsHeader);
                 })
             })
             .then((fileContents) => {
