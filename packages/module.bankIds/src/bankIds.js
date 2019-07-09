@@ -1,0 +1,57 @@
+'use strict';
+
+module.exports = (function() {
+    const ns = {};
+
+    ns.absa = '273cdbab-c56c-4681-90df-8fcadc3a7c71';
+    ns.aib = 'cb85d748-3226-4eb4-b7df-932c1a77ded6';
+    ns.barclays = '1c6862c1-f6f4-4671-a240-14b5eb56b566';
+    ns.usbank = 'b84a7cb2-4802-45e4-bac7-891e844bac7b';
+    ns.natwest = '1b29cae8-29d9-40b6-8925-125efa010c1d';
+    ns.rbs = 'fe9f88e8-7e17-4086-b668-b08045e6f087';
+    ns.aps = 'a6333da7-17e2-4f37-a802-005331f5ca40';
+    ns.lloyds = '41a2e599-1041-494d-89b5-84d03ad688fa';
+    ns.bos = '21ae0185-1acb-484c-9afd-96544cd9354f';
+    ns.hsbc = '453e8bd6-958a-49a4-8b4d-0dc571b98ba3';
+    ns.hsbccan = 'cd0809a4-33bd-4e02-898b-11c2c371c36c';
+    ns.sagedirectgbr = 'ae409f2c-1f6a-44b7-97e5-5aa685b37214';
+    ns.sagewebgbr = 'ad01d1db-f2d0-4bda-bf49-7d4548b15393';
+    ns.sageformgbr = 'fe8563d8-6a0c-421a-9cb7-02638ac1ceac';
+    ns.sagedirectirl = 'd262045a-7d18-48f3-82d2-4d3ec230ca49';
+    ns.sagewebirl = '3f6fb14b-39d3-45b3-b169-7fc5865f46f4';
+    ns.sageformirl = '9eec64d5-b378-4248-a98b-9fc80dac562c';
+    ns.sagedirectusa = 'ef7fa1aa-06d0-4f57-a5d9-3a9b51ab1307';
+    ns.sagewebusa = 'fef00b71-315c-451d-9b04-73f8220d4966';
+    ns.sageformusa = '8b0ed344-45a6-4743-8821-ad4e9ff605ba';
+    ns.sagedirectcan = '94b7900b-eacc-40e6-baf1-075dd4f8df4c';
+    ns.sagewebcan = '2ea5ce4f-5a02-4768-a757-123582fdf324';
+    ns.sageformcan = '6b7fa8a0-ce48-444d-b756-b95bbefa3216';
+    ns.sagedirectaus = '3c9a0c38-3488-4ae1-a799-61fe600f1a62';
+    ns.sagewebaus = '42790ef2-2223-455e-b105-33eeb2597d5b';
+    ns.sageformaus = '2d67bf00-ff78-44cd-8c80-63297a5d56ce';
+    ns.sagedirectesp = 'ff3143ce-ea06-4e93-9339-75d86c2b7b44';
+    ns.sagewebesp = '3229cfd7-909a-4d09-a546-25433fd0381d';
+    ns.sageformesp = '0c3f42a9-9bda-45bf-b877-2caf6d04038c';
+    ns.sagedirectfra = 'd62611c6-54b0-43da-806c-747f92a4482d';
+    ns.sagewebfra = '48fcbdb9-4997-4a9c-959d-52c6e356dca1';
+    ns.sageformfra = 'c1473110-e971-48fe-8a3e-afc59e572f82';
+    ns.sagedirectzaf = '341a73fe-4387-4947-aa24-25ba9ded4651';
+    ns.sagewebzaf = '42ff3f2b-983b-484d-81be-c9c5f1a14b0d';
+    ns.sageformzaf = 'b57e08d0-ef22-4769-a890-339722bf2b26';
+    ns.sageDirectMys = 'de146b9d-5027-4bef-ae46-36e80a0518ac';
+    ns.sageWebMys = '757df490-45fb-4752-9b7d-78da74c28077';
+    ns.sageFormMys = 'ed5b34f6-0004-47f4-a6e5-1fa26e914340';
+    ns.sageindirectgbr = 'b542be6b-c6fb-444d-be44-3ef863a1dbcf';
+    ns.sageindirectirl = 'ed932fe2-29a4-4f31-96b4-59ea5754f274';
+    ns.sageindirectusa = '92c3264b-4835-44bf-a9df-0bfb29b6b327';
+    ns.sageindirectcan = '59ec86a9-c94b-42d0-bc5e-e92e495bd95a';
+    ns.sageindirectesp = '26c1ca90-c569-43f8-bc48-083d1c07de93';
+    ns.sageindirectfra = '86727000-6cd7-4175-895d-6cfbf06f9f06';
+    ns.sageindirectzaf = 'eaf6f40a-9714-4c36-be02-b0318abecdc6';
+    ns.sageindirectaus = '7b0964d9-7e4d-4b7b-999d-098d4910b1a4';
+    ns.sageIndirectMys = '8d95b304-dbfa-444b-9828-f93b97bff1d6';
+    ns.tide = '8ccee59e-d837-4d1b-8d79-5a664971af8a';
+
+    Object.freeze(ns);
+    return ns;
+}());
