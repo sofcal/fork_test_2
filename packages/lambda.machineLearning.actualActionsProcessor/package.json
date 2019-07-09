@@ -1,13 +1,13 @@
 {
   "name": "lambda-machineLearning-actualActionsProcessor",
-  "version": "1.1.8",
+  "version": "1.1.12",
   "author": "",
   "license": "ISC",
   "description": "",
   "private": true,
   "main": "lib/handler.js",
   "dependencies": {
-    "@sage/bc-contracts-narrativedictionary": "^1.1.8",
+    "@sage/bc-contracts-narrativedictionary": "^1.1.12",
     "@sage/bc-contracts-rule": "^1.1.8",
     "@sage/bc-parameterstore-static-loader": "^1.1.8",
     "@sage/bc-requestlogger": "^1.1.8",
