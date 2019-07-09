@@ -1,3 +1,3 @@
 const AlertTypes = require('./AlertTypes');
  
-module.exports = { AlertTypes };
+module.exports = AlertTypes;
