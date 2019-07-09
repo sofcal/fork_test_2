@@ -7,7 +7,7 @@ variables:
   outputPath: build/
 
 trigger:
-- develop
+- contracts
 
 pool:
   vmImage: 'Ubuntu-16.04'
@@ -20,7 +20,7 @@ steps:
 
 - task: CmdLine@2
   inputs:
-    script: 'git checkout develop'
+    script: 'git checkout contracts'
   displayName: 'branch checkout (why?)'
 
 - task: Npm@1
