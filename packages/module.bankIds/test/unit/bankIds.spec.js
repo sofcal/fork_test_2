@@ -1,6 +1,6 @@
 'use strict';
 
-const bankIds = require('../../lib/bankIds');
+const bankIds = require('../../lib/bankIds'); 
 const should = require('should');
 
 describe('@sage/bc-bankIds.bankIds', function() {

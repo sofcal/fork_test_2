@@ -1,3 +1,3 @@
-const bankIds = require('./bankIds.js');
+const bankIds = require('./bankIds.js'); 
 
 module.exports = bankIds;

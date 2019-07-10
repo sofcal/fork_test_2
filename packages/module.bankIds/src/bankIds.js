@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = (function() {
-    const ns = {};
+    const ns = {}; 
 
     ns.absa = '273cdbab-c56c-4681-90df-8fcadc3a7c71';
     ns.aib = 'cb85d748-3226-4eb4-b7df-932c1a77ded6';
