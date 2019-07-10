@@ -15,8 +15,7 @@
   "dependencies": {
     "@babel/code-frame": "^7.0.0-beta.48",
     "@babel/core": "^7.2.2",
-    "@babel/preset-env": "^7.0.0-beta.47",
-    "@sage/bc-statuscodeerror": "^1.1.8"
+    "@babel/preset-env": "^7.0.0-beta.47"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
