@@ -1,6 +1,6 @@
 {
   "name": "@sage/bc-bankids",
-  "version": "1.1.17",
+  "version": "1.1.18",
   "author": "Sage UK",
   "license": "ISC",
   "description": "Banking Cloud BankIds module",
