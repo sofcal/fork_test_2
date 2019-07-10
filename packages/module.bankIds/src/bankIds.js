@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = (function() {
-    const ns = {}; 
+    const ns = {};
 
     ns.absa = '273cdbab-c56c-4681-90df-8fcadc3a7c71';
     ns.aib = 'cb85d748-3226-4eb4-b7df-932c1a77ded6';
@@ -51,7 +51,7 @@ module.exports = (function() {
     ns.sageindirectaus = '7b0964d9-7e4d-4b7b-999d-098d4910b1a4';
     ns.sageIndirectMys = '8d95b304-dbfa-444b-9828-f93b97bff1d6';
     ns.tide = '8ccee59e-d837-4d1b-8d79-5a664971af8a';
-    // Freeze
+
     Object.freeze(ns);
     return ns;
 }());
