@@ -1,11 +1,11 @@
 const index = require('../../lib/index');
-const AlertTypes = require('../../lib/AlertTypes');
+const ProductIds = require('../../lib/ProductIds');
 const should = require('should');
 
-describe('@sage/bc-alerttypes.index', function(){
+describe('@sage/bc-productids.index', function(){
     // placeholder
     it('should export the correct modules', (done) => {
-        should(index).eql(AlertTypes);
+        should(index).eql(ProductIds);
         done();
     });
 });
