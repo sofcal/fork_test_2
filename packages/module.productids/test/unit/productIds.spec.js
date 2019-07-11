@@ -1,11 +1,30 @@
 'use strict';
 
 const ProductIds = require('../../lib/ProductIds');
-const should = require('should');
 
 describe('@sage/bc-productids', function() {
-    it('should have a property named as alerts', (done) => {
-        ProductIds.should.be.a.Object();
+    it('should export an object with the correct properties', (done) => {
+        ProductIds.should.be.a.Object().with.properties(
+            'sagelive',
+            'sageLiveAccountant',
+            'sageOne',
+            'sageUKI50Accounts',
+            'sageUKI200Accounts',
+            'sageUS50Accounts',
+            'sageCA50Accounts',
+            'sageES50Accounts',
+            'sageUS100Accounts',
+            'sageUS100Contractor',
+            'sageCA100Contractor',
+            'sageES200Accounts',
+            'sageZA50Accounts',
+            'sageIntegration',
+            'sageMigration',
+            'sageIntacct',
+            'sageIntacctSig',
+            'sageZAEvolution',
+            'sageMY50Accounts'
+        );
         done();
     });
 });
