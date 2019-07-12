@@ -89,6 +89,7 @@
         "statuses": {
           "active": 14,
           "authRequired": 2,
+          "autoCancelled": 1,
           "cancelled": 2,
           "inactiveClient": 2,
           "inactiveFeed": 2,
