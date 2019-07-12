@@ -14,6 +14,13 @@ module.exports = (function() {
         lte: 'le'
     };
 
+    ns.types = {
+        user: 'User',
+        accountant: 'Accountant',
+        feedback: 'Feedback',
+        global: 'Global'
+    };
+
     Object.freeze(ns);
     return ns;
 }());
