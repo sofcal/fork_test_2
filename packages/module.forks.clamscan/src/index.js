@@ -12,7 +12,7 @@ const fs = require('fs');
 const node_path = require('path'); // renamed to prevent conflicts in `scan_dir`
 const child_process = require('child_process');
 const {PassThrough, Transform} = require('stream');
-const {promisify} = util;
+const {promisify} = require('bluebird');
 const {exec, execSync, execFile, spawn} = child_process;
 
 // Enable these once the FS.promises API is no longer experimental
@@ -41,9 +41,8 @@ let counter = 0;
 // NOTE: If string is passed to first param, it will be `msg` and data will be `{}`
 // -----
 // @param   Object  data    Additional data we might want to have access to on error
-// ****************************************************************************
 class NodeClamError extends Error {
-    constructor(data={}, ...params) {
+    constructor(data = {}, ...params) {
         let [ msg, fileName, lineNumber ] = params;
 
         if (typeof data === 'string') {
