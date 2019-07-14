@@ -1,6 +1,6 @@
 {
   "name": "@sage/sfab-workers-clam-av",
-  "version": "1.1.32",
+  "version": "1.1.33",
   "description": "Worker process for scanning files using ClamAV. Polls for work on an AWS Step Activity",
   "publishConfig": {
     "registry": "https://sage.myget.org/F/npm/npm/",
