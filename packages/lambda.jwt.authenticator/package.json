@@ -1,13 +1,13 @@
 {
   "name": "lambda-jwt-authenticator",
-  "version": "1.1.13",
+  "version": "1.1.20",
   "author": "",
   "license": "ISC",
   "description": "",
   "main": "lib/handler.js",
   "private": true,
   "dependencies": {
-    "@sage/sfab-s2s-jwt-authenticator-lambda": "^1.1.13",
+    "@sage/sfab-s2s-jwt-authenticator-lambda": "^1.1.20",
     "aws-sdk": "^2.220.1"
   },
   "devDependencies": {
