@@ -5,7 +5,8 @@ const { Readable } = require('stream');
 const Promise = require('bluebird');
 
 class Worker {
-    constructor({ step, s3, clam, name }) {
+    constructor({ step, s3, activityArn, clam, name }) {
+        this.activityArn = activityArn;
         this.name = name;
         this.services = { step, s3, clam };
         this.active = false;
@@ -29,7 +30,7 @@ class Worker {
         console.log('BEGINNING WAIT ON TASK');
         return Promise.resolve(undefined)
             .then(() => {
-                const taskOptions = { activityArn: 'arn:aws:states:eu-west-1:277381856145:activity:test_activity_3', workerName: this.name };
+                const taskOptions = { activityArn: this.activityArn, workerName: this.name };
                 return this.services.step.getActivityTask(taskOptions).promise()
                     .then(({ taskToken, input }) => {
                         console.log('___LONG POLL FINISHED');

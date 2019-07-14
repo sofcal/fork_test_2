@@ -25,14 +25,13 @@ const clamScanOptions = {
 
 class Supervisor {
     constructor(config) {
-        const { step, region, bucket, numberOfWorkers = 1 } = config;
-        const paramPrefix = config.paramPrefix || `/${config.environment}/`;
+        const { step, region, bucket, activityArn, numberOfWorkers = 1 } = config;
 
         this.services = {
             step: step || new AWS.StepFunctions({ region }),
-            parameter: Parameter.Create({ env: { region }, paramPrefix }),
             s3: S3.Create({ bucket })
         };
+        this.activityArn = activityArn;
         this.numberOfWorkers = numberOfWorkers;
         this.clam = null;
     }
@@ -51,7 +50,16 @@ class Supervisor {
                         this.clam = clam;
 
                         console.log('____CREATING WORKERS', this.numberOfWorkers);
-                        this.workers = _.times(this.numberOfWorkers, (id) => Worker.Create({ step: this.services.step, s3: this.services.s3, clam: this.clam, name: `clam_av_worker_${id}_${uuid()}` }));
+                        this.workers = _.times(this.numberOfWorkers, (id) => {
+                            const options = {
+                                step: this.services.step,
+                                s3: this.services.s3,
+                                clam: this.clam,
+                                activityArn: this.activityArn,
+                                name: `clam_av_worker_${id}_${uuid()}`
+                            };
+                            return Worker.Create(options);
+                        });
                         console.log('____CREATED WORKERS', this.workers.length);
                     });
             });
