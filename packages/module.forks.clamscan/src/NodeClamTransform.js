@@ -3,6 +3,11 @@
  * https://github.com/yongtang/clamav.js
  */
 
+/**
+ * This package is forked from the original to allow transpiling to node 6 compatible ES6. Use of util.promisify has been replaced with
+ * bluebird promisify
+ */
+
 const { Transform } = require('stream');
 
 class NodeClamTransform extends Transform {

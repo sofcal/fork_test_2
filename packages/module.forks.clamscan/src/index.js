@@ -4,6 +4,11 @@
  * MIT Licensed
  */
 
+/**
+ * This package is forked from the original to allow transpiling to node 6 compatible ES6. Use of util.promisify has been replaced with
+ * bluebird promisify
+ */
+
 // Module dependencies.
 const os = require('os');
 const util = require('util');

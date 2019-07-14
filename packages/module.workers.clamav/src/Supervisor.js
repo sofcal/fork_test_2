@@ -40,6 +40,7 @@ class Supervisor {
         return Promise.resolve(undefined)
             .then(() => {
                 if (this.clam) {
+                    console.log('CLAM ALREADY INITIALISED');
                     return undefined;
                 }
 
