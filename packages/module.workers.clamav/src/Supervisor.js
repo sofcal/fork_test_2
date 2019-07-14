@@ -9,7 +9,6 @@ const uuid = require('uuid/v4');
 const _ = require('underscore');
 
 const S3 = require('@sage/bc-services-s3');
-const Parameter = require('@sage/bc-services-parameter');
 
 const clamScanOptions = {
     scan_log: '/var/log/node-clam', // You're a detail-oriented security professional.

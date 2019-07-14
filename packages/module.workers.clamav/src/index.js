@@ -1,8 +1,8 @@
 'use strict';
 
 const Worker = require('./Worker');
-const WorkerFactory = require('./WorkerFactory');
+const Supervisor = require('./Supervisor');
 
 module.exports = {
-    Worker, WorkerFactory
+    Worker, Supervisor
 };

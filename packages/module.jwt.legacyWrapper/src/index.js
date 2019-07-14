@@ -6,8 +6,10 @@ const EndpointStore = require('@sage/sfab-s2s-jwt-endpoint-store');
 const Issuer = require('@sage/sfab-s2s-jwt-issuer');
 const Jwks = require('@sage/sfab-s2s-jwt-jwks');
 const Kid = require('@sage/sfab-s2s-jwt-kid');
+const Parameter = require('@sage/bc-services-parameter');
 const Step = require('@sage/bc-services-step');
+const ClamAVWorkers = require('@sage/sfab-workers-clam-av');
 
 module.exports = {
-    Authenticator, Cache, EndpointStore, Issuer, Jwks, Kid, Step
+    Authenticator, Cache, EndpointStore, Issuer, Jwks, Kid, Parameter, Step, ClamAVWorkers
 };
