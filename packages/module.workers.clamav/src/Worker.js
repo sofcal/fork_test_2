@@ -4,8 +4,15 @@ const { Readable } = require('stream');
 
 const Promise = require('bluebird');
 
+const consts = {
+    INFECTED: 'Infected',
+    CLEAN: 'Clean'
+};
+
 class Worker {
-    constructor({ step, s3, activityArn, clam, name }) {
+    constructor({ step, s3, activityArn, clam, name }, { logger }) {
+        this.logger = logger;
+
         this.activityArn = activityArn;
         this.name = name;
         this.services = { step, s3, clam };
@@ -17,83 +24,99 @@ class Worker {
     }
 
     start() {
+        const func = `${Worker.name}.start`;
+        this.logger.info({ function: func, msg: 'started', params: { worker_name: this.name } });
         this.active = true;
 
         poll(this);
+        this.logger.info({ function: func, msg: 'ended', params: { worker_name: this.name } });
     }
 
     stop() {
+        const func = `${Worker.name}.stop`;
+        this.logger.info({ function: func, msg: 'started', params: { worker_name: this.name } });
         this.active = false;
+
+        this.logger.info({ function: func, msg: 'ended', params: { worker_name: this.name } });
     }
 
     waitOnTask() {
-        console.log('BEGINNING WAIT ON TASK');
+        const func = `${Worker.name}.waitOnTask`;
+        this.logger.debug({ function: func, msg: 'started', params: { worker_name: this.name } });
         return Promise.resolve(undefined)
             .then(() => {
                 const taskOptions = { activityArn: this.activityArn, workerName: this.name };
                 return this.services.step.getActivityTask(taskOptions).promise()
-                    .then(({ taskToken, input }) => {
-                        console.log('___LONG POLL FINISHED');
+                    .then(({ taskToken, input = '{}' }) => {
                         if (!taskToken) {
-                            console.log('NO TASK');
+                            this.logger.debug({ function: func, msg: 'no task after long poll. Retrying', params: { worker_name: this.name } });
                             return undefined;
                         }
 
-                        return scan(this.services, taskToken, input)
+                        this.logger.info({ function: func, msg: 'retrieved task', params: { worker_name: this.name, taskToken } });
+                        const parsed = JSON.parse(input);
+
+                        return scan(this.services, taskToken, parsed, { logger: this.logger })
                             .then((result) => {
-                                console.log('______SENDING SUCCESS')
-                                const successOptions = { taskToken, output: input };
-                                return this.services.step.sendTaskSuccess(successOptions).promise()
-                                    .then((res) => {
-                                        console.log('______RES');
-                                        console.log(res);
-                                    });
+                                parsed.scanStatus = result.is_infected ? consts.INFECTED : consts.CLEAN;
+                                const successOptions = { taskToken, output: JSON.stringify(parsed) };
+
+                                this.logger.info({ function: func, msg: 'sending success result', params: { worker_name: this.name, is_infected: result.is_infected, scanStatus: successOptions.scanStatus } });
+                                return this.services.step.sendTaskSuccess(successOptions).promise();
                             })
                             .catch((err) => {
+                                this.logger.error({ function: func, msg: 'error occurred during scan. Sending failure result', params: { worker_name: this.name, error: err.message } });
                                 const failureOptions = { taskToken, cause: 'AV Check error', error: err.message };
-                                console.log('______SENDING FAILURE')
-                                console.log(err);
                                 return this.services.step.sendTaskFailure(failureOptions).promise();
                             });
                     });
             })
             .catch((err) => {
-                console.log('SOME ERROR');
-                console.log(err);
+                this.logger.error({ function: func, msg: 'error attempting to retrieve task. Swallowing', params: { worker_name: this.name, error: err.message } });
             })
-            .then(() => Promise.delay(1000));
+            .then(() => Promise.delay(1000))
+            .then(() => {
+                this.logger.debug({ function: func, msg: 'ended', params: { worker_name: this.name } });
+            });
     }
 }
 
 const poll = Promise.method((self) => {
-    console.log('POLL START')
     return self.waitOnTask()
         .then(() => {
             if (self.active) {
-                console.log('CALLING POLL')
                 poll(self);
             }
         });
 });
 
-const scan = Promise.method((services, taskToken, input) => {
-    console.log('_____PERFORMING SCAN');
-    console.log(taskToken);
-    console.log(input);
+const scan = Promise.method((services, taskToken, parsed, { logger }) => {
+    const func = `${Worker.name}.scan`;
+    logger.info({ function: func, msg: 'started', params: { worker_name: this.name } });
 
-    const parsed = JSON.parse(input);
-    return services.s3.get(`${parsed.prefix}${parsed.fileName}`, parsed.bucket)
+    const bucket = parsed.bucket;
+    const key = `${parsed.prefix}${parsed.fileName}`;
+
+    logger.info({ function: func, msg: 'retrieving file from s3', params: { worker_name: this.name, bucket, key } });
+
+    return services.s3.get(key, bucket)
+        .catch((err) => {
+            logger.info({ function: func, msg: 'error retrieving file from s3', params: { worker_name: this.name, error: err.message } });
+            throw err;
+        })
         .then((data) => {
-            console.log(data);
+            logger.info({ function: func, msg: 'retrieved file from s3', params: { worker_name: this.name } });
             if (!data.Body) {
+                logger.info({ function: func, msg: 'file had no content', params: { worker_name: this.name } });
                 throw new Error('s3 file is empty');
             }
 
+            logger.info({ function: func, msg: 'beginning scan', params: { worker_name: this.name } });
             const stream = bufferToStream(data.Body);
-            //return services.clam.is_infected('/Users/wayne.smith/Desktop/BC-ArchitecturalOverview-040619-2304-312.pdf')
             return services.clam.scan_stream(stream)
-                .then((isInfected) => {
-                    console.log('_____RESULT', isInfected);
+                .then((result) => {
+                    logger.info({ function: func, msg: 'ended', params: { worker_name: this.name } });
+                    return result;
                 });
         });
 });
@@ -103,10 +126,8 @@ const bufferToStream = (data) => {
     readable._read = () => {}; // _read should be used to populate the stream, but we're pushing direct to it as we have the data in memory
     readable.push(data);
     readable.push(null);
-    const original = readable.destroy;
     readable.destroy = () => {
-        console.log('____ORIG')
-        console.log(original);
+        // pass-through to allow this stream to work with clamscan
     };
 
     return readable;
