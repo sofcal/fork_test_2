@@ -1,16 +1,16 @@
 'use strict';
 
-const util = require('util');
-const Query = require('');
+//const util = require('util');
+//const Query = require('');
 
 module.exports = function() {
     const defaultCount = 100;
 
     function UncappedQuery(startIndex, count, where) {
-        UncappedQuery.super_.call(this, startIndex, count, where);
+       // UncappedQuery.super_.call(this, startIndex, count, where);
     }
 
-    util.inherits(UncappedQuery, Query);
+   // util.inherits(UncappedQuery, Query);
 
     let p = UncappedQuery.prototype;
 
