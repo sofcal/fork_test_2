@@ -14,7 +14,7 @@ module.exports = (function() {
         lte: 'le'
     };
 
-    ns.types = {
+    ns.ruleTypes = {
         user: 'User',
         accountant: 'Accountant',
         feedback: 'Feedback',
