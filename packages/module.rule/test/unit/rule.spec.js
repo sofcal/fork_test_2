@@ -14,10 +14,10 @@ describe('@sage/bc-rule', function() {
         RuleSpec.operations.should.have.property('gte').which.is.a.String();
         RuleSpec.operations.should.have.property('lte').which.is.a.String();
 
-        RuleSpec.types.should.property('user').which.is.a.String();
-        RuleSpec.types.should.property('accountant').which.is.a.String();
-        RuleSpec.types.should.property('feedback').which.is.a.String();
-        RuleSpec.types.should.property('global').which.is.a.String();
+        RuleSpec.ruleTypes.should.property('user').which.is.a.String();
+        RuleSpec.ruleTypes.should.property('accountant').which.is.a.String();
+        RuleSpec.ruleTypes.should.property('feedback').which.is.a.String();
+        RuleSpec.ruleTypes.should.property('global').which.is.a.String();
 
         Object.isFrozen(RuleSpec).should.be.true();
         done();
