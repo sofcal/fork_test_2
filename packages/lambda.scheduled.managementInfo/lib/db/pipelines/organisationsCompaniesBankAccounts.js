@@ -59,6 +59,7 @@ module.exports = ({ productId, count } = {}) => {
                     missing: { $cond: [{ $not: ['$bankAccountLookup'] }, true, false] },
 
                     status: { $cond: [{ $not: ['$bankAccountLookup'] }, null, '$bankAccountLookup.status'] },
+                    internal: { $cond: [{ $not: ['$bankAccountLookup'] }, null, '$bankAccountLookup.internal'] },
                     transactionCount: { $cond: [{ $not: ['$bankAccountLookup'] }, null, '$bankAccountLookup.lastTransactionId'] },
                     unresolvedCount: { $cond: [{ $not: ['$bankAccountLookup'] }, null, '$bankAccountLookup.lastHeldTransactionId'] },
                     bankId: { $cond: [{ $not: ['$bankAccountLookup'] }, null, '$bankAccountLookup.bankId'] },

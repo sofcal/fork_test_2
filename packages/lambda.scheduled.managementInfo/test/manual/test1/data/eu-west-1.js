@@ -130,6 +130,25 @@ var ba8 = {
     organisationId: org1ID,
     bankId: bank._id,
     bankIdentifier: '000000',
+    accountIdentifier: '000000007',
+    aggregatorName: null,
+    status: 'cancelled',
+    internal: {
+        cancellationReason: {
+            code: "auto",
+            description: "bank account pending for over 180 days"
+        }
+    },
+    accountant: { accountantManaged: 'none' },
+    lastTransactionId: 2,
+    lastHeldTransactionId: 0
+};
+
+var ba9 = {
+    _id: '10000000-0000-0000-0000-000000000009',
+    organisationId: org1ID,
+    bankId: bank._id,
+    bankIdentifier: '000000',
     accountIdentifier: '000000008',
     aggregatorName: null,
     status: 'invalid',
@@ -141,7 +160,7 @@ var ba8 = {
 var comp1 = {
     _id: '10000000-0000-0000-0000-000000000001',
     organisationId: org1ID,
-    bankAccounts: [ba1._id, ba2._id, ba3._id, ba4._id, ba5._id, ba6._id, ba7._id, ba8._id]
+    bankAccounts: [ba1._id, ba2._id, ba3._id, ba4._id, ba5._id, ba6._id, ba7._id, ba8._id, ba9._id]
 };
 
 var comp2 = {
@@ -163,18 +182,19 @@ var org1 = {
         { bankAccountId: ba6._id, region: 'GBR', deleted: null },
         { bankAccountId: ba7._id, region: 'GBR', deleted: null },
         { bankAccountId: ba8._id, region: 'GBR', deleted: null },
+        { bankAccountId: ba9._id, region: 'GBR', deleted: null },
         { bankAccountId: '10000000-0000-0000-0000-999999999999', region: 'GBR', deleted: new Date('2018-10-01') }
     ]
 };
 
-bankAccounts.push(ba1, ba2, ba3, ba4, ba5, ba6, ba7, ba8);
+bankAccounts.push(ba1, ba2, ba3, ba4, ba5, ba6, ba7, ba8, ba9);
 companies.push(comp1, comp2);
 organisations.push(org1);
 
 /* setup for organisation 1 */
 
-var ba9 = {
-    _id: '10000000-0000-0000-0000-000000000009',
+var ba10 = {
+    _id: '10000000-0000-0000-0000-000000000010',
     organisationId: org2ID,
     bankId: bank._id,
     bankIdentifier: '000000',
@@ -186,8 +206,8 @@ var ba9 = {
     lastHeldTransactionId: 0
 };
 
-var ba10 = {
-    _id: '10000000-0000-0000-0000-000000000010',
+var ba11 = {
+    _id: '10000000-0000-0000-0000-000000000011',
     organisationId: org2ID,
     bankId: bank._id,
     bankIdentifier: '000000',
@@ -199,8 +219,8 @@ var ba10 = {
     lastHeldTransactionId: 101
 };
 
-var ba11 = {
-    _id: '10000000-0000-0000-0000-000000000011',
+var ba12 = {
+    _id: '10000000-0000-0000-0000-000000000012',
     organisationId: org2ID,
     bankId: bank._id,
     bankIdentifier: '000000',
@@ -212,8 +232,8 @@ var ba11 = {
     lastHeldTransactionId: 101
 };
 
-var ba12 = {
-    _id: '10000000-0000-0000-0000-000000000012',
+var ba13 = {
+    _id: '10000000-0000-0000-0000-000000000013',
     organisationId: org2ID,
     bankId: bank._id,
     bankIdentifier: '000000',
@@ -228,7 +248,7 @@ var ba12 = {
 var comp3 = {
     _id: '10000000-0000-0000-0000-000000000003',
     organisationId: org2ID,
-    bankAccounts: [ba9._id, ba10._id, ba11._id, ba12._id]
+    bankAccounts: [ba10._id, ba11._id, ba12._id, ba13._id]
 };
 
 var org2 = {
@@ -236,14 +256,14 @@ var org2 = {
     companies: [comp3._id],
     products: [{ productId: product._id }],
     bankAccounts: [
-        { bankAccountId: ba9._id, region: 'GBR', deleted: null },
         { bankAccountId: ba10._id, region: 'GBR', deleted: null },
         { bankAccountId: ba11._id, region: 'GBR', deleted: null },
-        { bankAccountId: ba12._id, region: 'GBR', deleted: null }
+        { bankAccountId: ba12._id, region: 'GBR', deleted: null },
+        { bankAccountId: ba13._id, region: 'GBR', deleted: null }
     ]
 };
 
-bankAccounts.push(ba9, ba10, ba11, ba12);
+bankAccounts.push(ba10, ba11, ba12, ba13);
 companies.push(comp3);
 organisations.push(org2);
 
