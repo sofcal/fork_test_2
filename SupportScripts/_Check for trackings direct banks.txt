@@ -1,5 +1,0 @@
-db.getCollection('Tracking').find({"owner":{$in:[
-"41a2e599-1041-494d-89b5-84d03ad688fa","fe9f88e8-7e17-4086-b668-b08045e6f087","453e8bd6-958a-49a4-8b4d-0dc571b98ba3","1b29cae8-29d9-40b6-8925-125efa010c1d",
-"a6333da7-17e2-4f37-a802-005331f5ca40","8ccee59e-d837-4d1b-8d79-5a664971af8a","21ae0185-1acb-484c-9afd-96544cd9354f","273cdbab-c56c-4681-90df-8fcadc3a7c71",
-"cd0809a4-33bd-4e02-898b-11c2c371c36c","b84a7cb2-4802-45e4-bac7-891e844bac7b"
-]}})
