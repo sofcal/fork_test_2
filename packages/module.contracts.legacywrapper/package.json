@@ -1,6 +1,6 @@
 {
   "name": "@sage/bc-contracts-legacy-wrapper",
-  "version": "1.0.0",
+  "version": "1.1.38",
   "author": "Sage UK",
   "license": "ISC",
   "description": "contracts legacy wrapper",
@@ -22,7 +22,7 @@
     "@sage/bc-rule": "^1.1.29",
     "@sage/bc-servicenames": "^1.1.23",
     "@sage/bc-statuscodeerror": "^1.1.32",
-    "@sage/bc-validators": "^1.1.37"
+    "@sage/bc-validators": "^1.1.38"
   },
   "devDependencies": {
     "eslint": "^4.11.0",

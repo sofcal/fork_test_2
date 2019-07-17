@@ -1,6 +1,6 @@
 {
   "name": "@sage/bc-validators",
-  "version": "1.1.37",
+  "version": "1.1.38",
   "author": "Sage UK",
   "license": "ISC",
   "description": "lib/service/utils validators",
