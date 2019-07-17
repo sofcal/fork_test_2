@@ -5,7 +5,6 @@
   "license": "ISC",
   "description": "contracts legacy wrapper",
   "main": "lib/index.js",
-  "private": true,
   "directories": {
     "lib": "lib"
   },
