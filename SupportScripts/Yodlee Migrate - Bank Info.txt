@@ -1,0 +1,6 @@
+DBQuery.shellBatchSize = 500;
+db.BankAccount.find({ _id: { $in: [
+ 
+// ids go here 
+]}}
+, { ledgerBalanceAmout: 1, openingBalanceAmount: 1, availableBalanceAmount: 1, status: 1, accountName:1})

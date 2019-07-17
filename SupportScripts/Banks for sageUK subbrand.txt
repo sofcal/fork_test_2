@@ -1,0 +1,14 @@
+DBQuery.shellBatchSize = 500;
+db.BankAccount.aggregate([{$match:{aggregatorApplicationAccount:"sageUK"}},
+{ $lookup: { from: 'Bank', localField: 'bankId', foreignField: '_id', as: 'bnkDetail'}}, 
+{ $unwind: '$bnkDetail' },
+{
+                $group:{
+                    _id: {'bankName':'$bnkDetail.name', 'providerId':'$bnkDetail.aggregatorId' , 'aggregatorName':'$aggregatorName', 'region':'$region'},
+                    bankCount: {'$sum':1}
+                    }
+             },
+             { $sort: {bankCount: -1} },
+],{
+allowDiskUse: true
+})

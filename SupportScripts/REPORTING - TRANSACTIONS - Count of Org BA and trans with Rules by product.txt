@@ -1,0 +1,41 @@
+db.Organisation.aggregate([
+{ $unwind: { path: '$products', preserveNullAndEmptyArrays: false } },
+{ $lookup: { from: 'Product', localField: 'products.productId', foreignField: '_id', as: 'prod'}},
+{ $unwind: { path: '$bankAccounts', preserveNullAndEmptyArrays: false } },
+{ $lookup: { from: 'Transaction', localField: 'bankAccounts.bankAccountId', foreignField: 'bankAccountId', as: 'transLookup'}},
+{ $unwind: { path: '$transLookup', preserveNullAndEmptyArrays: false } },
+{ $unwind: { path: '$transLookup.transactions', preserveNullAndEmptyArrays: false } },
+{ $unwind: { path: '$transLookup.transactions.accountsPostings', preserveNullAndEmptyArrays: false } },
+{
+        $project: {
+            _id: '$products.productId',
+            productName: '$prod.name',
+            numberOfOrg: '$_id',
+            numberOfBankAccounts: '$transLookup.bankAccountId',
+            numberOfTransWithRules: '$transLookup.transactions.uuid',
+            numberOfUniqueRules: '$transLookup.transactions.accountsPostings.createdBy'
+        }
+    }, {
+        $group: {
+            _id: '$_id',
+            productName: { $first: '$productName' },
+            numberOfOrg: { $addToSet: '$numberOfOrg' },
+            numberOfBankAccounts: { $addToSet: '$numberOfBankAccounts' },
+            numberOfTransWithRules: { $addToSet: '$numberOfTransWithRules' },
+            numberOfUniqueRules: { $addToSet: '$numberOfUniqueRules' },
+        }
+    },
+{ $unwind: { path: '$productName', preserveNullAndEmptyArrays: false } },
+{
+        $project: {
+            _id: 1,
+            productName: 1,
+            numberOfOrg: { $cond: [{ $not: ['$numberOfOrg'] }, 0, { $size: '$numberOfOrg'}] },
+            numberOfBankAccounts: { $cond: [{ $not: ['$numberOfBankAccounts'] }, 0, { $size: '$numberOfBankAccounts'}] },
+            numberOfTransWithRules: { $cond: [{ $not: ['$numberOfTransWithRules'] }, 0, { $size: '$numberOfTransWithRules'}] },
+            numberOfUniqueRules: { $cond: [{ $not: ['$numberOfUniqueRules'] }, 0, { $size: '$numberOfUniqueRules'}] }
+        }
+    }
+],{
+allowDiskUse: true
+})

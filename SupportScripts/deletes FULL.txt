@@ -1,0 +1,93 @@
+db.Transaction.remove({"bankAccountId":{$in:[ 
+'d9c9fc84-0514-4cde-adb3-b6ff603f4f89','cd77290f-7c33-4dae-9144-13b42619d37c','ff9fae51-78ba-461e-b029-faa9e5452e14'
+]}}) 
+
+db.Rule.remove({"bankAccountId":{$in:[ 
+'d9c9fc84-0514-4cde-adb3-b6ff603f4f89','cd77290f-7c33-4dae-9144-13b42619d37c','ff9fae51-78ba-461e-b029-faa9e5452e14'
+]}}) 
+
+db.Transaction.remove({bankAccountId: '687e0010-6376-4129-8784-220e3f725be1'})
+db.Unresolved.remove({bankAccountId: '687e0010-6376-4129-8784-220e3f725be1'})
+db.Rule.remove({bankAccountId: '687e0010-6376-4129-8784-220e3f725be1'})
+db.User.remove({_id: '9833fb7f-3e10-41ca-80b1-3652ead53dca'}); 
+db.BankAccount.remove({organisationId:"3283eaf6-f9f1-42c7-9e3b-eefd511d23d8"}) 
+db.CompanyData.remove({companyId: '472508c0-19a9-4934-bc02-886cf41e8bbc'});
+db.Company.remove({organisationId:'3283eaf6-f9f1-42c7-9e3b-eefd511d23d8'}); 
+db.ProviderAccessAccount.remove({organisationId:'3283eaf6-f9f1-42c7-9e3b-eefd511d23d8'}) 
+db.Organisation.remove({_id: '3283eaf6-f9f1-42c7-9e3b-eefd511d23d8'});
+
+
+
+
+
+
+//DELETES 
+db.BankAccount.remove({_id: 'ed00aafc-ad26-464f-b698-fe1e6c74c16b'})
+db.Transaction.remove({bankAccountId: '687e0010-6376-4129-8784-220e3f725be1'})
+db.Unresolved.remove({bankAccountId: '687e0010-6376-4129-8784-220e3f725be1'})
+db.Rule.remove({bankAccountId: '687e0010-6376-4129-8784-220e3f725be1'})
+db.CompanyData.remove({companyId: 'a16c3cc6-ea67-4f72-9e5b-684502a85796'});
+db.Company.remove({_id: 'a16c3cc6-ea67-4f72-9e5b-684502a85796'});
+db.User.remove({_id: 'bdec7c6e-7aac-4587-8f5e-74a6a28566ae'});
+db.Organisation.remove({_id: '6246cfc5-aa37-489c-a2d3-c3a3a7921086'});
+
+
+
+
+db.BankAccount.remove({_id:'825ea560-9390-473f-b21c-bd41c9c08df5'})  
+db.Rule.remove({bankAccountId:'825ea560-9390-473f-b21c-bd41c9c08df5'})
+db.CompanyData.remove({companyId: '608c168b-be84-4a40-a28e-f018504a4c94'});
+db.Company.remove({_id: '608c168b-be84-4a40-a28e-f018504a4c94'});
+db.User.remove({_id: '222fb88e-a0c4-407c-885a-0454ee541435'});
+db.Organisation.remove({_id: '27201fd8-589c-4903-b6f0-d23abd05b5a3'});
+
+
+db.BankAccount.find({"_id":{$in:[
+"89225398-3c55-4e4a-8cec-8e099ec64ffe","da19dce8-18b2-464f-825c-68bc53e3c116","f3594403-228e-42a8-954f-4c95609698e9","3fb89d76-c593-44e1-a9e1-9523304e203e"
+]}})
+
+//DELETES 
+db.BankAccount.remove({_id: 'ed00aafc-ad26-464f-b698-fe1e6c74c16b'})
+db.Transaction.remove({bankAccountId: 'ed00aafc-ad26-464f-b698-fe1e6c74c16b'})
+db.Unresolved.remove({bankAccountId: 'ed00aafc-ad26-464f-b698-fe1e6c74c16b'})
+db.Rule.remove({bankAccountId: 'ed00aafc-ad26-464f-b698-fe1e6c74c16b'})
+db.CompanyData.remove({"companyId":{$in:[
+"38fc6201-5cf4-4275-b2f5-53d899aa6734", 
+        "a5eadf8f-d14e-4dce-aa9c-944b7a3c9411", 
+        "d52b9adf-8b17-4cc6-bba3-736e09a7b6b0", 
+        "b564c82e-aa33-466c-a867-4702d0661c61", 
+        "92609c4e-ef3f-4bd6-aee2-eec043162686", 
+        "482d0f90-bc6d-4a21-bb68-dbd07487c741", 
+        "8b292138-2940-4ca9-bfde-d6170cebabbb", 
+        "e55c622a-8fb5-4bce-a65c-fe31f783f7c3", 
+        "d0302954-ce95-4696-959b-c1651bc8933a", 
+        "8d6584a8-ec6f-40e3-ac3e-082bd2e70f49", 
+        "623d2253-e05c-455d-8f25-f115e9ecb368", 
+        "4fd4ec12-6c3d-4985-91b9-7421ca10db94", 
+        "d9980f6a-6c97-4f68-bc93-8cce8123b0cb", 
+        "9b50e534-478e-4a54-b11f-e5879a3a8d92", 
+        "09d990af-4877-40df-af57-0c9d1fc8eaf5"
+]}})
+db.Company.remove({"_id":{$in:[
+"38fc6201-5cf4-4275-b2f5-53d899aa6734", 
+        "a5eadf8f-d14e-4dce-aa9c-944b7a3c9411", 
+        "d52b9adf-8b17-4cc6-bba3-736e09a7b6b0", 
+        "b564c82e-aa33-466c-a867-4702d0661c61", 
+        "92609c4e-ef3f-4bd6-aee2-eec043162686", 
+        "482d0f90-bc6d-4a21-bb68-dbd07487c741", 
+        "8b292138-2940-4ca9-bfde-d6170cebabbb", 
+        "e55c622a-8fb5-4bce-a65c-fe31f783f7c3", 
+        "d0302954-ce95-4696-959b-c1651bc8933a", 
+        "8d6584a8-ec6f-40e3-ac3e-082bd2e70f49", 
+        "623d2253-e05c-455d-8f25-f115e9ecb368", 
+        "4fd4ec12-6c3d-4985-91b9-7421ca10db94", 
+        "d9980f6a-6c97-4f68-bc93-8cce8123b0cb", 
+        "9b50e534-478e-4a54-b11f-e5879a3a8d92", 
+        "09d990af-4877-40df-af57-0c9d1fc8eaf5"
+]}})
+
+db.ProviderAccessAccount.remove({organisationId:"de195c10-22a0-4cc2-b081-7d318b4b5f4c"})
+
+
+db.User.remove({_id: '9d22ae60-ee42-455f-b772-6d278f27b4e8'});
+db.Organisation.remove({_id: '6246cfc5-aa37-489c-a2d3-c3a3a7921086'});

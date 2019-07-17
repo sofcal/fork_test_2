@@ -1,0 +1,59 @@
+//orgs where CRM not null
+db.getCollection('Organisation').find({crmId:{$ne:null}})
+
+//trans where transactionNarrative not null
+db.getCollection('Transaction').find({transactions:{$elemMatch:{accountsPostings:{$ne:null}}}})
+
+//trans where checkNum not null
+db.getCollection('Transaction').find({transactions:{$elemMatch:{checkNum:{$not:{ $type: 10 }}}}})
+
+//trans with accountsPostings
+db.getCollection('Transaction').find({transactions:{$elemMatch:{accountsPostings: {$gt: []}}}})
+
+//last 10 in array
+db.Bank.aggregate([{$match:{_id:"8ccee59e-d837-4d1b-8d79-5a664971af8a"}},
+{$project:{recentFileHistory: {$slice: ['$recentFileHistory', -5]}}}
+])
+
+DBQuery.shellBatchSize = 3000
+
+
+
+//find transaction after a date for a given bank accounts
+db.Transaction.aggregate([
+{$match : {"bankAccountId": ""}},
+{$unwind : "$transactions"},
+{$match : { "transactions.datePosted" : {$gte : ISODate("2018-07-17 09:35:11.017Z")}}},
+{ $limit : 5 },
+{ $sort : { datePosted : 1 }}
+])
+
+
+// name contains
+db.getCollection('Bank').find({name: {$regex: ".*Nevada State Bank.*"}})
+
+Sage 200 BC banks
+db.Organisation.aggregate([
+   { $match:{"products.productId": "a70e3079-a931-4a39-aa52-49afbce97005"}},
+   {
+        $lookup: {
+            from: 'BankAccount',
+            localField: '_id',
+            foreignField: 'organisationId',
+            as: 'bnkAccs'
+        }
+    },
+    { $unwind: '$bnkAccs' },
+    { $project: { crmId: '$crmId', 'bankAccountId': '$bnkAccs._id', 'status': '$bnkAccs.status', 'aggregatorName':'$bnkAccs.aggregatorName' , 'bankId': '$bnkAccs.bankId'} },
+	{ $match: { crmId: { $ne: null } } },
+    {
+        $lookup: {
+            from: 'Bank',
+            localField: 'bankId',
+            foreignField: '_id',
+            as: 'bnks'
+        }
+    },
+    { $unwind: '$bnks' },
+    { $project: { crmId: 1, 'bankAccountId': 1, 'bankId': 1, 'status': 1, 'aggregatorName':1, 'bankName': '$bnks.name'} }
+])

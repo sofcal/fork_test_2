@@ -1,0 +1,96 @@
+------- US -------
+
+{
+    "_id" : "d825af92-2dc9-4408-b323-117551039011",
+    "owner" : "b84a7cb2-4802-45e4-bac7-891e844bac7b",
+    "content": "{\"trackingContent\":{\"pollingMillis\":1000,\"phase\":\"failed\",\"phaseDetails\":{\"items\":[{\"severity\":\"Error\",\"errorCode\":\"ApplicationDiagnosis\",\"message\":\"Internal server error\",\"applicationCode\":\"US Bank\",\"formatArgs\":[]}],\"statusCode\":500},\"progress\":\"____US Bank____\",\"elapsedSeconds\":0,\"remainingSeconds\":0},\"persisted\":false,\"internal\":\"{\\\"name\\\":\\\"StatusCodeError\\\",\\\"items\\\":[{\\\"applicationCode\\\":\\\"InvalidProperty\\\",\\\"message\\\":\\\"US Bank\\\",\\\"params\\\":\\\"US Bank\\\"}],\\\"statusCode\\\":400}\"}",
+    "reason" : "b84a7cb2-4802-45e4-bac7-891e844bac7b_import",
+    "created" : ISODate("2019-05-30T15:00:00.161Z"),
+    "updated" : ISODate("2019-05-30T15:00:00.170Z"),
+    "etag" : 1523606930170.0
+}
+
+{
+    "_id" : "d825af92-2dc9-4408-b323-117551039012",
+    "owner" : "cd0809a4-33bd-4e02-898b-11c2c371c36c",
+    "content": "{\"trackingContent\":{\"pollingMillis\":1000,\"phase\":\"failed\",\"phaseDetails\":{\"items\":[{\"severity\":\"Error\",\"errorCode\":\"ApplicationDiagnosis\",\"message\":\"Internal server error\",\"applicationCode\":\"HSBC CAN\",\"formatArgs\":[]}],\"statusCode\":500},\"progress\":\"____HSBC CAN____\",\"elapsedSeconds\":0,\"remainingSeconds\":0},\"persisted\":false,\"internal\":\"{\\\"name\\\":\\\"StatusCodeError\\\",\\\"items\\\":[{\\\"applicationCode\\\":\\\"InvalidProperty\\\",\\\"message\\\":\\\"HSBC CAN\\\",\\\"params\\\":\\\"HSBC CAN\\\"}],\\\"statusCode\\\":400}\"}",
+    "reason" : "cd0809a4-33bd-4e02-898b-11c2c371c36c_import",
+    "created" : ISODate("2019-05-30T15:00:00.161Z"),
+    "updated" : ISODate("2019-05-30T15:00:00.170Z"),
+    "etag" : 1523606930170.0
+}
+
+
+
+
+------- EU -------
+
+{
+    "_id" : "d825af92-2dc9-4408-b323-117551039013",
+    "owner" : "1b29cae8-29d9-40b6-8925-125efa010c1d",
+    "content": "{\"trackingContent\":{\"pollingMillis\":1000,\"phase\":\"failed\",\"phaseDetails\":{\"items\":[{\"severity\":\"Error\",\"errorCode\":\"ApplicationDiagnosis\",\"message\":\"Internal server error\",\"applicationCode\":\"NatWest\",\"formatArgs\":[]}],\"statusCode\":500},\"progress\":\"____NatWest____\",\"elapsedSeconds\":0,\"remainingSeconds\":0},\"persisted\":false,\"internal\":\"{\\\"name\\\":\\\"StatusCodeError\\\",\\\"items\\\":[{\\\"applicationCode\\\":\\\"InvalidProperty\\\",\\\"message\\\":\\\"NatWest\\\",\\\"params\\\":\\\"NatWest\\\"}],\\\"statusCode\\\":400}\"}",
+    "reason" : "1b29cae8-29d9-40b6-8925-125efa010c1d_import",
+    "created" : ISODate("2019-05-30T15:00:00.161Z"),
+    "updated" : ISODate("2019-05-30T15:00:00.170Z"),
+    "etag" : 1523606930170.0
+}
+
+{
+    "_id" : "d825af92-2dc9-4408-b323-117551039015",
+    "owner" : "273cdbab-c56c-4681-90df-8fcadc3a7c71",
+    "content": "{\"trackingContent\":{\"pollingMillis\":1000,\"phase\":\"failed\",\"phaseDetails\":{\"items\":[{\"severity\":\"Error\",\"errorCode\":\"ApplicationDiagnosis\",\"message\":\"Internal server error\",\"applicationCode\":\"ABSA\",\"formatArgs\":[]}],\"statusCode\":500},\"progress\":\"____ABSA____\",\"elapsedSeconds\":0,\"remainingSeconds\":0},\"persisted\":false,\"internal\":\"{\\\"name\\\":\\\"StatusCodeError\\\",\\\"items\\\":[{\\\"applicationCode\\\":\\\"InvalidProperty\\\",\\\"message\\\":\\\"ABSA\\\",\\\"params\\\":\\\"ABSA\\\"}],\\\"statusCode\\\":400}\"}",
+    "reason" : "273cdbab-c56c-4681-90df-8fcadc3a7c71_import",
+    "created" : ISODate("2019-05-30T15:00:00.161Z"),
+    "updated" : ISODate("2019-05-30T15:00:00.170Z"),
+    "etag" : 1523606930170.0
+}
+
+{
+    "_id" : "d825af92-2dc9-4408-b323-117551039016",
+    "owner" : "41a2e599-1041-494d-89b5-84d03ad688fa",
+    "content": "{\"trackingContent\":{\"pollingMillis\":1000,\"phase\":\"failed\",\"phaseDetails\":{\"items\":[{\"severity\":\"Error\",\"errorCode\":\"ApplicationDiagnosis\",\"message\":\"Internal server error\",\"applicationCode\":\"Lloyds\",\"formatArgs\":[]}],\"statusCode\":500},\"progress\":\"____Lloyds____\",\"elapsedSeconds\":0,\"remainingSeconds\":0},\"persisted\":false,\"internal\":\"{\\\"name\\\":\\\"StatusCodeError\\\",\\\"items\\\":[{\\\"applicationCode\\\":\\\"InvalidProperty\\\",\\\"message\\\":\\\"Lloyds\\\",\\\"params\\\":\\\"Lloyds\\\"}],\\\"statusCode\\\":400}\"}",
+    "reason" : "41a2e599-1041-494d-89b5-84d03ad688fa_import",
+    "created" : ISODate("2019-05-30T15:00:00.161Z"),
+    "updated" : ISODate("2019-05-30T15:00:00.170Z"),
+    "etag" : 1523606930170.0
+}
+
+{
+    "_id" : "d825af92-2dc9-4408-b323-117551039017",
+    "owner" : "453e8bd6-958a-49a4-8b4d-0dc571b98ba3",
+    "content": "{\"trackingContent\":{\"pollingMillis\":1000,\"phase\":\"failed\",\"phaseDetails\":{\"items\":[{\"severity\":\"Error\",\"errorCode\":\"ApplicationDiagnosis\",\"message\":\"Internal server error\",\"applicationCode\":\"HSBC\",\"formatArgs\":[]}],\"statusCode\":500},\"progress\":\"____HSBC____\",\"elapsedSeconds\":0,\"remainingSeconds\":0},\"persisted\":false,\"internal\":\"{\\\"name\\\":\\\"StatusCodeError\\\",\\\"items\\\":[{\\\"applicationCode\\\":\\\"InvalidProperty\\\",\\\"message\\\":\\\"HSBC\\\",\\\"params\\\":\\\"HSBC\\\"}],\\\"statusCode\\\":400}\"}",
+    "reason" : "453e8bd6-958a-49a4-8b4d-0dc571b98ba3_import",
+    "created" : ISODate("2019-05-30T15:00:00.161Z"),
+    "updated" : ISODate("2019-05-30T15:00:00.170Z"),
+    "etag" : 1523606930170.0
+}
+
+{
+    "_id" : "d825af92-2dc9-4408-b323-117551039018",
+    "owner" : "8ccee59e-d837-4d1b-8d79-5a664971af8a",
+    "content": "{\"trackingContent\":{\"pollingMillis\":1000,\"phase\":\"failed\",\"phaseDetails\":{\"items\":[{\"severity\":\"Error\",\"errorCode\":\"ApplicationDiagnosis\",\"message\":\"Internal server error\",\"applicationCode\":\"Tide\",\"formatArgs\":[]}],\"statusCode\":500},\"progress\":\"____Tide____\",\"elapsedSeconds\":0,\"remainingSeconds\":0},\"persisted\":false,\"internal\":\"{\\\"name\\\":\\\"StatusCodeError\\\",\\\"items\\\":[{\\\"applicationCode\\\":\\\"InvalidProperty\\\",\\\"message\\\":\\\"Tide\\\",\\\"params\\\":\\\"Tide\\\"}],\\\"statusCode\\\":400}\"}",
+    "reason" : "8ccee59e-d837-4d1b-8d79-5a664971af8a_import",
+    "created" : ISODate("2019-05-30T15:00:00.161Z"),
+    "updated" : ISODate("2019-05-30T15:00:00.170Z"),
+    "etag" : 1523606930170.0
+}
+
+{
+    "_id" : "d825af92-2dc9-4408-b323-117551039019",
+    "owner" : "a6333da7-17e2-4f37-a802-005331f5ca40",
+    "content": "{\"trackingContent\":{\"pollingMillis\":1000,\"phase\":\"failed\",\"phaseDetails\":{\"items\":[{\"severity\":\"Error\",\"errorCode\":\"ApplicationDiagnosis\",\"message\":\"Internal server error\",\"applicationCode\":\"Cashplus\",\"formatArgs\":[]}],\"statusCode\":500},\"progress\":\"____Cashplus____\",\"elapsedSeconds\":0,\"remainingSeconds\":0},\"persisted\":false,\"internal\":\"{\\\"name\\\":\\\"StatusCodeError\\\",\\\"items\\\":[{\\\"applicationCode\\\":\\\"InvalidProperty\\\",\\\"message\\\":\\\"Cashplus\\\",\\\"params\\\":\\\"Cashplus\\\"}],\\\"statusCode\\\":400}\"}",
+    "reason" : "a6333da7-17e2-4f37-a802-005331f5ca40_import",
+    "created" : ISODate("2019-05-30T15:00:00.161Z"),
+    "updated" : ISODate("2019-05-30T15:00:00.170Z"),
+    "etag" : 1523606930170.0
+}
+
+{
+    "_id" : "d825af92-2dc9-4408-b323-117551039020",
+    "owner" : "fe9f88e8-7e17-4086-b668-b08045e6f087",
+    "content": "{\"trackingContent\":{\"pollingMillis\":1000,\"phase\":\"failed\",\"phaseDetails\":{\"items\":[{\"severity\":\"Error\",\"errorCode\":\"ApplicationDiagnosis\",\"message\":\"Internal server error\",\"applicationCode\":\"Royal Bank of Scotland\",\"formatArgs\":[]}],\"statusCode\":500},\"progress\":\"____Royal Bank of Scotland____\",\"elapsedSeconds\":0,\"remainingSeconds\":0},\"persisted\":false,\"internal\":\"{\\\"name\\\":\\\"StatusCodeError\\\",\\\"items\\\":[{\\\"applicationCode\\\":\\\"InvalidProperty\\\",\\\"message\\\":\\\"Royal Bank of Scotland\\\",\\\"params\\\":\\\"Royal Bank of Scotland\\\"}],\\\"statusCode\\\":400}\"}",
+    "reason" : "fe9f88e8-7e17-4086-b668-b08045e6f087_import",
+    "created" : ISODate("2019-05-30T15:00:00.161Z"),
+    "updated" : ISODate("2019-05-30T15:00:00.170Z"),
+    "etag" : 1523606930170.0
+}
