@@ -21,10 +21,12 @@ describe('runonce-support-missingbankaccounts.extractors.hsbc', function() {
         const expected = [{
             accountIdentifier: '12345678',
             bankIdentifier: '123456'
-        },{
+        },
+        {
             accountIdentifier: '12345671',
             bankIdentifier: '123451'
-        }, {
+        },
+        {
             accountIdentifier: '87654321',
             bankIdentifier: '654321'
         }];
@@ -39,10 +41,12 @@ describe('runonce-support-missingbankaccounts.extractors.hsbc', function() {
         const expected = [{
             accountIdentifier: '12345678',
             bankIdentifier: '123456'
-        },{
+        },
+        {
             accountIdentifier: '12345671',
             bankIdentifier: '123451'
-        }, {
+        },
+        {
             accountIdentifier: '87654321',
             bankIdentifier: '654321'
         }];

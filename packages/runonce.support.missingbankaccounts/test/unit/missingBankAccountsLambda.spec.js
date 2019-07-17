@@ -193,7 +193,15 @@ describe('runonce-support-missingbankaccounts.MissingBankAccountsLambda', functi
             .then(() => {
                 should(DB.Create.callCount).eql(1);
                 should(DB.Create.getCall(0).args).eql([
-                    { 'env': 'test', 'region': 'local', 'domain': expectedDomain, 'username': expectedUsername, 'password': expectedPassword, 'replicaSet': expectedReplicaSet, 'db': 'bank_db' }
+                    { 
+                        'env': 'test', 
+                        'region': 'local', 
+                        'domain': expectedDomain, 
+                        'username': expectedUsername, 
+                        'password': expectedPassword, 
+                        'replicaSet': expectedReplicaSet, 
+                        'db': 'bank_db' 
+                    }
                 ]);              
             });
 

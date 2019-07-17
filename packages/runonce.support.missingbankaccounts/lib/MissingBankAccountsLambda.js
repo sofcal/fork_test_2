@@ -70,16 +70,8 @@ class MissingBankAccountsLambda extends Handler {
                         logger.info({function: func, log: 'No Body in bank file' });
                         throw StatusCodeError.CreateFromSpecs([ErrorSpecs.invalidExtractorInput.body], ErrorSpecs.invalidExtractorInput.body.statusCode);
                     }
-
                     const bankFileString = bankFile.Body.toString();
                     const accountIdentifiers = extractors[bank](bankFileString);
-    
-                    // should a bank file containing no accounts throw an error?
-                    //
-                    // if (!accountIdentifiers || accountIdentifiers.length === 0) {
-                    //     logger.info({function: func, log: 'No accounts found in file' });
-                    //     throw StatusCodeError.CreateFromSpecs([ErrorSpecs.notFound.accountIdentifiers], ErrorSpecs.notFound.accountIdentifiers.statusCode);
-                    // }
 
                     return accountIdentifiers;
                 })
@@ -152,9 +144,6 @@ const populateServices = (services, { env, region, outputBucket, params }, logge
     // eslint-disable-next-line no-param-reassign
     services.db = serviceImpls.DB.Create({ env, region, domain, username, password, replicaSet, db: 'bank_db' });
     services.s3 = serviceImpls.S3.Create({ bucket: outputBucket });
-    // add any additional services that are created by the serviceLoader for the lambda
-
-    // Object.assign(services, serviceLoader.load({ env, region, params }));
 
     logger.info({ function: func, log: 'ended' });
 };
