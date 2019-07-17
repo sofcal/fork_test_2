@@ -1,0 +1,11 @@
+db.getCollection('BankAccount').aggregate([{$match:{bankIdentifier:"1",accountIdentifier://i}},
+{
+        $lookup: {
+            from: 'Organisation',
+            localField: 'organisationId',
+            foreignField: '_id',
+            as: 'org'
+        }
+    },
+{ $unwind: '$org' },
+ {$project:{'adminEmail':'$org.adminEmail','accountIdentifier':'$accountIdentifier','bankIdentifier':'$bankIdentifier','companyName':'$company.companyName'}}])

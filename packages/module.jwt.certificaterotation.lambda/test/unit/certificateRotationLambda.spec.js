@@ -127,7 +127,7 @@ describe('@sage/sfab-s2s-jwt-certificaterotation-lambda.CertificateRotationLambd
             primaryKeysResponse = {
                 'accessToken.primary.publicKey': 'primary_public',
                 'accessToken.primary.privateKey': 'primary_private',
-                'accessToken.primary.createdAt': 1
+                'accessToken.primary.createdAt': '1'
             };
         });
 
@@ -173,7 +173,7 @@ describe('@sage/sfab-s2s-jwt-certificaterotation-lambda.CertificateRotationLambd
                         name: 'accessToken.primary.createdAt',
                         overwrite: true,
                         type: 'SecureString',
-                        value: 1
+                        value: '1'
                     })).eql(true);
 
                     should(parameterService.setParameter.calledWith({
@@ -192,7 +192,7 @@ describe('@sage/sfab-s2s-jwt-certificaterotation-lambda.CertificateRotationLambd
                         name: 'accessToken.secondary.createdAt',
                         overwrite: true,
                         type: 'SecureString',
-                        value: 1
+                        value: '1'
                     })).eql(true);
                 });
         });
@@ -221,7 +221,7 @@ describe('@sage/sfab-s2s-jwt-certificaterotation-lambda.CertificateRotationLambd
                         name: 'accessToken.primary.createdAt',
                         overwrite: true,
                         type: 'SecureString',
-                        value: 1
+                        value: '1'
                     })).eql(true);
 
                     should(parameterService.setParameter.calledWith({
@@ -240,7 +240,7 @@ describe('@sage/sfab-s2s-jwt-certificaterotation-lambda.CertificateRotationLambd
                         name: 'accessToken.secondary.createdAt',
                         overwrite: true,
                         type: 'SecureString',
-                        value: 1
+                        value: '1'
                     })).eql(true);
                 });
         });

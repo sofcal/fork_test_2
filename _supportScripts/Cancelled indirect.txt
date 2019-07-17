@@ -1,0 +1,3 @@
+DBQuery.shellBatchSize = 500;
+db.BankAccount.aggregate([{$match:{bankIdentifier:null, status: 'cancelled', dataProvider:'indirect'}},
+{$project:{'bankIdentifier':'$bankIdentifier','accountIdentifier':'$accountIdentifier','status':'$status'}}]) 

@@ -1,6 +1,6 @@
 {
   "name": "@sage/bc-contracts-rule",
-  "version": "1.1.8",
+  "version": "1.1.32",
   "description": "Banking Cloud schemas",
   "main": "index.js",
   "publishConfig": {
@@ -19,8 +19,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@sage/bc-jsonschema-to-statuscodeerror": "^1.1.8",
-    "@sage/bc-statuscodeerror": "^1.1.8",
+    "@babel/code-frame": "^7.0.0",
+    "@babel/core": "^7.5.4",
+    "@babel/preset-env": "^7.5.4",
+    "@sage/bc-jsonschema-to-statuscodeerror": "^1.1.32",
+    "@sage/bc-statuscodeerror": "^1.1.32",
     "bignumber.js": "^4.0.0",
     "bluebird": "^3.5.1",
     "emitter": "0.0.5",
@@ -29,7 +32,14 @@
     "underscore": "^1.9.0"
   },
   "devDependencies": {
-    "babel-eslint": "^8.0.3",
+    "@babel/cli": "^7.5.0",
+    "@babel/plugin-proposal-class-properties": "^7.5.0",
+    "@babel/preset-env": "^7.5.4",
+    "@babel/preset-flow": "^7.0.0",
+    "@babel/register": "^7.4.4",
+    "babel-eslint": "^10.0.2",
+    "babel-plugin-istanbul": "^5.1.4",
+    "babel-plugin-transform-async-to-promises": "^0.8.12",
     "eslint": "^4.11.0",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-plugin-import": "^2.8.0",

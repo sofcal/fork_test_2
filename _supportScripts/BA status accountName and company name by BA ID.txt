@@ -1,0 +1,5 @@
+DBQuery.shellBatchSize = 500;
+db.BankAccount.aggregate([{$match:{"_id":{$in:[
+    ARRAY OF BankAccount IDS
+]}}},
+{$project:{'accountName':'$accountName', 'companyName':'$company.companyName', 'status':'$status'}}])
