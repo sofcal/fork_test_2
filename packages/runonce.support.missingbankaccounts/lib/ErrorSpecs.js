@@ -10,8 +10,11 @@ module.exports = {
         body: { applicationCode: 'InvalidExtractorInput', message: 'invalid extractor input: missing Body', statusCode: 400 }
     },
     notFound: {
-        accountIdentifiers: { applicationCode: 'NotFound', message: 'account identifiers not found', statusCode: 404 }
+        accountIdentifiers: { applicationCode: 'NotFound', message: 'account identifiers not found', statusCode: 404 },
+        s3Error: { applicationCode: 'NotFound', message: 'error from S3', statusCode: 404 }
     },
     internalServer: { applicationCode: 'InternalServerError', message: 'an error occurred while processing the request', statusCode: 500 },
     failedToRetrieveParameters: { applicationCode: 'ParamStoreError', message: 'failed to retrieve all parameters from parameter-store', statusCode: 500 },
+    failedToWriteToS3: { applicationCode: 'S3WriteError', message: 'failed to write file to s3', statusCode: 400 },
+    failedToReadDb: { applicationCode: 'DBReadError', message: 'failed to read from the database', statusCode: 400 }
 };

@@ -61,32 +61,47 @@ class MissingBankAccountsLambda extends Handler {
         return Promise.resolve(undefined)
             .then(() => {
                 return this.services.s3.get(key, bucket)
-                .then(bankFile => {
+                .catch((err) => {
+                    logger.info({function: func, log: 'Error from S3', params: { error: err.message || err } });
+                    throw StatusCodeError.CreateFromSpecs([ErrorSpecs.notFound.s3Error], ErrorSpecs.notFound.s3Error.statusCode);
+                })
+                .then((bankFile) => {
                     if (!bankFile.Body) {
+                        logger.info({function: func, log: 'No Body in bank file' });
                         throw StatusCodeError.CreateFromSpecs([ErrorSpecs.invalidExtractorInput.body], ErrorSpecs.invalidExtractorInput.body.statusCode);
                     }
-                    
+
                     const bankFileString = bankFile.Body.toString();
                     const accountIdentifiers = extractors[bank](bankFileString);
     
-                    if (!accountIdentifiers || accountIdentifiers.length === 0) {
-                        logger.info({function: func, log: 'No accounts found in file' });
-                        throw StatusCodeError.CreateFromSpecs([ErrorSpecs.notFound.accountIdentifiers], ErrorSpecs.notFound.accountIdentifiers.statusCode);
-                    }
+                    // should a bank file containing no accounts throw an error?
+                    //
+                    // if (!accountIdentifiers || accountIdentifiers.length === 0) {
+                    //     logger.info({function: func, log: 'No accounts found in file' });
+                    //     throw StatusCodeError.CreateFromSpecs([ErrorSpecs.notFound.accountIdentifiers], ErrorSpecs.notFound.accountIdentifiers.statusCode);
+                    // }
 
                     return accountIdentifiers;
                 })
             })
             .then((accountDetailsFromBankFile) => {
                 return dbQueries.getBankAccountsByAccountDetails(accountDetailsFromBankFile)
-                .then(dbQueryResults => {
-                    const filteredResult = accountDetailsFromBankFile.filter(bankFileAccount => !dbQueryResults.some(dbAccount => _.isEqual(bankFileAccount, dbAccount)));
+                .catch((err) => {
+                    logger.info({function: func, log: 'Error from S3', params: { error: err.message || err } });
+                    throw StatusCodeError.CreateFromSpecs([ErrorSpecs.failedToReadDb], ErrorSpecs.failedToReadDb.statusCode);
+                })
+                .then((dbQueryResults) => {
+                    const filteredResult = accountDetailsFromBankFile.filter((bankFileAccount) => !dbQueryResults.some((dbAccount) => _.isEqual(bankFileAccount, dbAccount)));
 
                     return _.reduce(filteredResult, (memo, element) => (`${memo}\n${element.bankIdentifier},${element.accountIdentifier}`), missingAccountsHeader);
                 })
             })
             .then((fileContents) => {
-                return this.services.s3.put((outputFilePrefix + key + '.txt'), fileContents, 'AES256') 
+                return this.services.s3.put((outputFilePrefix + key + '.txt'), fileContents, 'AES256')
+                .catch((err) => {
+                    logger.info({function: func, log: 'Error from S3', params: { error: err.message || err } });
+                    throw StatusCodeError.CreateFromSpecs([ErrorSpecs.failedToWriteToS3], ErrorSpecs.failedToWriteToS3.statusCode);
+                })
             })
             .then(() => {
                 logger.info({ function: func, log: 'ended' });

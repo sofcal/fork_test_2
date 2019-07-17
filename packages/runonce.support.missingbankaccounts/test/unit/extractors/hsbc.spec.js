@@ -1,8 +1,5 @@
 const hsbc = require('./../../../lib/extractors/hsbc')
-const ErrorSpecs = require('./../../../lib/ErrorSpecs');
-const { StatusCodeError } = require('@sage/bc-statuscodeerror');
 const should = require('should');
-const util = require('util')
 
 describe('runonce-support-missingbankaccounts.extractors.hsbc', function() {
 
@@ -86,6 +83,22 @@ describe('runonce-support-missingbankaccounts.extractors.hsbc', function() {
 
     it('should return the correct values in an array of objects', () => {
         const bankFileTwoAccounts = 'test1 \n03,12345612345678 \n03,12345112345671 \n01,340593845';
+
+        const expected = [{
+            accountIdentifier: '12345678',
+            bankIdentifier: '123456'
+        },
+        {
+            accountIdentifier: '12345671',
+            bankIdentifier: '123451'
+        }
+    ]
+        const actual = hsbc(bankFileTwoAccounts);
+        should(actual).eql(expected);
+    });
+
+    it('should return the correct values in an array of objects when string starts with a match', () => {
+        const bankFileTwoAccounts = '03,12345612345678 \n03,12345112345671 \n01,340593845';
 
         const expected = [{
             accountIdentifier: '12345678',
