@@ -318,7 +318,7 @@ describe('runonce-support-missingbankaccounts.MissingBankAccountsLambda', functi
                 .then(() => {
                     should(services.s3.put.callCount).eql(1);
                     should(services.s3.put.getCall(0).args).eql([
-                        'missing-accounts-from-test_key.txt', expected, 'AES256'
+                        'missing-accounts-from-test_key.csv', expected, 'AES256'
                     ]);
                 });
         });
@@ -347,7 +347,7 @@ describe('runonce-support-missingbankaccounts.MissingBankAccountsLambda', functi
                 .then(() => {
                     should(services.s3.put.callCount).eql(1);
                     should(services.s3.put.getCall(0).args).eql([
-                        'missing-accounts-from-test_key.txt', expected, 'AES256'
+                        'missing-accounts-from-test_key.csv', expected, 'AES256'
                     ]);
                 });
         });
@@ -372,7 +372,7 @@ describe('runonce-support-missingbankaccounts.MissingBankAccountsLambda', functi
                 .then(() => {
                     should(services.s3.put.callCount).eql(1);
                     should(services.s3.put.getCall(0).args).eql([
-                        'missing-accounts-from-test_key.txt', expected, 'AES256'
+                        'missing-accounts-from-test_key.csv', expected, 'AES256'
                     ]);
                 });
         });
@@ -393,14 +393,14 @@ describe('runonce-support-missingbankaccounts.MissingBankAccountsLambda', functi
                 .then(() => {
                     should(services.s3.put.callCount).eql(1);
                     should(services.s3.put.getCall(0).args).eql([
-                        'missing-accounts-from-test_key.txt', expected, 'AES256'
+                        'missing-accounts-from-test_key.csv', expected, 'AES256'
                     ]);
                 });
         });
 
         it('should throw an error if the file is missing in s3', (done) => {
 
-            const expected = StatusCodeError.CreateFromSpecs([ErrorSpecs.notFound.s3Error], ErrorSpecs.notFound.s3Error.statusCode);
+            const expected = StatusCodeError.CreateFromSpecs([ErrorSpecs.s3Error.read], ErrorSpecs.s3Error.read.statusCode);
             const event = { parsed: { bucket: 'test_bucket', key: 'test_key', bank: 'tester' }}
 
             sandbox.stub(services.db, 'getConnection').resolves({ value: 'db_connection' });
@@ -447,7 +447,7 @@ describe('runonce-support-missingbankaccounts.MissingBankAccountsLambda', functi
         });
 
         it('should throw an error if it cannot write the file to s3', (done) => {
-            const expected = StatusCodeError.CreateFromSpecs([ErrorSpecs.failedToWriteToS3], ErrorSpecs.failedToWriteToS3.statusCode);
+            const expected = StatusCodeError.CreateFromSpecs([ErrorSpecs.s3Error.write], ErrorSpecs.s3Error.write.statusCode);
             const s3FileContent = '03,00000100000001,23452523\n03,00000200000001,234293984982342\n03,00000200000002';
             const event = { parsed: { bucket: 'test_bucket', key: 'test_key', bank: 'tester' }}
 

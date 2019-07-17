@@ -63,7 +63,7 @@ class MissingBankAccountsLambda extends Handler {
                 return this.services.s3.get(key, bucket)
                 .catch((err) => {
                     logger.info({function: func, log: 'Error from S3', params: { error: err.message || err } });
-                    throw StatusCodeError.CreateFromSpecs([ErrorSpecs.notFound.s3Error], ErrorSpecs.notFound.s3Error.statusCode);
+                    throw StatusCodeError.CreateFromSpecs([ErrorSpecs.s3Error.read], ErrorSpecs.s3Error.read.statusCode);
                 })
                 .then((bankFile) => {
                     if (!bankFile.Body) {
@@ -83,16 +83,18 @@ class MissingBankAccountsLambda extends Handler {
                     throw StatusCodeError.CreateFromSpecs([ErrorSpecs.failedToReadDb], ErrorSpecs.failedToReadDb.statusCode);
                 })
                 .then((dbQueryResults) => {
+                    // checking for matching account details, and filtering out the matching details from the bank file
                     const filteredResult = accountDetailsFromBankFile.filter((bankFileAccount) => !dbQueryResults.some((dbAccount) => _.isEqual(bankFileAccount, dbAccount)));
 
+                    // creating the string from the array of filtered results into a csv format
                     return _.reduce(filteredResult, (memo, element) => (`${memo}\n${element.bankIdentifier},${element.accountIdentifier}`), missingAccountsHeader);
                 })
             })
             .then((fileContents) => {
-                return this.services.s3.put((outputFilePrefix + key + '.txt'), fileContents, 'AES256')
+                return this.services.s3.put((`${outputFilePrefix}${key}.csv`), fileContents, 'AES256')
                 .catch((err) => {
                     logger.info({function: func, log: 'Error from S3', params: { error: err.message || err } });
-                    throw StatusCodeError.CreateFromSpecs([ErrorSpecs.failedToWriteToS3], ErrorSpecs.failedToWriteToS3.statusCode);
+                    throw StatusCodeError.CreateFromSpecs([ErrorSpecs.s3Error.write], ErrorSpecs.s3Error.write.statusCode);
                 })
             })
             .then(() => {

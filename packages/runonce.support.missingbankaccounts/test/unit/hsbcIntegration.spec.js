@@ -81,7 +81,7 @@ describe('runonce-support-missingbankaccounts.HSBCExtractorIntegration', functio
                 .then(() => {
                     should(services.s3.put.callCount).eql(1);
                     should(services.s3.put.getCall(0).args).eql([
-                        'missing-accounts-from-test_key.txt', expected, 'AES256'
+                        'missing-accounts-from-test_key.csv', expected, 'AES256'
                     ]);
                 });
         });
@@ -105,7 +105,7 @@ describe('runonce-support-missingbankaccounts.HSBCExtractorIntegration', functio
                 .then(() => {
                     should(services.s3.put.callCount).eql(1);
                     should(services.s3.put.getCall(0).args).eql([
-                        'missing-accounts-from-test_key.txt', expected, 'AES256'
+                        'missing-accounts-from-test_key.csv', expected, 'AES256'
                     ]);
                 });
         });
@@ -125,7 +125,7 @@ describe('runonce-support-missingbankaccounts.HSBCExtractorIntegration', functio
                 .then(() => {
                     should(services.s3.put.callCount).eql(1);
                     should(services.s3.put.getCall(0).args).eql([
-                        'missing-accounts-from-test_key.txt', expected, 'AES256'
+                        'missing-accounts-from-test_key.csv', expected, 'AES256'
                     ]);
                 });
         });
@@ -145,7 +145,7 @@ describe('runonce-support-missingbankaccounts.HSBCExtractorIntegration', functio
                 .then(() => {
                     should(services.s3.put.callCount).eql(1);
                     should(services.s3.put.getCall(0).args).eql([
-                        'missing-accounts-from-test_key.txt', expected, 'AES256'
+                        'missing-accounts-from-test_key.csv', expected, 'AES256'
                     ]);
                 });
         });
