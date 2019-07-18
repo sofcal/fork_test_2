@@ -1,7 +1,7 @@
 'use strict';
 
-const UncappedQuery = require('../../lib/UncappedQuery');
-const Query = require('@sage/bc-query');
+const UncappedQuery = require('../../../lib/UncappedQuery');
+const Query = require('../../../lib/Query');
 const sinon = require('sinon');
 
 let getFuncProperties = (func) => {
@@ -14,7 +14,7 @@ let getFuncProperties = (func) => {
     return keys;
 };
 
-describe('@sage/bc-uncappedquery', function() {
+describe('UncappedQuery', function() {
     let sandbox;
 
     beforeEach(function () {

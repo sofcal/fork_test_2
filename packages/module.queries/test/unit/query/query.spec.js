@@ -1,6 +1,6 @@
 'use strict';
 
-const Query = require('../../lib/Query');
+const Query = require('../../../lib/Query');
 const sinon = require('sinon');
 
 let getFuncProperties = (func) => {
@@ -13,7 +13,7 @@ let getFuncProperties = (func) => {
     return keys;
 };
 
-describe('@sage/bc-query', function() {
+describe('Query', function() {
     let sandbox;
 
     beforeEach(function () {

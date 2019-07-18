@@ -1,7 +1,7 @@
 'use strict';
 
 const util = require('util');
-const Query = require('@sage/bc-query');
+const Query = require('./Query');
 
 const defaultCount = 100;
 
