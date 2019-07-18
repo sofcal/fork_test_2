@@ -1,6 +1,6 @@
 'use strict';
 
-const Query = require('../../lib/Query');
+const Query = require('../../../lib/Query');
 const sinon = require('sinon');
 
 let getFuncProperties = (func) => {
@@ -8,12 +8,12 @@ let getFuncProperties = (func) => {
     for (let key in func) {
         if (func.hasOwnProperty(key)) {
             keys.push(key);
-        }
+        } 
     }
     return keys;
 };
 
-describe('@sage/bc-query', function() {
+describe('Query', function() {
     let sandbox;
 
     beforeEach(function () {
@@ -69,31 +69,31 @@ describe('@sage/bc-query', function() {
 
         describe('count', function() {
             it('should have a count value of 50 while providing 0 for count when creating an instance of Query', (done) => {
-                let query = new Query(1, 0, {someProp : 'someVal'});
+                const query = new Query(1, 0, {someProp : 'someVal'});
                 should(query.count).eql(50);
                 done();
             });
 
             it('should have a count value of 50 while providing a number less than 0 for count when creating an instance of Query', (done) => {
-                let query = new Query(1, -26, {someProp : 'someVal'});
+                const query = new Query(1, -26, {someProp : 'someVal'});
                 should(query.count).eql(50);
                 done();
             });
 
             it('should have a count value of 50 while providing a number greater than 50 for count when creating an instance of Query', (done) => {
-                let query = new Query(1, 100, {someProp : 'someVal'});
+                const query = new Query(1, 120, {someProp : 'someVal'});
                 should(query.count).eql(50);
                 done();
             });
 
             it('should have a count value of 50 while providing undefined for count when creating an instance of Query', (done) => {
-                let query = new Query(1, undefined, {someProp : 'someVal'});
+                const query = new Query(1, undefined, {someProp : 'someVal'});
                 should(query.count).eql(50);
                 done();
             });
 
             it('should have a count value of 50 while providing a value which is not a number for count when creating an instance of Query', (done) => {
-                let query = new Query(1, 'not a number', {someProp : 'someVal'});
+                const query = new Query(1, 'not a number', {someProp : 'someVal'});
                 should(query.count).eql(50);
                 done();
             });
