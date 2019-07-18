@@ -1,11 +1,11 @@
 const index = require('../../lib/index');
-const Query = require('../../lib/Query');
+const UncappedQuery = require('../../lib/UncappedQuery');
 const should = require('should');
 
-describe('@sage/bc-query.index', function(){
+describe('@sage/bc-uncappedquery.index', function(){
     // placeholder
     it('should export the correct modules', (done) => {
-        should(index).eql(Query);
+        should(index).eql(UncappedQuery);
         done();
     });
 });

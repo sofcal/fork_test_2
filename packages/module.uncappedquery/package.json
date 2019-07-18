@@ -15,7 +15,8 @@
   "dependencies": {
     "@babel/code-frame": "^7.0.0-beta.48",
     "@babel/core": "^7.2.2",
-    "@babel/preset-env": "^7.0.0-beta.47"
+    "@babel/preset-env": "^7.0.0-beta.47",
+    "@sage/bc-query": "^1.1.36"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
