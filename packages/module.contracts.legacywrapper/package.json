@@ -22,6 +22,7 @@
     "@sage/bc-queries": "^1.1.41",
     "@sage/bc-rule": "^1.1.29",
     "@sage/bc-servicenames": "^1.1.23",
+    "@sage/bc-services-utils": "^1.1.43",
     "@sage/bc-statuscodeerror": "^1.1.32",
     "@sage/bc-validators": "^1.1.38"
   },
