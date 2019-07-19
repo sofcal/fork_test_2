@@ -1,7 +1,7 @@
 'use strict';
 
-const Query = require('../../../lib/Query');
-const UncappedQuery = require('../../../lib/UncappedQuery')(Query);
+const Query = require('../Query');
+const UncappedQuery = require('../../lib/UncappedQuery')(Query);
 const sinon = require('sinon');
 
 let getFuncProperties = (func) => {
