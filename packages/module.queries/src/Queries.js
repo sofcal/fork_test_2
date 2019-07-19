@@ -1,6 +1,7 @@
 'use strict';
 
-const Query = require('./Query');
-const UncappedQuery = require('./UncappedQuery');
+module.exports = function(Query) {
+    const UncappedQuery = require('./UncappedQuery')(Query);
 
-module.exports = { Query, UncappedQuery };
+    return { Query, UncappedQuery };
+};
