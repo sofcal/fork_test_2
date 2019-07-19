@@ -1,6 +1,6 @@
 {
-  "name": "@sage/bc-queries",
-  "version": "1.1.41",
+  "name": "@sage/bc-uncappedquery",
+  "version": "1.0.0",
   "author": "Sage UK",
   "license": "ISC",
   "description": "",
