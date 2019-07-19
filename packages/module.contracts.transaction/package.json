@@ -17,10 +17,12 @@
     "@babel/core": "^7.2.2",
     "@babel/preset-env": "^7.0.0-beta.47",
     "@sage/bc-common-resources": "^1.1.23",
+    "@sage/bc-framework-httpmethod": "^1.1.22",
     "@sage/bc-rule": "^1.1.26",
     "@sage/bc-statuscodeerror": "^1.1.8",
-    "@sage/bc-contracts-transaction": "^1.1.38",
-    "underscore": "^1.9.1"
+    "@sage/bc-validators": "^1.1.38",
+    "underscore": "^1.9.0",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",

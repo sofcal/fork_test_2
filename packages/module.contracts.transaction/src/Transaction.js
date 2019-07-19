@@ -3,17 +3,12 @@
 const resources = require('@sage/bc-common-resources');
 const Rule = require('@sage/bc-rule');
 const { StatusCodeErrorItem, StatusCodeError } = require('@sage/bc-statuscodeerror');
-//const utils = require('../../utils'); // TODO: When utils is complete
-//const framework = require('framework'); // TODO: When utils is complete
+const utils = require('@sage/bc-validators');
 const PredictedAction = require('./PredictedAction');
-//const util = require('util');
+const util = require('util');
 const _ = require('underscore');
-
-// const { format } = util;
-// const { httpMethod } = framework.common; // TODO: When utils is complete
-
-const { format } = function(){}; // TODO: REMOVE
-const { httpMethod } = function(){}; // TODO: REMOVE
+const { format } = util;
+const httpMethod = require('@sage/bc-framework-httpmethod');
 
 const DEFAULT_PAYEE = {
     payeeId: null,

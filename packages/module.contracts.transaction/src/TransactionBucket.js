@@ -2,12 +2,8 @@
 
 const resources = require('@sage/bc-common-resources');
 const Transaction = require('./Transaction');
-//const utils = require('../../utils'); // TODO: When utils is complete
+const utils = require('@sage/bc-validators');
 const _ = require('underscore');
-
-const utils = { // TODO: REMOVE
-    validateContractObject: () => {}
-};
 
 function TransactionBucket(data) {
     if (data) {
@@ -30,7 +26,7 @@ TransactionBucket.validate = function (transactionBucket) {
 
         _.each(transactions, (transaction) => {
             items.push(...Transaction.validate(transaction, true));
-    });
+        });
 
         return items;
     };
@@ -64,26 +60,25 @@ TransactionBucket.MAX_BUCKET_SIZE = resources.api.pageSize;
 
 TransactionBucket.getDatePostedRange = (transactions, checkInitiatedDate = false) => {
     const response = { startDate: null, endDate: null };
-
     _.each(transactions, (t) => {
         if (t.datePosted && (!response.startDate || t.datePosted < response.startDate)) {
-        response.startDate = new Date(t.datePosted);
-    }
-
-    if (t.datePosted && (!response.endDate || t.datePosted > response.endDate)) {
-        response.endDate = new Date(t.datePosted);
-    }
-
-    if (checkInitiatedDate) {
-        if (t.dateUserInitiated && (!response.startDate || t.dateUserInitiated < response.startDate)) {
-            response.startDate = new Date(t.dateUserInitiated);
+            response.startDate = new Date(t.datePosted);
         }
 
-        if (t.dateUserInitiated && (!response.endDate || t.dateUserInitiated > response.endDate)) {
-            response.endDate = new Date(t.dateUserInitiated);
+        if (t.datePosted && (!response.endDate || t.datePosted > response.endDate)) {
+            response.endDate = new Date(t.datePosted);
         }
-    }
-});
+
+        if (checkInitiatedDate) {
+            if (t.dateUserInitiated && (!response.startDate || t.dateUserInitiated < response.startDate)) {
+                response.startDate = new Date(t.dateUserInitiated);
+            }
+
+            if (t.dateUserInitiated && (!response.endDate || t.dateUserInitiated > response.endDate)) {
+                response.endDate = new Date(t.dateUserInitiated);
+            }
+        }
+    });
 
     return response;
 };

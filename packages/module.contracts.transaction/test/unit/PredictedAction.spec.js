@@ -1,7 +1,7 @@
 const PredictedAction = require('../../lib/PredictedAction');
 const should = require('should');
 const resources = require('@sage/bc-common-resources');
-const Rule = require('@sage/bc-rule');
+const { StatusCodeError } = require('@sage/bc-statuscodeerror');
 const _ = require('underscore');
 const sinon = require('sinon');
 
@@ -10,7 +10,7 @@ describe('@sage/bc-Transaction.PredictedAction', function(){
     let data;
 
     beforeEach(function () {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
 
         data = {
             predictionId: 'dc8c78bc-cff2-43ea-9f5f-f0cc0f4df1dc',

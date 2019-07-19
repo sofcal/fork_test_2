@@ -1,16 +1,11 @@
 'use strict';
 
-//const framework = require('framework'); // TODO: When utils is complete
 const resources = require('@sage/bc-common-resources');
-const utils = require('@sage/bc-validators'); // TODO: When utils is complete
+const utils = require('@sage/bc-validators');
 const Rule = require('@sage/bc-rule');
 const _ = require('underscore');
 const access = require('safe-access');
-
-//const commonUuid = framework.common.uuid; // TODO: Uncomment when above is ready
-const commonUuid = {
-    new: function() {return 'uuid' }
-};  //TODO: REMOVE when above replaced
+const commonUuid = require('uuid');
 
 const ACCOUNTS_POSTING_TEMPLATE = {
     createdBy: null,
@@ -68,7 +63,7 @@ static CreateForPostingsAndRule(accountsPostings, { uuid = null, ruleCounts = { 
         score = 100 * (ruleCounts.success / (ruleCounts.success + ruleCounts.fail));
     }
     const data = {
-        predictionId: commonUuid.new(),
+        predictionId: commonUuid.v4(),
         score,
         source: ruleType,
         rules: [convertedRule],
