@@ -1,5 +1,5 @@
 'use strict';
-// Dummy for testing - In Queries this is passed in as input.
+
 const maxCount = 50;
 
 function Query(startIndex, count, where) {
