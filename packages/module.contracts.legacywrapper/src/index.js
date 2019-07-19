@@ -10,6 +10,7 @@ const ProductIds = require('@sage/bc-productids');
 const ServiceNames = require('@sage/bc-servicenames');
 const Rule = require('@sage/bc-rule');
 const Queries = require('@sage/bc-queries');
+const servicesUtils = require('@sage/bc-services-utils');
 
 module.exports = {
     validators,
@@ -21,5 +22,6 @@ module.exports = {
     ProductIds,
     ServiceNames,
     Rule,
-    Queries
+    Queries,
+    servicesUtils,
 };

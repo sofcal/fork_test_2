@@ -1,9 +1,8 @@
 'use strict';
-
+// Dummy for testing - In Queries this is passed in as input.
 const maxCount = 50;
 
-function Query(startIndex, count, where){
-
+function Query(startIndex, count, where) {
     this.startIndex = parseInt(startIndex, 10);
     this.count = parseInt(count, 10);
     this.where = where ? where : {};
