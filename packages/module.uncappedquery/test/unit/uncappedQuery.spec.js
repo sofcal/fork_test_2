@@ -25,13 +25,13 @@ describe('UncappedQuery', function() {
         sandbox.restore();
     });
 
-    it('should export a function, which is an instance of Query and has the correct properties', (done) => {
+    it('should export a function which creates and returns an object that is an instance of Query and has the correct properties', (done) => {
         let uq = new UncappedQuery(1, 2, {someProp : 'someVal'});
         let propertyStack = getFuncProperties(uq);
 
         UncappedQuery.should.be.a.Function();
+        uq.should.be.an.Object();
         uq.should.be.instanceOf(Query);
-
         propertyStack.should.containEql('startIndex');
         propertyStack.should.containEql('count');
         propertyStack.should.containEql('where');
