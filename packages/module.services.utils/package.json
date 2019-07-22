@@ -1,30 +1,26 @@
 {
-  "name": "@sage/bc-contracts-legacy-wrapper",
+  "name": "@sage/bc-services-utils",
   "version": "1.1.45",
   "author": "Sage UK",
   "license": "ISC",
-  "description": "contracts legacy wrapper",
+  "description": "lib/service/utils",
   "main": "lib/index.js",
-  "directories": {
-    "lib": "lib"
-  },
-  "private": true,
   "publishConfig": {
     "registry": "https://sage.myget.org/F/npm/npm/",
     "access": "public"
   },
+  "directories": {
+    "lib": "lib"
+  },
   "dependencies": {
-    "@sage/bc-adapterresources": "^1.1.23",
-    "@sage/bc-alerttypes": "^1.1.22",
-    "@sage/bc-bankids": "^1.1.19",
+    "@babel/code-frame": "^7.0.0-beta.48",
+    "@babel/core": "^7.2.2",
+    "@babel/preset-env": "^7.0.0-beta.47",
     "@sage/bc-common-resources": "^1.1.23",
-    "@sage/bc-productids": "^1.1.23",
-    "@sage/bc-rule": "^1.1.29",
-    "@sage/bc-servicenames": "^1.1.23",
-    "@sage/bc-services-utils": "^1.1.45",
-    "@sage/bc-statuscodeerror": "^1.1.32",
-    "@sage/bc-uncappedquery": "^1.1.44",
-    "@sage/bc-validators": "^1.1.38"
+    "@sage/bc-framework-httpmethod": "^1.1.22",
+    "@sage/bc-statuscodeerror": "^1.1.8",
+    "bluebird": "^3.5.5",
+    "underscore": "^1.9.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
@@ -47,17 +43,15 @@
     "webpack-node-externals": "^1.6.0"
   },
   "scripts": {
-    "buildwrapper": "npm i && babel src -d lib --copy-files && npm run clean && npm i --production",
-    "clean": "rimraf ./coverage/ && rimraf ./.nyc_output/ && rimraf ./node_modules/",
+    "clean": "rimraf ./coverage/ && rimraf ./.nyc_output/ && rimraf ./node_modules/ && rimraf ./lib/",
+    "pretest": "rimraf ./lib/ && npm run build",
     "test": "NODE_ENV=test nyc --cache false --x test/ mocha -b --colors \"./test/unit/**/*.spec.js\"",
-    "testwatchunit": "NODE_ENV=test mocha -b -w --colors \"./test/unit/**/*.spec.js\"",
-    "testwatchuint": "NODE_ENV=test mocha -b -w --colors \"./test/int/**/*.spec.js\"",
-    "testint": "NODE_ENV=test nyc --x lib/_legacy --x test/ mocha -b --colors --reporter spec \"./test/int/**/*.spec.js\"",
     "cover": "NODE_ENV=test npm run test && nyc report --reporter=lcov",
     "report": "open coverage/lcov-report/index.html",
     "cover:report": "npm run cover && npm run report",
+    "int": "NODE_ENV=test nyc --x lib/_legacy --x test/ mocha -b --colors --reporter spec \"./test/int/**/*.spec.js\"",
     "lint": "eslint ./src/**",
-    "build": "",
+    "build": "babel src -d lib --copy-files",
     "watch": "babel --watch src --out-dir lib --copy-files",
     "unlock": "rimraf package-lock.json"
   }
