@@ -18,6 +18,7 @@
     "@sage/bc-alerttypes": "^1.1.22",
     "@sage/bc-bankids": "^1.1.19",
     "@sage/bc-common-resources": "^1.1.23",
+    "@sage/bc-contracts-transaction": "^1.1.46",
     "@sage/bc-productids": "^1.1.23",
     "@sage/bc-rule": "^1.1.29",
     "@sage/bc-servicenames": "^1.1.23",
