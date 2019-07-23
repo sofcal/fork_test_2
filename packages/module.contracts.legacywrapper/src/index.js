@@ -12,6 +12,7 @@ const Rule = require('@sage/bc-rule');
 const servicesUtils = require('@sage/bc-services-utils');
 const UncappedQuery = require('@sage/bc-uncappedquery');
 const Transaction = require('@sage/bc-contracts-transaction');
+const helpers = require('@sage/bc-common-helpers');
 
 module.exports = {
     validators,
@@ -26,4 +27,5 @@ module.exports = {
     servicesUtils,
     UncappedQuery,
     Transaction,
+    helpers,
 };
