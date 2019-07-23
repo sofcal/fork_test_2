@@ -1,6 +1,6 @@
 {
   "name": "@sage/bc-contracts-legacy-wrapper",
-  "version": "1.1.50",
+  "version": "1.1.51",
   "author": "Sage UK",
   "license": "ISC",
   "description": "contracts legacy wrapper",
@@ -17,7 +17,7 @@
     "@sage/bc-adapterresources": "^1.1.23",
     "@sage/bc-alerttypes": "^1.1.22",
     "@sage/bc-bankids": "^1.1.19",
-    "@sage/bc-common-helpers": "^1.1.50",
+    "@sage/bc-common-helpers": "^1.1.51",
     "@sage/bc-common-resources": "^1.1.23",
     "@sage/bc-contracts-transaction": "^1.1.50",
     "@sage/bc-productids": "^1.1.23",
