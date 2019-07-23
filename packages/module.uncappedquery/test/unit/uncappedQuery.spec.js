@@ -4,15 +4,18 @@ const Query = require('../Query');
 const UncappedQuery = require('../../lib/UncappedQuery')(Query);
 const sinon = require('sinon');
 
-let getFuncProperties = (func) => {
-    let keys = [];
-    for (let key in func) {
-        if (func.hasOwnProperty(key)) {
-            keys.push(key);
+// checker for properties of an instantiated object. Digs in to prototype level to ensure chained properties are included.
+function hasProperty(obj, propName) {
+    for (; obj != null; obj = Object.getPrototypeOf(obj)) {
+        let op = Object.getOwnPropertyNames(obj);
+        for (let i = 0; i < op.length; i++) {
+            if (op[i] === propName) {
+                return true;
+            }
         }
     }
-    return keys;
-};
+    return false;
+}
 
 describe('UncappedQuery.js', function() {
     let sandbox;
@@ -27,17 +30,18 @@ describe('UncappedQuery.js', function() {
 
     it('should export a function which creates and returns an object that is an instance of Query and has the correct properties', (done) => {
         let uq = new UncappedQuery(1, 2, {someProp : 'someVal'});
-        let propertyStack = getFuncProperties(uq);
 
         UncappedQuery.should.be.a.Function();
         uq.should.be.an.Object();
         uq.should.be.instanceOf(Query);
-        propertyStack.should.containEql('startIndex');
-        propertyStack.should.containEql('count');
-        propertyStack.should.containEql('where');
-        propertyStack.should.containEql('groupBy');
-        propertyStack.should.containEql('orderBy');
-        propertyStack.should.containEql('projection');
+
+        hasProperty(uq, 'startIndex').should.eql(true);
+        hasProperty(uq, 'count').should.eql(true);
+        hasProperty(uq, 'where').should.eql(true);
+        hasProperty(uq, 'groupBy').should.eql(true);
+        hasProperty(uq, 'orderBy').should.eql(true);
+        hasProperty(uq, 'projection').should.eql(true);
+        hasProperty(uq, 'validate').should.eql(true);
         done();
     });
 
