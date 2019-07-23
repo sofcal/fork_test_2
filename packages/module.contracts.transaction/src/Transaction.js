@@ -4,6 +4,7 @@ const resources = require('@sage/bc-common-resources');
 const Rule = require('@sage/bc-rule');
 const { StatusCodeErrorItem, StatusCodeError } = require('@sage/bc-statuscodeerror');
 const utils = require('@sage/bc-validators');
+const serviceUtils = require('@sage/bc-services-utils');
 const PredictedAction = require('./PredictedAction');
 const util = require('util');
 const _ = require('underscore');
@@ -409,7 +410,7 @@ Transaction.allowableRuleFields = [
 
 module.exports = Transaction;
 
-Transaction.extend = (destination, source, method) => _.extend(destination, source, method, (method === httpMethod.post ? postKeys : updateKeys), readOnlyKeys);
+Transaction.extend = (destination, source, method) => serviceUtils.extend(destination, source, method, (method === httpMethod.post ? postKeys : updateKeys), readOnlyKeys);
 
 const _Keys = [
     // these fields can neither be created nor modified by the API client

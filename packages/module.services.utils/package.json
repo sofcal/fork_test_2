@@ -1,6 +1,6 @@
 {
   "name": "@sage/bc-services-utils",
-  "version": "1.1.47",
+  "version": "1.1.48",
   "author": "Sage UK",
   "license": "ISC",
   "description": "lib/service/utils",
