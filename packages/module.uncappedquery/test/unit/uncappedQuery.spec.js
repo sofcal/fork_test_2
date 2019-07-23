@@ -14,7 +14,7 @@ let getFuncProperties = (func) => {
     return keys;
 };
 
-describe('UncappedQuery', function() {
+describe('UncappedQuery.js', function() {
     let sandbox;
 
     beforeEach(function () {
@@ -41,7 +41,7 @@ describe('UncappedQuery', function() {
         done();
     });
 
-    describe('UncappedQuery.prototype.validate', function() {
+    describe('Lock.js.prototype.validate', function() {
         it('should call validate when instantiating UncappedQuery', (done) => {
             const uqSpy = sandbox.spy(UncappedQuery.prototype, 'validate');
             uqSpy.called.should.be.false(); // should not have called validate at this point, as no instantiation has occurred.
