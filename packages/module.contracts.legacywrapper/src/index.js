@@ -13,6 +13,7 @@ const servicesUtils = require('@sage/bc-services-utils');
 const UncappedQuery = require('@sage/bc-uncappedquery');
 const Transaction = require('@sage/bc-contracts-transaction');
 const helpersWrapper = require('@sage/bc-common-helpers');
+const Lock = require('@sage/bc-lock');
 
 module.exports = {
     validators,
@@ -28,4 +29,5 @@ module.exports = {
     UncappedQuery,
     Transaction,
     helpersWrapper,
+    Lock,
 };
