@@ -12,7 +12,7 @@ const Rule = require('@sage/bc-rule');
 const servicesUtils = require('@sage/bc-services-utils');
 const UncappedQuery = require('@sage/bc-uncappedquery');
 const Transaction = require('@sage/bc-contracts-transaction');
-const helpers = require('@sage/bc-common-helpers');
+const helpersWrapper = require('@sage/bc-common-helpers');
 const Lock = require('@sage/bc-lock');
 
 module.exports = {
@@ -28,6 +28,6 @@ module.exports = {
     servicesUtils,
     UncappedQuery,
     Transaction,
-    helpers,
+    helpersWrapper,
     Lock,
 };

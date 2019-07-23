@@ -1,5 +1,5 @@
 'use strict';
 
-const helpers = require('./helpers');
+const helpersWrapper = require('./helpers');
 
-module.exports = helpers;
+module.exports = helpersWrapper;
