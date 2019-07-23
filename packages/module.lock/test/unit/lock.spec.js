@@ -1,6 +1,6 @@
 'use strict';
 
-const Lock = require('../../src/Lock');
+const Lock = require('../../lib/Lock');
 const sinon = require('sinon');
 
 // checker for properties of an instantiated object. Digs in to prototype level to ensure chained properties are included.
@@ -75,6 +75,94 @@ describe('Lock.js', function() {
         should(lock.uuid).be.undefined();
         should(lock.expiry).be.undefined();
         done();
+    });
+
+    describe('validate', function () {
+        it('should call Lock.validate when calling validate on the instance of Lock', (done) => {
+            let lock = new Lock(logger, {uuid: 'someUUID', expiry: new Date()});
+
+            const lockClassSpy = sandbox.spy(Lock, 'validate');
+            lockClassSpy.called.should.be.false(); // should not have called validate at this point, as the instance has not made a call to validate.
+            lock.validate(); // instance called validate - this should call through to the base class and call it's validate impl.
+            lockClassSpy.called.should.be.true();
+            done();
+        });
+    });
+
+    describe('checkLocked', function () {
+        it('should throw a TypeError when calling checkLocked with no input', (done) => {
+            let lock = new Lock(logger, {uuid: 'someUUID', expiry: new Date()});
+
+            try {
+                lock.checkLocked();
+                done(new Error('should have thrown'));
+            } catch (err) {
+                should(err.message).eql('Cannot read property \'uuid\' of undefined');
+                done();
+            }
+        });
+
+        it('should throw an error when calling checkLocked with an object which does not include a uuid', (done) => {
+            let lock = new Lock(logger, {uuid: 'someUUID', expiry: new Date()});
+
+            try {
+                lock.checkLocked({});
+                done(new Error('should have thrown'));
+            } catch (err) {
+                should(err.message).eql('Check lock failed.  Applies to: ' + lock.uuid + ' not:' + 'undefined');
+                done();
+            }
+        });
+
+        it('should throw an error when calling checkLocked with a uuid which does not match the lock objects uuid value', (done) => {
+            let lock = new Lock(logger, {uuid: 'someUUID', expiry: new Date()});
+
+            try {
+                lock.checkLocked({ uuid : 'unmatched' });
+                done(new Error('should have thrown'));
+            } catch (err) {
+                should(err.message).eql('Check lock failed.  Applies to: ' + lock.uuid + ' not:' + 'unmatched');
+                done();
+            }
+        });
+
+        it('should throw an error when calling checkLocked with an expiry value which is less than today\'s date', (done) => {
+            const date = new Date();
+            date.setDate(date.getDate() - 30); // a day which has passed.
+            let lock = new Lock(logger, {uuid: 'someUUID', expiry: date});
+
+            try {
+                lock.checkLocked({ uuid : 'someUUID' });
+                done(new Error('should have thrown'));
+            } catch (err) {
+                should(err.message).eql(`Lock on: ${lock.uuid} has expired during processing.`);
+                done();
+            }
+        });
+
+        it('should not throw any errors when lock instance has an expiry which is greater than now, as well as also ' +
+            'providing an object with a value which matches the lock instance\s uuid', (done) => {
+            const date = new Date();
+            date.setDate(date.getDate() + 30); // a day in the future.
+            let lock = new Lock(logger, {uuid: 'someUUID', expiry: date});
+
+            try {
+                lock.checkLocked({ uuid : 'someUUID' });
+                done();
+            } catch (err) {
+                done(new Error('should not have thrown'));
+            }
+        });
+    });
+
+    describe('filter', function () { // not available on the prototype - only Lock itself.
+        it('should pass through value which has been provided when calling filter, returning this value', (done) => {
+            const someObj = { someProp : 'someVal', someNum : 10 };
+            const result = new Lock.filter(someObj);
+
+            result.should.eql(someObj);
+            done();
+        });
     });
 });
 
