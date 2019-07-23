@@ -11,6 +11,7 @@ const ServiceNames = require('@sage/bc-servicenames');
 const Rule = require('@sage/bc-rule');
 const servicesUtils = require('@sage/bc-services-utils');
 const UncappedQuery = require('@sage/bc-uncappedquery');
+const Transaction = require('@sage/bc-contracts-transaction');
 
 module.exports = {
     validators,
@@ -24,4 +25,5 @@ module.exports = {
     Rule,
     servicesUtils,
     UncappedQuery,
+    Transaction,
 };

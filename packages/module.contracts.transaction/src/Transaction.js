@@ -409,7 +409,7 @@ Transaction.allowableRuleFields = [
 
 module.exports = Transaction;
 
-Transaction.extend = (destination, source, method) => utils.extend(destination, source, method, (method === httpMethod.post ? postKeys : updateKeys), readOnlyKeys);
+Transaction.extend = (destination, source, method) => _.extend(destination, source, method, (method === httpMethod.post ? postKeys : updateKeys), readOnlyKeys);
 
 const _Keys = [
     // these fields can neither be created nor modified by the API client
