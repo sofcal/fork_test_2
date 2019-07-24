@@ -1,6 +1,6 @@
 const handler = require('../../lib/handler');
 
-describe('migration.aggregatorPrivateKey.handler', function(){
+describe('runonce-migration-aggregatorprivatekey.handler', function(){
     it('should do nothing', () => {
 
     });

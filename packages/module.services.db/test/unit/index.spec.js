@@ -2,7 +2,7 @@ const DB = require('../../lib');
 const should = require('should');
 const sinon = require('sinon');
 
-describe('internal.services.db.index', function(){
+describe('@sage/bc-services-db.index', function(){
     const options = {};
     let sandbox;
 

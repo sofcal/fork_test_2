@@ -4,7 +4,7 @@
 const ErrorSpecs = require('../../ErrorSpecs');
 
 // internal modules
-const { StatusCodeError } = require('@sage/bc-status-code-error');
+const { StatusCodeError } = require('@sage/bc-statuscodeerror');
 
 // external modules
 const _ = require('underscore');

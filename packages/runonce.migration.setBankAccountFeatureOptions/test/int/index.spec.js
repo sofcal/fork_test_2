@@ -1,6 +1,6 @@
 const should = require('should');
 
-describe('migration-setBankAccountFeatureOptions', function(){
+describe('runonce-migration-setbankaccountfeatureoptions', function(){
     it('should do nothing', (done) => {
         done();
     });

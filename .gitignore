@@ -13,4 +13,6 @@ lerna-debug.log
 coverage
 
 packages/**/npm-debug*
+packages/**/module.*/lib
 
+.DS_Store

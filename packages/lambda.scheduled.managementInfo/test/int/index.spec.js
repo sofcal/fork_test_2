@@ -1,6 +1,6 @@
 const should = require('should');
 
-describe('scheduled-mi', function(){
+describe('lambda-scheduled-managementinfo.index', function(){
     it('should do nothing', (done) => {
         done();
     });

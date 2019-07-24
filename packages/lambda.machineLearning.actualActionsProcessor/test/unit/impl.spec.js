@@ -6,7 +6,7 @@ const impl = require('./../../lib/impl.js');
 const DbQueries = require('./../../lib/dbQueries');
 const FeedbackRuleGenerator = require('./../../lib/FeedbackRuleGenerator');
 
-describe('impl', function(){
+describe('lambda-machineLearning-actualActionsProcessor.impl', function(){
     let sandbox;
     before(()=>{
     });

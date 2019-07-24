@@ -1,7 +1,7 @@
 'use strict';
 
 const ErrorSpecs = require('../ErrorSpecs');
-const { StatusCodeError } = require('@sage/bc-status-code-error');
+const { StatusCodeError } = require('@sage/bc-statuscodeerror');
 
 module.exports = (event) => {
     // nothing to validate on the event

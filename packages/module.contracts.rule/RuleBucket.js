@@ -59,8 +59,7 @@ const validateImpl = function(ruleBucket, noThrow) {
         if (noThrow) {
             return createErrorItems(result.errors, ruleBucket);
         }
-        const error = createError(result.errors, ruleBucket);
-        throw error;
+        throw createError(result.errors, ruleBucket);
     }
     return true;
 };
@@ -76,7 +75,7 @@ const createErrorItems = (errCollection, rule) => {
         const dotSeparated = buildDotSeparatedString(err.property);
         const prop = resolvePath(dotSeparated, rule);
         if (_.isArray(prop)) {
-            invalidValue[dotSeparated] = prop[0];
+            invalidValue[dotSeparated] = prop[0]; // eslint-disable-line prefer-destructuring
         } else {
             invalidValue[dotSeparated] = prop;
         }
@@ -86,24 +85,24 @@ const createErrorItems = (errCollection, rule) => {
     return errorItems;
 };
 
-const resolvePath = (path, obj = self, separator = '.') => {
-    let properties = Array.isArray(path) ? path : path.split(separator);
+const resolvePath = (path, obj, separator = '.') => {
+    const properties = Array.isArray(path) ? path : path.split(separator);
     return properties.reduce((prev, curr) => prev && prev[curr], obj);
 };
 
 const buildDotSeparatedString = (dotSeparated) => {
-    dotSeparated = dotSeparated.split('instance.').join('');
-    dotSeparated = dotSeparated.split('[').join('.');
-    dotSeparated = dotSeparated.split(']').join('');
-    if (dotSeparated.indexOf('.') > 0) {
-        dotSeparated = dotSeparated.substring(0, dotSeparated.indexOf('.'));
+    let ret = dotSeparated.split('instance.').join('');
+    ret = ret.split('[').join('.');
+    ret = ret.split(']').join('');
+    if (ret.indexOf('.') > 0) {
+        ret = ret.substring(0, ret.indexOf('.'));
     }
-    return dotSeparated;
+    return ret;
 };
 
 // replace or insert rule into rules array based on its rank and recalculate rank for all rules
 const addOrUpdateRuleByRankImpl = (existingRules, rule) => {
-    let newRules = _.reject(existingRules, (existing) => existing.uuid === rule.uuid);
+    const newRules = _.reject(existingRules, (existing) => existing.uuid === rule.uuid);
 
     // remove this rule from the array if it exists
     const newIndex = (rule.ruleRank > 0) ? rule.ruleRank - 1 : newRules.length;
@@ -114,7 +113,7 @@ const addOrUpdateRuleByRankImpl = (existingRules, rule) => {
     reorderedRules.push(...orderTypedRules(newRules, Rule.ruleTypes.user));
     reorderedRules.push(...orderTypedRules(newRules, Rule.ruleTypes.accountant));
     reorderedRules.push(...orderTypedRules(newRules, Rule.ruleTypes.feedback));
-    reorderedRules.push(...orderTypedRules(newRules, Rule.ruleTypes.global));    
+    reorderedRules.push(...orderTypedRules(newRules, Rule.ruleTypes.global));
     RuleBucket.resetRuleRanks(reorderedRules);
 
     return reorderedRules;

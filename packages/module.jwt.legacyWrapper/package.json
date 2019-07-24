@@ -1,0 +1,48 @@
+{
+  "name": "@sage/sfab-s2s-jwt-legacy-wrapper",
+  "version": "1.1.35",
+  "author": "Sage UK",
+  "license": "ISC",
+  "description": "Legacy Wrapper for components used within Banking Cloud. These modules are installed locally using npm > 6 and then copied into the Banking Cloud solution to reduce dependency overhead (due to BC's use of npm 2.15.1)",
+  "main": "lib/index.js",
+  "private": true,
+  "directories": {
+    "lib": "lib"
+  },
+  "publishConfig": {
+    "registry": "https://sage.myget.org/F/npm/npm/",
+    "access": "public"
+  },
+  "dependencies": {
+    "@sage/bc-services-parameter": "^1.1.32",
+    "@sage/bc-services-step": "^1.1.32",
+    "@sage/sfab-s2s-jwt-authenticator": "^1.1.32",
+    "@sage/sfab-s2s-jwt-cache": "^1.1.32",
+    "@sage/sfab-s2s-jwt-endpoint-store": "^1.1.32",
+    "@sage/sfab-s2s-jwt-issuer": "^1.1.32",
+    "@sage/sfab-s2s-jwt-jwks": "^1.1.32",
+    "@sage/sfab-s2s-jwt-kid": "^1.1.32",
+    "@sage/sfab-workers-clam-av": "^1.1.35"
+  },
+  "devDependencies": {
+    "@sage/bc-debug-utils": "^1.1.32",
+    "eslint": "^4.11.0",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-stats": "^1.0.0"
+  },
+  "scripts": {
+    "clean": "rimraf ./coverage/ && rimraf ./.nyc_output/ && rimraf ./node_modules/",
+    "test": "NODE_ENV=test nyc --cache false --x test/ mocha -b --colors \"./test/unit/**/*.spec.js\"",
+    "testwatchunit": "NODE_ENV=test mocha -b -w --colors \"./test/unit/**/*.spec.js\"",
+    "testwatchuint": "NODE_ENV=test mocha -b -w --colors \"./test/int/**/*.spec.js\"",
+    "testint": "NODE_ENV=test nyc --x lib/_legacy --x test/ mocha -b --colors --reporter spec \"./test/int/**/*.spec.js\"",
+    "cover": "NODE_ENV=test npm run test && nyc report --reporter=lcov",
+    "report": "open coverage/lcov-report/index.html",
+    "cover:report": "npm run cover && npm run report",
+    "lint": "eslint ./src/**",
+    "build": "",
+    "watch": "babel --watch src --out-dir lib --copy-files",
+    "unlock": "rimraf package-lock.json"
+  }
+}

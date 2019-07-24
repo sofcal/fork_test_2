@@ -6,7 +6,7 @@ const DbQueries = require('../../lib/DbQueries');
 const Rule = require('@sage/bc-contracts-rule').Rule;
 const RuleBucket = require('@sage/bc-contracts-rule').RuleBucket;
 
-describe('machineLearning-actualActionsProcessor',() => {
+describe('lambda-machineLearning-actualActionsProcessor.DBQueries',() => {
     let db;
     let dbConnection;
     let queries;

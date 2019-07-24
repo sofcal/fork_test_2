@@ -1,6 +1,6 @@
 const should = require('should');
 
-describe('incident-rulesWildcardCheck', function(){
+describe('runonce-incident-ruleswildcardcheck.handler', function(){
     it('should do nothing', (done) => {
         done();
     });

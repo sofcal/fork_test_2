@@ -1,0 +1,79 @@
+//Transaction count with Rules
+db.getCollection('Transaction').count({transactions:{$elemMatch:{accountsPostings: {$gt: []}}}})
+
+//Number of transactions with Rules
+db.Transaction.aggregate([
+{ $unwind: '$transactions' },
+{ $match: { 'transactions.accountsPostings': { $gt: [] } } },
+{ $group: { _id: 1, count: { $sum: 1 } } }
+])
+
+//Number of rules all products
+db.Rule.aggregate([
+{ $unwind: '$rules' },
+{ $group: { _id: 1, count: { $sum: 1 } } }
+])
+
+//Number of orgs with rules all products
+DBQuery.shellBatchSize = 50000;
+db.Rule.aggregate([
+{ $group: { _id: '$organisationId', count: { $sum: 1 } } }
+])
+
+//number of bank accounts with rules all products
+DBQuery.shellBatchSize = 50000;
+db.Rule.aggregate([
+{ $group: { _id: '$bankAccountId', count: { $sum: 1 } } }
+])
+
+//rules count desc
+db.getCollection('Rule').aggregate([{$sort:{'numberOfRules':-1}}])
+	
+//rules by product
+//DBQuery.shellBatchSize = 50000;
+db.Organisation.aggregate([
+{ $match:{"products.productId": "2ac2a370-6f73-4be4-b138-08eb9f2e7992"}},
+{
+$lookup: {
+from: 'Rule',
+localField: '_id',
+foreignField: 'organisationId',
+as: 'r'
+}
+},
+{ $unwind: '$r' },
+{ $project: { 'organisationId':'$r.organisationId' ,'bankAccountId':'$r.bankAccountId', 'numberOfRules':'$r.numberOfRules'} },
+{$group:{
+_id: {'organisationId': '$organisationId','bankAccountId':'$bankAccountId', 'numberOfRules':'$numberOfRules'}
+
+}
+}
+])
+
+//rules by product 2
+db.Organisation.aggregate([
+{ $match:{"products.productId": "2ac2a370-6f73-4be4-b138-08eb9f2e7992"}},
+{
+$lookup: {
+from: 'BankAccount',
+localField: '_id',
+foreignField: 'organisationId',
+as: 'bnkAccs'
+}
+},
+{ $unwind: '$bnkAccs' },
+{ $project: {'bankAccountId':'$bnkAccs._id'} },
+{
+$lookup: {
+from: 'Rule',
+localField: 'bankAccountId',
+foreignField: 'bankAccountId',
+as: 'r'
+}
+},
+{ $unwind: '$r' },
+{ $project: {'bankAccountId':'$bankAccountId', 'numberOfRules':'$r.numberOfRules'} }
+])	
+	
+	
+	

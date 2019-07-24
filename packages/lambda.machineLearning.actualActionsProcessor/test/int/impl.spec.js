@@ -4,7 +4,7 @@ const _ = require('underscore');
 const DB =  require('@sage/bc-services-db');
 const impl = require('./../../lib/impl.js')
 
-describe('machine-learning-actual-actions-processor', function(){  //TEMP:RJ:TESTMATRIX:FR8,FR12,FR14
+describe('lambda-machineLearning-actualActionsProcessor.impl', function(){  //TEMP:RJ:TESTMATRIX:FR8,FR12,FR14
     let db;
     let dbConnection;
 

@@ -1,0 +1,1 @@
+db.getCollection('BankAccount').count({region:"AUS", dataProvider:"indirect", status:{$in:["active", "authRequired", "verifyingAuth"]}})

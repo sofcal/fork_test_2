@@ -3,9 +3,9 @@ const sinon = require('sinon');
 const _ = require('underscore');
 const Rule = require('../../Rule');
 const { resources } = require('../../_bankDrive');
-const { StatusCodeError } = require('@sage/bc-status-code-error');
+const { StatusCodeError } = require('@sage/bc-statuscodeerror');
 
-describe ('Rule', () => {
+describe ('@sage/bc-contracts-rule.Rule', () => {
 
     const validRule = {
         "uuid": "55111111-ba11-ba11-ba11-111111111111",
@@ -57,7 +57,7 @@ describe ('Rule', () => {
         }
     });
 
-    it.only('should throw an error if an invalid rule is provided', (done) => {
+    it('should throw an error if an invalid rule is provided', (done) => {
         try {
             Rule.validate('bob');
             done(new Error('should have thrown'));

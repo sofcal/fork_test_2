@@ -2,7 +2,7 @@
 
 const validate = require('./validators');
 const ErrorSpecs = require('./ErrorSpecs');
-const { StatusCodeError } = require('@sage/bc-status-code-error');
+const { StatusCodeError } = require('@sage/bc-statuscodeerror');
 const Promise = require('bluebird');
 const moment = require('moment');
 const _ = require('underscore');
@@ -14,7 +14,10 @@ module.exports.run = Promise.method((event, params, services) => {
     const func = 'impl.run';
     event.logger.info({ function: func, log: 'started' });
 
-    let { bucket, fromPrefix, toPrefix } = validate.env(process.env);
+    const validated = validate.env(process.env);
+    let { bucket } = validated;
+    const { fromPrefix, toPrefix } = validated;
+
     const { eventTargetDate } = validate.event(event);
     bucket = bucket.replace('arn:aws:s3:::', '');
 

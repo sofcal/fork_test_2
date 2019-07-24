@@ -33,22 +33,20 @@ const getParametersImpl = Promise.method((self, params) => {
         // eslint-disable-next-line no-restricted-syntax
         for (const p of response.Parameters) {
             const name = p.Name; // eslint-disable-next-line no-param-reassign
-            returnParams[name] = p.Type === 'StringList' ? p.Value.split(',') : p.Value;
+            returnParams[name.replace(self.paramPrefix, '')] = p.Type === 'StringList' ? p.Value.split(',') : p.Value;
         }
         return returnParams;
     };
 
-    const req = {
-        Names: params,
-        WithDecryption: true
-    };
+    const Names = params.map((p) => `${self.paramPrefix}${p}`);
+    const req = { Names, WithDecryption: true };
 
     return self.ssm.getParameters(req).promise()
         .then((response) => mapResponse(response));
 });
 
 const setParameterImpl = Promise.method((self, { name: Name, value: Value, type: Type, keyId: KeyId, overwrite: Overwrite = true }) => {
-    const options = { Name, Type, Value, Overwrite, KeyId };
+    const options = { Name: `${self.paramPrefix}${Name}`, Type, Value, Overwrite, KeyId };
 
     return self.ssm.putParameter(options).promise()
         .then((data) => data);

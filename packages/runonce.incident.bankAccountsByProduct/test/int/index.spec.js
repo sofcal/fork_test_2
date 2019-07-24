@@ -1,6 +1,6 @@
 const should = require('should');
 
-describe('incidents.bankAccountsByProduct', function(){
+describe('runonce-incident-bankaccountsbyproduct', function(){
     it('should do nothing', (done) => {
         done();
     });

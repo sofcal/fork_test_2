@@ -2,7 +2,7 @@ const RequestLogger = require('../../lib/RequestLogger');
 const should = require('should');
 const sinon = require('sinon');
 
-describe('@sage/bc-request-logger.requestLogger', function(){
+describe('@sage/bc-requestlogger.requestLogger', function(){
     let sandbox;
 
     beforeEach(() => {

@@ -1,13 +1,13 @@
 'use strict';
 
 const { resources } = require('../../_bankDrive');
-const { StatusCodeError } = require('@sage/bc-status-code-error');
+const { StatusCodeError } = require('@sage/bc-statuscodeerror');
 const Rule = require('../../Rule');
 const should = require('should');
 const sinon = require('sinon');
 const _ = require('underscore');
 
-describe('services.ruleService', function () {
+describe('@sage/bc-contracts-rule.Rule', function () {
     let sandbox;
     let data;
 
