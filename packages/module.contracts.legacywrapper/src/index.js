@@ -14,6 +14,7 @@ const UncappedQuery = require('@sage/bc-uncappedquery');
 const Transaction = require('@sage/bc-contracts-transaction');
 const helpersWrapper = require('@sage/bc-common-helpers');
 const Lock = require('@sage/bc-lock');
+const Quarantine = require('@sage/bc-contracts-quarantine');
 
 module.exports = {
     validators,
@@ -30,4 +31,5 @@ module.exports = {
     Transaction,
     helpersWrapper,
     Lock,
+    Quarantine,
 };

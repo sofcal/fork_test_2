@@ -19,6 +19,7 @@
     "@sage/bc-bankids": "^1.1.19",
     "@sage/bc-common-helpers": "^1.1.52",
     "@sage/bc-common-resources": "^1.1.23",
+    "@sage/bc-contracts-quarantine": "^1.1.52",
     "@sage/bc-contracts-transaction": "^1.1.52",
     "@sage/bc-lock": "^1.1.52",
     "@sage/bc-productids": "^1.1.23",
