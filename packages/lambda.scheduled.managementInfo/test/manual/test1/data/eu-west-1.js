@@ -356,33 +356,36 @@ var generateTransactions = (bankAccount, unresolved) => {
 
     var raw = [];
 
-    for (var i = 1; i <= bankAccount[prop]; ++i) {
-        if (( i-1 ) % 100 === 0) {
-            raw.push([]);
+    if (bankAccount[prop] > 0) {
+        for (var i = 1; i <= bankAccount[prop]; ++i) {
+            if ((i - 1) % 100 === 0) {
+                raw.push([]);
+            }
+
+            // CREDIT: >= 0
+            // DEBIT: < 0
+            // all odd transactionIds will be CREDIT, even will be DEBIT
+            var mod = i % 2 === 0 ? -1 : 1;
+            var transaction = {
+                incrementedId: i,
+                transactionAmount: (i * mod) / 100,
+                transactionType: mod === 1 ? 'CREDIT' : 'DEBIT'
+            };
+
+            raw[raw.length - 1].push(transaction);
         }
 
-        // CREDIT: >= 0
-        // DEBIT: < 0
-        // all odd transactionIds will be CREDIT, even will be DEBIT
-        var mod = i % 2 === 0 ? -1 : 1;
-        var transaction = {
-            incrementedId: i,
-            transactionAmount: (i * mod) / 100,
-            transactionType: mod === 1 ? 'CREDIT' : 'DEBIT'
-        };
-
-        raw[raw.length - 1].push(transaction);
+        return raw.map((transactions) => {
+            return {
+                bankAccountId: bankAccount._id,
+                startIncrementedId: transactions[0].incrementedId,
+                endIncrementedId: transactions[transactions.length - 1].incrementedId,
+                numberOfTransactions: transactions.length,
+                transactions
+            }
+        });
     }
-
-    return raw.map((transactions) => {
-        return {
-            bankAccountId: bankAccount._id,
-            startIncrementedId: transactions[0].incrementedId,
-            endIncrementedId: transactions[transactions.length - 1].incrementedId,
-            numberOfTransactions: transactions.length,
-            transactions
-        }
-    });
+    return undefined;
 };
 
 bankAccounts.forEach((ba) => {
