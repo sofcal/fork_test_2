@@ -1,3 +1,3 @@
 const QuarantineBucket = require('./QuarantineBucket');
 
-module.exports = QuarantineBucket;
+module.exports = { QuarantineBucket };

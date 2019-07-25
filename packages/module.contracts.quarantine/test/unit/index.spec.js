@@ -5,7 +5,7 @@ const should = require('should');
 describe('@sage/bc-quarantine.index', function(){
     // placeholder
     it('should export the correct modules', (done) => {
-        should(index).eql(QuarantineBucket);
+        should(index).eql({ QuarantineBucket });
         done();
     });
 });
