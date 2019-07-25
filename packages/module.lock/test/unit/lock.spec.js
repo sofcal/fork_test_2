@@ -32,7 +32,7 @@ describe('Lock.js', function() {
         sandbox.restore();
     });
 
-    it('should export a function which creates and returns an object that is an instance of Lock and has the correct properties', (done) => {
+    it('should export a function for Lock which can be instantiated and has the correct properties', (done) => {
         let lock = new Lock(logger, {uuid: 'someUUID', expiry: new Date()});
 
         Lock.should.be.a.Function();
