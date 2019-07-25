@@ -1,6 +1,6 @@
 {
   "name": "@sage/bc-contracts-transaction",
-  "version": "1.1.54",
+  "version": "1.1.55",
   "author": "Sage UK",
   "license": "ISC",
   "description": "Banking Cloud Transaction",
@@ -19,7 +19,7 @@
     "@sage/bc-common-resources": "^1.1.23",
     "@sage/bc-framework-httpmethod": "^1.1.22",
     "@sage/bc-rule": "^1.1.26",
-    "@sage/bc-services-utils": "^1.1.54",
+    "@sage/bc-services-utils": "^1.1.55",
     "@sage/bc-statuscodeerror": "^1.1.8",
     "@sage/bc-validators": "^1.1.38",
     "underscore": "^1.9.0",
