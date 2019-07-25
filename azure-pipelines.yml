@@ -7,7 +7,7 @@ variables:
   outputPath: build/
 
 trigger:
-- av_worker
+- develop
 
 pool:
   vmImage: 'Ubuntu-16.04'
@@ -20,7 +20,7 @@ steps:
 
 - task: CmdLine@2
   inputs:
-    script: 'git checkout av_worker'
+    script: 'git checkout develop'
   displayName: 'branch checkout (why?)'
 
 - task: Npm@1
