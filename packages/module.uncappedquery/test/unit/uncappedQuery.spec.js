@@ -28,7 +28,7 @@ describe('UncappedQuery.js', function() {
         sandbox.restore();
     });
 
-    it('should export a function which creates and returns an object that is an instance of Query and has the correct properties', (done) => {
+    it('should export a function for UncappedQuery which can be instantiated and has the correct properties', (done) => {
         let uq = new UncappedQuery(1, 2, {someProp : 'someVal'});
 
         UncappedQuery.should.be.a.Function();
