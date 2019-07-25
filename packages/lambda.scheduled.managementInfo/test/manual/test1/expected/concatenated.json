@@ -1,34 +1,35 @@
 {
+  "csv": "Product,Organisations,Companies,BankAccounts,ActiveBankAccounts,Transactions,TotalCredit,TotalDebit,TotalAbsolute\nMI TEST PRODUCT,6,8,30,26,444,104.24,-102.40,206.64",
   "orphaned": {
     "bankAccounts": [
       {
-        "_id": "10000000-0000-0000-0000-000000000015",
+        "_id": "10000000-0000-0000-0000-000000000018",
         "accountantManaged": "none",
         "aggregatorName": null,
         "bankId": "10000000-0000-0000-0000-000000000001",
         "bankName": "MI TEST BANK",
         "missing": true,
         "missingOnOrg": true,
-        "organisationId": "10000000-0000-0000-0000-000000000004",
+        "organisationId": "10000000-0000-0000-0000-000000000003",
         "status": "active",
         "transactionCount": 2,
         "unresolvedCount": 2
       },
       {
-        "_id": "20000000-0000-0000-0000-000000000015",
+        "_id": "20000000-0000-0000-0000-000000000018",
         "accountantManaged": "none",
         "aggregatorName": null,
         "bankId": "10000000-0000-0000-0000-000000000001",
         "bankName": "MI TEST BANK",
         "missing": true,
         "missingOnOrg": true,
-        "organisationId": "20000000-0000-0000-0000-000000000004",
+        "organisationId": "20000000-0000-0000-0000-000000000003",
         "status": "active",
         "transactionCount": 2,
         "unresolvedCount": 2
       },
       {
-        "_id": "20000000-0000-0000-0000-000000000016",
+        "_id": "20000000-0000-0000-0000-000000000019",
         "accountantManaged": "none",
         "aggregatorName": "plaid",
         "bankId": "10000000-0000-0000-0000-000000000001",
@@ -41,7 +42,7 @@
         "unresolvedCount": 2
       },
       {
-        "_id": "10000000-0000-0000-0000-000000000016",
+        "_id": "10000000-0000-0000-0000-000000000019",
         "accountantManaged": "none",
         "aggregatorName": "plaid",
         "bankId": "10000000-0000-0000-0000-000000000001",
@@ -89,7 +90,7 @@
         "statuses": {
           "active": 14,
           "authRequired": 2,
-          "autoCancelled": 1,
+          "autoCancelled": 2,
           "cancelled": 2,
           "inactiveClient": 2,
           "inactiveFeed": 2,
@@ -97,19 +98,19 @@
           "pending": 2,
           "verifyingAuth": 2
         },
-        "total": 28,
+        "total": 30,
         "transactionsMax": 101,
         "unresolvedMax": 101
       },
       "companies": {
-        "bankAccountsMax": 8,
+        "bankAccountsMax": 9,
         "missing": 0,
         "total": 8
       },
       "organisations": {
-        "bankAccountsMax": 9,
+        "bankAccountsMax": 10,
         "companiesMax": 2,
-        "total": 8
+        "total": 6
       },
       "productId": "10000000-0000-0000-0000-000000000001",
       "productName": "MI TEST PRODUCT",
