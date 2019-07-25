@@ -1,0 +1,10 @@
+db.BankAccount.aggregate([{$match:{"_id":{$in:[
+    ARRAY OF BankAccount IDS
+]}}},{
+        $lookup: {
+            from: 'Bank',
+            localField: 'bankId',
+            foreignField: '_id',
+            as: 'bnkDetail'}
+    }, { $unwind: '$bnkDetail' },
+{$project:{'bankName':'$bnkDetail.name','providerId':'$bnkDetail.aggregatorId','bankIdentifier':'$bankIdentifier','accountIdentifier':'$accountIdentifier','status':'$status', 'requestedStartDate':'$requestedStartDate','lastTransactionsReceived':'$lastTransactionsReceived','lastTransactionsGet':'$lastTransactionsGet','lastTransactionId':'$lastTransactionId','created':'$created'}}])

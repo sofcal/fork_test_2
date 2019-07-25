@@ -1,0 +1,5 @@
+DBQuery.shellBatchSize = 500;
+db.Organisation.aggregate([{$match:{"_id":{$in:[
+    ARRAY OF ORG IDS
+]}}},
+{$project:{'adminEmail':'$adminEmail', 'crmId':'$crmId'}}])
