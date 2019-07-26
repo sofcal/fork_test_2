@@ -16,6 +16,7 @@
   "dependencies": {
     "@sage/bc-adapterresources": "^1.1.23",
     "@sage/bc-alerttypes": "^1.1.22",
+    "@sage/bc-bank": "^1.1.57",
     "@sage/bc-bankids": "^1.1.19",
     "@sage/bc-common-helpers": "^1.1.56",
     "@sage/bc-common-resources": "^1.1.23",

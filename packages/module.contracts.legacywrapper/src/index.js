@@ -15,6 +15,7 @@ const Transaction = require('@sage/bc-contracts-transaction');
 const helpersWrapper = require('@sage/bc-common-helpers');
 const Lock = require('@sage/bc-lock');
 const Quarantine = require('@sage/bc-contracts-quarantine');
+const Bank = require('@sage/bc-bank');
 
 module.exports = {
     validators,
@@ -32,4 +33,5 @@ module.exports = {
     helpersWrapper,
     Lock,
     Quarantine,
+    Bank,
 };
