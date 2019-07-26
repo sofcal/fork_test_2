@@ -1,34 +1,35 @@
 {
+  "csv": "Product,Organisations,Companies,BankAccounts,ActiveBankAccounts,Transactions,TotalCredit,TotalDebit,TotalAbsolute\nMI TEST PRODUCT,6,8,30,26,444,104.24,-102.40,206.64",
   "orphaned": {
     "bankAccounts": [
       {
-        "_id": "10000000-0000-0000-0000-000000000015",
+        "_id": "10000000-0000-0000-0000-000000000018",
         "accountantManaged": "none",
         "aggregatorName": null,
         "bankId": "10000000-0000-0000-0000-000000000001",
         "bankName": "MI TEST BANK",
         "missing": true,
         "missingOnOrg": true,
-        "organisationId": "10000000-0000-0000-0000-000000000004",
+        "organisationId": "10000000-0000-0000-0000-000000000003",
         "status": "active",
         "transactionCount": 2,
         "unresolvedCount": 2
       },
       {
-        "_id": "20000000-0000-0000-0000-000000000015",
+        "_id": "20000000-0000-0000-0000-000000000018",
         "accountantManaged": "none",
         "aggregatorName": null,
         "bankId": "10000000-0000-0000-0000-000000000001",
         "bankName": "MI TEST BANK",
         "missing": true,
         "missingOnOrg": true,
-        "organisationId": "20000000-0000-0000-0000-000000000004",
+        "organisationId": "20000000-0000-0000-0000-000000000003",
         "status": "active",
         "transactionCount": 2,
         "unresolvedCount": 2
       },
       {
-        "_id": "20000000-0000-0000-0000-000000000016",
+        "_id": "20000000-0000-0000-0000-000000000019",
         "accountantManaged": "none",
         "aggregatorName": "plaid",
         "bankId": "10000000-0000-0000-0000-000000000001",
@@ -41,7 +42,7 @@
         "unresolvedCount": 2
       },
       {
-        "_id": "10000000-0000-0000-0000-000000000016",
+        "_id": "10000000-0000-0000-0000-000000000019",
         "accountantManaged": "none",
         "aggregatorName": "plaid",
         "bankId": "10000000-0000-0000-0000-000000000001",
@@ -66,19 +67,6 @@
       "debitsMaxValue": -2,
       "debitsTotalCount": 4,
       "debitsTotalValue": -8
-    },
-    "unresolved": {
-      "absoluteAverageValue": 1.5,
-      "absoluteTotalCount": 8,
-      "absoluteTotalValue": 12,
-      "creditsAverageValue": 1,
-      "creditsMaxValue": 1,
-      "creditsTotalCount": 4,
-      "creditsTotalValue": 4,
-      "debitsAverageValue": -2,
-      "debitsMaxValue": -2,
-      "debitsTotalCount": 4,
-      "debitsTotalValue": -8
     }
   },
   "products": [
@@ -89,6 +77,7 @@
         "statuses": {
           "active": 14,
           "authRequired": 2,
+          "autoCancelled": 2,
           "cancelled": 2,
           "inactiveClient": 2,
           "inactiveFeed": 2,
@@ -96,47 +85,34 @@
           "pending": 2,
           "verifyingAuth": 2
         },
-        "total": 28,
+        "total": 30,
         "transactionsMax": 101,
         "unresolvedMax": 101
       },
       "companies": {
-        "bankAccountsMax": 8,
+        "bankAccountsMax": 9,
         "missing": 0,
         "total": 8
       },
       "organisations": {
-        "bankAccountsMax": 9,
+        "bankAccountsMax": 10,
         "companiesMax": 2,
-        "total": 8
+        "total": 6
       },
       "productId": "10000000-0000-0000-0000-000000000001",
       "productName": "MI TEST PRODUCT",
       "transactions": {
-        "absoluteAverageValue": 185,
-        "absoluteTotalCount": 222,
-        "absoluteTotalValue": 41036,
-        "creditsAverageValue": 184,
+        "absoluteAverageValue": 46.54,
+        "absoluteTotalCount": 444,
+        "absoluteTotalValue": 20664,
+        "creditsAverageValue": 46.54,
         "creditsMaxValue": 101,
-        "creditsTotalCount": 111,
-        "creditsTotalValue": 20412,
-        "debitsAverageValue": 186,
-        "debitsMaxValue": 100,
-        "debitsTotalCount": 111,
-        "debitsTotalValue": 20624
-      },
-      "unresolved": {
-        "absoluteAverageValue": 0,
-        "absoluteTotalCount": 0,
-        "absoluteTotalValue": 0,
-        "creditsAverageValue": 0,
-        "creditsMaxValue": 0,
-        "creditsTotalCount": 0,
-        "creditsTotalValue": 0,
-        "debitsAverageValue": 0,
-        "debitsMaxValue": 0,
-        "debitsTotalCount": 0,
-        "debitsTotalValue": 0
+        "creditsTotalCount": 224,
+        "creditsTotalValue": 10424,
+        "debitsAverageValue": -46.55,
+        "debitsMaxValue": -100,
+        "debitsTotalCount": 220,
+        "debitsTotalValue": -10240
       }
     }
   ]
