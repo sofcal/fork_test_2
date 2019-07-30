@@ -22,6 +22,11 @@ class ResultsSummary {
         this.csv = _.reduce(this.products, (memo, product) => {
             return `${memo}\n${product.toCSV()}`;
         }, initial);
+
+        this.perProductBanksCSV = {};
+        _.each(this.products, (product) => {
+            this.perProductBanksCSV[product.productId] = product.toCSVForBank();
+        });
     }
 }
 

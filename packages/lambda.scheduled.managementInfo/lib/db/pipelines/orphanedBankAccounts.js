@@ -39,6 +39,7 @@ module.exports = ({ count = false } = {}) => {
                 accountantManaged: 1,
                 missing: 1,
                 bankId: 1,
+                aggregatorId: { $cond: [{ $or: [{ $not: ['$bankLookup'] }, { $eq: ['$bankAccount', []] }] }, null, { $arrayElemAt: ['$bankLookup.aggregatorId', 0] }] },
                 bankName: { $cond: [{ $or: [{ $not: ['$bankLookup'] }, { $eq: ['$bankAccount', []] }] }, null, { $arrayElemAt: ['$bankLookup.name', 0] }] },
             }
         }

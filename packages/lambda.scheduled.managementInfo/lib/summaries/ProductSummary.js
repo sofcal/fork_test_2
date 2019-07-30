@@ -1,3 +1,4 @@
+const BankSummary = require('./BankSummary');
 const TransactionSummary = require('./TransactionSummary');
 
 const _ = require('underscore');
@@ -37,6 +38,9 @@ class ProductSummary {
             unresolvedMax: 0
         };
 
+        // we don't know the bank names in advance, so we dynamically fill this object.
+        this.banks = {};
+
         this.transactions = new TransactionSummary();
     }
 
@@ -63,6 +67,9 @@ class ProductSummary {
                 this.bankAccounts.accountantManaged += bankAccount.accountantManaged === 'none' ? 0 : 1;
                 this.bankAccounts.transactionsMax = Math.max(this.bankAccounts.transactionsMax, bankAccount.transactionCount);
                 this.bankAccounts.unresolvedMax = Math.max(this.bankAccounts.unresolvedMax, bankAccount.unresolvedCount);
+
+                this.banks[bankAccount.bankId] = this.banks[bankAccount.bankId] || new BankSummary(bankAccount);
+                this.banks[bankAccount.bankId].updateFrom(bankAccount);
             }
         });
     }
@@ -102,6 +109,14 @@ class ProductSummary {
         const totalDebitsMajor = (this.transactions.debitsTotalValue / 100).toFixed(2);
         const totalAbsoluteMajor = (this.transactions.absoluteTotalValue / 100).toFixed(2);
         return `${this.productName},${this.organisations.total},${this.companies.total},${this.bankAccounts.total},${active},${this.transactions.absoluteTotalCount},${totalCreditsMajor},${totalDebitsMajor},${totalAbsoluteMajor}`;
+    }
+
+    toCSVForBank() {
+        // BankId, BankName, DataProvider, AggregatorName, AggregatorId, Pending, Active, AuthRequired, VerifyingAuth, InactiveFeed, InactiveClient, Cancelled, Invalid, AutoCancelled
+        const initial = 'BankId,BankName,DataProvider,AggregatorName,AggregatorId,Pending,Active,AuthRequired,VerifyingAuth,InactiveFeed,InactiveClient,Cancelled,Invalid,AutoCancelled';
+        this.csv = _.reduce(this.banks, (memo, bank) => {
+            return `${memo}\n${bank.toCSV()}`;
+        }, initial);
     }
 }
 
