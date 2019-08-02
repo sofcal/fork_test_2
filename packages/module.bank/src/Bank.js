@@ -37,7 +37,6 @@ class Bank {
 
             /* aggregator feature */
             if (plaidFeatureEnabled) {
-                this.plaidFeatureEnabled = true;
                 this.dataProvider = data.dataProvider || Bank.dataProviders.direct;
                 this.aggregatorId = data.aggregatorId;
                 this.aggregatorName = data.aggregatorName;
@@ -78,7 +77,7 @@ class Bank {
         ];
 
         /* aggregator feature */
-        if (access(bank, 'plaidFeatureEnabled')) {
+        if (bank && Object.prototype.hasOwnProperty.call(bank, 'dataProvider')) {
             /* for indirect, we only need these fields */
             if (access(bank, 'dataProvider') === Bank.dataProviders.indirect) {
                 properties = [
@@ -128,7 +127,7 @@ class Bank {
         }
 
         /* aggregator feature */
-        if (data.plaidFeatureEnabled) {
+        if (data && Object.prototype.hasOwnProperty.call(data, 'dataProvider')) {
             delete data.aggregatorId;
             delete data.aggregatorName;
         }

@@ -222,7 +222,6 @@ describe('@sage/bc-bank.Bank', () => {
 
                     should(bank.uuid).eql(uuid);
 
-                    should.not.exist(bank.plaidFeatureEnabled);
                     should.not.exist(bank.dataProvider);
                     should.not.exist(bank.aggregatorId);
                     should.not.exist(bank.aggregatorName);
@@ -238,7 +237,6 @@ describe('@sage/bc-bank.Bank', () => {
                     const bank = new Bank(data);
 
                     should(bank).have.property('uuid', uuid);
-                    should(bank).have.property('plaidFeatureEnabled', true);
                     should(bank).have.property('dataProvider', data.dataProvider);
                     should(bank).have.property('aggregatorId', data.aggregatorId);
                     should(bank).have.property('aggregatorName', data.aggregatorName);
@@ -254,7 +252,6 @@ describe('@sage/bc-bank.Bank', () => {
                     const bank = new Bank(data, true);
 
                     should(bank).have.property('uuid', uuid);
-                    should(bank).have.property('plaidFeatureEnabled', true);
                     should(bank).have.property('dataProvider', data.dataProvider);
                     should(bank).have.property('aggregatorId', data.aggregatorId);
                     should(bank).have.property('aggregatorName', data.aggregatorName);
@@ -1441,8 +1438,8 @@ describe('@sage/bc-bank.Bank', () => {
                 }
             });
 
-            it('should not attempt to filter aggregator details if plaidFeatureEnabled not set', (done) => {
-                bank.plaidFeatureEnabled = false;
+            it('should not attempt to filter aggregator details if dataProvider not set', (done) => {
+                delete bank.dataProvider;
 
                 try {
                     bank = Bank.filter(bank);
