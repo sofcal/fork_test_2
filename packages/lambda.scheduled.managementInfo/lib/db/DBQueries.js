@@ -26,6 +26,9 @@ class DBQueries {
     orphanedBankAccounts(...args) {
         return orphanedBankAccountsImpl(this, ...args);
     }
+    sitesNotSupported(...args) {
+        return sitesNotSupportedImpl(this, ...args);
+    }
 }
 
 const productsImpl = Promise.method((self, { all = false }, { logger }) => {
@@ -90,6 +93,25 @@ const orphanedBankAccountsImpl = Promise.method((self, { all = false }, { logger
 
     const collection = self.db.collection('BankAccount');
     const pipeline = self.pipelines.orphanedBankAccounts();
+
+    const promise = collection.aggregate(pipeline, consts.DEFAULT_OPTIONS);
+
+    if (!all) {
+        logger.debug({ function: func, log: 'ended - all not specified, returning cursor', params: { all } });
+        return promise;
+    }
+
+    logger.debug({ function: func, log: 'WARNING: requesting all results without a cursor could present a performance issue', params: { all } });
+    logger.debug({ function: func, log: 'ended - all specified; returning entire array', params: { all } });
+    return promise.toArray();
+});
+
+const sitesNotSupportedImpl = Promise.method((self, { productId = null, count = false, all = false }, { logger }) => {
+    const func = `${consts.LOG_PREFIX}.sitesNotSupported`;
+    logger.debug({ function: func, log: 'started', params: { productId, count, all } });
+
+    const collection = self.db.collection('Organisation');
+    const pipeline = self.pipelines.sitesNotSupported({ productId, count });
 
     const promise = collection.aggregate(pipeline, consts.DEFAULT_OPTIONS);
 

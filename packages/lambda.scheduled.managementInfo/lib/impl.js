@@ -4,7 +4,7 @@
 const validate = require('./validators');
 const { DBQueries } = require('./db');
 const { BlobStorage } = require('./blob');
-const { Orphans, Product, Concat } = require('./flows');
+const { Orphans, Product, Concat, SitesNotSupported } = require('./flows');
 
 // internal modules
 
@@ -26,7 +26,7 @@ module.exports.run = Promise.method((event, params, services) => {
     validate.event(event);
 
     const { orphans } = event;
-    let { products, concat } = event;
+    let { products, concat, sitesNotSupported } = event;
 
     const otherRegion = BlobStorage.getOtherRegion(thisRegion);
 
@@ -36,6 +36,7 @@ module.exports.run = Promise.method((event, params, services) => {
     const flows = {
         orphans: new Orphans(queries),
         product: new Product(queries),
+        sitesNotSupported: new SitesNotSupported(queries),
         concat: new Concat(blob)
     };
 
@@ -87,6 +88,25 @@ module.exports.run = Promise.method((event, params, services) => {
                         .then((results) => {
                             event.logger.info({ function: func, log: 'retrieved product information.', params: { } });
                             return blob.storeResults({ keyPostfix: product._id, results }, debug);
+                        });
+                }); // eslint-disable-line function-paren-newline
+        })
+        .then(() => {
+            if (!sitesNotSupported) {
+                event.logger.info({ function: func, log: 'sitesNotSupported not specified on event. Skipping data gather for sites not supported.', params: { } });
+                return undefined;
+            }
+
+            const keyPostfix = `${BlobStorage.Postfixes.siteNotSupported}_${product._id}`;
+
+            // we run through these one at a time to ensure we don't overload the memory
+            return Promise.each(products, // eslint-disable-line function-paren-newline
+                (product) => {
+                    event.logger.info({ function: func, log: 'gathering results for sites not supported', params: { productName: product.name, productId: product._id } });
+                    return flows.sitesNotSupported.run(product, debug)
+                        .then((results) => {
+                            event.logger.info({ function: func, log: 'retrieved sites not supported information.', params: { } });
+                            return blob.storeResults({ keyPostfix, results }, debug);
                         });
                 }); // eslint-disable-line function-paren-newline
         })

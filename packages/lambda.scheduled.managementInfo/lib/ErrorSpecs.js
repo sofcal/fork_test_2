@@ -16,6 +16,9 @@ module.exports = {
         concat: {
             orphansFailure: { applicationCode: 'FlowError', message: 'Concat: Failed to retrieve and merge orphans. Processing cannot continue', statusCode: 500 },
             productFailure: { applicationCode: 'FlowError', message: 'Concat: Failed to retrieve and merge results for product', statusCode: 500 }
+        },
+        sitesNotSupported: {
+            sitesNotSupportedFailure: { applicationCode: 'FlowError', message: 'SitesNotSupported: Failed to retrieve bank accounts with siteNotSupported set', statusCode: 500 }
         }
     }
 };

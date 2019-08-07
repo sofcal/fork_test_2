@@ -45,7 +45,7 @@ class BlobStorage {
     }
 }
 
-BlobStorage.Postfixes = { orphaned: 'orphaned', concatenated: 'concatenated' };
+BlobStorage.Postfixes = { orphaned: 'orphaned', concatenated: 'concatenated', siteNotSupported: 'siteNotSupported' };
 BlobStorage.Regions = { euWest1: 'eu-west-1', usEast1: 'us-east-1' };
 
 const retrieveFilesImpl = Promise.method((self, { regions, keyPostfix }, { logger }) => {
