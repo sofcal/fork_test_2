@@ -1,0 +1,65 @@
+DBQuery.shellBatchSize = 20000;
+db.Organisation.aggregate([
+{ $unwind: { path: '$products', preserveNullAndEmptyArrays: false } },
+{ $lookup: { from: 'Product', localField: 'products.productId', foreignField: '_id', as: 'prod'}},
+{ $unwind: '$prod' },
+{ $lookup: { from: 'Rule', localField: '_id', foreignField: 'organisationId', as: 'rulesLookup'}},
+{ $unwind: { path: '$rulesLookup', preserveNullAndEmptyArrays: false } },
+{ $unwind: { path: '$rulesLookup.rules', preserveNullAndEmptyArrays: false } },
+{ $unwind: { path: '$bankAccounts', preserveNullAndEmptyArrays: false } },
+{ $lookup: { from: 'BankAccount', localField: 'rulesLookup.bankAccountId', foreignField: '_id', as: 'baDetail'}}, 
+{ $unwind: '$baDetail' },
+{ $lookup: { from: 'Bank', localField: 'baDetail.bankId', foreignField: '_id', as: 'bnkDetail'}}, 
+{ $unwind: '$bnkDetail' },
+
+{
+$project: {
+    _id: '$rulesLookup.rules.uuid',
+    orgId: '$_id',
+    productName: '$prod.name',
+    bankname: '$bnkDetail.name',
+    ruleId: '$rulesLookup.rules.uuid',
+    bankAccount: '$rulesLookup.bankAccountId',
+    dataProvider: '$bnkDetail.dataProvider',       
+    providerId:'$bnkDetail.aggregatorId',
+    bankAccountStatus: '$baDetail.status'
+        }
+    }, 
+{
+        $group: {
+	_id: '$_id',
+    orgId: { $addToSet: '$orgId',},
+    productName: { $first: '$productName' },
+    bankname: { $addToSet: '$bankname'},
+    ruleId: { $addToSet: '$ruleId'},
+    bankAccount: { $addToSet: '$bankAccount'},
+    dataProvider: { $addToSet: '$dataProvider'},       
+    providerId:{ $addToSet: '$providerId'},
+    bankAccountStatus: { $addToSet: '$bankAccountStatus'}
+        }
+    },
+{ $unwind: { path: '$orgId', preserveNullAndEmptyArrays: false } },
+{ $unwind: { path: '$productName', preserveNullAndEmptyArrays: false } },
+{ $unwind: { path: '$bankname', preserveNullAndEmptyArrays: false } },
+{ $unwind: { path: '$ruleId', preserveNullAndEmptyArrays: false } },
+{ $unwind: { path: '$bankAccount', preserveNullAndEmptyArrays: false } },
+{ $unwind: { path: '$dataProvider', preserveNullAndEmptyArrays: false } },
+{ $unwind: { path: '$providerId', preserveNullAndEmptyArrays: false } },
+{ $unwind: { path: '$bankAccountStatus', preserveNullAndEmptyArrays: false } },
+{
+        $project: {
+    _id: 1,
+    productName: 1,
+    orgId: 1,
+    ruleId: 1,
+    bankAccount: 1,
+    bankname: 1,
+    dataProvider: 1,     
+    providerId:1,
+    bankAccountStatus: 1,
+        }
+    },
+],
+{
+allowDiskUse: true
+})

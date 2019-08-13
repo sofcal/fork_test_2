@@ -1,0 +1,17 @@
+DBQuery.shellBatchSize = 120000;
+db.BankAccount.aggregate([{$match:{status:"cancelled", accountIdentifier:{$not: /\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/i}}},{
+        $lookup: {
+            from: 'Bank',
+            localField: 'bankId',
+            foreignField: '_id',
+            as: 'bnkDetail'}
+    }, { $unwind: '$bnkDetail' },
+    {$lookup:{
+        from:'Company',
+        localField: 'company.companyId',
+        foreignField: '_id',
+            as: 'compDetail'}
+    }, { $unwind: '$compDetail' },   
+    {$project:{'bankName':'$bnkDetail.name','accountIdentifier':'$accountIdentifier','cancellationDate':'$cancellationDate',
+    'cancellationReason':'$internal.cancellationReason.description'}}
+])
