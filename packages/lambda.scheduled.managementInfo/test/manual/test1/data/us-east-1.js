@@ -44,7 +44,14 @@ var ba1 = {
     status: 'pending',
     accountant: { accountantManaged: 'none' },
     lastTransactionId: 2,
-    lastHeldTransactionId: 0
+    lastHeldTransactionId: 0,
+    accountType: 'CREDIT',
+    dataProvider: 'direct',
+    companyId: '20000000-0000-0000-0000-000000000001',
+    internal: {
+        siteNotSupported: true
+    },
+    primaryCountry: 'USA'
 };
 
 var ba2 = {
@@ -57,7 +64,14 @@ var ba2 = {
     status: 'active',
     accountant: { accountantManaged: 'none' },
     lastTransactionId: 2,
-    lastHeldTransactionId: 0
+    lastHeldTransactionId: 0,
+    accountType: 'CREDIT',
+    dataProvider: 'direct',
+    companyId: '20000000-0000-0000-0000-000000000001',
+    internal: {
+        siteNotSupported: true
+    },
+    primaryCountry: 'USA'
 };
 
 var ba3 = {
@@ -70,7 +84,14 @@ var ba3 = {
     status: 'authRequired',
     accountant: { accountantManaged: 'none' },
     lastTransactionId: 2,
-    lastHeldTransactionId: 0
+    lastHeldTransactionId: 0,
+    accountType: 'CREDIT',
+    dataProvider: 'direct',
+    companyId: '20000000-0000-0000-0000-000000000001',
+    internal: {
+        siteNotSupported: false
+    },
+    primaryCountry: 'USA'
 };
 
 var ba4 = {
@@ -83,7 +104,14 @@ var ba4 = {
     status: 'verifyingAuth',
     accountant: { accountantManaged: 'none' },
     lastTransactionId: 2,
-    lastHeldTransactionId: 0
+    lastHeldTransactionId: 0,
+    accountType: 'CREDIT',
+    dataProvider: 'direct',
+    companyId: '20000000-0000-0000-0000-000000000001',
+    internal: {
+        siteNotSupported: false
+    },
+    primaryCountry: 'USA'
 };
 
 var ba5 = {
@@ -96,7 +124,14 @@ var ba5 = {
     status: 'inactiveFeed',
     accountant: { accountantManaged: 'none' },
     lastTransactionId: 2,
-    lastHeldTransactionId: 0
+    lastHeldTransactionId: 0,
+    accountType: 'CREDIT',
+    dataProvider: 'direct',
+    companyId: '20000000-0000-0000-0000-000000000001',
+    internal: {
+        siteNotSupported: false
+    },
+    primaryCountry: 'USA'
 };
 
 var ba6 = {
@@ -109,7 +144,14 @@ var ba6 = {
     status: 'inactiveClient',
     accountant: { accountantManaged: 'none' },
     lastTransactionId: 2,
-    lastHeldTransactionId: 0
+    lastHeldTransactionId: 0,
+    accountType: 'CREDIT',
+    dataProvider: 'direct',
+    companyId: '20000000-0000-0000-0000-000000000001',
+    internal: {
+        siteNotSupported: false
+    },
+    primaryCountry: 'USA'
 };
 
 var ba7 = {
@@ -122,7 +164,14 @@ var ba7 = {
     status: 'cancelled',
     accountant: { accountantManaged: 'none' },
     lastTransactionId: 2,
-    lastHeldTransactionId: 0
+    lastHeldTransactionId: 0,
+    accountType: 'CREDIT',
+    dataProvider: 'direct',
+    companyId: '20000000-0000-0000-0000-000000000001',
+    internal: {
+        siteNotSupported: false
+    },
+    primaryCountry: 'USA'
 };
 
 var ba8 = {
@@ -134,6 +183,7 @@ var ba8 = {
     aggregatorName: null,
     status: 'cancelled',
     internal: {
+        siteNotSupported: false,
         cancellationReason: {
             code: "auto",
             description: "bank account pending for over 180 days"
@@ -141,7 +191,11 @@ var ba8 = {
     },
     accountant: { accountantManaged: 'none' },
     lastTransactionId: 0,
-    lastHeldTransactionId: 0
+    lastHeldTransactionId: 0,
+    accountType: 'CREDIT',
+    dataProvider: 'direct',
+    companyId: '20000000-0000-0000-0000-000000000001',
+    primaryCountry: 'USA'
 };
 
 var ba9 = {
@@ -154,7 +208,14 @@ var ba9 = {
     status: 'invalid',
     accountant: { accountantManaged: 'none' },
     lastTransactionId: 2,
-    lastHeldTransactionId: 0
+    lastHeldTransactionId: 0,
+    accountType: 'CREDIT',
+    dataProvider: 'direct',
+    companyId: '20000000-0000-0000-0000-000000000001',
+    internal: {
+        siteNotSupported: false
+    },
+    primaryCountry: 'USA'
 };
 
 var comp1 = {
@@ -203,7 +264,14 @@ var ba10 = {
     status: 'active',
     accountant: { accountantManaged: 'none' },
     lastTransactionId: 101,
-    lastHeldTransactionId: 0
+    lastHeldTransactionId: 0,
+    accountType: 'CREDIT',
+    dataProvider: 'direct',
+    companyId: '20000000-0000-0000-0000-000000000003',
+    internal: {
+        siteNotSupported: false
+    },
+    primaryCountry: 'USA'
 };
 
 var ba11 = {
@@ -216,7 +284,14 @@ var ba11 = {
     status: 'active',
     accountant: { accountantManaged: 'active' },
     lastTransactionId: 0,
-    lastHeldTransactionId: 101
+    lastHeldTransactionId: 101,
+    accountType: 'CREDIT',
+    dataProvider: 'direct',
+    companyId: '20000000-0000-0000-0000-000000000003',
+    internal: {
+        siteNotSupported: false
+    },
+    primaryCountry: 'USA'
 };
 
 var ba12 = {
@@ -229,7 +304,14 @@ var ba12 = {
     status: 'active',
     accountant: { accountantManaged: 'active' },
     lastTransactionId: 101,
-    lastHeldTransactionId: 101
+    lastHeldTransactionId: 101,
+    accountType: 'CREDIT',
+    dataProvider: 'direct',
+    companyId: '20000000-0000-0000-0000-000000000003',
+    internal: {
+        siteNotSupported: false
+    },
+    primaryCountry: 'USA'
 };
 
 var ba13 = {
@@ -242,7 +324,14 @@ var ba13 = {
     status: 'active',
     accountant: { accountantManaged: 'pending' },
     lastTransactionId: 0,
-    lastHeldTransactionId: 0
+    lastHeldTransactionId: 0,
+    accountType: 'CREDIT',
+    dataProvider: 'direct',
+    companyId: '20000000-0000-0000-0000-000000000003',
+    internal: {
+        siteNotSupported: false
+    },
+    primaryCountry: 'USA'
 };
 
 var comp3 = {
@@ -304,7 +393,14 @@ var orphanba16 = {
     status: 'active',
     accountant: { accountantManaged: 'none' },
     lastTransactionId: 2,
-    lastHeldTransactionId: 0
+    lastHeldTransactionId: 0,
+    accountType: 'CREDIT',
+    dataProvider: 'direct',
+    companyId: '10000000-0000-0000-0000-000000000004',
+    internal: {
+        siteNotSupported: false
+    },
+    primaryCountry: 'GBR'
 };
 
 var orphanba17 = {
@@ -318,7 +414,14 @@ var orphanba17 = {
     status: 'active',
     accountant: { accountantManaged: 'none' },
     lastTransactionId: 2,
-    lastHeldTransactionId: 0
+    lastHeldTransactionId: 0,
+    accountType: 'CREDIT',
+    dataProvider: 'direct',
+    companyId: '10000000-0000-0000-0000-000000000004',
+    internal: {
+        siteNotSupported: false
+    },
+    primaryCountry: 'GBR'
 };
 
 var orphanba18 = {
@@ -332,7 +435,14 @@ var orphanba18 = {
     status: 'active',
     accountant: { accountantManaged: 'none' },
     lastTransactionId: 2,
-    lastHeldTransactionId: 2
+    lastHeldTransactionId: 2,
+    accountType: 'CREDIT',
+    dataProvider: 'direct',
+    companyId: '10000000-0000-0000-0000-000000000004',
+    internal: {
+        siteNotSupported: false
+    },
+    primaryCountry: 'GBR'
 };
 
 var orphanba19 = {
@@ -346,7 +456,14 @@ var orphanba19 = {
     status: 'active',
     accountant: { accountantManaged: 'none' },
     lastTransactionId: 2,
-    lastHeldTransactionId: 2
+    lastHeldTransactionId: 2,
+    accountType: 'CREDIT',
+    dataProvider: 'direct',
+    companyId: '10000000-0000-0000-0000-999999999991',
+    internal: {
+        siteNotSupported: false
+    },
+    primaryCountry: 'GBR'
 };
 
 bankAccounts.push(orphanba16, orphanba17, orphanba18, orphanba19);

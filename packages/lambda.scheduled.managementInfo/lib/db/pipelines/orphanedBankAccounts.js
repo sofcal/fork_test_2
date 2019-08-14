@@ -17,8 +17,13 @@ module.exports = ({ count = false } = {}) => {
                 status: 1,
                 transactionCount: '$lastTransactionId',
                 unresolvedCount: '$lastHeldTransactionId',
+                aggregatorId: 1,
                 aggregatorName: 1,
                 accountantManaged: '$accountant.accountantManaged',
+                accountType: 1,
+                dataProvider: 1,
+                companyId: '$company.companyId',
+                siteNotSupported: { $cond: [{ $not: ['$internal.siteNotSupported'] }, null, '$internal.siteNotSupported'] },
                 // we also add a missing flag, which tells us whether this bank account has an organisation in this db
                 missing: { $cond: [{ $not: ['$organisationLookup'] }, true, false] }
             }
@@ -35,11 +40,17 @@ module.exports = ({ count = false } = {}) => {
                 status: 1,
                 transactionCount: 1,
                 unresolvedCount: 1,
+                aggregatorId: 1,
                 aggregatorName: 1,
                 accountantManaged: 1,
+                accountType: 1,
+                dataProvider: 1,
+                companyId: 1,
+                siteNotSupported: 1,
                 missing: 1,
                 bankId: 1,
                 bankName: { $cond: [{ $or: [{ $not: ['$bankLookup'] }, { $eq: ['$bankAccount', []] }] }, null, { $arrayElemAt: ['$bankLookup.name', 0] }] },
+                primaryCountry: { $cond: [{ $or: [{ $not: ['$bankLookup'] }, { $eq: ['$bankAccount', []] }] }, null, { $arrayElemAt: ['$bankLookup.primaryCountry', 0] }] },
             }
         }
 

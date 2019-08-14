@@ -13,7 +13,12 @@
         "organisationId": "10000000-0000-0000-0000-000000000003",
         "status": "active",
         "transactionCount": 2,
-        "unresolvedCount": 2
+        "unresolvedCount": 2,
+        "accountType": "CREDIT",
+        "dataProvider": "direct",
+        "companyId": "10000000-0000-0000-0000-000000000004",
+        "siteNotSupported": false,
+        "primaryCountry": "GBR"
       },
       {
         "_id": "20000000-0000-0000-0000-000000000018",
@@ -26,7 +31,12 @@
         "organisationId": "20000000-0000-0000-0000-000000000003",
         "status": "active",
         "transactionCount": 2,
-        "unresolvedCount": 2
+        "unresolvedCount": 2,
+        "accountType": "CREDIT",
+        "dataProvider": "direct",
+        "companyId": "20000000-0000-0000-0000-000000000003",
+        "siteNotSupported": false,
+        "primaryCountry": "USA"
       },
       {
         "_id": "20000000-0000-0000-0000-000000000019",
@@ -39,7 +49,12 @@
         "organisationId": "20000000-0000-0000-0000-999999999999",
         "status": "active",
         "transactionCount": 2,
-        "unresolvedCount": 2
+        "unresolvedCount": 2,
+        "accountType": "CREDIT",
+        "dataProvider": "direct",
+        "companyId": "9c59e35f-a116-405f-b3ef-8d231fa38bd7",
+        "siteNotSupported": false,
+        "primaryCountry": "USA"
       },
       {
         "_id": "10000000-0000-0000-0000-000000000019",
@@ -52,7 +67,12 @@
         "organisationId": "10000000-0000-0000-0000-999999999999",
         "status": "active",
         "transactionCount": 2,
-        "unresolvedCount": 2
+        "unresolvedCount": 2,
+        "accountType": "CREDIT",
+        "dataProvider": "direct",
+        "companyId": "10000000-0000-0000-0000-999999999991",
+        "siteNotSupported": false,
+        "primaryCountry": "GBR"
       }
     ],
     "transactions": {
@@ -87,7 +107,8 @@
         },
         "total": 30,
         "transactionsMax": 101,
-        "unresolvedMax": 101
+        "unresolvedMax": 101,
+        "siteNotSupported": 4
       },
       "companies": {
         "bankAccountsMax": 9,

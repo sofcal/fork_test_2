@@ -34,7 +34,8 @@ class ProductSummary {
             },
             accountantManaged: 0,
             transactionsMax: 0,
-            unresolvedMax: 0
+            unresolvedMax: 0,
+            siteNotSupported: 0
         };
 
         this.transactions = new TransactionSummary();
@@ -63,6 +64,7 @@ class ProductSummary {
                 this.bankAccounts.accountantManaged += bankAccount.accountantManaged === 'none' ? 0 : 1;
                 this.bankAccounts.transactionsMax = Math.max(this.bankAccounts.transactionsMax, bankAccount.transactionCount);
                 this.bankAccounts.unresolvedMax = Math.max(this.bankAccounts.unresolvedMax, bankAccount.unresolvedCount);
+                this.bankAccounts.siteNotSupported += (bankAccount.internal && bankAccount.internal.siteNotSupported === true) ? 1 : 0;
             }
         });
     }
@@ -101,7 +103,7 @@ class ProductSummary {
         const totalCreditsMajor = (this.transactions.creditsTotalValue / 100).toFixed(2);
         const totalDebitsMajor = (this.transactions.debitsTotalValue / 100).toFixed(2);
         const totalAbsoluteMajor = (this.transactions.absoluteTotalValue / 100).toFixed(2);
-        return `${this.productName},${this.organisations.total},${this.companies.total},${this.bankAccounts.total},${active},${this.transactions.absoluteTotalCount},${totalCreditsMajor},${totalDebitsMajor},${totalAbsoluteMajor}`;
+        return `${this.productName},${this.organisations.total},${this.companies.total},${this.bankAccounts.total},${active},${this.transactions.absoluteTotalCount},${totalCreditsMajor},${totalDebitsMajor},${totalAbsoluteMajor},${this.bankAccounts.siteNotSupported}`;
     }
 }
 
