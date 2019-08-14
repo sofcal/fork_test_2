@@ -112,14 +112,14 @@ const connectDB = (services) => {
         });
 };
 
-const getServices = (_env, _region, _params, _services) => {
+const getServices = (env, region, _params, _services) => {
     const username = _params['defaultMongo.username'];
     const password = _params['defaultMongo.password'];
     const replicaSet = _params['defaultMongo.replicaSet'];
     const { domain } = _params;
     const services = _services;
 
-    services.db = new serviceImpls.DB({ _env, _region, domain, username, password, replicaSet, db: dbName });
+    services.db = new serviceImpls.DB({ env, region, domain, username, password, replicaSet, db: dbName });
 
     return services;
 };
