@@ -1,9 +1,12 @@
 'use strict';
 
-const jsonschema = require('jsonschema');
-const ruleBucketSchema = require('./schemas/ruleBucketSchema');
 const Rule = require('./Rule');
-const { StatusCodeError, StatusCodeErrorItem, utils } = require('./_bankDrive');
+const ruleBucketSchema = require('./schemas/ruleBucketSchema');
+
+const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-statuscodeerror');
+const { validateType } = require('@sage/bc-contracts-util');
+
+const jsonschema = require('jsonschema');
 const _ = require('underscore');
 
 class RuleBucket {
@@ -48,17 +51,20 @@ class RuleBucket {
 }
 
 const validateImpl = function(ruleBucket, noThrow) {
-    const typeItem = utils.validateTypeNoThrow(ruleBucket, RuleBucket);
+    const typeItem = validateType({ obj: ruleBucket, Type: RuleBucket, noThrow });
     if (typeItem) {
-        throw new StatusCodeError([typeItem], 400);
+        // can only get here if noThrow was true
+        return [typeItem];
     }
 
     const result = jsonschema.validate(ruleBucket, ruleBucketSchema);
 
     if (result.errors.length > 0) {
         if (noThrow) {
+            // TODO: use the toStatusCodeError module instead
             return createErrorItems(result.errors, ruleBucket);
         }
+        // TODO: use the toStatusCodeError module instead
         throw createError(result.errors, ruleBucket);
     }
     return true;
@@ -110,10 +116,12 @@ const addOrUpdateRuleByRankImpl = (existingRules, rule) => {
     // insert rule into array based on it's rank
     newRules.splice(newIndex, 0, rule);
     const reorderedRules = [];
+    // TODO: surely this can be optimised? 4 loops where 1 will work
     reorderedRules.push(...orderTypedRules(newRules, Rule.ruleTypes.user));
     reorderedRules.push(...orderTypedRules(newRules, Rule.ruleTypes.accountant));
     reorderedRules.push(...orderTypedRules(newRules, Rule.ruleTypes.feedback));
     reorderedRules.push(...orderTypedRules(newRules, Rule.ruleTypes.global));
+    // TODO: can we avoid resetting rule ranks in the orderTypedRules calls, by just doing it here once
     RuleBucket.resetRuleRanks(reorderedRules);
 
     return reorderedRules;
@@ -121,7 +129,9 @@ const addOrUpdateRuleByRankImpl = (existingRules, rule) => {
 
 const orderTypedRules = (rules, filter) => {
     const typesRule = _.filter(rules, (r) => r.ruleType === filter);
+    // TODO: one additional loop per ruleType
     RuleBucket.resetRuleRanks(typesRule);
+    // TODO: why do we need to do both these things? Surely if we just reset the ranks, they're already ordered
     return Rule.sortRulesByRank(typesRule);
 };
 
@@ -139,6 +149,7 @@ const checkForDuplicateRuleNamesImpl = (bucket, doNotThrow) => {
 
     _.chain(bucket.rules)
         .pluck('ruleName')
+        // TODO: use find instead of each, so we can short-circuit
         .each((rn) => {
             if (_.contains(duplicates, rn)) {
                 if (!doNotThrow) {

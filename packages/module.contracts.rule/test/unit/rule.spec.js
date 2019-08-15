@@ -1,8 +1,7 @@
 'use strict';
 
-const { resources } = require('../../_bankDrive');
 const { StatusCodeError } = require('@sage/bc-statuscodeerror');
-const Rule = require('../../Rule');
+const Rule = require('../../lib/Rule');
 const should = require('should');
 const sinon = require('sinon');
 const _ = require('underscore');
@@ -12,7 +11,7 @@ describe('@sage/bc-contracts-rule.Rule', function () {
     let data;
 
     beforeEach(function () {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
     });
 
     afterEach(function () {
@@ -278,7 +277,6 @@ describe('@sage/bc-contracts-rule.Rule', function () {
         });
 
         describe('Rule.validate', function () {
-
             let newRule;
 
             beforeEach(function () {
@@ -295,7 +293,7 @@ describe('@sage/bc-contracts-rule.Rule', function () {
 
                     err.should.be.instanceOf(StatusCodeError);
                     err.statusCode.should.eql(400);
-                    err.items[0].applicationCode.should.eql(resources.services.common.InvalidProperties);
+                    err.items[0].applicationCode.should.eql('InvalidProperties');
 
                     done();
                 }
@@ -305,7 +303,7 @@ describe('@sage/bc-contracts-rule.Rule', function () {
                 try {
                     delete newRule.ruleName;
                     const response = newRule.validate(true);
-                    response[0].applicationCode.should.eql(resources.services.common.InvalidProperties);
+                    response[0].applicationCode.should.eql('InvalidProperties');
                     done();
                 } catch (err) {
                     done(err instanceof Error ? err : new Error(err));
@@ -796,7 +794,7 @@ describe('@sage/bc-contracts-rule.Rule', function () {
                                     console.log(err);
                                     err.should.be.instanceOf(StatusCodeError);
                                     err.statusCode.should.eql(400);
-                                    err.items[0].applicationCode.should.eql(resources.services.common.InvalidProperties);
+                                    err.items[0].applicationCode.should.eql('InvalidProperties');
                                     console.log(err.items[0].params);
                                     if (_.isArray(test.value)) {
                                         console.log('____target', target);
@@ -840,7 +838,7 @@ describe('@sage/bc-contracts-rule.Rule', function () {
 
                     err.should.be.instanceOf(StatusCodeError);
                     err.statusCode.should.eql(400);
-                    err.items[0].applicationCode.should.eql(resources.services.common.InvalidType);
+                    err.items[0].applicationCode.should.eql('InvalidType');
 
                     done();
                 }
@@ -855,7 +853,7 @@ describe('@sage/bc-contracts-rule.Rule', function () {
 
                     err.should.be.instanceof(StatusCodeError);
                     err.statusCode.should.eql(400);
-                    err.items[0].applicationCode.should.eql(resources.services.common.InvalidType);
+                    err.items[0].applicationCode.should.eql('InvalidType');
 
                     done();
                 }
@@ -870,7 +868,7 @@ describe('@sage/bc-contracts-rule.Rule', function () {
 
                     err.should.be.instanceof(StatusCodeError);
                     err.statusCode.should.eql(400);
-                    err.items[0].applicationCode.should.eql(resources.services.common.InvalidType);
+                    err.items[0].applicationCode.should.eql('InvalidType');
 
                     done();
                 }
@@ -890,10 +888,10 @@ describe('@sage/bc-contracts-rule.Rule', function () {
                     err.statusCode.should.eql(400);
                     err.items.length.should.eql(2);
 
-                    err.items[0].applicationCode.should.eql(resources.services.common.InvalidProperties);
+                    err.items[0].applicationCode.should.eql('InvalidProperties');
                     err.items[0].params.should.eql({uuid: null});
                     err.items[0].message.should.eql('Rule.uuid: null');
-                    err.items[1].applicationCode.should.eql(resources.services.common.InvalidProperties);
+                    err.items[1].applicationCode.should.eql('InvalidProperties');
                     err.items[1].params.should.eql({ruleName: null});
                     err.items[1].message.should.eql('Rule.ruleName: null');
 
@@ -909,9 +907,9 @@ describe('@sage/bc-contracts-rule.Rule', function () {
                     var items = Rule.validate(newRule, true);
 
                     should(items).be.an.Array().of.length(2);
-                    should(items[0].applicationCode).eql(resources.services.common.InvalidProperties);
+                    should(items[0].applicationCode).eql('InvalidProperties');
                     should(items[0].params).eql({uuid: null});
-                    should(items[1].applicationCode).eql(resources.services.common.InvalidProperties);
+                    should(items[1].applicationCode).eql('InvalidProperties');
                     should(items[1].params).eql({ruleName: null});
 
                     done();

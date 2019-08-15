@@ -1,8 +1,7 @@
 const should = require('should');
 const sinon = require('sinon');
 const _ = require('underscore');
-const Rule = require('../../Rule');
-const { resources } = require('../../_bankDrive');
+const Rule = require('../../lib/Rule');
 const { StatusCodeError } = require('@sage/bc-statuscodeerror');
 
 describe ('@sage/bc-contracts-rule.Rule', () => {

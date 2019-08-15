@@ -1,8 +1,10 @@
 'use strict';
 
-const { StatusCodeError, resources } = require('../../_bankDrive');
-const RuleBucket = require('../../RuleBucket');
-const Rule = require('../../Rule');
+const RuleBucket = require('../../lib/RuleBucket');
+const Rule = require('../../lib/Rule');
+
+const { StatusCodeError } = require('@sage/bc-statuscodeerror');
+
 const should = require('should');
 const sinon = require('sinon');
 const _ = require('underscore');
@@ -12,7 +14,7 @@ describe('@sage/bc-contracts-rule.RuleBucket', () => {
     let data;
 
     beforeEach(() => {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
 
         data = {
             uuid: '7d77e215-50c5-4765-93cd-74f1756a56dd',
@@ -155,7 +157,7 @@ describe('@sage/bc-contracts-rule.RuleBucket', () => {
             } catch (err) {
                 err.should.be.instanceOf(StatusCodeError);
                 err.statusCode.should.eql(400);
-                err.items[0].applicationCode.should.eql(resources.services.common.InvalidProperties);
+                err.items[0].applicationCode.should.eql('InvalidProperties');
                 done();
             }
         });
@@ -164,7 +166,7 @@ describe('@sage/bc-contracts-rule.RuleBucket', () => {
             try {
                 delete newRuleBucket.region;
                 const response = newRuleBucket.validate(true);
-                response[0].applicationCode.should.eql(resources.services.common.InvalidProperties);
+                response[0].applicationCode.should.eql('InvalidProperties');
                 done();
             } catch (err) {
                 done(err instanceof Error ? err : new Error(err));
@@ -189,7 +191,7 @@ describe('@sage/bc-contracts-rule.RuleBucket', () => {
 
                 err.should.be.instanceOf(StatusCodeError);
                 err.statusCode.should.eql(400);
-                err.items[0].applicationCode.should.eql(resources.services.common.InvalidType);
+                err.items[0].applicationCode.should.eql('InvalidType');
 
                 done();
             }
@@ -202,7 +204,7 @@ describe('@sage/bc-contracts-rule.RuleBucket', () => {
             } catch (err) {
                 err.should.be.instanceof(StatusCodeError);
                 err.statusCode.should.eql(400);
-                err.items[0].applicationCode.should.eql(resources.services.common.InvalidType);
+                err.items[0].applicationCode.should.eql('InvalidType');
                 done();
             }
         });
@@ -215,7 +217,7 @@ describe('@sage/bc-contracts-rule.RuleBucket', () => {
             } catch (err) {
                 err.should.be.instanceof(StatusCodeError);
                 err.statusCode.should.eql(400);
-                err.items[0].applicationCode.should.eql(resources.services.common.InvalidType);
+                err.items[0].applicationCode.should.eql('InvalidType');
 
                 done();
             }
@@ -235,10 +237,10 @@ describe('@sage/bc-contracts-rule.RuleBucket', () => {
                 err.statusCode.should.eql(400);
                 err.items.length.should.eql(2);
 
-                err.items[0].applicationCode.should.eql(resources.services.common.InvalidProperties);
+                err.items[0].applicationCode.should.eql('InvalidProperties');
                 err.items[0].params.should.eql({uuid: null});
                 err.items[0].message.should.eql('Rule.uuid: null');
-                err.items[1].applicationCode.should.eql(resources.services.common.InvalidProperties);
+                err.items[1].applicationCode.should.eql('InvalidProperties');
                 err.items[1].params.should.eql({region: null});
                 err.items[1].message.should.eql('Rule.region: null');
 
@@ -324,7 +326,7 @@ describe('@sage/bc-contracts-rule.RuleBucket', () => {
                                 console.log(err);
                                 err.should.be.instanceOf(StatusCodeError);
                                 err.statusCode.should.eql(400);
-                                err.items[0].applicationCode.should.eql(resources.services.common.InvalidProperties);
+                                err.items[0].applicationCode.should.eql('InvalidProperties');
                                 if (_.isArray(test.value)) {
                                     console.log('XXX Array', err.items[0].params[target]);
                                     console.log('XXX Array test val', test.value[0]);

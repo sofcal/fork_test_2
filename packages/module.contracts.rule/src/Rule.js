@@ -1,10 +1,13 @@
 'use strict';
 
-const jsonschema = require('jsonschema');
 const ruleSchema = require('./schemas/ruleSchema');
-const { utils, httpMethod } = require('./_bankDrive');
-const { StatusCodeError } = require('@sage/bc-statuscodeerror');
+const FilterKeys = require('./api/FilterKeys');
+
+const { HttpMethod } = require('@sage/bc-util-httpmethod');
+const { extend, filter, validateType } = require('@sage/bc-contracts-util');
 const { toStatusCodeError, toStatusCodeErrorItems } = require('@sage/bc-jsonschema-to-statuscodeerror');
+
+const jsonschema = require('jsonschema');
 const access = require('safe-access');
 const _ = require('underscore');
 const Big = require('bignumber.js');
@@ -38,100 +41,44 @@ class Rule {
         return Rule.validate(this, noThrow);
     }
 
-    static validate(...args) {
-        return validateImpl(...args);
+    static validate(rule, noThrow) {
+        const typeItem = validateType({ obj: rule, Type: Rule, noThrow });
+        if (typeItem) {
+            // can only get here if noThrow was true
+            return ([typeItem]);
+        }
+
+        const result = jsonschema.validate(rule, ruleSchema, { propertyName: Rule.name });
+        if (result.errors.length > 0) {
+            if (noThrow) {
+                return toStatusCodeErrorItems(result, Rule, rule);
+            }
+            throw toStatusCodeError(result, Rule, rule);
+        }
+
+        return true;
     }
 
-    static extend(...args) {
-        return extendImpl(...args);
+    static extend(destination, source, method) {
+        const sourceWhitelist = HttpMethod.IsPost(method) ? FilterKeys.post : FilterKeys.update;
+        const destinationWhitelist = HttpMethod.IsPut(method) ? FilterKeys.readOnly : null;
+
+        return extend({ destination, source, sourceWhitelist, destinationWhitelist });
     }
 
     static GetRuleTypesToProcess(...args) {
         return getRuleTypesToProcessImpl(...args);
     }
 
-    static filter(...args) {
-        return filterImpl(...args);
+    static filter(rule) {
+        return filter({ source: rule, sourceBlacklist: FilterKeys.returned });
     }
 
-    static sortRulesByRank(...args) {
-        return sortRulesByRankImpl(...args);
+    // TODO: Should this be here? Or should it be on the RuleBucket?
+    static sortRulesByRank(rules) {
+        return _.sortBy(rules, (item) => item.ruleRank || Number.MAX_SAFE_INTEGER);
     }
 }
-
-const filterImpl = function(data) {
-    /* eslint-disable no-param-reassign */
-    delete (data.created);
-    delete (data.updated);
-    delete (data.etag);
-    delete (data.targetType);
-    delete (data.productId);
-    delete (data.ruleCounts);
-    delete (data.globalRuleId);
-    /* eslint-enable no-param-reassign */
-    return data;
-};
-
-const sortRulesByRankImpl = function(rules) {
-    return _.sortBy(rules, (item) => item.ruleRank || Number.MAX_SAFE_INTEGER);
-};
-
-const validateImpl = function(rule, noThrow) {
-    const typeItem = utils.validateTypeNoThrow(rule, Rule);
-    if (typeItem) {
-        throw new StatusCodeError([typeItem], 400);
-    }
-
-    const result = jsonschema.validate(rule, ruleSchema, { propertyName: Rule.name });
-    if (result.errors.length > 0) {
-        if (noThrow) {
-            return toStatusCodeErrorItems(result, Rule, rule);
-        }
-        throw toStatusCodeError(result, Rule, rule);
-    }
-
-    return true;
-};
-
-// const createError = (errCollection, rule) => {
-//     return new StatusCodeError(createErrorItems(errCollection, rule), 400);
-// };
-
-// const createErrorItems = (errCollection, rule) => {
-//     const errorItems = [];
-//     _.each(errCollection, (err) => {
-//         const invalidValue = {};
-//         const dotSeparated = buildDotSeparatedString(err.property);
-//         const prop = resolvePath(dotSeparated, rule);
-//         if (_.isArray(prop)) {
-//             invalidValue[dotSeparated] = prop[0]; // eslint-disable-line prefer-destructuring
-//         } else {
-//             invalidValue[dotSeparated] = prop;
-//         }
-//         const errorText = `Rule.${dotSeparated}: ${invalidValue[dotSeparated]}`;
-//         errorItems.push(new StatusCodeErrorItem('InvalidProperties', errorText, invalidValue));
-//     });
-//     return errorItems;
-// };
-
-// const resolvePath = (path, obj = self, separator = '.') => {
-//     const properties = Array.isArray(path) ? path : path.split(separator);
-//     return properties.reduce((prev, curr) => prev && prev[curr], obj);
-// };
-//
-// const buildDotSeparatedString = (dotSeparated) => {
-//     dotSeparated = dotSeparated.split('instance.').join('');
-//     dotSeparated = dotSeparated.split('[').join('.');
-//     dotSeparated = dotSeparated.split(']').join('');
-//     if (dotSeparated.indexOf('.') > 0) {
-//         dotSeparated = dotSeparated.substring(0, dotSeparated.indexOf('.'));
-//     }
-//     return dotSeparated;
-// };
-
-const extendImpl = (destination, source, method) => {
-    return utils.extend(destination, source, method, (method === httpMethod.post ? postKeys : updateKeys), readOnlyKeys);
-};
 
 const buildRuleActionsImpl = function(actionsArray) {
     const arrayToReturn = [];
@@ -157,6 +104,7 @@ const buildRuleActionsImpl = function(actionsArray) {
     return arrayToReturn;
 };
 
+// TODO: This logic shouldn't be in this module. It's specific to the consuming application; so should exist as a util in those projects
 const getRuleTypesToProcessImpl = (bankAccount) => {
     const ruleTypesToProcess = [Rule.ruleTypes.user, Rule.ruleTypes.accountant];
     const processAutoRules = access(bankAccount, 'featureOptions.autoCreateRules');
@@ -167,6 +115,7 @@ const getRuleTypesToProcessImpl = (bankAccount) => {
     return ruleTypesToProcess;
 };
 
+// TODO: This logic shouldn't be in this module. It's specific actualActions and ML; o should exist as a util in that project
 const createFromActualActionImpl = (transaction, narrativeCriteria) => {
     const actualAccountsPostings = access(transaction, 'actualAction.action.accountsPosting.accountsPostings');
     if ((actualAccountsPostings === null) || actualAccountsPostings.length === 0) {
@@ -220,32 +169,6 @@ const createFromActualActionImpl = (transaction, narrativeCriteria) => {
 
     return new Rule(ruleData);
 };
-
-const _Keys = [
-    // these fields can neither be created nor modified by the API client
-    { canCreate: false, canUpdate: false, id: 'uuid' },
-    { canCreate: false, canUpdate: false, id: 'targetType' },
-    { canCreate: false, canUpdate: false, id: 'productId' },
-    { canCreate: false, canUpdate: false, id: 'counts' },
-    { canCreate: false, canUpdate: false, id: 'globalRuleId' },
-
-    // these fields can be created and updated by the API client
-    { canCreate: true, canUpdate: true, id: 'ruleName' },
-    { canCreate: true, canUpdate: true, id: 'ruleRank' },
-    { canCreate: true, canUpdate: true, id: 'ruleConditions' },
-    { canCreate: true, canUpdate: true, id: 'ruleActions' },
-    { canCreate: true, canUpdate: true, id: 'status' },
-    { canCreate: true, canUpdate: true, id: 'entities' },
-
-    // these fields can be created but not updated by the API client
-    { canCreate: true, canUpdate: false, id: 'ruleType' },
-];
-
-const mapKeys = (keys, filterFunc) => _.chain(keys).filter(filterFunc).map((k) => k.id).value();
-
-let postKeys = mapKeys(_Keys, (k) => k.canCreate);
-let updateKeys = mapKeys(_Keys, (k) => k.canUpdate);
-let readOnlyKeys = mapKeys(_Keys, (k) => !k.canUpdate);
 
 Rule.statuses = Object.freeze({ active: 'active', inactive: 'inactive' });
 Rule.operations = Object.freeze({
