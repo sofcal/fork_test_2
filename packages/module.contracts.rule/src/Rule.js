@@ -16,15 +16,16 @@ class Rule {
     constructor(data) {
         if (data) {
             this.uuid = data.uuid;
-            this.ruleName = data.ruleName;                // Custom name for this rule, unique at bank account level
-            this.ruleRank = data.ruleRank || null;
-            this.ruleConditions = data.ruleConditions || [];    // Array of rule conditions, ALL of which need to be true to invoke the resulting rule action(s)
-            this.ruleActions = buildRuleActionsImpl(data.ruleActions);       // Array of rule actions which are applied if ALL rule conditions are true
-            this.status = data.status || Rule.statuses.active;
+            this.productId = data.productId;
+            this.globalRuleId = data.globalRuleId || null;
+            this.ruleName = data.ruleName;                                  // Custom name for this rule, unique at bank account level
+            this.ruleRank = data.ruleRank || null;                          // Rank of this rule, which determines the order in which rules are checked against data items
             this.targetType = data.targetType;
             this.ruleType = data.ruleType;
-            this.productId = data.productId;
-            this.globalRuleId = data.globalRuleId || undefined;
+            this.status = data.status || Rule.statuses.active;
+            this.ruleConditions = data.ruleConditions || [];                // Array of rule conditions, ALL of which need to be true to invoke the resulting rule action(s)
+            this.ruleActions = buildRuleActionsImpl(data.ruleActions);      // Array of rule actions which are applied if ALL rule conditions are true
+            this.ruleAdditionalFields = data.ruleAdditionalFields || [];    // Array of client-supplied meta data that will be applied at the transaction level
             this.ruleCounts = data.ruleCounts || { success: 0, fail: 1, applied: 0 };
         }
     }
@@ -50,9 +51,18 @@ class Rule {
 
         const result = jsonschema.validate(rule, ruleSchema, { propertyName: Rule.name });
         if (result.errors.length > 0) {
+            const last = _.last(rule.ruleActions);
+            if (last && _.isNumber(last.splitPercentage) && last.splitPercentage !== 100) {
+                const additional = { custom: true, message: 'Rule.ruleActions: invalid final splitPercentage', params: {} } ;
+                result.errors.push(additional);
+            }
+
             if (noThrow) {
                 return toStatusCodeErrorItems(result, Rule, rule);
             }
+
+            console.log('________result');
+            console.log(result);
             throw toStatusCodeError(result, Rule, rule);
         }
 
@@ -83,7 +93,9 @@ class Rule {
 const buildRuleActionsImpl = function(actionsArray) {
     const arrayToReturn = [];
 
+    // TODO: can surely be optimised?
     if (actionsArray && actionsArray.length) {
+        // TODO: map?
         _.each(actionsArray, (action) => {
             // if splitAmount === 0, then entirely ignore it and use the rulePercentage instead
             // if splitAmount > 0, then use this value and entirely ignore the rulePercentage (i.e. don’t try to validate it!)
@@ -95,6 +107,7 @@ const buildRuleActionsImpl = function(actionsArray) {
                 accountsPostings: action.accountsPostings || undefined
             };
 
+            // TODO: we're iterating when we could just create and assign in a single if
             actionObj = _.pick(actionObj, (value) => value !== undefined);
 
             arrayToReturn.push(actionObj);
