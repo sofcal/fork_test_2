@@ -4,39 +4,39 @@
   "properties": {
     "uuid": {
       "type": "string", "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
-      "custom": { "property": "Rule.uuid" }
+      "custom": { "propertyName": "Rule.uuid" }
     },
     "ruleName": {
       "type": "string", "pattern": "^.{1,200}$",
-      "custom": { "property": "Rule.ruleName" }
+      "custom": { "propertyName": "Rule.ruleName" }
     },
     "ruleRank": {
       "type": ["integer", "null"], "minimum": 1,
-      "custom": { "property": "Rule.ruleRank" }
+      "custom": { "propertyName": "Rule.ruleRank" }
     },
     "targetType": {
       "type": "string", "pattern": "^Transaction$",
-      "custom": { "property": "Rule.targetType" }
+      "custom": { "propertyName": "Rule.targetType" }
     },
     "status": {
       "type": "string", "pattern": "^active|inactive$",
-      "custom": { "property": "Rule.status" }
+      "custom": { "propertyName": "Rule.status" }
     },
     "ruleType": {
       "type": "string", "pattern": "^User|Accountant|Feedback|Global$",
-      "custom": { "property": "Rule.ruleType" }
+      "custom": { "propertyName": "Rule.ruleType" }
     },
     "globalRuleID": {
       "type": ["string", "null" ], "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
-      "custom": { "property": "Rule.globalRuleId" }
+      "custom": { "propertyName": "Rule.globalRuleId" }
     },
     "ruleCounts": {
       "type": "object",
       "custom": {
         "item": {
-          "property": "Rule.ruleCounts",
+          "propertyName": "Rule.ruleCounts",
           "paramKey": "ruleCounts",
-          "useParent": true
+          "useParent": 2
         }
       },
       "properties": {
@@ -49,11 +49,12 @@
     "ruleConditions": {
       "type": "array",
       "custom": {
-          "property": "Rule.ruleConditions",
+          "propertyName": "Rule.ruleConditions",
           "message": "should be an array",
           "items": {
             "stringify": true,
-            "property": "Rule.ruleConditions"
+            "propertyName": "Rule.ruleConditions",
+            "paramKey": "ruleConditions"
           }
       },
       "items": {
@@ -97,17 +98,17 @@
     "ruleActions": {
       "type": "array",
       "custom": {
-        "property": "Rule.ruleActions",
+        "propertyName": "Rule.ruleActions",
         "message": "should be an array",
         "items": {
-          "property": "Object.ruleActions",
-          "useParent": true,
+          "propertyName": "Object.ruleActions",
+          "useParent": 2,
           "paramKey": "ruleActions"
         }
       },
       "items": {
         "properties": {
-          "splitAmount": { "type": "number", "minimum": 0, "custom": { "property": "Object.ruleActions" } },
+          "splitAmount": { "type": "number", "minimum": 0 },
           "splitPercentage": { "type": "integer", "minimum": 0, "maximum": 100 },
           "accountantNarrative": { "type": ["string", "null"], "pattern": "^.{0,200}$" },
           "accountsPostings": {
@@ -127,11 +128,12 @@
     "ruleAdditionalFields": {
       "type": "array",
       "custom": {
-        "property": "Rule.ruleAdditionalFields",
+        "propertyName": "Rule.ruleAdditionalFields",
         "message": "should be an array",
         "items": {
-          "property": "Object.ruleAdditionalFields",
-          "paramKey": "ruleAdditionalFields"
+          "propertyName": "Object.ruleAdditionalFields",
+          "paramKey": "ruleAdditionalFields",
+          "useParent": 2
         }
       },
       "items": {
