@@ -5,7 +5,7 @@ const FilterKeys = require('./api/FilterKeys');
 
 const { HttpMethod } = require('@sage/bc-util-httpmethod');
 const { extend, filter, validateType } = require('@sage/bc-contracts-util');
-const { toStatusCodeError, toStatusCodeErrorItems } = require('@sage/bc-jsonschema-to-statuscodeerror');
+const { Mapper: StatusCodeErrorMapper } = require('@sage/bc-jsonschema-to-statuscodeerror');
 
 const jsonschema = require('jsonschema');
 const access = require('safe-access');
@@ -58,12 +58,10 @@ class Rule {
             }
 
             if (noThrow) {
-                return toStatusCodeErrorItems(result, Rule, rule);
+                return StatusCodeErrorMapper.toStatusCodeErrorItems(result, Rule, rule);
             }
 
-            console.log('________result');
-            console.log(result);
-            throw toStatusCodeError(result, Rule, rule);
+            throw StatusCodeErrorMapper.toStatusCodeError(result, Rule, rule);
         }
 
         return true;
