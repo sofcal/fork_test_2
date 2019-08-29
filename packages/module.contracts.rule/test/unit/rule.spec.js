@@ -6,7 +6,7 @@ const should = require('should');
 const sinon = require('sinon');
 const _ = require('underscore');
 
-describe.only('@sage/bc-contracts-rule.Rule', function () {
+describe('@sage/bc-contracts-rule.Rule', function () {
     let sandbox;
     let data;
 

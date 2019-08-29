@@ -2,7 +2,10 @@
   "name": "@sage/bc-contracts-rule",
   "version": "1.1.32",
   "description": "Banking Cloud schemas",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib"
+  },
   "publishConfig": {
     "registry": "https://sage.myget.org/F/npm/npm/",
     "access": "public"
