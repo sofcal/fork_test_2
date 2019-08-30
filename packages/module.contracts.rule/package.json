@@ -1,6 +1,6 @@
 {
   "name": "@sage/bc-contracts-rule",
-  "version": "1.1.60",
+  "version": "1.1.61",
   "description": "Banking Cloud schemas",
   "main": "lib/index.js",
   "directories": {
@@ -17,7 +17,7 @@
     "@babel/core": "^7.5.4",
     "@babel/preset-env": "^7.5.4",
     "@sage/bc-contracts-util": "^1.1.60",
-    "@sage/bc-jsonschema-to-statuscodeerror": "^1.1.60",
+    "@sage/bc-jsonschema-to-statuscodeerror": "^1.1.61",
     "@sage/bc-statuscodeerror": "^1.1.60",
     "@sage/bc-util-httpmethod": "^1.1.60",
     "bignumber.js": "^4.0.0",
