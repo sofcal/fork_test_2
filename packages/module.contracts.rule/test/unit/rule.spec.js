@@ -280,6 +280,14 @@ describe('@sage/bc-contracts-rule.Rule', function () {
                 }
             };
 
+            it('should return an empty array if valid and noThrow=true', () => {
+                should(Rule.validate(uut, true)).eql([]);
+            });
+
+            it('should return undefined if valid and noThrow=false', () => {
+                should(Rule.validate(uut, false)).eql(undefined);
+            });
+
             describe('uuid', () => {
                 it('should NOT throw if uuid valid', () => {
                     should(() => Rule.validate(substitute(uut, 'uuid', '00000000-0000-0000-0000-000000000000'))).not.throw();
@@ -634,6 +642,7 @@ describe('@sage/bc-contracts-rule.Rule', function () {
                 describe('splitPercentage', () => {
                     it('should throw when invalid', (done) => {
                         try {
+                            const final = () => (new StatusCodeError([new StatusCodeErrorItem('InvalidProperties', `Rule.ruleActions: invalid final splitPercentage`, {})], 400));
                             const expectedWFinal = (value) => {
                                 return new StatusCodeError([
                                     // TODO: Return values are inconsistent
@@ -652,6 +661,8 @@ describe('@sage/bc-contracts-rule.Rule', function () {
                             shouldT(() => Rule.validate(substitute(uut, 'ruleActions[0].splitPercentage', null))).throw(expected(substitute(validPercentageAction, 'splitPercentage', null)));
                             shouldT(() => Rule.validate(substitute(uut, 'ruleActions[0].splitPercentage', ''))).throw(expected(substitute(validPercentageAction, 'splitPercentage', '')));
                             shouldT(() => Rule.validate(substitute(uut, 'ruleActions[0].splitPercentage', {}))).throw(expected(substitute(validPercentageAction, 'splitPercentage', {})));
+
+                            shouldT(() => Rule.validate(substitute(uut, 'ruleActions[0].splitPercentage', 99))).throw(final());
 
                             done();
                         } catch (err) {

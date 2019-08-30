@@ -50,13 +50,13 @@ class Rule {
         }
 
         const result = jsonschema.validate(rule, ruleSchema, { propertyName: Rule.name });
-        if (result.errors.length > 0) {
-            const last = _.last(rule.ruleActions);
-            if (last && _.isNumber(last.splitPercentage) && last.splitPercentage !== 100) {
-                const additional = { custom: true, message: 'Rule.ruleActions: invalid final splitPercentage', params: {} } ;
-                result.errors.push(additional);
-            }
+        const last = _.last(rule.ruleActions);
+        if (last && _.isNumber(last.splitPercentage) && last.splitPercentage !== 100) {
+            const additional = { custom: true, message: 'Rule.ruleActions: invalid final splitPercentage', params: {} };
+            result.errors.push(additional);
+        }
 
+        if (result.errors.length > 0) {
             if (noThrow) {
                 return StatusCodeErrorMapper.toStatusCodeErrorItems(result, Rule, rule);
             }
@@ -64,7 +64,7 @@ class Rule {
             throw StatusCodeErrorMapper.toStatusCodeError(result, Rule, rule);
         }
 
-        return true;
+        return noThrow ? [] : undefined;
     }
 
     static extend(destination, source, method) {

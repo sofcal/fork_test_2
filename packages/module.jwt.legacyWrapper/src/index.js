@@ -1,5 +1,7 @@
 'use strict';
 
+const Rule = require('@sage/bc-contracts-rule');
+
 const Authenticator = require('@sage/sfab-s2s-jwt-authenticator');
 const Cache = require('@sage/sfab-s2s-jwt-cache');
 const EndpointStore = require('@sage/sfab-s2s-jwt-endpoint-store');
@@ -11,5 +13,14 @@ const Step = require('@sage/bc-services-step');
 const ClamAVWorkers = require('@sage/sfab-workers-clam-av');
 
 module.exports = {
-    Authenticator, Cache, EndpointStore, Issuer, Jwks, Kid, Parameter, Step, ClamAVWorkers
+    contracts: { Rule },
+    Authenticator,
+    Cache,
+    EndpointStore,
+    Issuer,
+    Jwks,
+    Kid,
+    Parameter,
+    Step,
+    ClamAVWorkers
 };

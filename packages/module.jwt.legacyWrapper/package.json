@@ -14,15 +14,18 @@
     "access": "public"
   },
   "dependencies": {
+    "@sage/bc-contracts-rule": "^1.1.60",
     "@sage/bc-services-parameter": "^1.1.60",
     "@sage/bc-services-step": "^1.1.60",
+    "@sage/bc-statuscodeerror": "^1.1.60",
     "@sage/sfab-s2s-jwt-authenticator": "^1.1.60",
     "@sage/sfab-s2s-jwt-cache": "^1.1.60",
     "@sage/sfab-s2s-jwt-endpoint-store": "^1.1.60",
     "@sage/sfab-s2s-jwt-issuer": "^1.1.60",
     "@sage/sfab-s2s-jwt-jwks": "^1.1.60",
     "@sage/sfab-s2s-jwt-kid": "^1.1.60",
-    "@sage/sfab-workers-clam-av": "^1.1.60"
+    "@sage/sfab-workers-clam-av": "^1.1.60",
+    "ci": "^1.0.0"
   },
   "devDependencies": {
     "@sage/bc-debug-utils": "^1.1.60",

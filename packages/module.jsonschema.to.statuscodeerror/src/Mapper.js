@@ -8,7 +8,7 @@ const _s = require('underscore.string');
 // currently, this conversion mimics the behaviour of Banking Cloud validation. We are looking to update the validation
 //  messages seen by consuming client applications, but until we do that we need to preserve the responses they saw previously
 class Mapper {
-    static toStatusCodeErrorItems (result) {
+    static toStatusCodeErrorItems(result) {
         return _.map(result.errors, (err) => {
             if (err.custom) {
                 return StatusCodeErrorItem.Create('InvalidProperties', err.message, err.params);
@@ -47,7 +47,7 @@ class Mapper {
             //  - for field required errors, we need to include the argument field, so that nested objects print correctly
             //  - for simple types we set the paramKey as just value
             // once we have this, the paramKey becomes the value we calculated, or the custom override
-            const paramKeyBasic = required ? `${parentWithoutTypePrefix}${err.argument}` : withoutType;
+            const paramKeyBasic = required ? `${parentWithoutTypePrefix}${err.argument || withoutType}` : withoutType;
             const paramKeyActual = isSimpleType ? 'value' : paramKeyBasic;
             const paramKey = custom.paramKey || paramKeyActual;
 
@@ -63,7 +63,7 @@ class Mapper {
         });
     }
 
-    static toStatusCodeError (result, Type, obj) {
+    static toStatusCodeError(result, Type, obj) {
         if (!result.errors || !result.errors.length) {
             return null;
         }
@@ -75,7 +75,7 @@ class Mapper {
 const getPropertyNames = (err) => {
     const required = err.name === 'required';
 
-    const withTypeAndArray = `${err.property}${required ? `.${err.argument}` : ''}`;
+    const withTypeAndArray = `${err.property}${(required && err.argument) ? `.${err.argument}` : ''}`;
 
     let isArray = _s.endsWith(withTypeAndArray, ']');
     const withType = withTypeAndArray;
