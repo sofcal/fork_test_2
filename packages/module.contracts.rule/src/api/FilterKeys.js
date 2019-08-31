@@ -27,6 +27,7 @@ FilterKeys.settings = Object.freeze([
     Object.freeze({ canCreate: true, canUpdate: true, canReturn: true, id: 'ruleRank' }),
     Object.freeze({ canCreate: true, canUpdate: true, canReturn: true, id: 'ruleConditions' }),
     Object.freeze({ canCreate: true, canUpdate: true, canReturn: true, id: 'ruleActions' }),
+    Object.freeze({ canCreate: true, canUpdate: true, canReturn: true, id: 'ruleAdditionalFields' }),
     Object.freeze({ canCreate: true, canUpdate: true, canReturn: true, id: 'status' }),
     Object.freeze({ canCreate: true, canUpdate: true, canReturn: true, id: 'entities' }),
 

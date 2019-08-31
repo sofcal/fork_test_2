@@ -9,7 +9,7 @@ const should = require('should');
 const sinon = require('sinon');
 const _ = require('underscore');
 
-describe.only('@sage/bc-contracts-rule.RuleBucket', () => {
+describe('@sage/bc-contracts-rule.RuleBucket', () => {
     let sandbox;
     let data;
 
@@ -377,10 +377,10 @@ describe.only('@sage/bc-contracts-rule.RuleBucket', () => {
                 try {
                     shouldT(() => RuleBucket.validate(substitute(uut, 'productId', '00000000-0000-0000-0000-000000000000'))).not.throw();
                     shouldT(() => RuleBucket.validate(substitute(uut, 'productId', undefined))).not.throw();
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'productId', null))).not.throw();
 
                     done();
                 } catch(err) {
-                    console.log(err.stack)
                     done(err);
                 }
             });
@@ -388,7 +388,6 @@ describe.only('@sage/bc-contracts-rule.RuleBucket', () => {
             it('should throw when invalid', (done) => {
                 try {
                     const expected = (value) => (new StatusCodeError([new StatusCodeErrorItem('InvalidProperties', `RuleBucket.productId: ${value}`, { productId: value })], 400));
-                    shouldT(() => RuleBucket.validate(substitute(uut, 'productId', null))).throw(expected(null));
                     shouldT(() => RuleBucket.validate(substitute(uut, 'productId', ''))).throw(expected(''));
                     shouldT(() => RuleBucket.validate(substitute(uut, 'productId', 9))).throw(expected(9));
                     shouldT(() => RuleBucket.validate(substitute(uut, 'productId', {}))).throw(expected({}));

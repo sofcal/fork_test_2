@@ -25,8 +25,7 @@
     "@sage/sfab-s2s-jwt-issuer": "^1.1.60",
     "@sage/sfab-s2s-jwt-jwks": "^1.1.60",
     "@sage/sfab-s2s-jwt-kid": "^1.1.60",
-    "@sage/sfab-workers-clam-av": "^1.1.60",
-    "ci": "^1.0.0"
+    "@sage/sfab-workers-clam-av": "^1.1.60"
   },
   "devDependencies": {
     "@sage/bc-debug-utils": "^1.1.60",

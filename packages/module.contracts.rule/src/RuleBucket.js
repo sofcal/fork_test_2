@@ -72,42 +72,6 @@ const validateImpl = function(ruleBucket, noThrow) {
     return noThrow ? [] : undefined;
 };
 
-const createError = (errCollection, rule) => {
-    return new StatusCodeError(createErrorItems(errCollection, rule), 400);
-};
-
-const createErrorItems = (errCollection, rule) => {
-    const errorItems = [];
-    _.each(errCollection, (err) => {
-        const invalidValue = {};
-        const dotSeparated = buildDotSeparatedString(err.property);
-        const prop = resolvePath(dotSeparated, rule);
-        if (_.isArray(prop)) {
-            invalidValue[dotSeparated] = prop[0]; // eslint-disable-line prefer-destructuring
-        } else {
-            invalidValue[dotSeparated] = prop;
-        }
-        const errorText = `Rule.${dotSeparated}: ${invalidValue[dotSeparated]}`;
-        errorItems.push(new StatusCodeErrorItem('InvalidProperties', errorText, invalidValue));
-    });
-    return errorItems;
-};
-
-const resolvePath = (path, obj, separator = '.') => {
-    const properties = Array.isArray(path) ? path : path.split(separator);
-    return properties.reduce((prev, curr) => prev && prev[curr], obj);
-};
-
-const buildDotSeparatedString = (dotSeparated) => {
-    let ret = dotSeparated.split('instance.').join('');
-    ret = ret.split('[').join('.');
-    ret = ret.split(']').join('');
-    if (ret.indexOf('.') > 0) {
-        ret = ret.substring(0, ret.indexOf('.'));
-    }
-    return ret;
-};
-
 // replace or insert rule into rules array based on its rank and recalculate rank for all rules
 const addOrUpdateRuleByRankImpl = (existingRules, rule) => {
     const newRules = _.reject(existingRules, (existing) => existing.uuid === rule.uuid);
