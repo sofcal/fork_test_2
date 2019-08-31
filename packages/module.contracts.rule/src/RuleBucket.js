@@ -4,6 +4,7 @@ const Rule = require('./Rule');
 const ruleBucketSchema = require('./schemas/ruleBucketSchema');
 
 const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-statuscodeerror');
+const { Mapper: StatusCodeErrorMapper } = require('@sage/bc-jsonschema-to-statuscodeerror');
 const { validateType } = require('@sage/bc-contracts-util');
 
 const jsonschema = require('jsonschema');
@@ -20,6 +21,7 @@ class RuleBucket {
             this.numberOfRules = data.numberOfRules;
             this.rules = _.map(data.rules || [], (r) => (new Rule(r)));
             this.isAccountOwnerRules = data.isAccountOwnerRules || false;
+            this.productId = data.productId || null;
         }
     }
 
@@ -54,20 +56,20 @@ const validateImpl = function(ruleBucket, noThrow) {
     const typeItem = validateType({ obj: ruleBucket, Type: RuleBucket, noThrow });
     if (typeItem) {
         // can only get here if noThrow was true
-        return [typeItem];
+        return ([typeItem]);
     }
 
-    const result = jsonschema.validate(ruleBucket, ruleBucketSchema);
+    const result = jsonschema.validate(ruleBucket, ruleBucketSchema, { propertyName: RuleBucket.name });
 
     if (result.errors.length > 0) {
         if (noThrow) {
-            // TODO: use the toStatusCodeError module instead
-            return createErrorItems(result.errors, ruleBucket);
+            return StatusCodeErrorMapper.toStatusCodeErrorItems(result);
         }
-        // TODO: use the toStatusCodeError module instead
-        throw createError(result.errors, ruleBucket);
+
+        throw StatusCodeErrorMapper.toStatusCodeError(result);
     }
-    return true;
+
+    return noThrow ? [] : undefined;
 };
 
 const createError = (errCollection, rule) => {

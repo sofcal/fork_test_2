@@ -5,9 +5,15 @@ const access = require('safe-access');
 const _ = require('underscore');
 const _s = require('underscore.string');
 
+const jsonschema = require('jsonschema');
+
 // currently, this conversion mimics the behaviour of Banking Cloud validation. We are looking to update the validation
 //  messages seen by consuming client applications, but until we do that we need to preserve the responses they saw previously
 class Mapper {
+    static supportedJsonSchema() {
+        return jsonschema;
+    }
+
     static toStatusCodeErrorItems(result) {
         return _.map(result.errors, (err) => {
             if (err.custom) {

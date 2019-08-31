@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@sage/bc-contracts-rule": "^1.1.61",
+    "@sage/bc-jsonschema-to-statuscodeerror": "^1.1.61",
     "@sage/bc-services-parameter": "^1.1.60",
     "@sage/bc-services-step": "^1.1.60",
     "@sage/bc-statuscodeerror": "^1.1.60",

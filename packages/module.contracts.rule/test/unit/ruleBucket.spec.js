@@ -3,13 +3,13 @@
 const RuleBucket = require('../../lib/RuleBucket');
 const Rule = require('../../lib/Rule');
 
-const { StatusCodeError } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-statuscodeerror');
 
 const should = require('should');
 const sinon = require('sinon');
 const _ = require('underscore');
 
-describe('@sage/bc-contracts-rule.RuleBucket', () => {
+describe.only('@sage/bc-contracts-rule.RuleBucket', () => {
     let sandbox;
     let data;
 
@@ -20,6 +20,7 @@ describe('@sage/bc-contracts-rule.RuleBucket', () => {
             uuid: '7d77e215-50c5-4765-93cd-74f1756a56dd',
             region: 'GBR',
             organisationId: '96616525-c5a3-4958-b1ee-fb856fd83403',
+            productId: '00000000-0000-0000-0000-000000000001',
             bankAccountId: '5c94f4b7-bf84-418f-a6c6-a26349034a81',
             numberOfRules: 1,
             rules: [
@@ -58,69 +59,41 @@ describe('@sage/bc-contracts-rule.RuleBucket', () => {
         sandbox.restore();
     });
 
-    describe('contract.RuleBucket', () => {
-        it('should create an instance of RuleBucket using Create', (done) => {
-            try {
-                const newRuleBucket = RuleBucket.Create(data);
-                newRuleBucket.should.be.instanceof(RuleBucket);
-                done();
-            } catch (err) {
-                done(err instanceof Error ? err : new Error(err));
-            }
-        });
+    it('should create an instance of RuleBucket', (done) => {
+        try {
+            const uut = new RuleBucket(data);
+            uut.should.be.instanceof(RuleBucket);
+            done();
+        } catch (err) {
+            done(err instanceof Error ? err : new Error(err));
+        }
+    });
 
-        it('should assign properties using Create', (done) => {
-            try {
-                const newRuleBucket = RuleBucket.Create(data);
-                should(newRuleBucket.uuid).eql(data.uuid);
-                should(newRuleBucket.region).eql(data.region);
-                should(newRuleBucket.organisationId).eql(data.organisationId);
-                should(newRuleBucket.bankAccountId).eql(data.bankAccountId);
-                should(newRuleBucket.numberOfRules).eql(data.numberOfRules);
-                should(newRuleBucket.rules).eql([new Rule(data.rules[0])]);
-                should(newRuleBucket.isAccountOwnerRules).eql(data.isAccountOwnerRules);
-                done();
-            } catch (err) {
-                done(err instanceof Error ? err : new Error(err));
-            }
-        });
+    it('should assign properties', (done) => {
+        try {
+            const uut = new RuleBucket(data);
+            should(uut.uuid).eql(data.uuid);
+            should(uut.region).eql(data.region);
+            should(uut.organisationId).eql(data.organisationId);
+            should(uut.bankAccountId).eql(data.bankAccountId);
+            should(uut.numberOfRules).eql(data.numberOfRules);
+            should(uut.rules).eql([new Rule(data.rules[0])]);
+            should(uut.isAccountOwnerRules).eql(data.isAccountOwnerRules);
+            done();
+        } catch (err) {
+            done(err instanceof Error ? err : new Error(err));
+        }
+    });
 
-        it('should create an instance of RuleBucket', (done) => {
-            try {
-                const newRuleBucket = new RuleBucket(data);
-                newRuleBucket.should.be.instanceof(RuleBucket);
-                done();
-            } catch (err) {
-                done(err instanceof Error ? err : new Error(err));
-            }
-        });
-
-        it('should assign properties', (done) => {
-            try {
-                const newRuleBucket = new RuleBucket(data);
-                should(newRuleBucket.uuid).eql(data.uuid);
-                should(newRuleBucket.region).eql(data.region);
-                should(newRuleBucket.organisationId).eql(data.organisationId);
-                should(newRuleBucket.bankAccountId).eql(data.bankAccountId);
-                should(newRuleBucket.numberOfRules).eql(data.numberOfRules);
-                should(newRuleBucket.rules).eql([new Rule(data.rules[0])]);
-                should(newRuleBucket.isAccountOwnerRules).eql(data.isAccountOwnerRules);
-                done();
-            } catch (err) {
-                done(err instanceof Error ? err : new Error(err));
-            }
-        });
-
-        it('should not assign properties not on contract', (done) => {
-            try {
-                data.junk = 'wahwahwah';
-                const newRuleBucket = new RuleBucket(data);
-                should.not.exists(newRuleBucket.junk);
-                done();
-            } catch (err) {
-                done(err instanceof Error ? err : new Error(err));
-            }
-        });
+    it('should not assign properties not on contract', (done) => {
+        try {
+            data.junk = 'wahwahwah';
+            const uut = new RuleBucket(data);
+            should.not.exists(uut.junk);
+            done();
+        } catch (err) {
+            done(err instanceof Error ? err : new Error(err));
+        }
     });
 
     describe('RuleBucket.prototype.validate', () => {
@@ -128,11 +101,11 @@ describe('@sage/bc-contracts-rule.RuleBucket', () => {
             sandbox.stub(RuleBucket, 'validate');
 
             try {
-                const newRuleBucket = new RuleBucket(data);
-                RuleBucket.validate(newRuleBucket);
+                const uut = new RuleBucket(data);
+                RuleBucket.validate(uut);
 
                 RuleBucket.validate.callCount.should.eql(1);
-                RuleBucket.validate.calledWithExactly(newRuleBucket).should.eql(true);
+                RuleBucket.validate.calledWithExactly(uut).should.eql(true);
 
                 done();
             } catch (err) {
@@ -142,43 +115,44 @@ describe('@sage/bc-contracts-rule.RuleBucket', () => {
     });
 
     describe('RuleBucket.validate', () => {
-        let newRuleBucket;
+        let uut;
 
         beforeEach(() => {
-            newRuleBucket = new RuleBucket(data);
+            uut = new RuleBucket(data);
         });
 
         it('should validate and throw', (done) => {
             try {
-                delete newRuleBucket.region;
-                newRuleBucket.validate();
+                delete uut.region;
+                uut.validate();
 
                 done(new Error('should have thrown'));
             } catch (err) {
-                err.should.be.instanceOf(StatusCodeError);
-                err.statusCode.should.eql(400);
-                err.items[0].applicationCode.should.eql('InvalidProperties');
+                const expected = new StatusCodeError([new StatusCodeErrorItem('InvalidProperties', 'RuleBucket.region: undefined', { region: undefined})], 400);
+                should(err).eql(expected);
                 done();
             }
         });
 
         it('should validate and not throw', (done) => {
             try {
-                delete newRuleBucket.region;
-                const response = newRuleBucket.validate(true);
-                response[0].applicationCode.should.eql('InvalidProperties');
+                delete uut.region;
+                const response = uut.validate(true);
+                const expected = [new StatusCodeErrorItem('InvalidProperties', 'RuleBucket.region: undefined', { region: undefined})];
+                should(response).eql(expected);
+
                 done();
             } catch (err) {
+                console.log(err);
                 done(err instanceof Error ? err : new Error(err));
             }
         });
 
         it('should not throw for valid data', (done) => {
             try {
-                RuleBucket.validate(newRuleBucket);
+                RuleBucket.validate(uut);
                 done();
             } catch (err) {
-                console.log(err);
                 done((err instanceof Error) ? err : new Error());
             }
         });
@@ -188,10 +162,11 @@ describe('@sage/bc-contracts-rule.RuleBucket', () => {
                 RuleBucket.validate(undefined);
                 done(new Error('should have thrown'));
             } catch (err) {
-
-                err.should.be.instanceOf(StatusCodeError);
-                err.statusCode.should.eql(400);
-                err.items[0].applicationCode.should.eql('InvalidType');
+                const expected = new StatusCodeError([
+                    new StatusCodeErrorItem('InvalidType', 'Expected object of type: RuleBucket')
+                ], 400);
+                should(err).be.instanceOf(StatusCodeError);
+                should(err).eql(expected);
 
                 done();
             }
@@ -202,9 +177,11 @@ describe('@sage/bc-contracts-rule.RuleBucket', () => {
                 RuleBucket.validate(null);
                 done(new Error('should have thrown'));
             } catch (err) {
-                err.should.be.instanceof(StatusCodeError);
-                err.statusCode.should.eql(400);
-                err.items[0].applicationCode.should.eql('InvalidType');
+                const expected = new StatusCodeError([
+                    new StatusCodeErrorItem('InvalidType', 'Expected object of type: RuleBucket')
+                ], 400);
+                should(err).be.instanceOf(StatusCodeError);
+                should(err).eql(expected);
                 done();
             }
         });
@@ -215,9 +192,11 @@ describe('@sage/bc-contracts-rule.RuleBucket', () => {
 
                 done(new Error('should have thrown'));
             } catch (err) {
-                err.should.be.instanceof(StatusCodeError);
-                err.statusCode.should.eql(400);
-                err.items[0].applicationCode.should.eql('InvalidType');
+                const expected = new StatusCodeError([
+                    new StatusCodeErrorItem('InvalidType', 'Expected object of type: RuleBucket')
+                ], 400);
+                should(err).be.instanceOf(StatusCodeError);
+                should(err).eql(expected);
 
                 done();
             }
@@ -225,128 +204,283 @@ describe('@sage/bc-contracts-rule.RuleBucket', () => {
 
         it('should throw multiple error items if multiple fields are invalid', (done) => {
             try {
-                newRuleBucket.uuid = null;
-                newRuleBucket.region = null;
+                uut.uuid = null;
+                uut.region = null;
 
-                RuleBucket.validate(newRuleBucket);
+                RuleBucket.validate(uut);
 
                 done(new Error('should have thrown'));
             } catch (err) {
-
-                err.should.be.instanceOf(StatusCodeError);
-                err.statusCode.should.eql(400);
-                err.items.length.should.eql(2);
-
-                err.items[0].applicationCode.should.eql('InvalidProperties');
-                err.items[0].params.should.eql({uuid: null});
-                err.items[0].message.should.eql('Rule.uuid: null');
-                err.items[1].applicationCode.should.eql('InvalidProperties');
-                err.items[1].params.should.eql({region: null});
-                err.items[1].message.should.eql('Rule.region: null');
+                const expected = new StatusCodeError([
+                    new StatusCodeErrorItem('InvalidProperties', 'RuleBucket.uuid: null', {uuid: null}),
+                    new StatusCodeErrorItem('InvalidProperties', 'RuleBucket.region: null', {region: null}),
+                ], 400);
+                should(err).be.instanceOf(StatusCodeError);
+                should(err).eql(expected);
 
                 done();
             }
         });
 
-        const tests = [{
-            target: 'uuid', tests: [
-                {it: 'should not throw if uuid is undefined', value: undefined, error: false},
-                {it: 'should throw if uuid is null', value: null, error: true},
-                {it: 'should throw if uuid is an empty string', value: '', error: true},
-                {it: 'should throw if uuid is not a valid uuid', value: 'not-a-uuid', error: true},
-                {it: 'should throw if uuid is a number', value: 9, error: true},
-                {it: 'should throw if uuid is an object', value: {}, error: true}
-            ]
-        }, {
-            target: 'region', tests: [
-                {it: 'should not throw if region is a string', value: 'GBR', error: false},
-                {it: 'should throw if region is undefined', value: undefined, error: true},
-                {it: 'should throw if region is null', value: null, error: true},
-                {it: 'should throw if region is an empty string', value: '', error: true},
-                {it: 'should throw if region is a number', value: 9, error: true},
-                {it: 'should throw if region is an object', value: {}, error: true}
-            ]
-        }, {
-            target: 'bankAccountId', tests: [
-                {it: 'should throw if bankAccountId is undefined', value: undefined, error: true},
-                {it: 'should throw if bankAccountId is null', value: null, error: true},
-                {it: 'should throw if bankAccountId is an empty string', value: '', error: true},
-                {it: 'should throw if bankAccountId is not a valid uuid', value: 'not-a-uuid', error: true},
-                {it: 'should throw if bankAccountId is a number', value: 9, error: true},
-                {it: 'should throw if bankAccountId is an object', value: {}, error: true}
-            ]
-        },{
-            target: 'organisationId', tests: [
-                {it: 'should throw if organisationId is undefined', value: undefined, error: true},
-                {it: 'should throw if organisationId is null', value: null, error: true},
-                {it: 'should throw if organisationId is an empty string', value: '', error: true},
-                {it: 'should throw if organisationId is not a valid uuid', value: 'not-a-uuid', error: true},
-                {it: 'should throw if organisationId is a number', value: 9, error: true},
-                {it: 'should throw if organisationId is an object', value: {}, error: true}
-            ]
-        },
-        {
-            target: 'rules', tests: [
-                {it: 'should throw if rules is undefined', value: undefined, error: false},
-                {it: 'should throw if rules is null', value: null, error: true},
-                {it: 'should throw if rules is an empty string', value: '', error: true},
-                {it: 'should throw if rules is a string', value: 'hmmm', error: true},
-                {it: 'should throw if rules is a number', value: 9, error: true},
-                {it: 'should throw if rules is not a rule  object', value: {}, error: true}
-            ]
-        },
-        {
-            target: 'isAccountOwnerRules', tests: [
-                {it: 'should not throw if isAccountOwnerRules is boolean', value: true, error: false},
-                {it: 'should throw if isAccountOwnerRules is undefined', value: undefined, error: true},
-                {it: 'should throw if isAccountOwnerRules is null', value: null, error: true},
-                {it: 'should throw if isAccountOwnerRules is an empty string', value: '', error: true},
-                {it: 'should throw if isAccountOwnerRules is not a valid uuid', value: 'not-a-uuid', error: true},
-                {it: 'should throw if isAccountOwnerRules is a number', value: 9, error: true},
-                {it: 'should throw if isAccountOwnerRules is an object', value: {}, error: true}
-            ]
-        }];
+        const substitute = (obj, prop, value) => {
+            const splits = prop.split('.');
 
-        const runTest = (target, tests) => {
-            describe(target, () => {
-                _.each(tests, (test, index) =>  {
-                    it(test.it, (done) =>  {
-                        try {
-                            newRuleBucket[target] = test.value;
-                            let result = test.error ? new Error(target + ' test ' + index + ': should have thrown') : undefined;
-
-                            RuleBucket.validate(newRuleBucket);
-
-                            done(result);
-                        } catch (err) {
-                            if (!test.error) {
-                                console.log(err);
-                                done((err instanceof Error) ? err : new Error());
-                            } else {
-                                console.log(err);
-                                err.should.be.instanceOf(StatusCodeError);
-                                err.statusCode.should.eql(400);
-                                err.items[0].applicationCode.should.eql('InvalidProperties');
-                                if (_.isArray(test.value)) {
-                                    console.log('XXX Array', err.items[0].params[target]);
-                                    console.log('XXX Array test val', test.value[0]);
-                                } else {
-                                    console.log('XXX item', err.items[0].params[target]);
-                                    console.log('XXX Array test val', test.value);
-                                }
-
-                                should(err.items[0].params[target]).eql(_.isArray(test.value) ? test.value[0] : test.value);
-
-                                done();
-                            }
-                        }
-                    });
-                });
+            let ref = obj;
+            _.times(splits.length, (i) => {
+                let key = splits[i];
+                let match = key.match(/\[(\d*)\]/);
+                console.log('key', key);
+                console.log('index', match);
+                console.log(ref);
+                if (i < splits.length - 1) {
+                    ref = match ? ref[key.substring(0, match['index'])][match[1]] : ref[key];
+                } else {
+                    (match ? (ref[key.substring(0, match['index'])][match[1]] = value) : ref[key] = value);
+                }
             });
+
+            return obj;
         };
 
-        _.each(tests, (test) => {
-            runTest(test.target, test.tests);
+        const shouldT = (func) => {
+            return {
+                throw: (expected) => {
+                    let err = null;
+                    try {
+                        func();
+                        err = new Error('should have thrown');
+                    } catch(e1) {
+                        should(e1).eql(expected);
+                    }
+
+                    if (err) { throw err; }
+                },
+                not: {
+                    throw: () => {
+                        func();
+                    }
+                }
+            }
+        };
+
+        describe('uuid', () => {
+            it('should NOT throw if uuid valid', (done) => {
+                try {
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'uuid', '00000000-0000-0000-0000-000000000000'))).not.throw();
+                    should(() => RuleBucket.validate(substitute(uut, 'uuid', undefined))).not.throw();
+
+                    done();
+                } catch(err) {
+                    done(err);
+                }
+            });
+
+            it('should throw if uuid invalid', (done) => {
+                try {
+                    const expected = (value) => (new StatusCodeError([new StatusCodeErrorItem('InvalidProperties', `RuleBucket.uuid: ${value}`, { uuid: value })], 400));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'uuid', null))).throw(expected(null));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'uuid', ''))).throw(expected(''));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'uuid', 'not-a-uuid'))).throw(expected('not-a-uuid'));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'uuid', 9))).throw(expected(9));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'uuid', {}))).throw(expected({}));
+
+                    done();
+                } catch(err) {
+                    done(err);
+                }
+            });
+        });
+
+        describe('region', () => {
+            it('should NOT throw when valid', (done) => {
+                try {
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'region', 'GBR'))).not.throw();
+
+                    done();
+                } catch(err) {
+                    done(err);
+                }
+            });
+
+            it('should throw when invalid', (done) => {
+                try {
+                    const expected = (value) => (new StatusCodeError([new StatusCodeErrorItem('InvalidProperties', `RuleBucket.region: ${value}`, { region: value })], 400));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'region', undefined))).throw(expected(undefined));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'region', null))).throw(expected(null));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'region', ''))).throw(expected(''));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'region', 9))).throw(expected(9));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'region', {}))).throw(expected({}));
+
+                    done();
+                } catch(err) {
+                    done(err);
+                }
+            });
+        });
+
+        describe('bankAccountId', () => {
+            it('should NOT throw when valid', (done) => {
+                try {
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'bankAccountId', '00000000-0000-0000-0000-000000000000'))).not.throw();
+
+                    done();
+                } catch(err) {
+                    done(err);
+                }
+            });
+
+            it('should throw when invalid', (done) => {
+                try {
+                    const expected = (value) => (new StatusCodeError([new StatusCodeErrorItem('InvalidProperties', `RuleBucket.bankAccountId: ${value}`, { bankAccountId: value })], 400));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'bankAccountId', undefined))).throw(expected(undefined));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'bankAccountId', null))).throw(expected(null));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'bankAccountId', ''))).throw(expected(''));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'bankAccountId', 9))).throw(expected(9));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'bankAccountId', {}))).throw(expected({}));
+
+                    done();
+                } catch(err) {
+                    done(err);
+                }
+            });
+        });
+
+        describe('organisationId', () => {
+            it('should NOT throw when valid', (done) => {
+                try {
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'organisationId', '00000000-0000-0000-0000-000000000000'))).not.throw();
+
+                    done();
+                } catch(err) {
+                    done(err);
+                }
+            });
+
+            it('should throw when invalid', (done) => {
+                try {
+                    const expected = (value) => (new StatusCodeError([new StatusCodeErrorItem('InvalidProperties', `RuleBucket.organisationId: ${value}`, { organisationId: value })], 400));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'organisationId', undefined))).throw(expected(undefined));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'organisationId', null))).throw(expected(null));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'organisationId', ''))).throw(expected(''));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'organisationId', 9))).throw(expected(9));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'organisationId', {}))).throw(expected({}));
+
+                    done();
+                } catch(err) {
+                    done(err);
+                }
+            });
+        });
+
+        describe('productId', () => {
+            it('should NOT throw when valid', (done) => {
+                try {
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'productId', '00000000-0000-0000-0000-000000000000'))).not.throw();
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'productId', undefined))).not.throw();
+
+                    done();
+                } catch(err) {
+                    console.log(err.stack)
+                    done(err);
+                }
+            });
+
+            it('should throw when invalid', (done) => {
+                try {
+                    const expected = (value) => (new StatusCodeError([new StatusCodeErrorItem('InvalidProperties', `RuleBucket.productId: ${value}`, { productId: value })], 400));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'productId', null))).throw(expected(null));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'productId', ''))).throw(expected(''));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'productId', 9))).throw(expected(9));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'productId', {}))).throw(expected({}));
+
+                    done();
+                } catch(err) {
+                    done(err);
+                }
+            });
+        });
+
+        describe('isAccountOwnerRules', () => {
+            it('should NOT throw when valid', (done) => {
+                try {
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'isAccountOwnerRules', false))).not.throw();
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'isAccountOwnerRules', true))).not.throw();
+
+                    done();
+                } catch(err) {
+                    done(err);
+                }
+            });
+
+            it('should throw when invalid', (done) => {
+                try {
+                    const expected = (value) => (new StatusCodeError([new StatusCodeErrorItem('InvalidProperties', `RuleBucket.isAccountOwnerRules: ${value}`, { isAccountOwnerRules: value })], 400));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'isAccountOwnerRules', undefined))).throw(expected(undefined));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'isAccountOwnerRules', null))).throw(expected(null));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'isAccountOwnerRules', ''))).throw(expected(''));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'isAccountOwnerRules', 9))).throw(expected(9));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'isAccountOwnerRules', {}))).throw(expected({}));
+
+                    done();
+                } catch(err) {
+                    done(err);
+                }
+            });
+        });
+
+        describe('numberOfRules', () => {
+            it('should NOT throw when valid', (done) => {
+                try {
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'numberOfRules', 1))).not.throw();
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'numberOfRules', 102))).not.throw();
+
+                    done();
+                } catch(err) {
+                    done(err);
+                }
+            });
+
+            it('should throw when invalid', (done) => {
+                try {
+                    const expected = (value) => (new StatusCodeError([new StatusCodeErrorItem('InvalidProperties', `RuleBucket.numberOfRules: ${value}`, { numberOfRules: value })], 400));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'numberOfRules', undefined))).throw(expected(undefined));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'numberOfRules', null))).throw(expected(null));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'numberOfRules', ''))).throw(expected(''));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'numberOfRules', true))).throw(expected(true));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'numberOfRules', {}))).throw(expected({}));
+
+                    done();
+                } catch(err) {
+                    done(err);
+                }
+            });
+        });
+
+        describe('rules', () => {
+            it('should NOT throw when valid', (done) => {
+                try {
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'rules', []))).not.throw();
+
+                    done();
+                } catch(err) {
+                    done(err);
+                }
+            });
+
+            it('should throw when invalid', (done) => {
+                try {
+                    const expected = (value) => (new StatusCodeError([new StatusCodeErrorItem('InvalidProperties', `RuleBucket.rules: should be an array`, { rules: value })], 400));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'rules', undefined))).throw(expected(undefined));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'rules', null))).throw(expected(null));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'rules', ''))).throw(expected(''));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'rules', 9))).throw(expected(9));
+                    shouldT(() => RuleBucket.validate(substitute(uut, 'rules', {}))).throw(expected({}));
+
+                    done();
+                } catch(err) {
+                    done(err);
+                }
+            });
         });
     });
 });

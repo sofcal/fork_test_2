@@ -1,6 +1,9 @@
 'use strict';
 
-const Rule = require('@sage/bc-contracts-rule');
+const { Rule, RuleBucket } = require('@sage/bc-contracts-rule');
+
+const { Mapper: StatusCodeErrorMapper } = require('@sage/bc-jsonschema-to-statuscodeerror');
+const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-statuscodeerror');
 
 const Authenticator = require('@sage/sfab-s2s-jwt-authenticator');
 const Cache = require('@sage/sfab-s2s-jwt-cache');
@@ -13,7 +16,8 @@ const Step = require('@sage/bc-services-step');
 const ClamAVWorkers = require('@sage/sfab-workers-clam-av');
 
 module.exports = {
-    contracts: { Rule },
+    common: { StatusCodeErrorItem, StatusCodeError, StatusCodeErrorMapper },
+    contracts: { Rule, RuleBucket },
     Authenticator,
     Cache,
     EndpointStore,
