@@ -11,7 +11,7 @@ module.exports = (settings) => {
     const post = mapKeys(settings, (k) => k.canCreate);
     const update = mapKeys(settings, (k) => k.canUpdate);
     const readOnly = mapKeys(settings, (k) => !k.canUpdate);
-    const returned = mapKeys(settings, (k) => !k.canReturn);
+    const returned = mapKeys(settings, (k) => k.canReturn);
 
     return { post, update, readOnly, returned };
 };

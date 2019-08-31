@@ -21,6 +21,7 @@ FilterKeys.settings = Object.freeze([
     Object.freeze({ canCreate: false, canUpdate: false, canReturn: false, id: 'targetType' }),
     Object.freeze({ canCreate: false, canUpdate: false, canReturn: false, id: 'productId' }),
     Object.freeze({ canCreate: false, canUpdate: false, canReturn: false, id: 'globalRuleId' }),
+    Object.freeze({ canCreate: false, canUpdate: false, canReturn: false, id: 'ruleCounts' }),
 
     // these fields can be created and updated by the API client
     Object.freeze({ canCreate: true, canUpdate: true, canReturn: true, id: 'ruleName' }),
@@ -39,5 +40,6 @@ const filters = createFilters(FilterKeys.settings);
 FilterKeys.post = filters.post;
 FilterKeys.update = filters.update;
 FilterKeys.readOnly = filters.readOnly;
+FilterKeys.returned = filters.returned;
 
 module.exports = FilterKeys;

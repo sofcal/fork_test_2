@@ -79,7 +79,7 @@ class Rule {
     }
 
     static filter(rule) {
-        return filter({ source: rule, sourceBlacklist: FilterKeys.returned });
+        return filter({ source: rule, sourceWhitelist: FilterKeys.returned });
     }
 
     // TODO: Should this be here? Or should it be on the RuleBucket?
