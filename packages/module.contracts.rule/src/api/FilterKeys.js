@@ -40,6 +40,6 @@ const filters = createFilters(FilterKeys.settings);
 FilterKeys.post = filters.post;
 FilterKeys.update = filters.update;
 FilterKeys.readOnly = filters.readOnly;
-FilterKeys.returned = filters.returned;
+FilterKeys.filtered = filters.filtered;
 
 module.exports = FilterKeys;

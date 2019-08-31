@@ -11,9 +11,9 @@ module.exports = (settings) => {
     const post = mapKeys(settings, (k) => k.canCreate);
     const update = mapKeys(settings, (k) => k.canUpdate);
     const readOnly = mapKeys(settings, (k) => !k.canUpdate);
-    const returned = mapKeys(settings, (k) => k.canReturn);
+    const filtered = mapKeys(settings, (k) => !k.canReturn);
 
-    return { post, update, readOnly, returned };
+    return { post, update, readOnly, filtered };
 };
 
 // helper function which filters and extracts ids based on a provided function

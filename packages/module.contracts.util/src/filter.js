@@ -9,7 +9,7 @@ const _ = require('underscore');
  * source is filtered to ensure only these fields are returned
  * @returns {any | *}
  */
-module.exports = ({ source, sourceWhitelist = null } = {}) => {
+module.exports = ({ source, sourceBlacklist = null } = {}) => {
     // pick any value from the source that is in whitelist
-    return sourceWhitelist ? _.pick(source, sourceWhitelist) : source;
+    return sourceBlacklist ? _.omit(source, sourceBlacklist) : source;
 };
