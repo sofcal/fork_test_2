@@ -85,12 +85,11 @@
           },
           {
             "properties": {
-              "ruleField": { "enum": ["transactionType", "checkNum", "currency", "payee.payeeBankId", "payee.payeeAccountId"] },
+              "ruleField": { "enum": ["transactionType", "checkNum", "currency", "payee.payeeBankId", "payee.payeeAccountId", "$baseType"] },
               "ruleOperation": { "type": "string", "pattern": "eq" },
               "ruleCriteria": { "type": "string", "pattern": "^.{1,200}$" }
             },
-            "required": ["ruleField", "ruleOperation", "ruleCriteria"
-            ]
+            "required": ["ruleField", "ruleOperation", "ruleCriteria"]
           }
         ]
       }
