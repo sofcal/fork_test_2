@@ -1,7 +1,7 @@
 'use strict';
 
 const _ = require('underscore');
-const { toStatusCodeError } = require('@sage/bc-jsonschema-to-statuscodeerror');
+const { Mapper: StatusCodeErrorMapper } = require('@sage/bc-jsonschema-to-statuscodeerror');
 const { Validator } = require('jsonschema');
 const schema = require('./schema');
 
@@ -62,7 +62,7 @@ class NarrativeDictionary {
         const result = validator.validate(narrativeDictionary, schema, { throwError: false, propertyName: NarrativeDictionary.name });
 
         // StatusCodeError.Create([StatusCodeErrorItem.Create('InvalidProperties', 'NarrativeDictionary.data: undefined', { data: undefined })], 400);
-        const error = toStatusCodeError(result, NarrativeDictionary, narrativeDictionary);
+        const error = StatusCodeErrorMapper.toStatusCodeError(result, NarrativeDictionary, narrativeDictionary);
 
         if (error) {
             throw error;

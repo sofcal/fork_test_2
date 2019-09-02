@@ -1,0 +1,66 @@
+{
+  "name": "@sage/bc-processing-rules",
+  "version": "1.1.68",
+  "description": "Banking Cloud schemas",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "publishConfig": {
+    "registry": "https://sage.myget.org/F/npm/npm/",
+    "access": "public"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/code-frame": "^7.0.0",
+    "@babel/core": "^7.5.4",
+    "@babel/preset-env": "^7.5.4",
+    "@sage/bc-contracts-predictedaction": "^1.1.68",
+    "@sage/bc-contracts-rule": "^1.1.67",
+    "@sage/bc-contracts-util": "^1.1.65",
+    "@sage/bc-jsonschema-to-statuscodeerror": "^1.1.62",
+    "@sage/bc-statuscodeerror": "^1.1.60",
+    "@sage/bc-util-httpmethod": "^1.1.60",
+    "bignumber.js": "^4.0.0",
+    "bluebird": "^3.5.1",
+    "jsonschema": "^1.2.4",
+    "safe-access": "^0.1.0",
+    "underscore": "^1.9.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.5.0",
+    "@babel/plugin-proposal-class-properties": "^7.5.0",
+    "@babel/preset-env": "^7.5.4",
+    "@babel/preset-flow": "^7.0.0",
+    "@babel/register": "^7.4.4",
+    "babel-eslint": "^10.0.2",
+    "babel-plugin-istanbul": "^5.1.4",
+    "babel-plugin-transform-async-to-promises": "^0.8.12",
+    "eslint": "^4.11.0",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.8.0",
+    "istanbul": "^1.1.0-alpha.1",
+    "mocha": "^4.0.1",
+    "mongodb": "3.0.5",
+    "nock": "^10.0.6",
+    "nyc": "^12.0.2",
+    "should": "^13.2.1",
+    "sinon": "^5.0.10",
+    "sleep": "^5.1.0",
+    "snyk": "^1.19.1",
+    "watch": "^1.0.2"
+  },
+  "scripts": {
+    "clean": "rimraf ./coverage/ && rimraf ./.nyc_output/ && rimraf ./node_modules/ && rimraf ./lib/",
+    "test": "NODE_ENV=test nyc --cache false --x test/ mocha --colors \"./test/unit/**/*.spec.js\"",
+    "cover": "NODE_ENV=test npm run test && nyc report --reporter=lcov",
+    "report": "open coverage/lcov-report/index.html",
+    "cover:report": "npm run cover && npm run report",
+    "int": "NODE_ENV=test nyc --x lib/_legacy --x test/ mocha -b --colors --reporter spec \"./test/int/**/*.spec.js\"",
+    "lint": "eslint ./src/**",
+    "build": "babel --root-mode upward src -d lib --copy-files",
+    "watch": "babel --root-mode upward --watch src --out-dir lib --copy-files",
+    "unlock": "rimraf package-lock.json"
+  }
+}

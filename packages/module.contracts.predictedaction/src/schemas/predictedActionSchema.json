@@ -1,0 +1,85 @@
+{
+  "id": "/PredictedAction",
+  "type": "object",
+  "properties": {
+    "predictionId": {
+      "type": ["string", "null"], "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+      "custom": { "propertyName": "PredictedAction.predictionId" }
+    },
+    "score": {
+      "type": ["integer", "null"], "minimum": 0, "maximum": 100,
+      "custom": { "propertyName": "PredictedAction.score" }
+    },
+    "source": {
+      "type": ["string", "null"], "pattern": "^User|Accountant|Feedback|Global|Accountant Manual$",
+      "custom": { "propertyName": "PredictedAction.source" }
+    },
+    "rules": {
+      "type": "array",
+      "custom": {
+        "propertyName": "PredictedAction.rules",
+        "message": "should be an array",
+        "items": {
+          "propertyName": "Object.rules",
+          "useParent": 2,
+          "paramKey": "rules"
+        }
+      },
+      "items": {
+        "properties": {
+          "ruleId": { "type": ["string", "null"], "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$" },
+          "ruleRank": { "type": ["integer", "null"] },
+          "match": { "enum": [null, "full", "partial", "overwritten"] }
+        },
+        "required": []
+      }
+    },
+    "action": {
+      "type": ["object", "null"],
+      "properties": {
+        "type": { "type": ["string", "null"] },
+        "reference": { "type": ["string", "null"] },
+        "accountsPostings": {
+          "type": "array",
+          "items": {
+            "properties": {
+              "createdBy": { "type": ["string", "null"] },
+              "grossAmount": { "type": ["integer", "null"] },
+              "netAmount": { "type": ["integer", "null"] },
+              "taxAmount": { "type": ["integer", "null"] },
+              "accountantNarrative": { "type": ["string", "null"] },
+              "postingInstructions": {
+                "type": ["array"],
+                "items": {
+                  "properties": {
+                    "type": { "type": ["string"] },
+                    "userDefinedTypeName": { "type": ["string", "null"] },
+                    "code": { "type": ["string", "null"] },
+                    "name": { "type": ["string", "null"] },
+                    "status": { "type": ["string", "null"] },
+                    "description": { "type": ["string", "null"] },
+                    "value": { "type": ["integer", "null"] }
+                  },
+                  "required": ["type"]
+                }
+              }
+            },
+            "required": ["postingInstructions"]
+          }
+        },
+        "ruleAdditionalFields": {
+          "type": "array",
+          "items": {
+            "properties": {
+              "name": { "type": ["string"], "pattern": "^.{1,50}$" },
+              "value": { "type": ["string"], "pattern": "^.{1,50}$" }
+            },
+            "required": ["name", "value"]
+          }
+        }
+      },
+      "required": ["accountsPostings"]
+    }
+  },
+  "required": ["rules"]
+}
