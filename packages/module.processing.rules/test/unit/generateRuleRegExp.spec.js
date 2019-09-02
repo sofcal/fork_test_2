@@ -5,7 +5,7 @@ const generateRuleRegExp = require('../../lib/generateRuleRegExp');
 const should = require('should');
 const sinon = require('sinon');
 
-describe('rules.generateRuleRegExp', function () {
+describe('@sage/bc-processing-rules.generateRuleRegExp', function () {
     let sandbox;
 
     beforeEach(() => {

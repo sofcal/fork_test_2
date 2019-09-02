@@ -6,7 +6,7 @@ const Big = require('bignumber.js');
 const should = require('should');
 const sinon = require('sinon');
 
-describe('rules.RulesEngine', function () {
+describe('@sage/bc-processing-rules.RulesEngine', function () {
     let sandbox;
 
     let log;

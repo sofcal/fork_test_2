@@ -3,6 +3,8 @@
 const { Rule, RuleBucket } = require('@sage/bc-contracts-rule');
 const { PredictedAction } = require('@sage/bc-contracts-predictedaction');
 
+const { RulesEngine } = require('@sage/bc-processing-rules');
+
 const { Mapper: StatusCodeErrorMapper } = require('@sage/bc-jsonschema-to-statuscodeerror');
 const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-statuscodeerror');
 
@@ -19,6 +21,7 @@ const ClamAVWorkers = require('@sage/sfab-workers-clam-av');
 module.exports = {
     common: { StatusCodeErrorItem, StatusCodeError, StatusCodeErrorMapper },
     contracts: { PredictedAction, Rule, RuleBucket },
+    processing: { RulesEngine },
     Authenticator,
     Cache,
     EndpointStore,

@@ -17,6 +17,7 @@
     "@sage/bc-contracts-predictedaction": "^1.1.68",
     "@sage/bc-contracts-rule": "^1.1.67",
     "@sage/bc-jsonschema-to-statuscodeerror": "^1.1.62",
+    "@sage/bc-processing-rules": "^1.1.68",
     "@sage/bc-services-parameter": "^1.1.60",
     "@sage/bc-services-step": "^1.1.60",
     "@sage/bc-statuscodeerror": "^1.1.60",
