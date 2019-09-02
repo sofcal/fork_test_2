@@ -57,6 +57,14 @@ describe('@sage/bc-contracts-predictedaction.PredictedAction', function () {
                 should(uut).be.instanceof(PredictedAction);
             });
 
+            it('should ensure the contract is not modified without tests breaking', () => {
+                const expected = [
+                    'action', 'predictionId', 'rules', 'score', 'source'
+                ].sort();
+                const actual = Object.keys(new PredictedAction({})).sort();
+                should(actual).eql(expected);
+            });
+
             it('should assign properties', () => {
                 const uut = new PredictedAction(data);
 
