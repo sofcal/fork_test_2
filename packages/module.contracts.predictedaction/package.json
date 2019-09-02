@@ -1,5 +1,5 @@
 {
-  "name": "@sage/bc-contracts-rule",
+  "name": "@sage/bc-contracts-predictedaction",
   "version": "1.1.66",
   "description": "Banking Cloud schemas",
   "main": "lib/index.js",
@@ -16,15 +16,16 @@
     "@babel/code-frame": "^7.0.0",
     "@babel/core": "^7.5.4",
     "@babel/preset-env": "^7.5.4",
+    "@sage/bc-contracts-rule": "^1.1.66",
     "@sage/bc-contracts-util": "^1.1.65",
     "@sage/bc-jsonschema-to-statuscodeerror": "^1.1.62",
     "@sage/bc-statuscodeerror": "^1.1.60",
     "@sage/bc-util-httpmethod": "^1.1.60",
-    "bignumber.js": "^4.0.0",
     "bluebird": "^3.5.1",
     "jsonschema": "^1.2.4",
     "safe-access": "^0.1.0",
-    "underscore": "^1.9.0"
+    "underscore": "^1.9.0",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.5.0",
