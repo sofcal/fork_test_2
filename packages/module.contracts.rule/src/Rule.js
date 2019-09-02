@@ -16,16 +16,16 @@ class Rule {
     constructor(data) {
         if (data) {
             this.uuid = data.uuid;
-            this.productId = data.productId;
-            this.globalRuleId = data.globalRuleId || null;
             this.ruleName = data.ruleName;                                  // Custom name for this rule, unique at bank account level
             this.ruleRank = data.ruleRank || null;                          // Rank of this rule, which determines the order in which rules are checked against data items
-            this.targetType = data.targetType;
-            this.ruleType = data.ruleType;
-            this.status = data.status || Rule.statuses.active;
             this.ruleConditions = data.ruleConditions || [];                // Array of rule conditions, ALL of which need to be true to invoke the resulting rule action(s)
             this.ruleActions = buildRuleActionsImpl(data.ruleActions);      // Array of rule actions which are applied if ALL rule conditions are true
             this.ruleAdditionalFields = data.ruleAdditionalFields || [];    // Array of client-supplied meta data that will be applied at the transaction level
+            this.status = data.status || Rule.statuses.active;
+            this.targetType = data.targetType;
+            this.ruleType = data.ruleType;
+            this.productId = data.productId;
+            this.globalRuleId = data.globalRuleId || null;
             this.ruleCounts = data.ruleCounts || { success: 0, fail: 1, applied: 0 };
         }
     }

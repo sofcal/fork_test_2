@@ -64,10 +64,11 @@ describe('@sage/bc-contracts-rule.Rule', function () {
 
             it('should ensure the contract is not modified without tests breaking', () => {
                 const expected = [
-                    'uuid', 'productId', 'globalRuleId', 'ruleName', 'ruleRank', 'targetType', 'ruleType', 'status',
-                    'ruleConditions', 'ruleActions', 'ruleAdditionalFields', 'ruleCounts'
-                ];
-                should(Object.keys(new Rule({}))).eql(expected);
+                    'uuid', 'productId', 'globalRuleId', 'ruleCounts', 'ruleName', 'ruleRank', 'targetType', 'ruleType', 'status',
+                    'ruleConditions', 'ruleActions', 'ruleAdditionalFields'
+                ].sort();
+                const actual = Object.keys(new Rule({})).sort();
+                should(actual).eql(expected);
             });
 
             it('should assign properties', () => {

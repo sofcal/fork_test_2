@@ -69,6 +69,15 @@ describe('@sage/bc-contracts-rule.RuleBucket', () => {
         }
     });
 
+    it('should ensure the contract is not modified without tests breaking', () => {
+        const expected = [
+            'uuid', 'region', 'productId', 'organisationId', 'bankAccountId',
+            'isAccountOwnerRules', 'numberOfRules', 'rules'
+        ].sort();
+        const actual = Object.keys(new RuleBucket({})).sort();
+        should(actual).eql(expected);
+    });
+
     it('should assign properties', (done) => {
         try {
             const uut = new RuleBucket(data);
