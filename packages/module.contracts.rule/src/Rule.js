@@ -12,6 +12,7 @@ const access = require('safe-access');
 const _ = require('underscore');
 const Big = require('bignumber.js');
 
+
 class Rule {
     constructor(data) {
         if (data) {
@@ -21,7 +22,7 @@ class Rule {
             this.ruleConditions = data.ruleConditions || [];                // Array of rule conditions, ALL of which need to be true to invoke the resulting rule action(s)
             this.ruleActions = buildRuleActionsImpl(data.ruleActions);      // Array of rule actions which are applied if ALL rule conditions are true
             this.ruleAdditionalFields = data.ruleAdditionalFields || [];    // Array of client-supplied meta data that will be applied at the transaction level
-            this.status = data.status || Rule.statuses.active;
+            this.status = data.status || Rule.statuses.active;              // status of this rule
             this.targetType = data.targetType;
             this.ruleType = data.ruleType;
             this.productId = data.productId;

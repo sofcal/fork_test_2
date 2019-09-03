@@ -39,6 +39,7 @@ const RULE_TEMPLATE = {
 class PredictedAction {
     constructor(data) {
         if (data) {
+            //
             this.predictionId = data.predictionId || null;
             this.score = (_.isNumber(data.score) && !_.isNaN(data.score)) ? data.score : null;
             this.source = data.source || null;
