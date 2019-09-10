@@ -1,0 +1,18 @@
+ensure you change the name for the module (in package.json) to follow the new naming schema specified by Diego
+
+Because we're using modules hosted on myget, you'll need to register with npm your user account for that repos:
+
+npm adduser --registry=https://sage.myget.org/F/npm/npm/
+
+This module itself is marked as ("private": true) in the package.json, so it won't be published anywhere, make sure you
+keep it in your source control. Probably worth tidying up this README too :)
+
+Install Modules: npm install
+Run: npm run start
+
+If you start the module without changing the ARN, you'll get a whole bunch of errors logging out. Similarly if you don't have
+clamav installed locally. But it should let you see the gyst
+
+The cfn.template provided in scripts is NOT valid - this is deliberate to
+    a) allow documentation; and
+    b) ensure we don't deploy something that won't work

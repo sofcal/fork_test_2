@@ -1,0 +1,131 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+
+  "Parameters": {
+    // You would need additional templates to make this file work. I've left these as placeholders because they help
+    // describe what you may need. But you might want to get rid of them, certainly for your first pass
+    "VPCTemplate": {
+      // If I'm honest, I don't know how much you really need regarding a VPC - check this page for info: https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html
+      // A VPC is just a private network, but you likely don't need most the features it might normally support
+      "Description": "Template Name to link VPC exports",
+      "Default": "",
+      "Type": "String"
+    },
+    "IAMTemplate": {
+      // All you really need is an IAM role for the step function. You could do that in this template if required. I've added a version here
+      // for reference
+
+      //"StepRoleAntiVirus": {
+      //  "Type": "AWS::IAM::Role",
+      //  "Properties": {
+      //    "ManagedPolicyArns" : [{"Ref":"StepPolicyAntiVirus"}],
+      //    "AssumeRolePolicyDocument": {
+      //      "Version": "2012-10-17",
+      //      "Statement": [{
+      //        "Effect": "Allow",
+      //        "Principal": {"Service": [ "states.amazonaws.com" ]},
+      //        "Action": ["sts:AssumeRole"]
+      //      }]
+      //    }
+      //  }
+      //},
+      //"StepPolicyAntiVirus" : {
+      //  "Type" : "AWS::IAM::ManagedPolicy",
+      //  "Properties" : {
+      //    "PolicyDocument": {
+      //      "Version": "2012-10-17",
+      //      "Statement": [{
+      //        "Effect": "Allow",
+      //        "Action": [
+      //          "lambda:InvokeFunction"
+      //        ],
+      //        "Resource": [
+      //          {"Fn::Join" : [ "", ["arn:aws:lambda:",{"Ref" : "AWS::Region"},":", {"Ref":"AWS::AccountId"},":","function",":",{"Fn::ImportValue" : {"Fn::Sub" : "${VPCTemplate}-Product"}},"-",{"Fn::ImportValue" : {"Fn::Sub" : "${VPCTemplate}-Environment"}},"-stack-",{"Ref":"AWS::Region"},"-functions-","AntiVirusLambda"] ]}
+      //        ]
+      //      }]
+      //    }
+      //  }
+      //}
+      "Description": "Template Name to link IAM exports",
+      "Default": "",
+      "Type": "String"
+    },
+    "Name": {
+      // don't really need this, it's just habit
+      "Description": "Function Name",
+      "Default": "",
+      "Type": "String"
+    }
+  },
+
+  "Description": "Step function for orchestrating anti-virus process",
+
+  "Resources": {
+    // this is the Activity that will be polled by the node workers. You might want to isolate the names a little better. When
+    // I wrote this one, I didn't realise it would be shared outside of this Step function.
+    "ActivityAntiVirus" : {
+      "Type" : "AWS::StepFunctions::Activity",
+      "Properties" : {
+        "Name" : "ActivityAntiVirus"
+      }
+    },
+    "StepAntiVirus": {
+      "Type": "AWS::StepFunctions::StateMachine",
+      "Properties": {
+        "StateMachineName": {"Fn::Join" : [ "", [ "AV-", {"Ref":"Name"}] ]},
+        // use the role definied above - IAM role for step
+        "RoleArn": {"Fn::ImportValue" : {"Fn::Sub" : "${IAMTemplate}-StepRoleAntiVirus"}},
+        "DefinitionString": {
+          "Fn::Sub": [
+            // This is the actual definition of the state machine, the one you'll see in AWS step
+            "{\n\t\"StartAt\": \"Try\",\n\t\"States\": {\n\t\t\"Try\": {\n\t\t\t\"Type\": \"Parallel\",\n\t\t\t\"Next\": \"FinalState\",\n\t\t\t\"OutputPath\": \"$.[0]\",\n\t\t\t\"Branches\": [\n\t\t\t\t{\n\t\t\t\t\t\"StartAt\": \"Scan\",\n\t\t\t\t\t\"States\": {\n\t\t\t\t\t\t\"Scan\": {\n\t\t\t\t\t\t\t\"Type\": \"Task\",\n\t\t\t\t\t\t\t\"Resource\": \"${ActivityAntiVirusARN}\",\n\t\t\t\t\t\t\t\"TimeoutSeconds\": 30,\n\t\t\t\t\t\t\t\"HeartbeatSeconds\": 10,\n\t\t\t\t\t\t\t\"End\": true\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t],\n\t\t\t\"Catch\": [\n\t\t\t\t{\n\t\t\t\t\t\"ErrorEquals\": [\n\t\t\t\t\t\t\"States.ALL\"\n\t\t\t\t\t],\n\t\t\t\t\t\"Next\": \"ErrorHandler\"\n\t\t\t\t}\n\t\t\t]\n\t\t},\n\t\t\"ErrorHandler\": {\n\t\t\t\"Type\": \"Pass\",\n\t\t\t\"Result\": \"Error\",\n\t\t\t\"ResultPath\": \"$.scanStatus\",\n\t\t\t\"OutputPath\": \"$\",\n\t\t\t\"Next\": \"FinalState\"\n\t\t},\n\t\t\"FinalState\": {\n\t\t\t\"Type\": \"Pass\",\n\t\t\t\"OutputPath\": \"$\",\n\t\t\t\"End\": true\n\t\t}\n\t}\n}",
+            {
+              // Activity ARN as defined above
+              "ActivityAntiVirusARN": {"Ref" : "ActivityAntiVirus" }
+            }
+          ]
+        }
+      }
+    },
+    // the below bits will allow you to export the ARN values to param-store. I've commented them out because I dont know if you
+    // want that. BUT, the way BC works, is to export these fields here and then pull them into the Node worker so that the ARN of the
+    // activity can be known
+
+    //"StepParamStoreValue": {
+    //  "Type" : "AWS::SSM::Parameter",
+    //  "Properties" : {
+    //    "Description" : "AntiVirus Step Function ARN for consumption by app layer",
+    //    "Name": {"Fn::Join" : ["",["/", {"Fn::ImportValue" : {"Fn::Sub" : "${VPCTemplate}-Environment" } }, "/cfn-exports/antiVirusStepARN" ] ] },
+    //    "Tags": { "createdBy": "stepfunctions.template" },
+    //    "Tier": "Standard",
+    //    "Type": "String",
+    //    "Value": { "Ref": "StepAntiVirus" }
+    //  }
+    //},
+    //"ActivityParamStoreValue": {
+    //  "Type" : "AWS::SSM::Parameter",
+    //  "Properties" : {
+    //    "Description" : "AntiVirus Activity ARN for consumption by app layer",
+    //    "Name": {"Fn::Join" : ["",["/", {"Fn::ImportValue" : {"Fn::Sub" : "${VPCTemplate}-Environment" } }, "/cfn-exports/antiVirusActivityARN" ] ] },
+    //    "Tags": { "createdBy": "stepfunctions.template" },
+    //    "Tier": "Standard",
+    //    "Type": "String",
+    //    "Value": { "Ref": "ActivityAntiVirus" }
+    //  }
+    //}
+  },
+
+  "Outputs": {
+    "StepAntiVirusARN": {
+      "Description": "StepAntiVirus ARN",
+      "Value": { "Ref": "StepAntiVirus" },
+      "Export" : {"Name" : {"Fn::Sub": "SomePrefix-StepAntiVirusARN" }}
+    },
+    "ActivityAntiVirusARN": {
+      "Description": "ActivityAntiVirus ARN",
+      "Value": { "Ref": "ActivityAntiVirus" },
+      "Export" : {"Name" : {"Fn::Sub": "SomePrefix-ActivityAntiVirusARN" }}
+    }
+  }
+
+}
