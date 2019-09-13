@@ -1,6 +1,6 @@
 var pipeline = () => {
     return [
-        { $match: { 'endDate': { $gte: new Date('2019-08-12 00:00:00.000Z') }, 'transactions.feedSource': 'manual' } },
+        { $match: { 'endDate': { $gte: new Date('2019-09-12 00:00:00.000Z') }, 'transactions.feedSource': 'manual' } },
         { $unwind: { path: '$transactions', preserveNullAndEmptyArrays: false } },
         {
             $project: {
