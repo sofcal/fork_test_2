@@ -1,0 +1,72 @@
+var pipeline = (skip, limit) => {
+    return [
+        { $match: { 'aggregatorName': 'yodlee' } },
+        { $lookup: { from: 'Organisation', localField: 'organisationId', foreignField: '_id', as: 'organisationLookup' } },
+        { $lookup: { from: 'Bank', localField: 'bankId', foreignField: '_id', as: 'bankLookup' } },
+        { $unwind: { path: '$organisationLookup', preserveNullAndEmptyArrays: true } },
+        { $unwind: { path: '$organisationLookup.products', preserveNullAndEmptyArrays: true } },
+        { $lookup: { from: 'Product', localField: 'organisationLookup.products.productId', foreignField: '_id', as: 'productLookup' } },
+        { $unwind: { path: '$productLookup', preserveNullAndEmptyArrays: true } },
+        { $unwind: { path: '$bankLookup', preserveNullAndEmptyArrays: true } },
+        {
+            $project: {
+                _id: 1,
+                organisationId: 1,
+                bankId: '$bankLookup._id',
+                bankName: '$bankLookup.name',
+                bankStatus: '$bankLookup.status',
+                productId: { $cond: [{ $not: ['$productLookup'] }, '35e1bc00-7183-408f-b363-a3a8eaeb2162', '$productLookup._id'] },
+                productHeader: { $cond: [{ $not: ['$productLookup'] }, 'sage.live', '$productLookup.header'] },
+                lastTransactionsGet: 1,
+                lastTransactionsReceived: 1,
+                status: 1,
+                statusReason: 1,
+                region: 1,
+                feedSource: 1,
+                internal: 1,
+                created: 1,
+                isPlaceholder: '$featureOptions.isPlaceholder'
+            }
+        },
+        {
+            $group: {
+                _id: 1,
+                accounts: {
+                    $addToSet: {
+                        bankAccountId: '$_id',
+                        productId: '$productId',
+                        productHeader: '$productHeader',
+                        organisationId: '$organisationId',
+                        bankId: '$bankId',
+                        bankName: '$bankName',
+                        bankStatus: '$bankStatus',
+                        lastTransactionsGet: '$lastTransactionsGet',
+                        lastTransactionsReceived: '$lastTransactionsReceived',
+                        status: '$status',
+                        statusReason: '$statusReason',
+                        region: '$region',
+                        feedSource: '$feedSource',
+                        internal: '$internal',
+                        created: '$created',
+                        isPlaceholder: '$isPlaceholder'
+                    }
+                },
+                total: { $sum: 1 },
+                bankNotSupported: { $sum: { $cond: [{ $eq: ['$bankStatus', 'not supported'] }, 1, 0] } },
+                manualUploadAccount: { $sum: { $cond: [{ $eq: ['$feedSource', 'manual'] }, 1, 0] } },
+                placeholderAccounts: { $sum: { $cond: [{ $eq: ['$isPlaceholder', true] }, 1, 0] } },
+            }
+        },
+        { $skip: skip },
+        { $limit: limit }
+    ]
+}
+
+var options = { allowDiskUse: true };
+db.getCollection('BankAccount').aggregate(pipeline(0, 10000), options)
+db.getCollection('BankAccount').aggregate(pipeline(10000, 10000), options)
+db.getCollection('BankAccount').aggregate(pipeline(20000, 10000), options)
+db.getCollection('BankAccount').aggregate(pipeline(30000, 10000), options)
+db.getCollection('BankAccount').aggregate(pipeline(40000, 10000), options)
+db.getCollection('BankAccount').aggregate(pipeline(50000, 10000), options)
+db.getCollection('BankAccount').aggregate(pipeline(60000, 10000), options)

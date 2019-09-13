@@ -1,0 +1,17 @@
+db.Bank.aggregate([
+    { $match: { 'aggregatorName': 'yodlee' } },
+    {
+        $group: {
+            _id: '$primaryCountry',
+            banks: {
+                $addToSet: {
+                    bankId: '$_id',
+                    name: '$name',
+                    status: '$status'
+                }
+            }
+        }
+    }
+], {
+    allowDiskUse: true
+})

@@ -1,0 +1,30 @@
+var pipeline = () => {
+    return [
+        { $match: { 'endDate': { $gte: new Date('2019-08-12 00:00:00.000Z') }, 'transactions.feedSource': 'manual' } },
+        { $unwind: { path: '$transactions', preserveNullAndEmptyArrays: false } },
+        {
+            $project: {
+                _id: 1,
+                bankAccountId: 1,
+                transactionId: '$transactions.uuid',
+                feedSource: '$transactions.feedSource'
+            }
+        },
+        { $match: { 'feedSource': 'manual' } },
+        {
+            $group: {
+                _id: '$bankAccountId',
+                numberOfTransactions: { $sum: 1 },
+            }
+        },
+        {
+            $group: {
+                _id: 1,
+                bankAccounts: { $addToSet: '$$ROOT' }
+            }
+        }
+    ]
+}
+
+var options = { allowDiskUse: true };
+db.getCollection('Transaction').aggregate(pipeline(), options)
