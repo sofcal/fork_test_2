@@ -79,7 +79,7 @@ const getTransactionSyncResultsImpl = Promise.method((self, { region, startDate,
     const promise = collection.aggregate([
         { $match: { status: { $in: statusWhitelist }, region, aggregatorName: { $in: aggregatorWhitelist } } },
         { $lookup: { from: 'Organisation', localField: 'organisationId', foreignField: '_id', as: 'organisationLookup' } },
-        { $project: { _id: 1, lastTransactionsReceived: 1, aggregatorName: 1, internal: 1, adminEmail: { $arrayElemAt: ['$organisationLookup.adminEmail', 0] } } },
+        { $project: { _id: 1, bankId: 1, lastTransactionsReceived: 1, aggregatorName: 1, internal: 1, adminEmail: { $arrayElemAt: ['$organisationLookup.adminEmail', 0] } } },
         { $match: { adminEmail: { $nin: emailBlacklist } } },
         {
             $group: {
@@ -93,7 +93,8 @@ const getTransactionSyncResultsImpl = Promise.method((self, { region, startDate,
                         statusMessage: '$internal.providerStatus.statusMessage',
                         statusCode: '$internal.providerStatus.statusCode'
                     }
-                }
+                },
+                banksWithThisStatus: { $addToSet: '$bankId' }
             }
         },
         {
@@ -108,7 +109,8 @@ const getTransactionSyncResultsImpl = Promise.method((self, { region, startDate,
                         status: '$status.status',
                         statusMessage: '$status.statusMessage',
                         statusCode: '$status.statusCode',
-                        total: '$total'
+                        total: '$total',
+                        banksWithThisStatus: '$banksWithThisStatus'
                     }
                 }
             }
