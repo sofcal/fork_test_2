@@ -1,0 +1,19 @@
+Extracts customer data per bankaccount; grouped by product.
+
+Scripts should be run in this order:
+* 1_euRegion_all.js:
+  ** will extract all required information from accounts and products hosted entirely within the EU region.
+  ** run each product group separately (see markers in file)
+  ** each results tab for the product will have between 0 and 10000 results - if the last tab has exactly 10000, add an
+      additional line to that group and increment the values accordingly
+  ** copy the results into files named after the products and postfixed with the index (ie sage.50.uki.acounts.1.json)
+* 2_usRegion_organisations.js:
+  ** will extract organisation information for Sage Financials, which is the only app hosted in the US that uses EU banks
+  ** copy the results into files named after the product and postfixed with organisation_index (ie sage.live.organisations.1.json)
+* 3_usRegion_accountIds.js:
+  ** will extract bankAccountIds for for Sage Financials, which is the only app hosted in the US that uses EU banks
+  ** copy the results into files named after the product and postfixed with ids_index (ie sage.live.ids.1.json)
+* 4_euRegion_accounts.js:
+  ** will extract all remaining required information from accounts on Sage Financials
+  ** copy the result of step 3 into the bankAccountIds array at the top of the script
+  ** copy the results into files named after the product and postfixed with index (ie sage.live.accounts.1.json)
