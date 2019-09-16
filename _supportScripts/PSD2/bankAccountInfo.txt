@@ -15,7 +15,6 @@ var pipeline = (skip, limit) => {
                 bankId: '$bankLookup._id',
                 bankName: '$bankLookup.name',
                 bankStatus: '$bankLookup.status',
-                productId: { $cond: [{ $not: ['$productLookup'] }, '35e1bc00-7183-408f-b363-a3a8eaeb2162', '$productLookup._id'] },
                 productHeader: { $cond: [{ $not: ['$productLookup'] }, 'sage.live', '$productLookup.header'] },
                 lastTransactionsGet: 1,
                 lastTransactionsReceived: 1,
@@ -34,7 +33,6 @@ var pipeline = (skip, limit) => {
                 accounts: {
                     $addToSet: {
                         bankAccountId: '$_id',
-                        productId: '$productId',
                         productHeader: '$productHeader',
                         organisationId: '$organisationId',
                         bankId: '$bankId',
