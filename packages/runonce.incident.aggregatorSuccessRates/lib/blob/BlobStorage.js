@@ -33,7 +33,7 @@ const storeResultsImpl = Promise.method((self, { keyPostfix, results, stringifie
     logger.debug({ function: func, log: 'started' });
 
     const utc = moment.utc();
-    const key = `${consts.KEY_PREFIX}/${utc.format('YYYY-MM-DD')}/${utc.format('HH:mm:ss')}_${keyPostfix}.json`;
+    const key = `${consts.KEY_PREFIX}/${utc.format('YYYYMMDD_HHmmss')}_${keyPostfix}`;
     const data = stringified || JSON.stringify(results);
 
     const readable = stringToBuffer(data);

@@ -1,5 +1,8 @@
 'use strict';
 
+const { tasks } = require('./resources');
+const flows = require('./flows');
+
 const validate = require('./validators');
 const ErrorSpecs = require('./ErrorSpecs');
 const keys = require('./params');
@@ -12,7 +15,6 @@ const DB = require('@sage/bc-services-db');
 const S3 = require('@sage/bc-services-s3');
 const { Handler } = require('@sage/bc-independent-lambda-handler');
 
-const Big = require('bignumber.js');
 const Promise = require('bluebird');
 const _ = require('underscore');
 
@@ -51,81 +53,63 @@ class CheckAggregatorSuccessLambda extends Handler {
     impl(event, { logger }) {
         const func = `${CheckAggregatorSuccessLambda.name}.impl`;
         // get details from event
-        const { switchOverDate: startDate, countryCodes, emailBlacklist, aggregatorWhitelist } = event.parsed;
-        logger.info({function: func, log: 'started', params: { }});
+        const { startDate, countryCodes, emailBlacklist, aggregatorWhitelist, taskWhitelist } = event.parsed;
+        logger.info({function: func, log: 'started', params: { startDate, countryCodes, aggregatorWhitelist, taskWhitelist }});
 
         const dbQueries = DBQueries.Create(this.services.db.getConnection());
         const blob = new BlobStorage({ s3: this.services.s3, region: this.config.region, bucketName: this.config.bucket });
 
-        const all = {
-            manualUploadCounts: {},
-            transactionSyncResults: {}
-        };
+        const data = {};
+        _.each(taskWhitelist, (task) => data[task] = {});
 
         return Promise.each(countryCodes,
-            (cc) => {
-                return Promise.resolve(undefined)
-                    .then(() => {
-                        logger.info({function: func, log: 'manual upload CHECK for countryCode: STARTED', params: { countryCode: cc, aggregatorWhitelist }});
-                        return dbQueries.getManualUploadedCounts({ region: cc, startDate, emailBlacklist, aggregatorWhitelist, all: true }, { logger: event.logger })
-                            .then((resultsPerAggregator = []) => {
-                                all.manualUploadCounts[cc] = {};
-                                _.each(aggregatorWhitelist, (aggregator) => {
-                                    logger.info({function: func, log: 'manual upload PARSING for countryCode', params: { countryCode: cc, aggregator }});
-                                    const { bankAccounts = [] } = _.find(resultsPerAggregator, (a) => a._id === aggregator) || {};
-                                    all.manualUploadCounts[cc][aggregator] = {
-                                        totalBankAccounts: bankAccounts.length,
-                                        totalOrganisations: _.uniq(bankAccounts, false, (ba) => ba.organisationId).length,
-                                        results: bankAccounts
-                                    };
-                                });
+            (countryCode) => {
+                return Promise.each(taskWhitelist,
+                    (task) => {
+                        if (!_.contains(taskWhitelist, task)) {
+                            logger.info({function: func, log: 'SKIPPING task RETRIEVE', params: { task, countryCode }});
+                            return undefined;
+                        }
 
-                                logger.info({function: func, log: 'manual upload CHECK for countryCode: ENDED', params: { countryCode: cc }});
-                            })
-                    })
-                    .then(() => {
-                        logger.info({function: func, log: 'transaction sync CHECK for countryCode: STARTED', params: { countryCode: cc, aggregatorWhitelist }});
-                        return dbQueries.getTransactionSyncResults({ region: cc, startDate, emailBlacklist, aggregatorWhitelist, all: true }, { logger: event.logger })
-                            .then((resultsPerAggregator = []) => {
-                                all.transactionSyncResults[cc] = {};
-                                _.each(aggregatorWhitelist, (aggregator) => {
-                                    logger.info({function: func, log: 'transaction sync PARSING for countryCode', params: { countryCode: cc, aggregator }});
-                                    all.transactionSyncResults[cc][aggregator] = _.find(resultsPerAggregator, (rpa) => rpa._id === aggregator) || {};
-                                });
-
-                                logger.info({function: func, log: 'transaction sync CHECK for countryCode: ENDED', params: { countryCode: cc }});
-                            })
-                    })
+                        logger.info({function: func, log: 'STARTED task RETRIEVE', params: { task, countryCode }});
+                        return flows[task].retrieve({ data, task, countryCode, dbQueries, blob, event }, { logger })
+                            .then(() => logger.info({function: func, log: 'ENDED task RETRIEVE', params: { task, countryCode }}));
+                    });
             })
             .then(() => {
                 const keys = {};
-                return Promise.resolve(undefined)
-                    .then(() => {
-                        const keyPostfix = 'manual_upload_counts';
-                        logger.info({function: func, log: 'S3 upload STARTED', params: { keyPostfix }});
-                        return blob.storeResults({ keyPostfix, results: all.manualUploadCounts }, { logger })
-                            .then(({ key }) => {
-                                keys.manual_upload_counts = key;
-                                logger.info({function: func, log: 'S3 upload ENDED', params: { keyPostfix }});
-                            });
-                    })
-                    .then(() => {
-                        const keyPostfix = 'transaction_syncs';
-                        logger.info({function: func, log: 'S3 upload STARTED', params: { keyPostfix }});
-                        return blob.storeResults({ keyPostfix, results: all.transactionSyncResults }, { logger })
-                            .then(({ key }) => {
-                                keys.transaction_sync_results = key;
-                                logger.info({function: func, log: 'S3 upload ENDED', params: { keyPostfix }});
+
+                return Promise.each(taskWhitelist,
+                    (task) => {
+                        if (!_.contains(taskWhitelist, task)) {
+                            logger.info({ function: func, log: 'SKIPPING task STORE', params: { task }});
+                            return undefined;
+                        }
+
+                        const store = flows[task].store || defaultStore;
+
+                        logger.info({function: func, log: 'STARTED task STORE', params: { task }});
+                        return store({ data, task, dbQueries, blob, event }, { logger })
+                            .then((result) => {
+                                keys[task] = result;
+                                logger.info({function: func, log: 'ENDED task STORE', params: { task }});
                             });
                     })
                     .then(() => keys);
-            });
+            })
     }
 
     dispose({ logger }) { // eslint-disable-line class-methods-use-this
         return disconnectDB(this.services, logger);
     }
 }
+
+const defaultStore = Promise.method(({ data, task, dbQueries, blob, event }, { logger }) => {
+    return blob.storeResults({ keyPostfix: `${task}.json`, results: data[task] }, { logger })
+        .then(({ key }) => {
+            return [key];
+        });
+});
 
 const getParams = ({ env, region }, logger) => {
     const func = 'handler.getParams';
@@ -202,12 +186,7 @@ const disconnectDB = Promise.method((services, logger) => {
 });
 
 const consts = {
-    DB: 'bank_db',
-    SWITCHOVER_DATE: new Date('2019-09-12T06:00:00.000Z'),
-    COUNTRY_CODES: ['IRL', 'GBR', 'FRA', 'ESP'],
-    FILTER_EMAILS: [
-
-    ]
+    DB: 'bank_db'
 };
 
 module.exports = CheckAggregatorSuccessLambda;

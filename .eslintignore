@@ -9,6 +9,7 @@ packages/**/nyc_output/*
 packages/**/node_modules/*
 
 build/*
+_supportScripts
 reports/*
 templates/*
 jspm_packages/*

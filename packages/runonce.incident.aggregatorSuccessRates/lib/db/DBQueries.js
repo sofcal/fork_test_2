@@ -21,6 +21,10 @@ class DBQueries {
     getTransactionSyncResults(...args) {
         return getTransactionSyncResultsImpl(this, ...args);
     }
+
+    getBankInfo(...args) {
+        return getBankInfoImpl(this, ...args);
+    }
 }
 
 const getManualUploadedCountsImpl = Promise.method((self, { region, startDate, emailBlacklist = [], aggregatorWhitelist = [], all = false }, { logger }) => {
@@ -113,6 +117,41 @@ const getTransactionSyncResultsImpl = Promise.method((self, { region, startDate,
                         banksWithThisStatus: '$banksWithThisStatus'
                     }
                 }
+            }
+        }
+    ], consts.DEFAULT_OPTIONS);
+
+    const hr = timer.start();
+
+    return Promise.resolve(undefined)
+        .then(() => {
+            if (!all) {
+                logger.debug({ function: func, log: 'ended - all not specified, returning cursor', params: { all } });
+                return promise
+            }
+
+            logger.debug({ function: func, log: 'WARNING: requesting all results without a cursor could present a performance issue', params: { all } });
+            logger.debug({ function: func, log: 'ended - all specified; returning entire array', params: { all } });
+            return promise.toArray()
+                .then((results = []) => results)
+        })
+        .finally(() => {
+            timer.end(hr);
+        })
+});
+
+const getBankInfoImpl = Promise.method((self, { region, aggregatorWhitelist = [], all = false }, { logger }) => {
+    const func = `${consts.LOG_PREFIX}.getBankAccountsById`;
+    logger.debug({ function: func, log: 'started', params: { all, region, aggregatorWhitelist } });
+
+    const collection = self.db.collection('Bank');
+
+    const promise = collection.aggregate([
+        { $match: { primaryCountry: region, aggregatorName: { $in: aggregatorWhitelist } } },
+        {
+            $group: {
+                _id: '$aggregatorName',
+                banks: { $addToSet: { bankId: '$_id', bankName: '$name', status: '$status', aggregatorId: '$aggregatorId' } }
             }
         }
     ], consts.DEFAULT_OPTIONS);
