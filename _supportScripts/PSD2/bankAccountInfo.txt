@@ -27,6 +27,8 @@ var pipeline = (skip, limit) => {
                 isPlaceholder: '$featureOptions.isPlaceholder'
             }
         },
+        { $skip: skip },
+        { $limit: limit },
         {
             $group: {
                 _id: 1,
@@ -54,9 +56,7 @@ var pipeline = (skip, limit) => {
                 manualUploadAccount: { $sum: { $cond: [{ $eq: ['$feedSource', 'manual'] }, 1, 0] } },
                 placeholderAccounts: { $sum: { $cond: [{ $eq: ['$isPlaceholder', true] }, 1, 0] } },
             }
-        },
-        { $skip: skip },
-        { $limit: limit }
+        }
     ]
 }
 
