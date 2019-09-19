@@ -1,9 +1,9 @@
 {
   "name": "@sage/sfab-s2s-jwt-legacy-wrapper",
-  "version": "1.1.12",
+  "version": "1.1.71",
   "author": "Sage UK",
   "license": "ISC",
-  "description": "Banking Cloud data cache module",
+  "description": "Legacy Wrapper for components used within Banking Cloud. These modules are installed locally using npm > 6 and then copied into the Banking Cloud solution to reduce dependency overhead (due to BC's use of npm 2.15.1)",
   "main": "lib/index.js",
   "private": true,
   "directories": {
@@ -14,16 +14,23 @@
     "access": "public"
   },
   "dependencies": {
-    "@sage/bc-services-step": "^1.1.12",
-    "@sage/sfab-s2s-jwt-authenticator": "^1.1.12",
-    "@sage/sfab-s2s-jwt-cache": "^1.1.12",
-    "@sage/sfab-s2s-jwt-endpoint-store": "^1.1.12",
-    "@sage/sfab-s2s-jwt-issuer": "^1.1.12",
-    "@sage/sfab-s2s-jwt-jwks": "^1.1.12",
-    "@sage/sfab-s2s-jwt-kid": "^1.1.12"
+    "@sage/bc-contracts-predictedaction": "^1.1.71",
+    "@sage/bc-contracts-rule": "^1.1.71",
+    "@sage/bc-jsonschema-to-statuscodeerror": "^1.1.71",
+    "@sage/bc-processing-rules": "^1.1.71",
+    "@sage/bc-services-parameter": "^1.1.71",
+    "@sage/bc-services-step": "^1.1.71",
+    "@sage/bc-statuscodeerror": "^1.1.71",
+    "@sage/sfab-s2s-jwt-authenticator": "^1.1.71",
+    "@sage/sfab-s2s-jwt-cache": "^1.1.71",
+    "@sage/sfab-s2s-jwt-endpoint-store": "^1.1.71",
+    "@sage/sfab-s2s-jwt-issuer": "^1.1.71",
+    "@sage/sfab-s2s-jwt-jwks": "^1.1.71",
+    "@sage/sfab-s2s-jwt-kid": "^1.1.71",
+    "@sage/sfab-workers-clam-av": "^1.1.71"
   },
   "devDependencies": {
-    "@sage/bc-debug-utils": "^1.1.12",
+    "@sage/bc-debug-utils": "^1.1.71",
     "eslint": "^4.11.0",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-plugin-import": "^2.8.0",

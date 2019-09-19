@@ -3,7 +3,7 @@
 const Promise = require('bluebird');
 const DbQueries = require('./dbQueries');
 const _ = require('underscore');
-const ParameterStoreStaticLoader = require('@sage/bc-parameterstore-static-loader');
+const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
 const BcServicesDb = require('@sage/bc-services-db');
 const crypto = require('crypto');
 const { RequestLogger } = require('@sage/bc-requestlogger');
@@ -112,35 +112,35 @@ const connectDB = (services) => {
         });
 };
 
-const getServices = (_env, _region, _params, _services) => {
+const getServices = (env, region, _params, _services) => {
     const username = _params['defaultMongo.username'];
     const password = _params['defaultMongo.password'];
     const replicaSet = _params['defaultMongo.replicaSet'];
     const { domain } = _params;
     const services = _services;
 
-    services.db = new serviceImpls.DB({ _env, _region, domain, username, password, replicaSet, db: dbName });
+    services.db = new serviceImpls.DB({ env, region, domain, username, password, replicaSet, db: dbName });
 
     return services;
 };
 
-const getParams = (_env, _region) => {
+const getParams = (env, region) => {
     const func = 'handler.getParams';
     const keys = ['domain', 'defaultMongo.username', 'defaultMongo.password', 'defaultMongo.replicaSet', 'keyRotation.exclusions'];
-    const paramPrefix = `/${_env}/`;
+    const paramPrefix = `/${env}/`;
 
-    const tmpParams = {};
+    const params = {};
     logger.info({ function: func, log: `retrieving keys ${keys} ${paramPrefix}` });
 
-    const loader = new ParameterStoreStaticLoader({ keys, paramPrefix, env: { _region } });
-    return loader.load(tmpParams)
+    const loader = new ParameterStoreStaticLoader({ keys, paramPrefix, env: { region } });
+    return loader.load(params)
         .then(() => {
-            const retrieved = Object.keys(tmpParams).length;
+            const retrieved = Object.keys(params).length;
             if (!retrieved || retrieved < keys.length) {
                 throw new Error('failed to retrieved params');
             }
-            tmpParams['keyRotation.exclusions'] = JSON.parse(tmpParams['keyRotation.exclusions']);
-            logger.info({ function: func, log: `retrieved keys - requested: ${keys.length}; retrieved: ${Object.keys(tmpParams).length}` });
-            return tmpParams;
+            params['keyRotation.exclusions'] = JSON.parse(params['keyRotation.exclusions']);
+            logger.info({ function: func, log: `retrieved keys - requested: ${keys.length}; retrieved: ${Object.keys(params).length}` });
+            return params;
         });
 };

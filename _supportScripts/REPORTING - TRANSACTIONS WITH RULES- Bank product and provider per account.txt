@@ -1,0 +1,29 @@
+DBQuery.shellBatchSize = 20000;
+db.Organisation.aggregate([
+{ $unwind: { path: '$products', preserveNullAndEmptyArrays: false } },
+{ $lookup: { from: 'Product', localField: 'products.productId', foreignField: '_id', as: 'prod'}},
+{ $unwind: '$prod' },
+{ $unwind: { path: '$bankAccounts', preserveNullAndEmptyArrays: false } },
+{ $lookup: { from: 'BankAccount', localField: 'bankAccounts.bankAccountId', foreignField: '_id', as: 'baDetail'}}, 
+{ $unwind: '$baDetail' },
+{ $lookup: { from: 'Bank', localField: 'baDetail.bankId', foreignField: '_id', as: 'bnkDetail'}}, 
+{ $unwind: '$bnkDetail' },
+{ $lookup: { from: 'Transaction', localField: 'bankAccounts.bankAccountId', foreignField: 'bankAccountId', as: 'transLookup'}},
+{ $unwind: { path: '$transLookup', preserveNullAndEmptyArrays: false } },
+{ $unwind: { path: '$transLookup.transactions', preserveNullAndEmptyArrays: false } },
+{ $unwind: { path: '$transLookup.transactions.accountsPostings', preserveNullAndEmptyArrays: false } },
+{
+        $project: {
+            _id: '$products.productId',
+            productName: '$prod.name',
+            bankname: '$bnkDetail.name',
+            dataProvider: '$bnkDetail.dataProvider',
+    providerId:'$bnkDetail.aggregatorId',
+    bankAccountStatus: '$baDetail.status'
+
+        }
+    }
+],
+{
+allowDiskUse: true
+})

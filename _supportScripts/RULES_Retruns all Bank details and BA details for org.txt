@@ -1,0 +1,29 @@
+DBQuery.shellBatchSize = 20000;
+db.Rule.aggregate([
+{ $lookup: { from: 'Organisation', localField: 'organisationId', foreignField: '_id', as: 'org'}},
+{ $unwind: '$org' },
+{ $unwind: { path: '$org.products', preserveNullAndEmptyArrays: false } },
+{ $lookup: { from: 'Product', localField: 'org.products.productId', foreignField: '_id', as: 'prod'}},
+{ $unwind: '$prod' },
+{ $lookup: { from: 'BankAccount', localField: 'bankAccountId', foreignField: '_id', as: 'baDetail'}}, 
+{ $unwind: { path: '$baDetail', preserveNullAndEmptyArrays: false } },
+{ $unwind: '$baDetail' },
+{ $lookup: { from: 'Bank', localField: 'baDetail.bankId', foreignField: '_id', as: 'bnkDetail'}}, 
+{ $unwind: '$bnkDetail' },
+
+{
+$project: {
+    _id: '$bankAccountId',
+    orgId: '$organisationId',
+    productName: '$prod.name',
+    bankname: '$bnkDetail.name',
+    bankAccount: '$rulesLookup.bankAccountId',
+    dataProvider: '$bnkDetail.dataProvider',       
+    providerId:'$bnkDetail.aggregatorId',
+    bankAccountStatus: '$baDetail.status'
+        }
+    }, 
+],
+{
+allowDiskUse: true
+})
