@@ -5,7 +5,13 @@ const Promise = require('bluebird');
 
 class DB {
     constructor(options) {
-        this.connectionString = getConnectionString(options);
+        if (options.connectionString) {
+            this.connectionString = options.connectionString;
+        } else {
+            this.connectionString = getConnectionString(options);
+        }
+
+        this.sslCA = options.sslCA;
         this._MongoClient = MongoClient;
     }
 
@@ -32,8 +38,17 @@ class DB {
 
 const connectImpl = Promise.method((self) => {
     const url = self.connectionString;
+    let options;
 
-    return self._MongoClient.connect(url)
+    if (self.sslCA) {
+        options = {
+            ssl: true,
+            sslCA: self.sslCA
+        }
+    }
+
+
+    return self._MongoClient.connect(url, options)
         .then((client) => {
             self.client = client; // eslint-disable-line no-param-reassign
             return client.db();
