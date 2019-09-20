@@ -1,11 +1,11 @@
 'use strict';
 
 const resources = require('@sage/bc-common-resources');
-const Rule = require('@sage/bc-rule');
+const { Rule } = require('@sage/bc-contracts-rule');
 const { StatusCodeErrorItem, StatusCodeError } = require('@sage/bc-statuscodeerror');
 const utils = require('@sage/bc-validators');
 const serviceUtils = require('@sage/bc-services-utils');
-const PredictedAction = require('./PredictedAction');
+const PredictedAction = require('@sage/bc-contracts-predictedaction');
 const util = require('util');
 const _ = require('underscore');
 const { format } = util;
