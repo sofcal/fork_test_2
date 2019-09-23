@@ -10,7 +10,7 @@
     "prebuild": "lerna bootstrap --hoist --no-hoist=@sage/*",
     "build": "lerna run build",
     "unlock": "rimraf package-lock.json && lerna run unlock",
-    "test": "NODE_ENV=test nyc --cache false mocha -b --colors \"./test/unit/index.spec.js\"",
+    "test": "NODE_ENV=test nyc --cache false --x **/test/ --x **/packages/test/ -x **/packages/internal.*/src/* mocha -b --colors \"./test/unit/**/*.spec.js\"",
     "cover": "NODE_ENV=test npm run test && nyc report --reporter=lcov",
     "report": "open coverage/lcov-report/index.html",
     "lint": "eslint ./packages/**",
