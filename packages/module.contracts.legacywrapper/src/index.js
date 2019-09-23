@@ -13,7 +13,7 @@ const servicesUtils = require('@sage/bc-services-utils');
 const UncappedQuery = require('@sage/bc-uncappedquery');
 const Transaction = require('@sage/bc-contracts-transaction');
 const helpersWrapper = require('@sage/bc-common-helpers');
-const Lock = require('@sage/bc-contracts-lock');
+const Lock = require('@sage/bc-lock');
 const Quarantine = require('@sage/bc-contracts-quarantine');
 const Bank = require('@sage/bc-bank');
 
