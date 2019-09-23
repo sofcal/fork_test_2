@@ -19,7 +19,6 @@ Lock.validate = function (lock) {
 let p = Lock.prototype;
 
 p.checkLocked = function (entity) {
-
     if (this.uuid !== entity.uuid) {
         this.logger.error({function: 'Lock.CheckLock', msg: 'Invalid lock - wrong object.', params: {uuid: this.uuid}});
         throw new Error('Check lock failed.  Applies to: ' + this.uuid + ' not:' + entity.uuid);
