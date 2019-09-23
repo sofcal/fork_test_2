@@ -64,6 +64,7 @@ function Transaction(data) {
         this.internalProcessingStatus = data.internalProcessingStatus;
         this.raw = data.raw;
         this.validationStatus = data.validationStatus || Transaction.validationStatus.notValidated;
+        this.feedSource = data.feedSource || Transaction.feedSources.auto;
         this.actualAction = data.actualAction;
         this.providerAdditionalFields = data.providerAdditionalFields || [];
         this.predictedActions = _.map(data.predictedActions || [], (p) => (new PredictedAction(p)));
@@ -147,7 +148,7 @@ Transaction.validate = function(transaction, noThrow, sm) {
             { path: 'netAmount', custom: validateNumber, optional: true },
             { path: 'taxAmount', custom: validateNumber, optional: true },
             { path: 'accountantNarrative', custom: _.isString, optional: true, allowNull: true },
-            { path: 'postingInstructions', nested: validatePostingsInstructions, optional: true }
+            { path: 'postingInstructions', arrayCustom: validateActualActionPostingsInstructions, optional: true, allowNull: true }
         ];
 
         const valType = utils.validateTypeNoThrow(value, Object, { path: 'accountsPostings', prefix: Transaction.name });
@@ -231,6 +232,8 @@ Transaction.validate = function(transaction, noThrow, sm) {
     };
     const validateValidationStatus = (validationStatus) => _.contains(_.values(Transaction.validationStatus), validationStatus);
 
+    const validateFeedSource = (feedSource) => _.contains(_.values(Transaction.feedSources), feedSource);
+
     const validateProviderAdditionalFields = (fields) => {
         const items = [];
         _.each(fields, (field) => {
@@ -274,6 +277,7 @@ Transaction.validate = function(transaction, noThrow, sm) {
         { path: 'coordinates', nested: validateCoordinates },
         { path: 'raw', nested: validateRaw, optional: true, allowNull: true },
         { path: 'validationStatus', custom: validateValidationStatus, optional: true, allowNull: true },
+        { path: 'feedSource', custom: validateFeedSource, optional: true, allowNull: true },
         { path: 'actualAction', nested: validateActualAction, optional: true, allowNull: true },
         { path: 'providerAdditionalFields', arrayCustom: validateProviderAdditionalFields, allowEmptyArray: true },
         { path: 'predictedActions', custom: validatePredictedActions, allowEmptyArray: true }
@@ -417,6 +421,7 @@ const _Keys = [
     { canCreate: false, canUpdate: false, id: 'uuid' },
     { canCreate: false, canUpdate: false, id: 'raw' },
     { canCreate: false, canUpdate: false, id: 'validationStatus' },
+    { canCreate: false, canUpdate: false, id: 'feedSource' },
     { canCreate: false, canUpdate: false, id: 'providerAdditionalFields' },
     { canCreate: false, canUpdate: false, id: 'predictedActions' },
 
@@ -459,4 +464,9 @@ Transaction.validationStatus = Object.freeze({
     notValidated: 'notValidated',
     manual: 'manual',
     auto: 'auto'
+});
+
+Transaction.feedSources = Object.freeze({
+    auto: 'auto',
+    manual: 'manual'
 });
