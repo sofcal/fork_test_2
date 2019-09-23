@@ -207,6 +207,13 @@ describe('@sage/bc-Transaction.Transaction', function(){
                     should(transaction.providerAdditionalFields).eql([]);
                 });
 
+                it('should default feedSource to auto', function() {
+                    let transactionData = freshTransactionData();
+                    let transaction = new Transaction(transactionData);
+
+                    should(transaction.feedSource).eql(Transaction.feedSources.auto);
+                });
+
                 describe('coordinates', function() {
 
                     it('should default if coordinates is undefined', function(done) {
@@ -683,6 +690,17 @@ describe('@sage/bc-Transaction.Transaction', function(){
                         {it: 'should throw if internalProcessingStatus is an object', value: {}, error: true}
                     ]
                     , errorCode: common.services.transaction.InvalidInternalProcessingStatus, errorNumber: 400
+                }, {
+                    target: 'feedSource', tests: [
+                        { it: 'should not throw if feedSource is undefined', value: undefined, error: false },
+                        { it: 'should not throw if feedSource is null', value: null, error: false },
+                        { it: 'should not throw if feedSource is a valid string', value: Transaction.feedSources.manual, error: false },
+                        { it: 'should throw if feedSource is invalid string', value: 'string', error: true },
+                        { it: 'should throw if feedSource is a boolean', value: true, error: true },
+                        { it: 'should throw if feedSource is a number', value: 100, error: true },
+                        { it: 'should throw if feedSource is a date', value: new Date(), error: true },
+                        { it: 'should throw if feedSource is an object', value: {}, error: true }
+                    ]
                 }, {
                     target: 'raw', tests: [
                         {it: 'should not throw if raw is undefined', value: undefined, error: false},
@@ -1921,6 +1939,7 @@ describe('@sage/bc-Transaction.Transaction', function(){
                     'datePosted',
                     'dateUserInitiated',
                     'extendedName',
+                    'feedSource',
                     'incrementedId',
                     'name',
                     'narrative1',

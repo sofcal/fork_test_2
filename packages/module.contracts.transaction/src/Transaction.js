@@ -193,7 +193,7 @@ Transaction.validate = function(transaction, noThrow, sm) {
                 { path: 'netAmount', custom: validateNumber, optional: true },
                 { path: 'taxAmount', custom: validateNumber, optional: true },
                 { path: 'accountantNarrative', custom: _.isString, optional: true, allowNull: true },
-                { path: 'postingInstructions', arrayCustom: validateActualActionPostingsInstructions, optional: true }
+                { path: 'postingInstructions', arrayCustom: validateActualActionPostingsInstructions, optional: true, allowNull: true }
             ];
         items.push(...utils.validateContractObjectNoThrow(accountPosting, Object, properties, 'accountsPostings'));
     });
