@@ -50,6 +50,8 @@ module.exports = (function() {
     ns.sageindirectzaf = 'eaf6f40a-9714-4c36-be02-b0318abecdc6';
     ns.sageindirectaus = '7b0964d9-7e4d-4b7b-999d-098d4910b1a4';
     ns.sageIndirectMys = '8d95b304-dbfa-444b-9828-f93b97bff1d6';
+    ns.sageManualUploadBank = '7966800c-b4ff-4dc9-a6ef-756319c39ee2';
+    ns.sageIndirectGbrNoIframe = '843a95dd-55a1-4f06-a376-273b88949a2f';
     ns.tide = '8ccee59e-d837-4d1b-8d79-5a664971af8a';
 
     Object.freeze(ns);
