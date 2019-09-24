@@ -5,4 +5,5 @@ module.exports = {
     validateContractObject,
     validateContractObjectNoThrow,
     validateTypeNoThrow,
+
 };
