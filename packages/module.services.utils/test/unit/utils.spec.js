@@ -94,7 +94,7 @@ describe('@sage/bc-services-utils.utils', () => {
                     should(err).be.an.instanceOf(StatusCodeError);
                     should(err).have.property('statusCode', statCode);
                     should(err).have.property('items').which.is.Array().of.length(1);
-                    should(err.items).be.eql(errItems);
+                    should(err.items[0]).be.instanceOf(StatusCodeErrorItem);
                 });
         });
 
