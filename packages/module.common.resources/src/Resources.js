@@ -318,7 +318,9 @@ module.exports = (function() {
             bankAuthorisationToken: /^.{1,256}$/,
             status: /^pending|active|authRequired|verifyingAuth|cancelled|invalid/,
             accountName: /^.{1,128}$/,
-            accountantLinkCode: /^[a-fA-F0-9]{8}$/
+            accountantLinkCode: /^[a-fA-F0-9]{8}$/,
+            statusReason: /^noBankFeedAvailable|bankFeedAvailable|standardAuthentication|standardFlow/,
+            yodleeMigrationProgress: /^migrationComplete|migrationInProgress/,
         },
         claim: {
             identity: /^.{1,128}$/,
