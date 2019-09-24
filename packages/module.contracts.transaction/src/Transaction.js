@@ -148,7 +148,7 @@ Transaction.validate = function(transaction, noThrow, sm) {
             { path: 'netAmount', custom: validateNumber, optional: true },
             { path: 'taxAmount', custom: validateNumber, optional: true },
             { path: 'accountantNarrative', custom: _.isString, optional: true, allowNull: true },
-            { path: 'postingInstructions', arrayCustom: validateActualActionPostingsInstructions, optional: true, allowNull: true }
+            { path: 'postingInstructions', nested: validatePostingsInstructions, optional: true }
         ];
 
         const valType = utils.validateTypeNoThrow(value, Object, { path: 'accountsPostings', prefix: Transaction.name });

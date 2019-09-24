@@ -21,16 +21,11 @@ const servicesUtils = {
                     }
 
                     if (err instanceof ApplicationError) {
-                        throw new StatusCodeError(err.items, err.statusCode);
+                        const items = _.map(err.items, (item) => StatusCodeErrorItem.Create(item.code || null, item.message, item.params));
+                        throw StatusCodeError.Create(items, err.statusCode);
                     }
 
-                    throw new StatusCodeError(
-                        [
-                            new StatusCodeErrorItem(resources.services.common.UnknownErrorCode, err.message)
-                        ],
-                        400,
-                        err.stack
-                    );
+                    throw StatusCodeError.Create([StatusCodeErrorItem.Create(resources.services.common.UnknownErrorCode, err.message)], 400, err.stack);
                 });
         });
     },
