@@ -169,6 +169,7 @@ describe('@sage/bc-bank.Bank', () => {
                     should(bank.offBoardingMechanism).eql(offBoarding);
                     should(bank.proxy).eql(proxy);
                     should(bank.supportiframe).eql(false);
+                    bank.internal.should.eql({"longURL": false});
 
                     done();
                 } catch (err) {
@@ -194,6 +195,7 @@ describe('@sage/bc-bank.Bank', () => {
                     should(bank.internalStatuses).eql([]);
                     should(bank.quarantine).eql({ forceQuarantine: false, transactionTypes: [] });
                     should(bank.offBoardingMechanism).eql({ type: Bank.offBoardingTypes.none, instructions: '' });
+                    bank.internal.should.eql({"longURL": false});
                     should(bank.proxy).be.null();
                     should(bank.supportiframe).eql(true);
                     should(bank.dataProvider).eql(Bank.dataProviders.direct);
@@ -466,6 +468,11 @@ describe('@sage/bc-bank.Bank', () => {
                         { it: 'should throw if supportiframe is a string', value: 'true', error: true },
                         { it: 'should throw if supportiframe is a number', value: 0, error: true },
                         { it: 'should throw if supportiframe is an object', value: {}, error: true }
+                    ]
+                }, {
+                    target: 'internal.longURL', tests: [
+                        { it: 'should not throw if internal.longURL is boolean true', value: true, error: false },
+                        { it: 'should not throw if internal.longURL is boolean false', value: false, error: false }
                     ]
                 }, {
                     target: 'quarantine',
@@ -1445,6 +1452,7 @@ describe('@sage/bc-bank.Bank', () => {
                     should.not.exists(bank.offBoardingMechanism.emailTitle);
                     should.not.exists(bank.proxy);
                     should.not.exists(bank.internalStatuses);
+                    should.not.exists(bank.internal);
 
                     done();
                 } catch (err) {
