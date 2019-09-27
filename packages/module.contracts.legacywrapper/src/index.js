@@ -1,9 +1,9 @@
 'use strict';
 
 const validators = require('@sage/bc-validators');
-const Resources = require('@sage/bc-common-resources');
+const commonResources = require('@sage/bc-common-resources');
 const statusCodeError = require('@sage/bc-statuscodeerror');
-const AdapterResources = require('@sage/bc-adapterresources');
+const adaptersResources = require('@sage/bc-adapterresources');
 const AlertTypes = require('@sage/bc-alerttypes');
 const bankIds = require('@sage/bc-bankids');
 const ProductIds = require('@sage/bc-productids');
@@ -19,9 +19,9 @@ const Bank = require('@sage/bc-bank');
 
 module.exports = {
     validators,
-    Resources,
+    resources,
     statusCodeError,
-    AdapterResources,
+    adaptersResources,
     AlertTypes,
     bankIds,
     ProductIds,

@@ -1,11 +1,11 @@
 const index = require('../../lib/index');
-const AdapterResources = require('../../lib/AdapterResources');
+const resources = require('../../lib/resources');
 const should = require('should');
 
-describe('@sage/bc-adapter-resources.index', function(){
+describe('@sage/bc-adapters-resources.index', function(){
     // placeholder
     it('should export the correct modules', (done) => {
-        should(index).eql(AdapterResources);
+        should(index).eql(resources);
         done();
     });
 });

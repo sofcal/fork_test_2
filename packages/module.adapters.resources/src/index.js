@@ -1,3 +1,3 @@
-const AdapterResources = require('./AdapterResources');
- 
-module.exports = AdapterResources;
+const resources = require('./resources');
+
+module.exports = resources;

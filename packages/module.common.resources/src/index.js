@@ -1,3 +1,3 @@
-const Resources = require('./Resources.js');
+const resources = require('./resources.js');
 
-module.exports = Resources;
+module.exports = resources;
