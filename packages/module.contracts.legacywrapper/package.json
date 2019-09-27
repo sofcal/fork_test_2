@@ -1,6 +1,6 @@
 {
   "name": "@sage/bc-contracts-legacy-wrapper",
-  "version": "1.1.58",
+  "version": "1.1.72",
   "author": "Sage UK",
   "license": "ISC",
   "description": "contracts legacy wrapper",
@@ -16,20 +16,20 @@
   "dependencies": {
     "@sage/bc-adapterresources": "^1.1.23",
     "@sage/bc-alerttypes": "^1.1.22",
-    "@sage/bc-bank": "^1.1.58",
-    "@sage/bc-bankids": "^1.1.19",
-    "@sage/bc-common-helpers": "^1.1.56",
-    "@sage/bc-common-resources": "^1.1.23",
-    "@sage/bc-contracts-quarantine": "^1.1.56",
-    "@sage/bc-contracts-transaction": "^1.1.56",
+    "@sage/bc-bank": "^1.1.72",
+    "@sage/bc-bankids": "^1.1.72",
+    "@sage/bc-common-helpers": "^1.1.72",
+    "@sage/bc-common-resources": "^1.1.72",
+    "@sage/bc-contracts-quarantine": "^1.1.72",
+    "@sage/bc-contracts-transaction": "^1.1.72",
     "@sage/bc-lock": "^1.1.52",
     "@sage/bc-productids": "^1.1.23",
     "@sage/bc-rule": "^1.1.29",
     "@sage/bc-servicenames": "^1.1.23",
-    "@sage/bc-services-utils": "^1.1.56",
-    "@sage/bc-statuscodeerror": "^1.1.32",
+    "@sage/bc-services-utils": "^1.1.72",
+    "@sage/bc-statuscodeerror": "^1.1.72",
     "@sage/bc-uncappedquery": "^1.1.52",
-    "@sage/bc-validators": "^1.1.38"
+    "@sage/bc-validators": "^1.1.72"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
