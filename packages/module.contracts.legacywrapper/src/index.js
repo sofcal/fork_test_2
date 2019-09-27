@@ -4,9 +4,9 @@ const validators = require('@sage/bc-validators');
 const commonResources = require('@sage/bc-common-resources');
 const statusCodeError = require('@sage/bc-statuscodeerror');
 const adaptersResources = require('@sage/bc-adapterresources');
-const AlertTypes = require('@sage/bc-alerttypes');
+const alertTypes = require('@sage/bc-alerttypes');
 const bankIds = require('@sage/bc-bankids');
-const ProductIds = require('@sage/bc-productids');
+const productIds = require('@sage/bc-productids');
 const ServiceNames = require('@sage/bc-servicenames');
 const Rule = require('@sage/bc-rule');
 const servicesUtils = require('@sage/bc-services-utils');
@@ -19,12 +19,12 @@ const Bank = require('@sage/bc-bank');
 
 module.exports = {
     validators,
-    resources,
+    commonResources,
     statusCodeError,
     adaptersResources,
-    AlertTypes,
+    alertTypes,
     bankIds,
-    ProductIds,
+    productIds,
     ServiceNames,
     Rule,
     servicesUtils,

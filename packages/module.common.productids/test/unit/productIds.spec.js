@@ -1,6 +1,6 @@
 'use strict';
 
-const ProductIds = require('../../lib/ProductIds');
+const ProductIds = require('../../lib/productIds');
 
 describe('@sage/bc-common-productids', function() {
     it('should export an object with the correct properties', (done) => {
