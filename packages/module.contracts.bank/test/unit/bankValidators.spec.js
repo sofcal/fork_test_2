@@ -8,7 +8,7 @@ const _ = require('underscore');
 const bankValidators = require('../../lib/bankValidators');
 const dict = require('../../lib/bankDictionary');
 
-describe('@sage/bc-bank.bankValidators', () => {
+describe('@sage/bc-contracts-bank.bankValidators', () => {
     let sandbox;
     let bank;
     let val;

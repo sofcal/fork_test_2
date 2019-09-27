@@ -3,7 +3,7 @@ const should = require('should');
 const Bank = require('../../lib/Bank');
 const sinon = require('sinon');
 
-describe('@sage/bc-bank.FileDescriptors', () => {
+describe('@sage/bc-contracts-bank.FileDescriptors', () => {
     let data;
     let sandbox;
 

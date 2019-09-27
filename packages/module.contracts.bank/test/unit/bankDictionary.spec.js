@@ -1,7 +1,7 @@
 const bankDictionary = require('../../lib/bankDictionary');
 const should = require('should');
 
-describe('@sage/bc-bank.bankDictionary', () => {
+describe('@sage/bc-contracts-bank.bankDictionary', () => {
     it('should export bankDictionary', () => {
         should(bankDictionary).be.an.Object().with.properties(
             'AuthorisationMechanism',

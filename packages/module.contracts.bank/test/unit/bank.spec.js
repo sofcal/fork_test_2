@@ -10,7 +10,7 @@ const should = require('should');
 const sinon = require('sinon');
 const _ = require('underscore');
 
-describe('@sage/bc-bank.Bank', () => {
+describe('@sage/bc-contracts-bank.Bank', () => {
     let sandbox;
     let uuid;
     let name;
