@@ -1,3 +1,3 @@
-const ProductIds = require('./ProductIds');
- 
-module.exports = ProductIds;
+const productIds = require('./productIds');
+
+module.exports = productIds;
