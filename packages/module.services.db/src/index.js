@@ -6,6 +6,7 @@ const Promise = require('bluebird');
 class DB {
     constructor(options) {
         this.connectionString = getConnectionString(options);
+        this.sslCA = options.sslCA;
         this._MongoClient = MongoClient;
     }
 
@@ -33,7 +34,12 @@ class DB {
 const connectImpl = Promise.method((self) => {
     const url = self.connectionString;
 
-    return self._MongoClient.connect(url)
+    const options = {};
+    if (self.sslCA) {
+        Object.assign(options, { ssl: true, sslCA: self.sslCA } );
+    }
+
+    return self._MongoClient.connect(url,  (Object.keys(options).length ? options : undefined))
         .then((client) => {
             self.client = client; // eslint-disable-line no-param-reassign
             return client.db();
@@ -51,7 +57,11 @@ const disconnectImpl = Promise.method((self) => {
         });
 });
 
-const getConnectionString = ({ env: awsEnv, region: awsRegion, domain, username, password, replicaSet, db, localhost = false }) => {
+const getConnectionString = ({ env: awsEnv, region: awsRegion, domain, username, password, replicaSet, db, localhost = false, connectionString }) => {
+    if (connectionString) {
+        return;
+    }
+
     if (localhost) {
         return `mongodb://localhost:27017/${db}`;
     }

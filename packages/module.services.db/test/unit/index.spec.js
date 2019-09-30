@@ -108,7 +108,7 @@ describe('@sage/bc-services-db.index', function(){
 
                     should(db._MongoClient.connect.callCount).eql(1);
                     should(db._MongoClient.connect.calledWithExactly(
-                        'mongodb://localhost:27017/db_name'
+                        'mongodb://localhost:27017/db_name', undefined
                     )).eql(true);
 
                     should(client.db.callCount).eql(1);
