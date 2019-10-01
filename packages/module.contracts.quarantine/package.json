@@ -1,6 +1,6 @@
 {
   "name": "@sage/bc-contracts-quarantine",
-  "version": "1.1.75",
+  "version": "1.1.76",
   "author": "Sage UK",
   "license": "ISC",
   "description": "",
@@ -16,9 +16,9 @@
     "@babel/code-frame": "^7.0.0-beta.48",
     "@babel/core": "^7.2.2",
     "@babel/preset-env": "^7.0.0-beta.47",
-    "@sage/bc-common-resources": "^1.1.75",
-    "@sage/bc-contracts-transaction": "^1.1.75",
-    "@sage/bc-services-validators": "^1.1.75",
+    "@sage/bc-common-resources": "^1.1.76",
+    "@sage/bc-contracts-transaction": "^1.1.76",
+    "@sage/bc-services-validators": "^1.1.76",
     "underscore": "^1.9.0"
   },
   "devDependencies": {
