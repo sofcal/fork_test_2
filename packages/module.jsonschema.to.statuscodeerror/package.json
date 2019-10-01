@@ -1,6 +1,6 @@
 {
   "name": "@sage/bc-jsonschema-to-statuscodeerror",
-  "version": "1.1.73",
+  "version": "1.1.74",
   "author": "Sage UK",
   "license": "ISC",
   "description": "",
@@ -16,7 +16,7 @@
     "@babel/code-frame": "^7.0.0",
     "@babel/core": "^7.5.4",
     "@babel/preset-env": "^7.5.4",
-    "@sage/bc-statuscodeerror": "^1.1.73",
+    "@sage/bc-statuscodeerror": "^1.1.74",
     "jsonschema": "^1.2.4",
     "safe-access": "^0.1.0",
     "underscore": "^1.9.0",
