@@ -1,7 +1,7 @@
 'use strict';
 
 const Resources = require('@sage/bc-common-resources');
-const validators = require('@sage/bc-validators');
+const validators = require('@sage/bc-services-validators');
 
 const _ = require('underscore');
 const FileDescriptors = require('./FileDescriptors');

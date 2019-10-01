@@ -22,7 +22,7 @@
     "@sage/bc-framework-httpmethod": "^1.1.22",
     "@sage/bc-services-utils": "^1.1.74",
     "@sage/bc-statuscodeerror": "^1.1.74",
-    "@sage/bc-validators": "^1.1.74",
+    "@sage/bc-services-validators": "^1.1.74",
     "underscore": "^1.9.0",
     "uuid": "^3.3.2"
   },

@@ -20,7 +20,7 @@
     "@sage/bc-common-resources": "^1.1.72",
     "@sage/bc-statuscodeerror": "^1.1.74",
     "@sage/bc-uncappedquery": "^1.1.50",
-    "@sage/bc-validators": "^1.1.74",
+    "@sage/bc-services-validators": "^1.1.74",
     "bluebird": "^3.5.5",
     "safe-access": "^0.1.0",
     "underscore": "^1.9.0"
