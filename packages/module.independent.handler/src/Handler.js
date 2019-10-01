@@ -49,7 +49,7 @@ class Handler {
                         // give the derived instance an opportunity to initialise any services or add-ons that are required for the
                         // running of the function. Since this class should be instantiated once, it gives the ability to cache items
                         event.logger.info({ function: func, log: 'initialising services and add-ons' });
-                        return this.init(event, { logger: event.logger })
+                        return this.init(event, { logger: event.logger }, context)
                             .then((initialised = false) => {
                                 this.initialised = initialised;
                             });
@@ -58,7 +58,7 @@ class Handler {
                         // now that everything else is set-up and ready to go, call the implementation for handling this request.
                         // This will be the business logic for the invocation of the lambda.
                         event.logger.info({ function: func, log: 'invoking handler function' });
-                        return this.impl(event, { logger: event.logger });
+                        return this.impl(event, { logger: event.logger }, context);
                     })
                     .then((ret) => {
                         // if we get a valid response, give the derived class the opportunity to modify the response before we send it
