@@ -3,7 +3,7 @@
 const QuarantineBucket = require('../../lib/QuarantineBucket');
 const resources = require('@sage/bc-common-resources');
 const { Transaction } = require('@sage/bc-contracts-transaction');
-const validators = require('@sage/bc-validators');
+const validators = require('@sage/bc-services-validators');
 const sinon = require('sinon');
 
 // checker for properties of an instantiated object. Digs in to prototype level to ensure chained properties are included.

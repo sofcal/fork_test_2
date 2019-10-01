@@ -1,4 +1,4 @@
-const validators = require('@sage/bc-validators');
+const validators = require('@sage/bc-services-validators');
 const { StatusCodeErrorItem } = require('@sage/bc-common-statuscodeerror');
 const Resources = require('@sage/bc-common-resources');
 const should = require('should');

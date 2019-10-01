@@ -2,7 +2,7 @@
 
 const resources = require('@sage/bc-common-resources');
 const Transaction = require('./Transaction');
-const utils = require('@sage/bc-validators');
+const utils = require('@sage/bc-services-validators');
 const _ = require('underscore');
 
 function TransactionBucket(data) {

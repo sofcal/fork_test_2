@@ -2,7 +2,7 @@
 
 const Resources = require('@sage/bc-common-resources');
 const { StatusCodeError } = require('@sage/bc-common-statuscodeerror');
-const validators = require('@sage/bc-validators');
+const validators = require('@sage/bc-services-validators');
 
 const Bank = require('../../lib/Bank');
 const FileDescriptors = require('../../lib/FileDescriptors');

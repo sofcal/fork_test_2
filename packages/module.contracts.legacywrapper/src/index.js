@@ -1,6 +1,6 @@
 'use strict';
 
-const validators = require('@sage/bc-validators');
+const validators = require('@sage/bc-services-validators');
 const commonResources = require('@sage/bc-common-resources');
 const statusCodeError = require('@sage/bc-common-statuscodeerror');
 const adaptersResources = require('@sage/bc-adapters-resources');

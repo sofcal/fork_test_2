@@ -2,7 +2,7 @@
 
 const Resources = require('@sage/bc-common-resources');
 const { StatusCodeErrorItem } = require('@sage/bc-common-statuscodeerror');
-const validators = require('@sage/bc-validators');
+const validators = require('@sage/bc-services-validators');
 
 const _ = require('underscore');
 const dict = require('./bankDictionary');
