@@ -1,13 +1,13 @@
 {
   "name": "lambda-jwt-issuer",
-  "version": "1.1.77",
+  "version": "1.1.78",
   "author": "",
   "license": "ISC",
   "description": "",
   "private": true,
   "main": "lib/handler.js",
   "dependencies": {
-    "@sage/sfab-s2s-jwt-issuer-lambda": "^1.1.77",
+    "@sage/sfab-s2s-jwt-issuer-lambda": "^1.1.78",
     "aws-sdk": "^2.220.1",
     "bluebird": "^3.5.1"
   },
