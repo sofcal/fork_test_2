@@ -18,7 +18,7 @@
  * @type _Infrastructure._Common.Resources
  */
 
-const bankIds = require('@sage/bc-bankids');
+const bankIds = require('@sage/bc-adapters-bankids');
 
 /**
  * @type {_Infrastructure._Common.Resources}

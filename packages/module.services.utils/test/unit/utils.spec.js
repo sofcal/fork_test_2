@@ -3,7 +3,7 @@ const servicesUtils = require('../../lib');
 const should = require('should');
 const sinon = require('sinon');
 
-const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-common-statuscodeerror');
 
 describe('@sage/bc-services-utils.utils', () => {
     const sandbox = sinon.createSandbox();

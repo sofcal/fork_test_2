@@ -1,4 +1,4 @@
-const { StatusCodeErrorItem } = require('@sage/bc-statuscodeerror');
+const { StatusCodeErrorItem } = require('@sage/bc-common-statuscodeerror');
 const should = require('should');
 const { validateTypeNoThrow } = require('../../lib');
 

@@ -1,6 +1,6 @@
 const validateContract = require('../../lib/validatorContractObject');
 const validateType = require('../../lib/validateType');
-const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-common-statuscodeerror');
 const { services: { common: { InvalidType } } } = require('@sage/bc-common-resources');
 
 const should = require('should');

@@ -1,6 +1,6 @@
 'use strict';
 
-const alertTypes = require('@sage/bc-alerttypes');
+const alertTypes = require('@sage/bc-common-alerttypes');
 
 function Lock(logger, data) {
     let self = this;

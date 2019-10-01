@@ -3,7 +3,7 @@ const keyPairWrapper = require('../../lib/helpers/keyPairWrapper');
 const ErrorSpecs = require('../../lib/ErrorSpecs');
 
 const { Handler } = require('@sage/bc-independent-lambda-handler');
-const { StatusCodeError } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError } = require('@sage/bc-common-statuscodeerror');
 const { logger: loggerGen } = require('@sage/bc-debug-utils');
 const ParameterService = require('@sage/bc-services-parameter');
 

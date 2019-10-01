@@ -18,7 +18,7 @@ describe('lambda-jwt-certificaterotation.index', function(){
 //
 // const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
 // const DB = require('@sage/bc-services-db');
-// const { StatusCodeError } = require('@sage/bc-statuscodeerror');
+// const { StatusCodeError } = require('@sage/bc-common-statuscodeerror');
 // const ParameterService = require('@sage/bc-services-parameter');
 //
 // describe.skip('lambda-jwt-certificaterotation', function() {

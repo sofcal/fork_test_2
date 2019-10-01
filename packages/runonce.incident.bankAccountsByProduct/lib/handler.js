@@ -9,7 +9,7 @@ const keys = require('./params');
 
 const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
 const { RequestLogger } = require('@sage/bc-requestlogger');
-const { StatusCodeError } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError } = require('@sage/bc-common-statuscodeerror');
 
 const DB = require('@sage/bc-services-db');
 
@@ -112,7 +112,7 @@ const populateServices = (services, { env, region, params }, logger) => {
     services.db = serviceImpls.DB.Create({ env, region, domain, username, password, replicaSet, db: 'bank_db' });
 
     // add any additional services that are created by the serviceLoader for the lambda
-    
+
     Object.assign(services, serviceLoader.load({ env, region, params }));
 
     logger.info({ function: func, log: 'ended' });

@@ -8,7 +8,7 @@ const Promise = require('bluebird');
 
 const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
 const DB = require('@sage/bc-services-db');
-const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-common-statuscodeerror');
 
 describe.skip('lambda-machineLearning-actualActionsProcessor.handler', function() {
     let sandbox;

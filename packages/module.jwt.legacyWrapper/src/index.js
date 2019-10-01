@@ -6,7 +6,7 @@ const { PredictedAction } = require('@sage/bc-contracts-predictedaction');
 const { RulesEngine } = require('@sage/bc-processing-rules');
 
 const { Mapper: StatusCodeErrorMapper } = require('@sage/bc-jsonschema-to-statuscodeerror');
-const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-common-statuscodeerror');
 
 const Authenticator = require('@sage/sfab-s2s-jwt-authenticator');
 const Cache = require('@sage/sfab-s2s-jwt-cache');

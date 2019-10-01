@@ -1,7 +1,7 @@
 'use strict';
 
 const Resources = require('@sage/bc-common-resources');
-const { StatusCodeError } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError } = require('@sage/bc-common-statuscodeerror');
 const validators = require('@sage/bc-validators');
 
 const Bank = require('../../lib/Bank');
@@ -10,7 +10,7 @@ const should = require('should');
 const sinon = require('sinon');
 const _ = require('underscore');
 
-describe('@sage/bc-bank.Bank', () => {
+describe('@sage/bc-contracts-bank.Bank', () => {
     let sandbox;
     let uuid;
     let name;

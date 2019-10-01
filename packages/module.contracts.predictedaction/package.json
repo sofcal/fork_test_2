@@ -19,7 +19,7 @@
     "@sage/bc-contracts-rule": "^1.1.75",
     "@sage/bc-contracts-util": "^1.1.75",
     "@sage/bc-jsonschema-to-statuscodeerror": "^1.1.75",
-    "@sage/bc-statuscodeerror": "^1.1.75",
+    "@sage/bc-common-statuscodeerror": "^1.1.75",
     "@sage/bc-util-httpmethod": "^1.1.75",
     "bluebird": "^3.5.1",
     "jsonschema": "^1.2.4",

@@ -20,7 +20,7 @@
     "@sage/bc-requestlogger": "^1.1.75",
     "@sage/bc-services-db": "^1.1.75",
     "@sage/bc-services-parameter": "^1.1.75",
-    "@sage/bc-statuscodeerror": "^1.1.75",
+    "@sage/bc-common-statuscodeerror": "^1.1.75",
     "aws-sdk": "^2.220.1",
     "bluebird": "^3.5.1",
     "mongodb": "3.0.5",

@@ -1,5 +1,5 @@
 const { services: { common: { InvalidProperties, InvalidPropertiesFormat, InvalidType } } } = require('@sage/bc-common-resources');
-const { StatusCodeErrorItem } = require('@sage/bc-statuscodeerror');
+const { StatusCodeErrorItem } = require('@sage/bc-common-statuscodeerror');
 const _ = require('underscore');
 const { format } = require('util');
 

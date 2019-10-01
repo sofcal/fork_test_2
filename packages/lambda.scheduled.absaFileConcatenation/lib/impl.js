@@ -2,7 +2,7 @@
 
 const validate = require('./validators');
 const ErrorSpecs = require('./ErrorSpecs');
-const { StatusCodeError } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError } = require('@sage/bc-common-statuscodeerror');
 const Promise = require('bluebird');
 const moment = require('moment');
 const _ = require('underscore');

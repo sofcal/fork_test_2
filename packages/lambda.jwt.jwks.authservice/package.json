@@ -7,7 +7,7 @@
   "private": true,
   "main": "lib/index.js",
   "dependencies": {
-    "@sage/bc-statuscodeerror": "^1.1.75",
+    "@sage/bc-common-statuscodeerror": "^1.1.75",
     "@sage/sfab-s2s-jwt-jwks": "^1.1.75",
     "@sage/sfab-s2s-jwt-jwks-lambda": "^1.1.75",
     "aws-sdk": "^2.220.1",

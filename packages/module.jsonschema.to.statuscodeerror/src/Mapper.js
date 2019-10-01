@@ -1,6 +1,6 @@
 'use strict';
 
-const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-common-statuscodeerror');
 const access = require('safe-access');
 const _ = require('underscore');
 const _s = require('underscore.string');

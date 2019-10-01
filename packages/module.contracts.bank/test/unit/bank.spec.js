@@ -1,7 +1,7 @@
 'use strict';
 
 const Resources = require('@sage/bc-common-resources');
-const { StatusCodeError } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError } = require('@sage/bc-common-statuscodeerror');
 const validators = require('@sage/bc-validators');
 
 const Bank = require('../../lib/Bank');

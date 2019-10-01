@@ -1,6 +1,6 @@
 const { logger: loggerGen } = require('@sage/bc-debug-utils');
 const { ErrorSpecs } = require('@sage/bc-independent-lambda-handler');
-const { StatusCodeError } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError } = require('@sage/bc-common-statuscodeerror');
 const should = require('should');
 const validate = require('../../../lib/validators/config');
 

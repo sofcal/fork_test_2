@@ -3,7 +3,7 @@
 const Rule = require('./Rule');
 const ruleBucketSchema = require('./schemas/ruleBucketSchema');
 
-const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-common-statuscodeerror');
 const { Mapper: StatusCodeErrorMapper } = require('@sage/bc-jsonschema-to-statuscodeerror');
 const { validateType } = require('@sage/bc-contracts-util');
 

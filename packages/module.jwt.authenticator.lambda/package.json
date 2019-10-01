@@ -18,7 +18,7 @@
     "@babel/preset-env": "^7.5.4",
     "@sage/bc-independent-lambda-handler": "^1.1.75",
     "@sage/bc-requestlogger": "^1.1.75",
-    "@sage/bc-statuscodeerror": "^1.1.75",
+    "@sage/bc-common-statuscodeerror": "^1.1.75",
     "@sage/sfab-s2s-jwt-authenticator": "^1.1.75",
     "@sage/sfab-s2s-jwt-cache": "^1.1.75",
     "@sage/sfab-s2s-jwt-endpoint-store": "^1.1.75",

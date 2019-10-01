@@ -1,6 +1,6 @@
 'use strict';
 
-const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-common-statuscodeerror');
 const { services: { common: { InvalidProperties, InvalidPropertiesFormat } } } = require('@sage/bc-common-resources');
 const validateType = require('./validateType');
 const _ = require('underscore');

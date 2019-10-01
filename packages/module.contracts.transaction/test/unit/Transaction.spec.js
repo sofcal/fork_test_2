@@ -2,7 +2,7 @@
 
 const Transaction = require('../../lib/Transaction');
 const common = require('@sage/bc-common-resources');
-const { StatusCodeError } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError } = require('@sage/bc-common-statuscodeerror');
 const should = require('should');
 const sinon = require('sinon');
 const _ = require('underscore');

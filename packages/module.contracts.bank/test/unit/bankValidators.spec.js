@@ -1,5 +1,5 @@
 const validators = require('@sage/bc-validators');
-const { StatusCodeErrorItem } = require('@sage/bc-statuscodeerror');
+const { StatusCodeErrorItem } = require('@sage/bc-common-statuscodeerror');
 const Resources = require('@sage/bc-common-resources');
 const should = require('should');
 const sinon = require('sinon');

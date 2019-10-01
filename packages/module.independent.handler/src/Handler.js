@@ -3,7 +3,7 @@
 const Promise = require('bluebird');
 
 const { RequestLogger } = require('@sage/bc-requestlogger');
-const { StatusCodeError } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError } = require('@sage/bc-common-statuscodeerror');
 const { CloudWatchSubscription } = require('@sage/bc-infrastructure-cloudwatchsubscription');
 const ErrorSpecs = require('./ErrorSpecs');
 

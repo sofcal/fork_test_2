@@ -2,7 +2,7 @@
 
 'use strict';
 
-const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-common-statuscodeerror');
 const httpMethod = require('@sage/bc-framework-httpmethod');
 const resources = require('@sage/bc-common-resources');
 

@@ -1,6 +1,6 @@
 'use strict';
 
-const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-common-statuscodeerror');
 const Rule = require('../../lib/Rule');
 const should = require('should');
 const sinon = require('sinon');

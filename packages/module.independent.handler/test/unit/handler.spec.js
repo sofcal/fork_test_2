@@ -1,6 +1,6 @@
 const Handler = require('../../lib/Handler');
 const ErrorSpecs = require('../../lib/ErrorSpecs');
-const { StatusCodeError } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError } = require('@sage/bc-common-statuscodeerror');
 const { CloudWatchSubscription } = require('@sage/bc-infrastructure-cloudwatchsubscription');
 const { RequestLogger } = require('@sage/bc-requestlogger');
 const { logger: loggerGen } = require('@sage/bc-debug-utils');

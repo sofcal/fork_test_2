@@ -3,7 +3,7 @@
 const TransactionBucket = require('../../lib/TransactionBucket');
 const Transaction = require('../../lib/Transaction');
 const common = require('@sage/bc-common-resources');
-const { StatusCodeError } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError } = require('@sage/bc-common-statuscodeerror');
 const utils = require('@sage/bc-validators');
 const should = require('should');
 const sinon = require('sinon');

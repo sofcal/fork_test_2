@@ -17,7 +17,7 @@
     "@babel/core": "^7.5.4",
     "@babel/preset-env": "^7.5.4",
     "@sage/bc-requestlogger": "^1.1.75",
-    "@sage/bc-statuscodeerror": "^1.1.75",
+    "@sage/bc-common-statuscodeerror": "^1.1.75",
     "@sage/sfab-s2s-jwt-kid": "^1.1.75",
     "bluebird": "^3.5.1",
     "underscore": "^1.9.0"

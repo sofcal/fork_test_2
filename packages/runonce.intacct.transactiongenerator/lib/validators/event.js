@@ -1,7 +1,7 @@
 'use strict';
 
 const ErrorSpecs = require('../ErrorSpecs');
-const { StatusCodeError } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError } = require('@sage/bc-common-statuscodeerror');
 
 module.exports = (event, { logger }) => {
     const parsed = event.body ? JSON.parse(event.body) : event;

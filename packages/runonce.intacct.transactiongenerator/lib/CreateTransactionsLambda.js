@@ -6,7 +6,7 @@ const keys = require('./params');
 const TransactionBuilder = require('./TransactionBuilder');
 const { DBQueries } = require('./db');
 
-const { StatusCodeError } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError } = require('@sage/bc-common-statuscodeerror');
 const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
 const DB = require('@sage/bc-services-db');
 const { Handler } = require('@sage/bc-independent-lambda-handler');

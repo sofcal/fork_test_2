@@ -1,6 +1,6 @@
 'use strict';
 
-const serviceNames = require('@sage/bc-servicenames');
+const serviceNames = require('@sage/bc-services-names');
 
 const access = require('safe-access');
 const Promise = require('bluebird');

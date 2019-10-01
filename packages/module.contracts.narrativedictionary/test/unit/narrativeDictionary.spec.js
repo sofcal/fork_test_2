@@ -2,7 +2,7 @@
 
 const NarrativeDictionary = require('../../lib/NarrativeDictionary');
 const debug = require('@sage/bc-debug-utils');
-const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-common-statuscodeerror');
 const fs = require('fs');
 const sinon = require('sinon');
 const should = require('should');

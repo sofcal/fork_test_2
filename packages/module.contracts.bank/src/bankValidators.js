@@ -1,7 +1,7 @@
 'use strict';
 
 const Resources = require('@sage/bc-common-resources');
-const { StatusCodeErrorItem } = require('@sage/bc-statuscodeerror');
+const { StatusCodeErrorItem } = require('@sage/bc-common-statuscodeerror');
 const validators = require('@sage/bc-validators');
 
 const _ = require('underscore');
