@@ -4,12 +4,12 @@ const resources = require('@sage/bc-common-resources');
 const { Rule } = require('@sage/bc-contracts-rule');
 const { StatusCodeErrorItem, StatusCodeError } = require('@sage/bc-common-statuscodeerror');
 const utils = require('@sage/bc-services-validators');
-const serviceUtils = require('@sage/bc-services-utils');
 const PredictedAction = require('@sage/bc-contracts-predictedaction');
 const util = require('util');
 const _ = require('underscore');
 const { format } = util;
 const httpMethod = require('@sage/bc-framework-httpmethod');
+const { extend } = require('@sage/bc-contracts-util');
 
 const DEFAULT_PAYEE = {
     payeeId: null,
@@ -414,7 +414,12 @@ Transaction.allowableRuleFields = [
 
 module.exports = Transaction;
 
-Transaction.extend = (destination, source, method) => serviceUtils.extend(destination, source, method, (method === httpMethod.post ? postKeys : updateKeys), readOnlyKeys);
+Transaction.extend = (destination, source, method) => {
+    const sourceWhitelist = httpMethod.isPost(method) ? postKeys : updateKeys;
+    const destinationWhitelist = httpMethod.isPut(method) ? readOnlyKeys : null;
+
+    return extend({ destination, source, sourceWhitelist, destinationWhitelist });
+};
 
 const _Keys = [
     // these fields can neither be created nor modified by the API client
