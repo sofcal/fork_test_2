@@ -26,7 +26,7 @@ module.exports.run = (event, context, callback) => {
     event.logger.info({ function: func, log: 'started' });
 
     // these environment variables allow us to retrieve the correct param-store values for more configurable options
-    const { Environment: env, AWS_REGION: region } = process.env;
+    const { Environment: env, AWS_REGION: region, localhost = false } = process.env;
     const services = {};
 
     return Promise.resolve(undefined)
@@ -40,7 +40,7 @@ module.exports.run = (event, context, callback) => {
             return setupLogGroupSubscription(event, context)
                 .then(() => getParams({ env, region }, event.logger))
                 .then((params) => {
-                    populateServices(services, { env, region, params }, event.logger);
+                    populateServices(services, { env, region, params, localhost }, event.logger);
                     return connectDB(services, event.logger)
                         .then(() => params);
                 });
@@ -98,8 +98,8 @@ const getParams = ({ env, region }, logger) => {
         });
 };
 
-const populateServices = (services, { env, region, params }, logger) => {
-    const func = 'handler.getServices';
+const populateServices = (services, { env, region, params, localhost }, logger) => {
+    const func = 'handler.populateServices';
     logger.info({ function: func, log: 'started' });
 
     const {
@@ -110,7 +110,7 @@ const populateServices = (services, { env, region, params }, logger) => {
     } = params;
 
     // eslint-disable-next-line no-param-reassign
-    services.db = serviceImpls.DB.Create({ env, region, domain, username, password, replicaSet, db: 'bank_db' });
+    services.db = serviceImpls.DB.Create({ env, region, domain, username, password, replicaSet, db: 'bank_db', localhost });
 
     // add any additional services that are created by the serviceLoader for the lambda
     Object.assign(services, serviceLoader.load({ env, region, params }));

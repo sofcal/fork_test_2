@@ -1,0 +1,34 @@
+[
+	{
+		"_id" : "10000000-0000-0000-0000-000000000002",
+		"companies" : [
+			{
+				"_id" : "10000000-0000-0000-0000-200000000001",
+				"bankAccountCount" : 1,
+				"missing" : false
+			}
+		],
+		"products" : [
+			{
+				"_id" : "10000000-0000-0000-0000-000000000001"
+			}
+		],
+		"companyCount" : 1,
+		"bankAccountCount" : 1,
+		"bankAccounts" : [
+			{
+				"region" : "GBR",
+				"deleted" : null,
+				"_id" : "10000000-0000-0000-0000-200000000001",
+				"missing" : false,
+				"status" : "active",
+				"transactionCount" : 101,
+				"unresolvedCount" : 0,
+				"bankId" : "10000000-0000-0000-0000-000000000001",
+				"bankName" : "MI TEST BANK",
+				"aggregatorName" : null,
+				"accountantManaged" : "none"
+			}
+		]
+	}
+]

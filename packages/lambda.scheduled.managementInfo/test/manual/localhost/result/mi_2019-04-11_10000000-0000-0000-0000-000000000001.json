@@ -1,0 +1,114 @@
+{
+    "productName": "MI TEST PRODUCT",
+    "productId": "10000000-0000-0000-0000-000000000001",
+    "organisations": [
+        {
+            "_id": "10000000-0000-0000-0000-000000000001",
+            "companies": [
+                {
+                    "_id": "10000000-0000-0000-0000-100000000002",
+                    "bankAccountCount": 1,
+                    "missing": false
+                },
+                {
+                    "_id": "10000000-0000-0000-0000-100000000001",
+                    "bankAccountCount": 2,
+                    "missing": false
+                }
+            ],
+            "products": [
+                {
+                    "_id": "10000000-0000-0000-0000-000000000001"
+                }
+            ],
+            "companyCount": 2,
+            "bankAccountCount": 3,
+            "bankAccounts": [
+                {
+                    "region": "GBR",
+                    "deleted": "2018-10-01T00:00:00.000Z",
+                    "_id": "10000000-0000-0000-0000-999999999999",
+                    "missing": true,
+                    "status": null,
+                    "transactionCount": null,
+                    "unresolvedCount": null,
+                    "bankId": null,
+                    "bankName": null,
+                    "aggregatorName": null,
+                    "accountantManaged": null
+                },
+                {
+                    "region": "GBR",
+                    "deleted": null,
+                    "_id": "10000000-0000-0000-0000-100000000002",
+                    "missing": false,
+                    "status": "pending",
+                    "transactionCount": 2,
+                    "unresolvedCount": 0,
+                    "bankId": "10000000-0000-0000-0000-000000000001",
+                    "bankName": "MI TEST BANK",
+                    "aggregatorName": null,
+                    "accountantManaged": "none"
+                },
+                {
+                    "region": "GBR",
+                    "deleted": null,
+                    "_id": "10000000-0000-0000-0000-100000000001",
+                    "missing": false,
+                    "status": "pending",
+                    "transactionCount": 2,
+                    "unresolvedCount": 0,
+                    "bankId": "10000000-0000-0000-0000-000000000001",
+                    "bankName": "MI TEST BANK",
+                    "aggregatorName": null,
+                    "accountantManaged": "none"
+                }
+            ]
+        },
+        {
+            "_id": "10000000-0000-0000-0000-000000000002",
+            "companies": [
+                {
+                    "_id": "10000000-0000-0000-0000-200000000001",
+                    "bankAccountCount": 1,
+                    "missing": false
+                }
+            ],
+            "products": [
+                {
+                    "_id": "10000000-0000-0000-0000-000000000001"
+                }
+            ],
+            "companyCount": 1,
+            "bankAccountCount": 1,
+            "bankAccounts": [
+                {
+                    "region": "GBR",
+                    "deleted": null,
+                    "_id": "10000000-0000-0000-0000-200000000001",
+                    "missing": false,
+                    "status": "active",
+                    "transactionCount": 101,
+                    "unresolvedCount": 0,
+                    "bankId": "10000000-0000-0000-0000-000000000001",
+                    "bankName": "MI TEST BANK",
+                    "aggregatorName": null,
+                    "accountantManaged": "none"
+                }
+            ]
+        }
+    ],
+    "transactionSummary": {
+        "creditsTotalCount": 53,
+        "creditsTotalValue": 2603,
+        "creditsMaxValue": 101,
+        "debitsTotalCount": 52,
+        "debitsTotalValue": -2554,
+        "debitsMaxValue": -100,
+        "absoluteTotalCount": 105,
+        "absoluteTotalValue": 5157,
+        "creditsAverageValue": 49.11,
+        "debitsAverageValue": -49.12,
+        "absoluteAverageValue": 49.11
+    }
+}

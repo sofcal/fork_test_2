@@ -1,10 +1,10 @@
 'use strict';
 
-module.exports = ({ count = false } = {}) => {
+module.exports = ({ count = false, OrgCollection } = {}) => {
     const pipeline = [
         // with no $match stage, our results will contain all bank accounts in the database
         // so now we attempt to find the organisation for each of them
-        { $lookup: { from: 'Organisation', localField: 'organisationId', foreignField: '_id', as: 'organisationLookup' } },
+        { $lookup: { from: OrgCollection, localField: 'organisationId', foreignField: '_id', as: 'organisationLookup' } },
         // since lookup gives us back an array, we unwind to give us a document per organisation (though we know there'll
         // be one or none for each bank account)
         { $unwind: { path: '$organisationLookup', preserveNullAndEmptyArrays: true } },

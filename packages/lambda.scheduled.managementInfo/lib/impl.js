@@ -69,6 +69,7 @@ module.exports.run = Promise.method((event, params, services) => {
 
             return flows.orphans.run(null, debug)
                 .then((results) => {
+                    results.orphaned = results.orphaned.sort((a, b) => { return a._id < b._id ? -1 : 1; }); // eslint-disable-line no-param-reassign
                     event.logger.info({ function: func, log: 'retrieved orphan information.', params: { } });
                     return blob.storeResults({ keyPostfix: BlobStorage.Postfixes.orphaned, results }, debug);
                 });
@@ -85,6 +86,12 @@ module.exports.run = Promise.method((event, params, services) => {
                     event.logger.info({ function: func, log: 'gathering results for product', params: { productName: product.name, productId: product._id } });
                     return flows.product.run(product, debug)
                         .then((results) => {
+//     console.log('\n\n>>>>>>>> products ');
+// console.dir({ test: results.organisations.map(x => x._id) }, { depth: 3, colors: true });
+
+                            results.organisations = results.organisations.sort((a, b) => { return a._id < b._id ? -1 : 1; }); // eslint-disable-line no-param-reassign
+// console.dir({ test: results.organisations.map(x => x._id) }, { depth: 3, colors: true });
+// console.log('<<<<<<<<<\n\n');
                             event.logger.info({ function: func, log: 'retrieved product information.', params: { } });
                             return blob.storeResults({ keyPostfix: product._id, results }, debug);
                         });
@@ -99,6 +106,7 @@ module.exports.run = Promise.method((event, params, services) => {
             const keyPostfix = `${BlobStorage.Postfixes.concatenated}_${moment.utc().format('hh:mm:ss.SSS')}`;
             return flows.concat.run({ regions: [thisRegion, otherRegion], productInfos: concat }, debug)
                 .then((results) => {
+                    results.orphaned.bankAccounts = results.orphaned.bankAccounts.sort((a, b) => { return a._id < b._id ? -1 : 1; }); // eslint-disable-line no-param-reassign
                     event.logger.info({ function: func, log: 'successfully concatenated all data; storing.', params: { } });
                     return blob.storeResults({ keyPostfix, results }, debug);
                 });
