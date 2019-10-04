@@ -98,6 +98,15 @@ const bankValidators = (bank) => {
             return valType ? [valType] : validators.validateContractObjectNoThrow(offBoardingMechanism, Object, properties, null);
         },
 
+        validateInternal: (internal) => {
+            const properties = [
+                { path: 'longURL', custom: _.isBoolean, optional: true, allowNull: true }
+            ];
+
+            const valType = utils.validateTypeNoThrow(internal, Object, { path: 'internal', prefix: Bank.name });
+            return valType ? [valType] : utils.validateContractObjectNoThrow(internal, Object, properties, null);
+        },
+
         validateProxy: (proxy) => {
             const properties = [
                 { path: 'bankId', regex: Resources.regex.uuid },

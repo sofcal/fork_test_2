@@ -35,6 +35,8 @@ class Bank {
             this.proxy = data.proxy || null;
             this.supportiframe = !_.isUndefined(data.supportiframe) ? data.supportiframe : true;
 
+            this.internal = { longURL: data.longURL || false };
+
             /* aggregator feature */
             if (plaidFeatureEnabled) {
                 this.dataProvider = data.dataProvider || Bank.dataProviders.direct;
@@ -73,7 +75,8 @@ class Bank {
             { path: 'offBoardingMechanism', nested: val.validateOffBoardingMechanism },
             { path: 'proxy', nested: val.validateProxy, optional: true, allowNull: true },
             { path: 'supportiframe', custom: _.isBoolean },
-            { path: 'recentFileHistory', nested: val.validateRecentFileHistory, optional: true, allowNull: true }
+            { path: 'recentFileHistory', nested: val.validateRecentFileHistory, optional: true, allowNull: true },
+            { path: 'internal', nested: val.validateInternal, optional: true, allowNull: true }
         ];
 
         /* aggregator feature */
@@ -120,6 +123,7 @@ class Bank {
         delete data.quarantine;
         delete data.proxy;
         delete data.internalStatuses;
+        delete data.internal;
 
         if (data.offBoardingMechanism) {
             delete data.offBoardingMechanism.emailAddress;
