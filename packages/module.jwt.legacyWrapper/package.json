@@ -27,7 +27,14 @@
     "@sage/sfab-s2s-jwt-issuer": "^1.1.78",
     "@sage/sfab-s2s-jwt-jwks": "^1.1.78",
     "@sage/sfab-s2s-jwt-kid": "^1.1.78",
-    "@sage/sfab-workers-clam-av": "^1.1.78"
+    "@sage/sfab-workers-clam-av": "^1.1.78",
+    "@sage/bc-services-validators": "^1.1.78",
+    "@sage/bc-common-resources": "^1.1.78",
+    "@sage/bc-common-uncappedquery": "^1.1.78",
+    "@sage/bc-contracts-transaction": "^1.1.78",
+    "@sage/bc-contracts-lock": "^1.1.78",
+    "@sage/bc-contracts-quarantine": "^1.1.78",
+    "@sage/bc-contracts-bank": "^1.1.78"
   },
   "devDependencies": {
     "@sage/bc-debug-utils": "^1.1.78",
