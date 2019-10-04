@@ -103,8 +103,8 @@ const bankValidators = (bank) => {
                 { path: 'longURL', custom: _.isBoolean, optional: true, allowNull: true }
             ];
 
-            const valType = utils.validateTypeNoThrow(internal, Object, { path: 'internal', prefix: Bank.name });
-            return valType ? [valType] : utils.validateContractObjectNoThrow(internal, Object, properties, null);
+            const valType = validators.validateTypeNoThrow(internal, Object, { path: 'internal', prefix: Bank.name });
+            return valType ? [valType] : validators.validateContractObjectNoThrow(internal, Object, properties, null);
         },
 
         validateProxy: (proxy) => {
