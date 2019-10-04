@@ -14,8 +14,6 @@
     "access": "public"
   },
   "dependencies": {
-    "@sage/bc-adapters-bankids": "^1.1.78",
-    "@sage/bc-common-alerttypes": "^1.1.78",
     "@sage/bc-common-resources": "^1.1.78",
     "@sage/bc-common-statuscodeerror": "^1.1.78",
     "@sage/bc-common-uncappedquery": "^1.1.78",
@@ -24,7 +22,6 @@
     "@sage/bc-contracts-quarantine": "^1.1.78",
     "@sage/bc-contracts-transaction": "^1.1.78",
     "@sage/bc-rule": "^1.1.29",
-    "@sage/bc-services-utils": "^1.1.78",
     "@sage/bc-services-validators": "^1.1.78"
   },
   "devDependencies": {

@@ -1,6 +1,6 @@
 'use strict';
 
-const alertTypes = require('@sage/bc-common-alerttypes');
+const resources = require('@sage/bc-common-resources');
 
 function Lock(logger, data) {
     let self = this;
@@ -31,7 +31,7 @@ p.checkLocked = function (entity) {
             function: 'Lock.CheckLock',
             msg: 'Invalid lock',
             params: { uuid: this.uuid, expired: this.expiry, attempted: now },
-            alert: alertTypes.alerts.lockExpired
+            alert: resources.lock.alerts.lockExpired
         });
         throw new Error(`Lock on: ${this.uuid} has expired during processing.`);
     }
