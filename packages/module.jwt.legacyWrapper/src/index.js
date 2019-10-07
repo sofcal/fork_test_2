@@ -10,7 +10,7 @@ const { Rule, RuleBucket } = require('@sage/bc-contracts-rule');
 const { PredictedAction } = require('@sage/bc-contracts-predictedaction');
 const { Transaction, TransactionBucket } = require('@sage/bc-contracts-transaction');
 const Lock = require('@sage/bc-contracts-lock');
-const QuarantineBucket = require('@sage/bc-contracts-quarantine');
+const { QuarantineBucket } = require('@sage/bc-contracts-quarantine');
 const Bank = require('@sage/bc-contracts-bank');
 
 // Services
