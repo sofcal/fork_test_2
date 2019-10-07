@@ -3,7 +3,6 @@
 // Common
 const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-common-statuscodeerror');
 const resources = require('@sage/bc-common-resources');
-const UncappedQuery = require('@sage/bc-common-uncappedquery');
 const { Mapper: StatusCodeErrorMapper } = require('@sage/bc-jsonschema-to-statuscodeerror');
 
 // Contracts
@@ -32,7 +31,7 @@ const Step = require('@sage/bc-services-step');
 const ClamAVWorkers = require('@sage/sfab-workers-clam-av');
 
 module.exports = {
-    common: { StatusCodeErrorItem, StatusCodeError, StatusCodeErrorMapper, resources, UncappedQuery },
+    common: { StatusCodeErrorItem, StatusCodeError, StatusCodeErrorMapper, resources },
     contracts: { PredictedAction, Rule, RuleBucket, Transaction, TransactionBucket, Lock, QuarantineBucket, Bank },
     services: { validators },
     processing: { RulesEngine },
