@@ -1,6 +1,6 @@
 {
   "name": "@sage/bc-contracts-bank",
-  "version": "1.1.80",
+  "version": "1.1.81",
   "author": "Sage UK",
   "license": "ISC",
   "description": "lib/services/bank",
