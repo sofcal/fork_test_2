@@ -103,7 +103,7 @@ const bankValidators = (bank) => {
                 { path: 'longURL', custom: _.isBoolean, optional: true, allowNull: true }
             ];
 
-            const valType = validators.validateTypeNoThrow(internal, Object, { path: 'internal', prefix: Resources.regex.bank.name });
+            const valType = validators.validateTypeNoThrow(internal, Object, { path: 'internal', prefix: dict.name });
             return valType ? [valType] : validators.validateContractObjectNoThrow(internal, Object, properties, null);
         },
 
