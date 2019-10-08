@@ -21,7 +21,7 @@ const bankValidators = (bank) => {
                 { path: 'isAmendable', custom: _.isBoolean, optional: false }
             ];
 
-            const valType = validators.validateTypeNoThrow(value, Object, { path: 'mandatoryCustomerBankDetails', prefix: dict.name });
+            const valType = validators.validateTypeNoThrow(value, Object, { path: 'mandatoryCustomerBankDetails', prefix: 'Bank' });
             return valType ? [valType] : validators.validateContractObjectNoThrow(value, Object, properties);
         },
 
@@ -31,7 +31,7 @@ const bankValidators = (bank) => {
                 { path: 'mandatoryCustomerBankDetails', nested: val.validateMandatoryCustomerBankDetails, optional: true }
             ];
 
-            const valType = validators.validateTypeNoThrow(value, Object, { path: 'accountTypes', prefix: dict.name });
+            const valType = validators.validateTypeNoThrow(value, Object, { path: 'accountTypes', prefix: 'Bank' });
             return valType ? [valType] : validators.validateContractObjectNoThrow(value, Object, properties);
         },
 
@@ -58,7 +58,7 @@ const bankValidators = (bank) => {
                 { path: 'transactionTypes', arrayCustom: val.validateTransactionTypes, allowEmptyArray: true }
             ];
 
-            const valType = validators.validateTypeNoThrow(quarantine, Object, { path: 'quarantine', prefix: dict.name });
+            const valType = validators.validateTypeNoThrow(quarantine, Object, { path: 'quarantine', prefix: 'Bank' });
             return valType ? [valType] : validators.validateContractObjectNoThrow(quarantine, Object, properties, null);
         },
 
@@ -68,7 +68,7 @@ const bankValidators = (bank) => {
                 { path: 'releaseDate', custom: _.isDate, optional: true, allowNull: true },
             ];
 
-            const valType = validators.validateTypeNoThrow(quarantine, Object, { path: 'quarantine', prefix: dict.name });
+            const valType = validators.validateTypeNoThrow(quarantine, Object, { path: 'quarantine', prefix: 'Bank' });
             return valType ? [valType] : validators.validateContractObjectNoThrow(quarantine, Object, properties, null, true);
         },
 
@@ -80,7 +80,7 @@ const bankValidators = (bank) => {
                 { path: 'quarantine', nested: val.validateRFHQuarantine, optional: true, allowNull: true }
             ];
 
-            const valType = validators.validateTypeNoThrow(recentFileHistory, Object, { path: 'quarantine', prefix: dict.name });
+            const valType = validators.validateTypeNoThrow(recentFileHistory, Object, { path: 'quarantine', prefix: 'Bank' });
             return valType ? [valType] : validators.validateContractObjectNoThrow(recentFileHistory, Object, properties, null, true);
         },
 
@@ -94,7 +94,7 @@ const bankValidators = (bank) => {
                 { path: 'emailTitle', regex: Resources.regex.bank.offBoardingEmailTitle, optional: true, allowNull: true }
             ];
 
-            const valType = validators.validateTypeNoThrow(offBoardingMechanism, Object, { path: 'offBoardingMechanism', prefix: dict.name });
+            const valType = validators.validateTypeNoThrow(offBoardingMechanism, Object, { path: 'offBoardingMechanism', prefix: 'Bank' });
             return valType ? [valType] : validators.validateContractObjectNoThrow(offBoardingMechanism, Object, properties, null);
         },
 
@@ -103,7 +103,7 @@ const bankValidators = (bank) => {
                 { path: 'longURL', custom: _.isBoolean, optional: true, allowNull: true }
             ];
 
-            const valType = validators.validateTypeNoThrow(internal, Object, { path: 'internal', prefix: dict.name });
+            const valType = validators.validateTypeNoThrow(internal, Object, { path: 'internal', prefix: 'Bank' });
             return valType ? [valType] : validators.validateContractObjectNoThrow(internal, Object, properties, null);
         },
 
@@ -113,7 +113,7 @@ const bankValidators = (bank) => {
                 { path: 'bankName', regex: Resources.regex.bank.name },
             ];
 
-            const valType = validators.validateTypeNoThrow(proxy, Object, { path: 'proxy', prefix: dict.name });
+            const valType = validators.validateTypeNoThrow(proxy, Object, { path: 'proxy', prefix: 'Bank' });
             return valType ? [valType] : validators.validateContractObjectNoThrow(proxy, Object, properties, null);
         },
 
