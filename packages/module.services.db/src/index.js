@@ -36,10 +36,10 @@ const connectImpl = Promise.method((self) => {
 
     const options = {};
     if (self.sslCA) {
-        Object.assign(options, { ssl: true, sslCA: self.sslCA } );
+        Object.assign(options, { ssl: true, sslCA: self.sslCA });
     }
 
-    return self._MongoClient.connect(url,  (Object.keys(options).length ? options : undefined))
+    return self._MongoClient.connect(url, (Object.keys(options).length ? options : undefined))
         .then((client) => {
             self.client = client; // eslint-disable-line no-param-reassign
             return client.db();
@@ -59,7 +59,7 @@ const disconnectImpl = Promise.method((self) => {
 
 const getConnectionString = ({ env: awsEnv, region: awsRegion, domain, username, password, replicaSet, db, localhost = false, connectionString }) => {
     if (connectionString) {
-        return;
+        return connectionString;
     }
 
     if (localhost) {
