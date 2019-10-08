@@ -59,6 +59,7 @@ const disconnectImpl = Promise.method((self) => {
 
 const getConnectionString = ({ env: awsEnv, region: awsRegion, domain, username, password, replicaSet, db, localhost = false, connectionString }) => {
     if (connectionString) {
+        // if we already have a connection string, we just return
         return connectionString;
     }
 
