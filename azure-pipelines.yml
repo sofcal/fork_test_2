@@ -20,8 +20,8 @@ steps:
 
 - task: CmdLine@2
   inputs:
-    script: 'git fetch && git checkout $(Build.SourceBranchName)'
-  displayName: 'Update and pull branch: $(Build.SourceBranchName)'
+    script: 'git checkout develop'
+  displayName: 'branch checkout (why?)'
 
 - task: Npm@1
   inputs:
