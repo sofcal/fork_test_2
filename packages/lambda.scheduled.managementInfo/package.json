@@ -1,6 +1,6 @@
 {
   "name": "lambda-scheduled-managementinfo",
-  "version": "1.1.73",
+  "version": "1.1.91",
   "author": "",
   "license": "ISC",
   "description": "",
@@ -9,7 +9,7 @@
   "dependencies": {
     "@sage/bc-parameterstore-static-loader": "^1.1.73",
     "@sage/bc-requestlogger": "^1.1.73",
-    "@sage/bc-services-db": "^1.1.73",
+    "@sage/bc-services-db": "^1.1.91",
     "@sage/bc-services-s3": "^1.1.73",
     "@sage/bc-statuscodeerror": "^1.1.73",
     "aws-sdk": "^2.220.1",

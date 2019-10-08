@@ -1,6 +1,6 @@
 {
   "name": "@sage/bc-default-lambda-handler",
-  "version": "1.1.73",
+  "version": "1.1.91",
   "author": "Sage UK",
   "license": "ISC",
   "description": "",
@@ -18,7 +18,7 @@
     "@babel/preset-env": "^7.5.4",
     "@sage/bc-parameterstore-static-loader": "^1.1.73",
     "@sage/bc-requestlogger": "^1.1.73",
-    "@sage/bc-services-db": "^1.1.73",
+    "@sage/bc-services-db": "^1.1.91",
     "@sage/bc-services-parameter": "^1.1.73",
     "@sage/bc-statuscodeerror": "^1.1.73",
     "aws-sdk": "^2.220.1",
