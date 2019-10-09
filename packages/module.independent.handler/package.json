@@ -19,6 +19,7 @@
     "@sage/bc-infrastructure-cloudwatchsubscription": "^1.1.73",
     "@sage/bc-requestlogger": "^1.1.73",
     "@sage/bc-statuscodeerror": "^1.1.73",
+    "@sage/bc-util-fuzzyaccess": "^1.1.73",
     "aws-sdk": "^2.220.1",
     "bluebird": "^3.5.1",
     "mongodb": "3.0.5",

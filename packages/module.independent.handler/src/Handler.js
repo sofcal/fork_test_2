@@ -1,11 +1,13 @@
 'use strict';
 
-const Promise = require('bluebird');
+const ErrorSpecs = require('./ErrorSpecs');
 
 const { RequestLogger } = require('@sage/bc-requestlogger');
 const { StatusCodeError } = require('@sage/bc-statuscodeerror');
 const { CloudWatchSubscription } = require('@sage/bc-infrastructure-cloudwatchsubscription');
-const ErrorSpecs = require('./ErrorSpecs');
+const { FuzzyAccess } = require('@sage/bc-util-fuzzyaccess');
+
+const Promise = require('bluebird');
 
 class Handler {
     constructor({ config, serviceId = '@sage/base-service-id' }) {
@@ -16,6 +18,10 @@ class Handler {
         this.services = {};
         this.config = config;
         this.serviceId = serviceId;
+
+        this.flags = {
+            logStackTraceOnError: FuzzyAccess.Get(config, 'DEBUG_LOG_STACK_TRACE')
+        };
 
         this.initialised = false;
     }
@@ -122,6 +128,11 @@ class Handler {
         return Promise.resolve(undefined)
             .then(() => {
                 const func = `${Handler.name}.buildErrorResponse`;
+
+                if (this.flags.logStackTraceOnError) {
+                    logger.error({ function: func, log: 'stack trace for error', params: { stack: err.stack } });
+                }
+
                 // if we caught an error; we ensure it's either a valid error we can return, or a 500 internal.
                 const statusCodeError = StatusCodeError.is(err)
                     ? err
