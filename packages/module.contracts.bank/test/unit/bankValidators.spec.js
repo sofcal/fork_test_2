@@ -83,7 +83,7 @@ describe('@sage/bc-contracts-bank.bankValidators', () => {
             const valError = new Error('validateTypeNoThrow');
             validators.validateTypeNoThrow.returns(valError);
             const value = {};
-            const props = { path: 'mandatoryCustomerBankDetails', prefix: dict.name };
+            const props = { path: 'mandatoryCustomerBankDetails', prefix: 'Bank' };
 
             should(val.validateMandatoryCustomerBankDetails(value)).eql([valError]);
             should(validators.validateTypeNoThrow.calledOnce).be.true('should call validateTypeNoThrow once');
@@ -97,7 +97,7 @@ describe('@sage/bc-contracts-bank.bankValidators', () => {
             const valError = new Error('validateContractObjectNoThrow');
             validators.validateContractObjectNoThrow.returns(valError);
             const value = {};
-            const props1 = { path: 'mandatoryCustomerBankDetails', prefix: dict.name };
+            const props1 = { path: 'mandatoryCustomerBankDetails', prefix: 'Bank' };
             const props2 = [
                 { path: 'name', custom: _.isString, optional: false },
                 { path: 'value', custom: _.isString, optional: false },
@@ -129,7 +129,7 @@ describe('@sage/bc-contracts-bank.bankValidators', () => {
             const valError = new Error('validateTypeNoThrow');
             validators.validateTypeNoThrow.returns(valError);
             const value = {};
-            const props = { path: 'accountTypes', prefix: dict.name };
+            const props = { path: 'accountTypes', prefix: 'Bank' };
 
             should(val.validateAccountTypes(value)).eql([valError]);
             should(validators.validateTypeNoThrow.calledOnce).be.true('should call validateTypeNoThrow once');
@@ -143,7 +143,7 @@ describe('@sage/bc-contracts-bank.bankValidators', () => {
             const valError = new Error('validateContractObjectNoThrow');
             validators.validateContractObjectNoThrow.returns(valError);
             const value = {};
-            const props1 = { path: 'accountTypes', prefix: dict.name };
+            const props1 = { path: 'accountTypes', prefix: 'Bank' };
             const props2 = [
                 { path: 'name', regex: Resources.regex.bank.accountTypes, optional: true },
                 { path: 'mandatoryCustomerBankDetails', nested: val.validateMandatoryCustomerBankDetails, optional: true }
@@ -246,7 +246,7 @@ describe('@sage/bc-contracts-bank.bankValidators', () => {
             const valError = new Error('validateTypeNoThrow');
             validators.validateTypeNoThrow.returns(valError);
             const value = {};
-            const props = { path: 'quarantine', prefix: dict.name };
+            const props = { path: 'quarantine', prefix: 'Bank' };
 
             should(val.validateQuarantine(value)).eql([valError]);
             should(validators.validateTypeNoThrow.calledOnce).be.true('should call validateTypeNoThrow once');
@@ -260,7 +260,7 @@ describe('@sage/bc-contracts-bank.bankValidators', () => {
             const valError = new Error('validateContractObjectNoThrow');
             validators.validateContractObjectNoThrow.returns(valError);
             const value = {};
-            const props1 = { path: 'quarantine', prefix: dict.name };
+            const props1 = { path: 'quarantine', prefix: 'Bank' };
             const props2 = [
                 { path: 'forceQuarantine', custom: _.isBoolean },
                 { path: 'transactionTypes', arrayCustom: val.validateTransactionTypes, allowEmptyArray: true }
@@ -290,7 +290,7 @@ describe('@sage/bc-contracts-bank.bankValidators', () => {
             const valError = new Error('validateTypeNoThrow');
             validators.validateTypeNoThrow.returns(valError);
             const value = {};
-            const props = { path: 'quarantine', prefix: dict.name };
+            const props = { path: 'quarantine', prefix: 'Bank' };
 
             should(val.validateRFHQuarantine(value)).eql([valError]);
             should(validators.validateTypeNoThrow.calledOnce).be.true('should call validateTypeNoThrow once');
@@ -304,7 +304,7 @@ describe('@sage/bc-contracts-bank.bankValidators', () => {
             const valError = new Error('validateContractObjectNoThrow');
             validators.validateContractObjectNoThrow.returns(valError);
             const value = {};
-            const props1 = { path: 'quarantine', prefix: dict.name };
+            const props1 = { path: 'quarantine', prefix: 'Bank' };
             const props2 = [
                 { path: 'isQuarantined', custom: _.isBoolean },
                 { path: 'releaseDate', custom: _.isDate, optional: true, allowNull: true },
@@ -334,7 +334,7 @@ describe('@sage/bc-contracts-bank.bankValidators', () => {
             const valError = new Error('validateTypeNoThrow');
             validators.validateTypeNoThrow.returns(valError);
             const value = {};
-            const props = { path: 'quarantine', prefix: dict.name };
+            const props = { path: 'quarantine', prefix: 'Bank' };
 
             should(val.validateRecentFileHistory(value)).eql([valError]);
             should(validators.validateTypeNoThrow.calledOnce).be.true('should call validateTypeNoThrow once');
@@ -348,7 +348,7 @@ describe('@sage/bc-contracts-bank.bankValidators', () => {
             const valError = new Error('validateContractObjectNoThrow');
             validators.validateContractObjectNoThrow.returns(valError);
             const value = {};
-            const props1 = { path: 'quarantine', prefix: dict.name };
+            const props1 = { path: 'quarantine', prefix: 'Bank' };
             const props2 = [
                 { path: 'timestamp', custom: _.isDate, optional: true, allowNull: true },
                 { path: 'fileId', custom: _.isString },
@@ -394,7 +394,7 @@ describe('@sage/bc-contracts-bank.bankValidators', () => {
             const valError = new Error('validateTypeNoThrow');
             validators.validateTypeNoThrow.returns(valError);
             const value = {};
-            const props1 = { path: 'offBoardingMechanism', prefix: dict.name };
+            const props1 = { path: 'offBoardingMechanism', prefix: 'Bank' };
 
             should(val.validateOffBoardingMechanism(value)).eql([valError]);
             should(validators.validateTypeNoThrow.calledOnce).be.true('should call validateTypeNoThrow once');
@@ -408,7 +408,7 @@ describe('@sage/bc-contracts-bank.bankValidators', () => {
             const valError = new Error('validateContractObjectNoThrow');
             validators.validateContractObjectNoThrow.returns(valError);
             const value = {};
-            const props1 = { path: 'offBoardingMechanism', prefix: dict.name };
+            const props1 = { path: 'offBoardingMechanism', prefix: 'Bank' };
             const props2 = [
                 { path: 'type', custom: val.validateOffBoardingType },
                 { path: 'instructions', custom: _.isString, optional: true, allowNull: true },
@@ -440,7 +440,7 @@ describe('@sage/bc-contracts-bank.bankValidators', () => {
             const valError = new Error('validateTypeNoThrow');
             validators.validateTypeNoThrow.returns(valError);
             const value = {};
-            const props1 = { path: 'proxy', prefix: dict.name };
+            const props1 = { path: 'proxy', prefix: 'Bank' };
 
             should(val.validateProxy(value)).eql([valError]);
             should(validators.validateTypeNoThrow.calledOnce).be.true('should call validateTypeNoThrow once');
@@ -454,7 +454,7 @@ describe('@sage/bc-contracts-bank.bankValidators', () => {
             const valError = new Error('validateContractObjectNoThrow');
             validators.validateContractObjectNoThrow.returns(valError);
             const value = {};
-            const props1 = { path: 'proxy', prefix: dict.name };
+            const props1 = { path: 'proxy', prefix: 'Bank' };
             const props2 = [
                 { path: 'bankId', regex: Resources.regex.uuid },
                 { path: 'bankName', regex: Resources.regex.bank.name },
