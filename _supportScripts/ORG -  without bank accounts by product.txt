@@ -1,10 +1,8 @@
 db.Organisation.aggregate([
+{$match:{bankAccounts:[]}},
 { $unwind: { path: '$products', preserveNullAndEmptyArrays: false } },
 { $lookup: { from: 'Product', localField: 'products.productId', foreignField: '_id', as: 'prod'}},
-{ $unwind: { path: '$bankAccounts', preserveNullAndEmptyArrays: false } },
-{ $lookup: { from: 'Transaction', localField: 'bankAccounts.bankAccountId', foreignField: 'bankAccountId', as: 'transLookup'}},
-{ $unwind: { path: '$transLookup', preserveNullAndEmptyArrays: false } },
-{ $unwind: { path: '$transLookup.transactions', preserveNullAndEmptyArrays: false } },
+
 {
         $project: {
             _id: '$products.productId',
@@ -18,8 +16,6 @@ db.Organisation.aggregate([
             _id: '$_id',
             productName: { $first: '$productName' },
             numberOfOrg: { $addToSet: '$numberOfOrg' },
-            numberOfBankAccounts: { $addToSet: '$numberOfBankAccounts' },
-            numberOfTrans: { $addToSet: '$numberOfTrans' },
         }
     },
 { $unwind: { path: '$productName', preserveNullAndEmptyArrays: false } },
@@ -28,8 +24,6 @@ db.Organisation.aggregate([
             _id: 1,
             productName: 1,
             numberOfOrg: { $cond: [{ $not: ['$numberOfOrg'] }, 0, { $size: '$numberOfOrg'}] },
-            numberOfBankAccounts: { $cond: [{ $not: ['$numberOfBankAccounts'] }, 0, { $size: '$numberOfBankAccounts'}] },
-            numberOfTrans: { $cond: [{ $not: ['$numberOfTrans'] }, 0, { $size: '$numberOfTrans'}] }
         }
     }
 ],{

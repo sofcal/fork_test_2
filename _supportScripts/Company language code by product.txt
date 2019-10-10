@@ -1,0 +1,18 @@
+DBQuery.shellBatchSize = 7000;
+db.Organisation.aggregate([
+   { $match:{"products.productId": {$in:["97f054f1-3660-4f6f-a3e2-4cfd603ede68","b2967e8f-a249-4ef8-aa6d-d23b56c4aff7"]}}},
+{ $unwind: { path: '$products', preserveNullAndEmptyArrays: false } },
+{ $lookup: { from: 'Product', localField: 'products.productId', foreignField: '_id', as: 'prod'}},
+   {
+        $lookup: {
+            from: 'Company',
+            localField: '_id',
+            foreignField: 'organisationId',
+            as: 'comp'
+        }
+    },
+    { $unwind: '$comp' },
+{ $project: {"product":"$prod.name", "companyId":"$comp._id","languageCode": "$comp.languageCode" }},
+{ $unwind: { path: '$product', preserveNullAndEmptyArrays: false } },
+{ $project: {"product":1, "companyId":1,"languageCode": 1 }},
+    ])

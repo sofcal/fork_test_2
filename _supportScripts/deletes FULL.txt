@@ -91,3 +91,16 @@ db.ProviderAccessAccount.remove({organisationId:"de195c10-22a0-4cc2-b081-7d318b4
 
 db.User.remove({_id: '9d22ae60-ee42-455f-b772-6d278f27b4e8'});
 db.Organisation.remove({_id: '6246cfc5-aa37-489c-a2d3-c3a3a7921086'});
+
+
+Change email
+Please run the following in EU
+db.getCollection('Organisation').find({_id:"c2aa944f-bd3c-4520-9ec2-e909c68f3be6"})
+
+Edit document > Change
+"adminEmail" : "richard.lowe@hsgservices.co.uk",
+
+to
+"adminEmail" : "accounts@hsgservices.co.uk",
+
+Validate > Save
