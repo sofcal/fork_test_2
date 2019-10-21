@@ -124,6 +124,16 @@ const bankValidators = (bank) => {
             }
             return [new StatusCodeErrorItem(Resources.services.common.InvalidProperties, 'invalid internalStatus value', { internalStatuses })];
         },
+
+        validateProvider: (provider) => {
+            const properties = [
+                { path: 'providerId', regex: resources.regex.uuid, optional: false, allowNull: false },
+                { path: 'authUrl', custom: _.isString, optional: false, allowNull: false }
+            ];
+
+            const valType = utils.validateTypeNoThrow(provider, Object, { path: 'provider', prefix: Bank.name });
+            return valType ? [valType] : utils.validateContractObjectNoThrow(provider, Object, properties, null);
+        },
     };
     return val;
 };

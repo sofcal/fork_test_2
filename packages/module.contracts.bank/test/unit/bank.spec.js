@@ -13,6 +13,7 @@ const _ = require('underscore');
 describe('@sage/bc-contracts-bank.Bank', () => {
     let sandbox;
     let uuid;
+    let bankProviderId;
     let name;
     let primaryCountry;
     let primaryCountry2CharIso;
@@ -42,6 +43,7 @@ describe('@sage/bc-contracts-bank.Bank', () => {
         sandbox.stub(validators);
 
         uuid = 'd73ebc4a-654b-4e87-ae35-b37fc562de06';
+        bankProviderId = 'f686f71a-ad34-4056-8e49-5e368ac4a6a7';
         name = 'bank_name';
         primaryCountry = 'GBR';
         primaryCountry2CharIso = 'GB';
@@ -114,6 +116,10 @@ describe('@sage/bc-contracts-bank.Bank', () => {
             recentFileHistory: [],
             aggregatorId,
             aggregatorName,
+            provider: {
+                providerId: bankProviderId,
+                authUrl: 'authUrl'
+            },
         };
     });
 
@@ -169,6 +175,10 @@ describe('@sage/bc-contracts-bank.Bank', () => {
                     should(bank.offBoardingMechanism).eql(offBoarding);
                     should(bank.proxy).eql(proxy);
                     should(bank.supportiframe).eql(false);
+                    bank.provider.should.eql({
+                        providerId: bankProviderId,
+                        authUrl: 'authUrl'
+                    });
 
                     done();
                 } catch (err) {
@@ -186,6 +196,7 @@ describe('@sage/bc-contracts-bank.Bank', () => {
                     delete data.supportiframe;
                     delete data.internalStatuses;
                     delete data.dataProvider;
+                    delete data.provider;
 
                     const bank = new Bank(data);
 
@@ -197,6 +208,7 @@ describe('@sage/bc-contracts-bank.Bank', () => {
                     should(bank.proxy).be.null();
                     should(bank.supportiframe).eql(true);
                     should(bank.dataProvider).eql(Bank.dataProviders.direct);
+                    should(bank.provider).eql(null);
 
                     done();
                 } catch (err) {
@@ -1001,6 +1013,28 @@ describe('@sage/bc-contracts-bank.Bank', () => {
                             error: true,
                             skipParamAssert: true }
                     ]
+                }, {
+                    target: 'provider', tests: [
+                        { it: 'should not throw if provider is null', value: null },
+                        { it: 'should not throw if provider is a valid object', value: { providerId: 'f686f71a-ad34-4056-8e49-5e368ac4a6a7', authUrl: 'authUrl' } },
+                        { it: 'should throw if provider is a string', value: 'string', error: true },
+                        { it: 'should throw if provider is a number', value: 9, error: true },
+                        { it: 'should throw if provider is a boolean', value: true, error: true },
+
+                        { it: 'should throw if provider.providerId is null', value: { providerId: null, authUrl: 'authUrl' }, error: true, skipParamAssert: true },
+                        { it: 'should throw if provider.providerId is an empty string', value: { providerId: '', authUrl: 'authUrl' }, error: true, skipParamAssert: true },
+                        { it: 'should throw if provider.providerId is not a valid uuid', value: { providerId: 'not_a_uuid', authUrl: 'authUrl' }, error: true, skipParamAssert: true },
+                        { it: 'should throw if provider.providerId is a number', value: { providerId: 9, authUrl: 'authUrl' }, error: true, skipParamAssert: true },
+                        { it: 'should throw if provider.providerId is an object', value: { providerId: {}, authUrl: 'authUrl' }, error: true, skipParamAssert: true },
+                        { it: 'should throw if provider.providerId is a boolean', value: { providerId: true, authUrl: 'authUrl' }, error: true, skipParamAssert: true },
+
+                        { it: 'should not throw if provider.authUrl is 255 characters', value: { providerId: bankProviderId, authUrl: resources.fixedLengthString.len255 }, error: true, skipParamAssert: true },
+                        { it: 'should throw if provider.authUrl is null', value: { providerId: bankProviderId, authUrl: null }, error: true, skipParamAssert: true },
+                        { it: 'should throw if provider.authUrl is a zero length string', value: { providerId: bankProviderId, authUrl: '' }, error: true, skipParamAssert: true },
+                        { it: 'should throw if provider.authUrl is greater than 255 characters', value: { providerId: bankProviderId, authUrl: resources.fixedLengthString.len256 }, error: true, skipParamAssert: true },
+                        { it: 'should throw if provider.authUrl is a number', value: { providerId: bankProviderId, authUrl: 3 }, error: true, skipParamAssert: true },
+                        { it: 'should throw if provider.authUrl is an object', value: { providerId: bankProviderId, authUrl: {} }, error: true, skipParamAssert: true }
+                    ]
                 }];
 
             const accountTypesTests = [
@@ -1445,6 +1479,7 @@ describe('@sage/bc-contracts-bank.Bank', () => {
                     should.not.exists(bank.offBoardingMechanism.emailTitle);
                     should.not.exists(bank.proxy);
                     should.not.exists(bank.internalStatuses);
+                    should.not.exists(bank.provider);
 
                     done();
                 } catch (err) {

@@ -37,6 +37,8 @@ class Bank {
 
             this.internal = { longURL: data.longURL || false };
 
+            this.provider = data.provider || null;
+
             /* aggregator feature */
             if (plaidFeatureEnabled) {
                 this.dataProvider = data.dataProvider || Bank.dataProviders.direct;
@@ -76,7 +78,8 @@ class Bank {
             { path: 'proxy', nested: val.validateProxy, optional: true, allowNull: true },
             { path: 'supportiframe', custom: _.isBoolean },
             { path: 'recentFileHistory', nested: val.validateRecentFileHistory, optional: true, allowNull: true },
-            { path: 'internal', nested: val.validateInternal, optional: true, allowNull: true }
+            { path: 'internal', nested: val.validateInternal, optional: true, allowNull: true },
+            { path: 'provider', nested: val.validateProvider, optional: true, allowNull: true }
         ];
 
         /* aggregator feature */
@@ -124,6 +127,7 @@ class Bank {
         delete data.proxy;
         delete data.internalStatuses;
         delete data.internal;
+        delete data.provider;
 
         if (data.offBoardingMechanism) {
             delete data.offBoardingMechanism.emailAddress;
