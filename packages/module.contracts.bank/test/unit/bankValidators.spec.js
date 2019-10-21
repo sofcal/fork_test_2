@@ -543,7 +543,7 @@ describe('@sage/bc-contracts-bank.bankValidators', () => {
             validators.validateTypeNoThrow.returns(undefined);
             validators.validateContractObjectNoThrow.returns(undefined);
 
-            should(val.validateProxy({})).eql(undefined);
+            should(val.validateProvider({})).eql(undefined);
             should(validators.validateTypeNoThrow.calledOnce).be.true('should call validateTypeNoThrow once');
             should(validators.validateContractObjectNoThrow.calledOnce).be.true('should call validateContractObjectNoThrow once');
         });
