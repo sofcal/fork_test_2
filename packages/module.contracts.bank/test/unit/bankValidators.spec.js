@@ -469,7 +469,7 @@ describe('@sage/bc-contracts-bank.bankValidators', () => {
             should(contractArgs).be.eql([value, Object, props2, null]);
         });
 
-        it('should return undefined if validateTypeNoThrow andvalidateContractObjectNoThrow do not return any errors', () => {
+        it('should return undefined if validateTypeNoThrow and validateContractObjectNoThrow do not return any errors', () => {
             validators.validateTypeNoThrow.returns(undefined);
             validators.validateContractObjectNoThrow.returns(undefined);
 
