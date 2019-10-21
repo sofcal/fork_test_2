@@ -1028,10 +1028,10 @@ describe('@sage/bc-contracts-bank.Bank', () => {
                         { it: 'should throw if provider.providerId is an object', value: { providerId: {}, authUrl: 'authUrl' }, error: true, skipParamAssert: true },
                         { it: 'should throw if provider.providerId is a boolean', value: { providerId: true, authUrl: 'authUrl' }, error: true, skipParamAssert: true },
 
-                        { it: 'should not throw if provider.authUrl is 255 characters', value: { providerId: bankProviderId, authUrl: resources.fixedLengthString.len255 }, error: true, skipParamAssert: true },
+                        { it: 'should not throw if provider.authUrl is 255 characters', value: { providerId: bankProviderId, authUrl: Resources.fixedLengthString.len255 }, error: true, skipParamAssert: true },
                         { it: 'should throw if provider.authUrl is null', value: { providerId: bankProviderId, authUrl: null }, error: true, skipParamAssert: true },
                         { it: 'should throw if provider.authUrl is a zero length string', value: { providerId: bankProviderId, authUrl: '' }, error: true, skipParamAssert: true },
-                        { it: 'should throw if provider.authUrl is greater than 255 characters', value: { providerId: bankProviderId, authUrl: resources.fixedLengthString.len256 }, error: true, skipParamAssert: true },
+                        { it: 'should throw if provider.authUrl is greater than 255 characters', value: { providerId: bankProviderId, authUrl: Resources.fixedLengthString.len256 }, error: true, skipParamAssert: true },
                         { it: 'should throw if provider.authUrl is a number', value: { providerId: bankProviderId, authUrl: 3 }, error: true, skipParamAssert: true },
                         { it: 'should throw if provider.authUrl is an object', value: { providerId: bankProviderId, authUrl: {} }, error: true, skipParamAssert: true }
                     ]
