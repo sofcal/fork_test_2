@@ -504,4 +504,48 @@ describe('@sage/bc-contracts-bank.bankValidators', () => {
             should(error).have.propertyByPath('params', 'internalStatuses').which.is.an.Array();
         });
     });
+
+    describe('validateProvider', () => {
+        it('should return any errors from validateTypeNoThrow', () => {
+            const valError = new Error('validateTypeNoThrow');
+            validators.validateTypeNoThrow.returns(valError);
+            const value = {};
+            const props1 = { path: 'provider', prefix: 'Bank' };
+
+            should(val.validateProxy(value)).eql([valError]);
+            should(validators.validateTypeNoThrow.calledOnce).be.true('should call validateTypeNoThrow once');
+            const { args: typeArgs } = validators.validateTypeNoThrow.lastCall;
+            should(typeArgs).be.eql([value, Object, props1]);
+            should(validators.validateContractObjectNoThrow.called).be.false('should skip validateContractObjectNoThrow call');
+        });
+
+        it('should return any errors from validateContractObjectNoThrow', () => {
+            validators.validateTypeNoThrow.returns(undefined);
+            const valError = new Error('validateContractObjectNoThrow');
+            validators.validateContractObjectNoThrow.returns(valError);
+            const value = {};
+            const props1 = { path: 'provider', prefix: 'Bank' };
+            const props2 = [
+                { path: 'providerId', regex: Resources.regex.uuid },
+                { path: 'authUrl', string: 'authUrl' },
+            ];
+
+            should(val.validateProxy(value)).eql(valError);
+            should(validators.validateTypeNoThrow.calledOnce).be.true('should call validateTypeNoThrow once');
+            const { args: typeArgs } = validators.validateTypeNoThrow.lastCall;
+            should(typeArgs).be.eql([value, Object, props1]);
+            should(validators.validateContractObjectNoThrow.calledOnce).be.true('should call validateContractObjectNoThrow once');
+            const { args: contractArgs } = validators.validateContractObjectNoThrow.lastCall;
+            should(contractArgs).be.eql([value, Object, props2, null]);
+        });
+
+        it('should return undefined if validateTypeNoThrow and validateContractObjectNoThrow do not return any errors', () => {
+            validators.validateTypeNoThrow.returns(undefined);
+            validators.validateContractObjectNoThrow.returns(undefined);
+
+            should(val.validateProxy({})).eql(undefined);
+            should(validators.validateTypeNoThrow.calledOnce).be.true('should call validateTypeNoThrow once');
+            should(validators.validateContractObjectNoThrow.calledOnce).be.true('should call validateContractObjectNoThrow once');
+        });
+    });
 });

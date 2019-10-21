@@ -131,7 +131,7 @@ const bankValidators = (bank) => {
                 { path: 'authUrl', custom: _.isString, optional: false, allowNull: false }
             ];
 
-            const valType = utils.validateTypeNoThrow(provider, Object, { path: 'provider', prefix: Bank.name });
+            const valType = utils.validateTypeNoThrow(provider, Object, { path: 'provider', prefix: 'Bank' });
             return valType ? [valType] : utils.validateContractObjectNoThrow(provider, Object, properties, null);
         },
     };
