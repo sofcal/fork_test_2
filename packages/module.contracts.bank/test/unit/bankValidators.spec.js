@@ -512,7 +512,7 @@ describe('@sage/bc-contracts-bank.bankValidators', () => {
             const value = {};
             const props1 = { path: 'provider', prefix: 'Bank' };
 
-            should(val.validateProxy(value)).eql([valError]);
+            should(val.validateProvider(value)).eql([valError]);
             should(validators.validateTypeNoThrow.calledOnce).be.true('should call validateTypeNoThrow once');
             const { args: typeArgs } = validators.validateTypeNoThrow.lastCall;
             should(typeArgs).be.eql([value, Object, props1]);
@@ -530,7 +530,7 @@ describe('@sage/bc-contracts-bank.bankValidators', () => {
                 { path: 'authUrl', string: 'authUrl' },
             ];
 
-            should(val.validateProxy(value)).eql(valError);
+            should(val.validateProvider(value)).eql(valError);
             should(validators.validateTypeNoThrow.calledOnce).be.true('should call validateTypeNoThrow once');
             const { args: typeArgs } = validators.validateTypeNoThrow.lastCall;
             should(typeArgs).be.eql([value, Object, props1]);
