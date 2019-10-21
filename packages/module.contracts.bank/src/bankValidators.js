@@ -127,12 +127,12 @@ const bankValidators = (bank) => {
 
         validateProvider: (provider) => {
             const properties = [
-                { path: 'providerId', regex: resources.regex.uuid, optional: false, allowNull: false },
+                { path: 'providerId', regex: Resources.regex.uuid, optional: false, allowNull: false },
                 { path: 'authUrl', custom: _.isString, optional: false, allowNull: false }
             ];
 
-            const valType = utils.validateTypeNoThrow(provider, Object, { path: 'provider', prefix: 'Bank' });
-            return valType ? [valType] : utils.validateContractObjectNoThrow(provider, Object, properties, null);
+            const valType = validators.validateTypeNoThrow(provider, Object, { path: 'provider', prefix: 'Bank' });
+            return valType ? [valType] : validators.validateContractObjectNoThrow(provider, Object, properties, null);
         },
     };
     return val;
