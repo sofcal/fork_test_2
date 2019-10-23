@@ -58,12 +58,12 @@ var pipeline = (skip, limit) => {
 };
 
 var options = { allowDiskUse: true };
-db.getCollection('BankAccount').aggregate(pipeline(0, 10000), options);
-db.getCollection('BankAccount').aggregate(pipeline(10000, 10000), options);
-db.getCollection('BankAccount').aggregate(pipeline(20000, 10000), options);
-db.getCollection('BankAccount').aggregate(pipeline(30000, 10000), options);
-db.getCollection('BankAccount').aggregate(pipeline(40000, 10000), options);
-db.getCollection('BankAccount').aggregate(pipeline(50000, 10000), options);
-db.getCollection('BankAccount').aggregate(pipeline(60000, 10000), options);
-db.getCollection('BankAccount').aggregate(pipeline(70000, 10000), options);
-db.getCollection('BankAccount').aggregate(pipeline(80000, 10000), options);
+db.getCollection('BankAccount').aggregate(pipeline(0, 25000), options);
+db.getCollection('BankAccount').aggregate(pipeline(25000, 25000), options);
+db.getCollection('BankAccount').aggregate(pipeline(50000, 25000), options);
+db.getCollection('BankAccount').aggregate(pipeline(75000, 25000), options);
+db.getCollection('BankAccount').aggregate(pipeline(100000, 25000), options);
+db.getCollection('BankAccount').aggregate(pipeline(125000, 25000), options);
+db.getCollection('BankAccount').aggregate(pipeline(150000, 25000), options);
+db.getCollection('BankAccount').aggregate(pipeline(175000, 25000), options);
+db.getCollection('BankAccount').aggregate(pipeline(200000, 25000), options);
