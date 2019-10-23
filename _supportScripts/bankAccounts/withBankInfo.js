@@ -41,7 +41,7 @@ var pipeline = (skip, limit) => {
                         statusReason: '$statusReason',
                         region: '$region',
                         feedSource: '$feedSource',
-                        dataProvider: '$organisationId',
+                        dataProvider: '$dataProvider',
                         bankId: '$bankId',
                         bankName: '$bankName',
                         bankStatus: '$bankStatus',
