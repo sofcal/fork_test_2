@@ -10,6 +10,7 @@ var pipeline = (skip, limit) => {
                 organisationId: 1,
                 lastTransactionsGet: { $dateToString: { format: '%Y-%m-%dT%H:%M:%S:%LZ', date: '$lastTransactionsGet' } },
                 lastTransactionsReceived: { $dateToString: { format: '%Y-%m-%dT%H:%M:%S:%LZ', date: '$lastTransactionsReceived' } },
+                lastTransactionId: 1,
                 status: 1,
                 statusReason: 1,
                 region: 1,
@@ -24,6 +25,8 @@ var pipeline = (skip, limit) => {
                 created: { $dateToString: { format: '%Y-%m-%dT%H:%M:%S:%LZ', date: '$created' } }
             }
         },
+        { $lookup: { from: 'Rule', localField: '_id', foreignField: 'bankAccountId', as: 'ruleLookup' } },
+        { $unwind: { path: '$ruleLookup', preserveNullAndEmptyArrays: true } },
         {
             $group: {
                 _id: 1,
@@ -33,6 +36,7 @@ var pipeline = (skip, limit) => {
                         organisationId: '$organisationId',
                         lastTransactionsGet: '$lastTransactionsGet',
                         lastTransactionsReceived: '$lastTransactionsReceived',
+                        lastTransactionId: '$lastTransactionId',
                         status: '$status',
                         statusReason: '$statusReason',
                         region: '$region',
@@ -44,7 +48,8 @@ var pipeline = (skip, limit) => {
                         bankCountry: '$bankCountry',
                         aggregatorName: '$aggregatorName',
                         aggregatorId: '$aggregatorId',
-                        created: '$created'
+                        created: '$created',
+                        ruleCount: '$ruleLookup.numberOfRules'
                     }
                 }
             }
