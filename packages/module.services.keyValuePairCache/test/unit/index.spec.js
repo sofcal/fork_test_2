@@ -1,55 +1,93 @@
 const keyValuePairCache = require('../../src');
-// TODO: Magic Mocking Stuff
+const KeyValuePair = require('../../src/KeyValuePair');
 const sinon = require('sinon');
 const should = require('should');
+const Promise = require('bluebird');
+const redis = Promise.promisifyAll(require('redis'));
 
 describe('@sage/bc-services-keyvaluepaircache', function() {
     let service;
+    let sandbox;
 
     beforeEach(() => {
         service = new keyValuePairCache({localhost:true});
+        sandbox = sinon.createSandbox();
+        sandbox.stub(redis, 'createClient')
+            .returns(new MockRedis());
+        service.connect();
     });
 
     afterEach(() => {
         service.disconnect();
+        sandbox.restore();
     });
 
-    it('should test something useful', () => {
-        sinon.spy(service, 'connect');
-
-        return service.connect()
-            .then (() => {
-                should.equal(service.connect.called, true);
+    it('should process store successfully', () => {
+        sandbox.stub(service.redisClient, 'setAsync').returns(Promise.resolve());
+        let kvp = new KeyValuePair({key:'key1',value:'value1'});
+        return service.storePair(kvp,300)
+            .then((response) => {
+                should.equal(response.value, 'value1');
             })
     });
 
-    it('should test something evil', () => {
-        //sinon.stub(service); // Will stub everything in service
-        sinon.stub(service, 'connect').resolves(true); // Use resolves rather than returns when using promises
-
-        return service.connect()
-            .then((res) => {
-                should.equal(res,true);
+    it('should process retrieve successfully', () => {
+        sandbox.stub(service.redisClient, 'getAsync').returns(Promise.resolve("{\"type\":\"Object\",\"value\":\"dummyValue\"}"));
+        return service.retrievePair('dummyKey')
+            .then((response) => {
+                should.equal(response.value, 'dummyValue');
             })
     });
 
-    it('should test something evil again', () => {
-        sinon.stub(service, 'connect').rejects(new Error('Problem connecting to cache')); // Use resolves rather than returns when using promises
+    it('should process upsert as set', () => {
+        let setStub = sandbox.stub(service.redisClient, 'setAsync').returns(Promise.resolve());
+        let kvp = new KeyValuePair({key:'key1_mock',value:'value1_mock'});
+        return service.upsertPair(kvp, 300)
+            .then(() => {
+                should.equal(setStub.callCount, 1);
+            })
+    });
 
-        return service.connect()
+    it('should error when upsert rejects', () => {
+        sandbox.stub(service.redisClient, 'setAsync').returns(Promise.reject());
+        let kvp = new KeyValuePair({key:'key1_mock',value:'value1_mock'});
+        return service.upsertPair(kvp, 300)
             .catch((err) => {
-                should(err).eql(new Error('Problem connecting to cache'));
+                should(err).eql(new Error('Problem writing to cache'));
             })
     });
 
-    it('should test something slightly less evil', () => {
-        const stub = sinon.stub(service, 'retrievePair');
-        stub.withArgs('key1').resolves({"key":"key1","value":"value1"});
-
-        return service.retrievePair('key1')
-            .then((val1) => {
-                should.equal(val1.value,'value1');
+    it('should error when delete rejects', () => {
+        sandbox.stub(service.redisClient, 'delAsync').returns(Promise.reject());
+        return service.deletePair('dummyKey')
+            .catch((err) => {
+                should(err).eql(new Error('Problem deleting from cache'));
             })
     });
 
+    it('should error when no pair is submitted on upsert', () => {
+        return service.upsertPair()
+            .catch((err) => {
+                should(err).eql(new Error('Invalid Pair'));
+            })
+    });
+
+    it('should error when no pair is submitted on delete', () => {
+        sandbox.stub(service.redisClient, 'delAsync').returns(Promise.resolve());
+        return service.deletePair()
+            .catch((err) => {
+                should(err).eql(new Error('Invalid Key'));
+            })
+    });
 });
+
+class MockRedis{
+    constructor() {
+        this.connected = true;
+    }
+
+    setAsync(){};
+    getAsync(){};
+    delAsync(){};
+    quitAsync(){};
+}

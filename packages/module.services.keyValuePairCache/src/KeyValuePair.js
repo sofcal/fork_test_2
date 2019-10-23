@@ -1,7 +1,5 @@
 'use strict';
 
-const Promise = require('bluebird');
-
 class KeyValuePair {
     constructor(data) {
         this.key = data.key;
@@ -9,12 +7,8 @@ class KeyValuePair {
     }
 
     validate() {
-        return validateImpl(this);
+        return !(!this.key || !this.value);
     }
 }
-
-const validateImpl = Promise.method((self) => {
-    return !(!self.key || !self.value);
-});
 
 module.exports = KeyValuePair;

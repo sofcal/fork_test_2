@@ -6,9 +6,6 @@ const redis = Promise.promisifyAll(require('redis'));
 
 Promise.promisifyAll(redis.RedisClient.prototype);
 
-// TODO: Consider use of contract for KeyValuePair to validate input
-// Replicate Contract in ES6
-
 class KeyValuePairCache {
     constructor(options) {
         this.connectionString = getConnectionString(options);
@@ -17,10 +14,9 @@ class KeyValuePairCache {
     connect(...args) {
         return connectImpl(this, ...args)
             .catch(() => {
-                throw new Error('Problem connecting to cache'); // TODO: Use StatusCodeError - explore usage
+                throw new Error('Problem connecting to cache');
             });
     }
-    // TODO: Lerna explore usage - Lerna.add(module)
 
     disconnect(...args) {
         return disconnectImpl(this, ...args);
@@ -44,7 +40,6 @@ class KeyValuePairCache {
 }
 
 const connectImpl = Promise.method((self) => {
-    // TODO: Error
     self.redisClient = redis.createClient(self.connectionString);
     return self.redisClient;
 });
@@ -53,7 +48,7 @@ const disconnectImpl = Promise.method((self) => {
     if (self.redisClient) {
         return self.redisClient.quitAsync();
     }
-    return null; // TODO: No connection to disconnect; handle more elegantly?
+    return null;
 });
 
 const getConnectionString = ({ env: awsEnv, region: awsRegion, localhost = false, connectionString }) => {
@@ -63,7 +58,7 @@ const getConnectionString = ({ env: awsEnv, region: awsRegion, localhost = false
     }
 
     if (localhost) {
-        return `redis://127.0.0.1:6379`;
+        return 'redis://127.0.0.1:6379';
     }
 
     return `redis://elasticache.${awsEnv}.${awsRegion}.sagebanking-dev.cloud:6379$`;
@@ -73,10 +68,10 @@ const storePairImpl = Promise.method((self, kvp, ttl = 300) => {
     if (!(kvp instanceof KeyValuePair)) {
         throw new Error('Invalid Pair');
     }
-
     if (self.redisClient) {
         if (self.redisClient.connected) {
-            return self.redisClient.setAsync(kvp.key, kvp.value, 'EX', ttl)
+            const value = wrapValue(kvp.value);
+            return self.redisClient.setAsync(kvp.key, value, 'EX', ttl)
                 .then(() => {
                     return kvp;
                 })
@@ -98,7 +93,8 @@ const retrievePairImpl = Promise.method((self, key) => {
             return self.redisClient.getAsync(key)
                 .then((value) => {
                     if (value) {
-                        return new KeyValuePair({ key, value });
+                        const unwrappedValue = unwrapValue(value);
+                        return new KeyValuePair({ key, value: unwrappedValue });
                     }
                     throw new Error(`KeyValuePair not found: ${key}`);
                 });
@@ -114,10 +110,26 @@ const deletePairImpl = Promise.method((self, key) => {
 
     if (self.redisClient) {
         if (self.redisClient.connected) {
-            return self.redisClient.delAsync(key);
+            return self.redisClient.delAsync(key)
+                .catch(() => {
+                    throw new Error('Problem deleting from cache');
+                });
         }
     }
     throw new Error('Not connected to cache');
+});
+
+const wrapValue = ((value) => {
+    const wrappedObject = { type: 'Object', value };
+    return JSON.stringify(wrappedObject);
+});
+
+const unwrapValue = ((value) => {
+    try {
+        return JSON.parse(value).value;
+    } catch (err) {
+        throw new Error('Unable to parse response');
+    }
 });
 
 module.exports = KeyValuePairCache;
