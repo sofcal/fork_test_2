@@ -9,7 +9,9 @@ var pipeline = (skip, limit) => {
                 _id: 1,
                 organisationId: 1,
                 lastTransactionsGet: { $dateToString: { format: '%Y-%m-%dT%H:%M:%S:%LZ', date: '$lastTransactionsGet' } },
+                lastTransactionsGetDate: { $dateToString: { format: '%Y-%m-%d', date: '$lastTransactionsGet' } },
                 lastTransactionsReceived: { $dateToString: { format: '%Y-%m-%dT%H:%M:%S:%LZ', date: '$lastTransactionsReceived' } },
+                lastTransactionsReceivedDate: { $dateToString: { format: '%Y-%m-%d', date: '$lastTransactionsReceived' } },
                 lastTransactionId: 1,
                 status: 1,
                 statusReason: 1,
@@ -22,7 +24,8 @@ var pipeline = (skip, limit) => {
                 bankCountry: '$bankLookup.primaryCountry',
                 aggregatorName: '$bankLookup.aggregatorName',
                 aggregatorId: '$bankLookup.aggregatorId',
-                created: { $dateToString: { format: '%Y-%m-%dT%H:%M:%S:%LZ', date: '$created' } }
+                created: { $dateToString: { format: '%Y-%m-%dT%H:%M:%S:%LZ', date: '$created' } },
+                createdDate: { $dateToString: { format: '%Y-%m-%d', date: '$created' } }
             }
         },
         { $lookup: { from: 'Rule', localField: '_id', foreignField: 'bankAccountId', as: 'ruleLookup' } },
@@ -35,7 +38,9 @@ var pipeline = (skip, limit) => {
                         bankAccountId: '$_id',
                         organisationId: '$organisationId',
                         lastTransactionsGet: '$lastTransactionsGet',
+                        lastTransactionsGetDate: '$lastTransactionsGetDate',
                         lastTransactionsReceived: '$lastTransactionsReceived',
+                        lastTransactionsReceivedDate: '$lastTransactionsReceivedDate',
                         lastTransactionId: '$lastTransactionId',
                         status: '$status',
                         statusReason: '$statusReason',
@@ -49,6 +54,7 @@ var pipeline = (skip, limit) => {
                         aggregatorName: '$aggregatorName',
                         aggregatorId: '$aggregatorId',
                         created: '$created',
+                        createdDate: '$createdDate',
                         ruleCount: '$ruleLookup.numberOfRules'
                     }
                 }
