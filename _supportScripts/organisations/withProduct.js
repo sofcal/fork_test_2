@@ -10,7 +10,8 @@ var pipeline = (skip, limit) => {
                 _id: 1,
                 productId: 1,
                 productHeader: '$productLookup.header',
-                created: { $dateToString: { format: '%Y-%m-%dT%H:%M:%S:%LZ', date: '$created' } }
+                created: { $dateToString: { format: '%Y-%m-%dT%H:%M:%S:%LZ', date: '$created' } },
+                createdDate: { $dateToString: { format: '%Y-%m-%d', date: '$created' } }
             }
         },
         {
@@ -21,7 +22,8 @@ var pipeline = (skip, limit) => {
                         organisationId: '$_id',
                         productId: '$productId',
                         productHeader: '$productHeader',
-                        organisationCreated: '$created'
+                        organisationCreated: '$created',
+                        organisationCreatedDate: '$createdDate'
                     }
                 }
             }
