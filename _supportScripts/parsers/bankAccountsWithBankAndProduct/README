@@ -1,0 +1,7 @@
+* run bankAccounts/withBankInfo.js via mongoShell / robo3t on both regions (just copy and paste the contents into the shell)
+** copy json from each tab/window into it's own file (make sure it's valid JSON, i.e, no /* 1 */ at the top)
+** save the file as whatever you want, as long as the extension is .json
+* run organisations/withProduct.js via mongoShell / robo3t on both regions (just copy and paste the contents into the shell)
+** copy json from each tab/window into it's own file (make sure it's valid JSON, i.e, no /* 1 */ at the top)
+** save the file as whatever you want, as long as the extension is .json
+* run: node concat.js "path_to_dir_you_saved_above_json_files_to"
