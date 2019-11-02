@@ -53,6 +53,7 @@ const getParametersImpl = Promise.method((self, params) => {
         .then((response) => mapResponse(response));
 });
 
+// secrets manager secrets can only be retrieved using getParameters (not getParametersByPath)
 const getSecretsManagerParametersImpl = Promise.method((self, params) => {
     const mapResponse = (response) => {
         const returnParams = {};
