@@ -3,6 +3,10 @@
 const AWS = require('aws-sdk');
 const Promise = require('bluebird');
 
+const consts = {
+    SECRETS_MANAGER: '/aws/reference/secretsmanager/'
+};
+
 class ParameterService {
     constructor({ paramPrefix = null, env: { region } = {}, ssm }) {
         this.func = 'ParameterService.constructor';
@@ -15,6 +19,10 @@ class ParameterService {
 
     getParameters(params) {
         return getParametersImpl(this, params);
+    }
+
+    getSecretsManagerParameters(params) {
+        return getSecretsManagerParametersImpl(this, params);
     }
 
     setParameter(...args) {
@@ -39,6 +47,25 @@ const getParametersImpl = Promise.method((self, params) => {
     };
 
     const Names = params.map((p) => `${self.paramPrefix}${p}`);
+    const req = { Names, WithDecryption: true };
+
+    return self.ssm.getParameters(req).promise()
+        .then((response) => mapResponse(response));
+});
+
+const getSecretsManagerParametersImpl = Promise.method((self, params) => {
+    const mapResponse = (response) => {
+        const returnParams = {};
+        // for loop used for performance reasons
+        // eslint-disable-next-line no-restricted-syntax
+        for (const p of response.Parameters) {
+            const name = p.Name; // eslint-disable-next-line no-param-reassign
+            returnParams[name.replace(`${consts.SECRETS_MANAGER}${self.paramPrefix}`, '')] = JSON.parse(p.Value);
+        }
+        return returnParams;
+    };
+
+    const Names = params.map((p) => `${consts.SECRETS_MANAGER}${self.paramPrefix}${p}`);
     const req = { Names, WithDecryption: true };
 
     return self.ssm.getParameters(req).promise()
