@@ -4,7 +4,7 @@ const AWS = require('aws-sdk');
 const Promise = require('bluebird');
 
 const consts = {
-    SECRETS_MANAGER: '/aws/reference/secretsmanager/'
+    SECRETS_MANAGER: '/aws/reference/secretsmanager'
 };
 
 class ParameterService {
