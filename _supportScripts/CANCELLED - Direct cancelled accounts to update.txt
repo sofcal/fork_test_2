@@ -1,0 +1,40 @@
+DBQuery.shellBatchSize = 11000;
+db.BankAccount.aggregate([
+{ 
+    $match : 
+    {
+        dataProvider:"direct", 
+        status:"cancelled"
+        }},
+        {
+        $lookup: {
+            from: 'Bank',
+            localField: 'bankId',
+            foreignField: '_id',
+            as: 'bank'
+        }
+    },{ $unwind: '$bank' },
+{
+    $project: {
+        bankIdentifier: 1,
+        accountIdentifier: 1,
+        dataProvider: 1,
+        aggregatorName: 1,
+        status: 1,
+        toUpdate: { $ne:["$_id","$accountIdentifier"] },
+        cancellationDate: 1,
+        lastTransactionsReceived: 1,
+        lastTransactionsGet: 1,
+        'cancellationReason':'$internal.cancellationReason.description',
+        company:'$company.companyName',
+	bankName:'$bank.name'
+        }
+},
+{ 
+    $match : 
+    {
+        toUpdate : true
+        }},
+        {$sort:{'bankName': 1, lastTransactionsReceived:-1,cancellationReason:1,cancellationDate:1}}
+        
+])

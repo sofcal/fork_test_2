@@ -1,0 +1,12 @@
+DBQuery.shellBatchSize = 120000;
+db.Organisation.aggregate([
+{$match:{'bankAccounts':[]}},
+{ $unwind: { path: '$products', preserveNullAndEmptyArrays: false } },
+{ $lookup: { from: 'Product', localField: 'products.productId', foreignField: '_id', as: 'prod'}},
+{ $unwind: '$prod'},
+{$project:{'adminEmail':'$adminEmail','prodName':'$prod.name', 'lastAccessedTimestamp':'$products.lastAccessedTimestamp','prodName':'$prod.name'}},
+{$sort:{lastAccessedTimestamp:1}}
+],
+{
+allowDiskUse: true
+})

@@ -7,11 +7,15 @@ db.BankAccount.aggregate([{$match:{status:"cancelled", accountIdentifier:{$not: 
             as: 'bnkDetail'}
     }, { $unwind: '$bnkDetail' },
     {$lookup:{
-        from:'Company',
-        localField: 'company.companyId',
+        from:'Organisation',
+        localField: 'organisationId',
         foreignField: '_id',
-            as: 'compDetail'}
-    }, { $unwind: '$compDetail' },   
-    {$project:{'bankName':'$bnkDetail.name','accountIdentifier':'$accountIdentifier','cancellationDate':'$cancellationDate',
-    'cancellationReason':'$internal.cancellationReason.description'}}
+            as: 'org'}
+    }, { $unwind: '$org' },  
+   { $unwind: { path: '$org.products', preserveNullAndEmptyArrays: false } }, 
+    { $lookup: { from: 'Product', localField: 'org.products.productId', foreignField: '_id', as: 'prod'}},
+    { $unwind: '$prod' },  
+        {$project:{'bankName':'$bnkDetail.name','dataProvider':'$dataProvider','bankIdentifier':'$bankIdentifier','accountIdentifier':'$accountIdentifier',
+            'cancellationDate':'$cancellationDate','lastTransactionsReceived':'$lastTransactionsReceived','cancellationReason':'$internal.cancellationReason.description', 'product':'$prod.header'}},
+    {$sort:{product:1, bankName: 1, cancellationDate:1}}
 ])

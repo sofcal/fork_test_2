@@ -1,0 +1,34 @@
+DBQuery.shellBatchSize = 50000;
+db.BankAccount.aggregate([{$match:{aggregatorName:'yodlee',status:{$ne:'cancelled'}}},
+{
+        $lookup: {
+            from: 'Organisation',
+            localField: 'organisationId',
+            foreignField: '_id',
+            as: 'org'
+        }
+    },
+{ $unwind: '$org' },{ $unwind: '$org.products' },
+{ $project: { 'productId': '$org.products.productId', 'adminEmail':'$org.adminEmail','accountIdentifier':'$accountIdentifier','status':'$status',
+   'lastTransactionsReceived':'$lastTransactionsReceived','lastTransactionsGet':'$lastTransactionsGet','lastTransactionId':'$lastTransactionId','created':'$created', 'bankId':'$bankId', 'region':'$region',
+    'aggregatorId':'$aggregatorId','aggregatorApplicationAccount':'$aggregatorApplicationAccount', 'accountName':'$accountName','accountType':'$accountType'}},
+{
+        $lookup: {
+            from: 'Product',
+            localField: 'productId',
+            foreignField: '_id',
+            as: 'prod'
+        }
+    },
+{ $unwind: '$prod' },
+{
+        $lookup: {
+            from: 'Bank',
+            localField: 'bankId',
+            foreignField: '_id',
+            as: 'bank'
+        }
+    },{ $unwind: '$bank' },
+{$project:{'product':'$prod.name','adminEmail':'$adminEmail','accountIdentifier':'$accountIdentifier','status':'$status','lastTransactionsReceived':'$lastTransactionsReceived','lastTransactionsGet':'$lastTransactionsGet','lastTransactionId':'$lastTransactionId',
+    'created':'$created', 'bankId':'$bankId', 'bankName':'$bank.name','region':'$region','aggregatorId':'$aggregatorId','aggregatorApplicationAccount':'$aggregatorApplicationAccount','accountName':'$accountName','accountType':'$accountType'}},
+{$sort:{'product': - 1, 'status': -1, 'created': -1}}])

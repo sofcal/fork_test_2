@@ -1,6 +1,6 @@
 DBQuery.shellBatchSize = 7000;
 db.Organisation.aggregate([
 { $match:{"products.productId": "2ac2a370-6f73-4be4-b138-08eb9f2e7992"}},
-{ $project: { crmId: '$crmId', adminEmail:'$adminEmail' }
+{ $project: { crmId: '$crmId', adminEmail:'$adminEmail' }}
 
 ])

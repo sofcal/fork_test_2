@@ -1,0 +1,13 @@
+DBQuery.shellBatchSize = 500;
+db.BankAccount.aggregate([{$match:{aggregatorName:"plaid"}},
+{$lookup: {from: 'Bank', localField: 'bankId', foreignField: '_id', as: 'bank'}},
+{ $unwind: '$bank' },
+{$lookup: {from: 'Organisation', localField: 'organisationId', foreignField: '_id', as: 'org'}},
+{ $unwind: '$org' },{ $unwind: '$org.products' },
+{ $project: { 'productId': '$org.products.productId', 'adminEmail':'$org.adminEmail','accountIdentifier':'$accountIdentifier','status':'$status',
+   'lastTransactionsReceived':'$lastTransactionsReceived','lastTransactionsGet':'$lastTransactionsGet','cancellationDate':'$cancellationDate','lastTransactionId':'$lastTransactionId','created':'$created','bankName':'$bank.name'}},
+{$lookup: {from: 'Product',localField: 'productId', foreignField: '_id',as: 'prod'}},
+{ $unwind: '$prod' },
+{$project:{'product':'$prod.name','adminEmail':1,'accountIdentifier':1,'status':1,'lastTransactionsReceived':1,'cancellationDate':1,'lastTransactionId':1,'created':1,'bankName':1}},
+{$sort:{'product': - 1, 'adminEmail': -1, 'created': -1}}
+])
