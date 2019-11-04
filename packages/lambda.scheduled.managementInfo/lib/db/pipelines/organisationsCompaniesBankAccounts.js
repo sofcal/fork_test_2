@@ -11,7 +11,7 @@ const _ = require('underscore');
 
 module.exports = ({ productId, count } = {}) => {
     if (!productId) {
-        const spec = _.extend({ params: { productId } }, ErrorSpecs.pipeline.invalidPropertiesOCB);
+        const spec = _.extend({ params: { productId } }, ErrorSpecs.pipelines.invalidPropertiesOCB);
         throw StatusCodeError.CreateFromSpecs([spec], spec.statusCode);
     }
 
@@ -79,13 +79,38 @@ module.exports = ({ productId, count } = {}) => {
         // now we group documents back up again by their organisationId (and a few other fields which we know will be the same - because we unwound)
         // the main reason for this stage is to push all the bank accounts for an organisation back into an array.
         { $group: { _id: { _id: '$_id', crmId: '$crmId', type: '$type', products: '$products', companyCount: '$companyCount', companies: '$companies', bankAccountCount: '$bankAccountCount' }, bankAccounts: { $addToSet: '$bankAccounts' } } },
+
+        // add to set does not guarantee sort order, so split into array and sort
+        { $unwind: { path: '$bankAccounts', preserveNullAndEmptyArrays: true } },
+        { $sort: { '_id._id': 1, 'bankAccounts._id': 1 } },
+        { $group: {
+            _id: { _id: '$_id._id', type: '$_id.type', products: '$_id.products', companyCount: '$_id.companyCount', companies: '$_id.companies', bankAccountCount: '$_id.bankAccountCount' },
+            bankAccounts: { $push: '$bankAccounts' }
+        } },
+
         // because we're on mongo 3.2, we have no replaceRoot function, so we have this slightly ugly projection to get rid of our nested _id object field
         { $project: { _id: '$_id._id', crmId: '$_id.crmId', type: '$_id.type', products: '$_id.products', companyCount: '$_id.companyCount', companies: '$_id.companies', bankAccountCount: '$_id.bankAccountCount', bankAccounts: '$bankAccounts' } },
 
         // we now go through the same process as for bank accounts, but for companies. Unwinding the array...
         { $unwind: { path: '$companies', preserveNullAndEmptyArrays: true } },
-        // ... retrieving the company objects with a lookup
+
+        // ... retrieving the company objects with lookups
         { $lookup: { from: 'Company', localField: 'companies', foreignField: '_id', as: 'companyLookup' } },
+        { $lookup: { from: 'CompanyExt', localField: 'companies', foreignField: '_id', as: 'companyExtLookup' } },
+
+        // Join Company and CompanyExt arrays
+        {
+            $project: {
+                _id: 1,
+                type: 1,
+                products: 1,
+                bankAccountCount: 1,
+                bankAccounts: 1,
+                companyCount: 1,
+                companies: 1,
+                companyLookup: { $concatArrays: ['$companyLookup', '$companyExtLookup'] },
+            }
+        },
         // ... unwinding the documents to create one per company
         { $unwind: { path: '$companyLookup', preserveNullAndEmptyArrays: true } },
         {
@@ -108,6 +133,16 @@ module.exports = ({ productId, count } = {}) => {
         },
         // ...grouping back up so we can push the companies back into an array
         { $group: { _id: { _id: '$_id', crmId: '$crmId', type: '$type', products: '$products', bankAccounts: '$bankAccounts', bankAccountCount: '$bankAccountCount', companyCount: '$companyCount' }, companies: { $addToSet: '$companies' } } },
+
+        // add to set does not guarantee sort order, so split into array and sort
+        { $unwind: { path: '$companies', preserveNullAndEmptyArrays: true } },
+
+        { $sort: { '_id._id': 1, 'companies._id': 1 } },
+        { $group: {
+            _id: { _id: '$_id._id', products: '$_id.products', bankAccounts: '$_id.bankAccounts', companyCount: '$_id.companyCount', bankAccountCount: '$_id.bankAccountCount' },
+            companies: { $push: '$companies' }
+        } },
+
         // ...and projecting against to get rid of the nasty nested _id object
         {
             $project: {
@@ -120,7 +155,7 @@ module.exports = ({ productId, count } = {}) => {
                 bankAccountCount: '$_id.bankAccountCount',
                 bankAccounts: { $cond: [{ $gt: ['$_id.bankAccountCount', 0] }, '$_id.bankAccounts', []] }
             }
-        }
+        },
 
         // we would now have a document per organisation, with some general summary information, an array of companies and an
         // array of bank accounts

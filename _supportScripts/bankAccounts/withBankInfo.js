@@ -9,7 +9,10 @@ var pipeline = (skip, limit) => {
                 _id: 1,
                 organisationId: 1,
                 lastTransactionsGet: { $dateToString: { format: '%Y-%m-%dT%H:%M:%S:%LZ', date: '$lastTransactionsGet' } },
+                lastTransactionsGetDate: { $dateToString: { format: '%Y-%m-%d', date: '$lastTransactionsGet' } },
                 lastTransactionsReceived: { $dateToString: { format: '%Y-%m-%dT%H:%M:%S:%LZ', date: '$lastTransactionsReceived' } },
+                lastTransactionsReceivedDate: { $dateToString: { format: '%Y-%m-%d', date: '$lastTransactionsReceived' } },
+                lastTransactionId: 1,
                 status: 1,
                 statusReason: 1,
                 region: 1,
@@ -21,9 +24,12 @@ var pipeline = (skip, limit) => {
                 bankCountry: '$bankLookup.primaryCountry',
                 aggregatorName: '$bankLookup.aggregatorName',
                 aggregatorId: '$bankLookup.aggregatorId',
-                created: { $dateToString: { format: '%Y-%m-%dT%H:%M:%S:%LZ', date: '$created' } }
+                created: { $dateToString: { format: '%Y-%m-%dT%H:%M:%S:%LZ', date: '$created' } },
+                createdDate: { $dateToString: { format: '%Y-%m-%d', date: '$created' } }
             }
         },
+        { $lookup: { from: 'Rule', localField: '_id', foreignField: 'bankAccountId', as: 'ruleLookup' } },
+        { $unwind: { path: '$ruleLookup', preserveNullAndEmptyArrays: true } },
         {
             $group: {
                 _id: 1,
@@ -32,19 +38,24 @@ var pipeline = (skip, limit) => {
                         bankAccountId: '$_id',
                         organisationId: '$organisationId',
                         lastTransactionsGet: '$lastTransactionsGet',
+                        lastTransactionsGetDate: '$lastTransactionsGetDate',
                         lastTransactionsReceived: '$lastTransactionsReceived',
+                        lastTransactionsReceivedDate: '$lastTransactionsReceivedDate',
+                        lastTransactionId: '$lastTransactionId',
                         status: '$status',
                         statusReason: '$statusReason',
                         region: '$region',
                         feedSource: '$feedSource',
-                        dataProvider: '$organisationId',
+                        dataProvider: '$dataProvider',
                         bankId: '$bankId',
                         bankName: '$bankName',
                         bankStatus: '$bankStatus',
                         bankCountry: '$bankCountry',
                         aggregatorName: '$aggregatorName',
                         aggregatorId: '$aggregatorId',
-                        created: '$created'
+                        created: '$created',
+                        createdDate: '$createdDate',
+                        ruleCount: '$ruleLookup.numberOfRules'
                     }
                 }
             }
@@ -53,12 +64,12 @@ var pipeline = (skip, limit) => {
 };
 
 var options = { allowDiskUse: true };
-db.getCollection('BankAccount').aggregate(pipeline(0, 10000), options);
-db.getCollection('BankAccount').aggregate(pipeline(10000, 10000), options);
-db.getCollection('BankAccount').aggregate(pipeline(20000, 10000), options);
-db.getCollection('BankAccount').aggregate(pipeline(30000, 10000), options);
-db.getCollection('BankAccount').aggregate(pipeline(40000, 10000), options);
-db.getCollection('BankAccount').aggregate(pipeline(50000, 10000), options);
-db.getCollection('BankAccount').aggregate(pipeline(60000, 10000), options);
-db.getCollection('BankAccount').aggregate(pipeline(70000, 10000), options);
-db.getCollection('BankAccount').aggregate(pipeline(80000, 10000), options);
+db.getCollection('BankAccount').aggregate(pipeline(0, 25000), options);
+db.getCollection('BankAccount').aggregate(pipeline(25000, 25000), options);
+db.getCollection('BankAccount').aggregate(pipeline(50000, 25000), options);
+db.getCollection('BankAccount').aggregate(pipeline(75000, 25000), options);
+db.getCollection('BankAccount').aggregate(pipeline(100000, 25000), options);
+db.getCollection('BankAccount').aggregate(pipeline(125000, 25000), options);
+db.getCollection('BankAccount').aggregate(pipeline(150000, 25000), options);
+db.getCollection('BankAccount').aggregate(pipeline(175000, 25000), options);
+db.getCollection('BankAccount').aggregate(pipeline(200000, 25000), options);

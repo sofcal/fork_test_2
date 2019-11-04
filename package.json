@@ -4,7 +4,7 @@
   "description": "",
   "main": "handler.js",
   "scripts": {
-    "prepenv": "npm install -g npm@\"6.7.0\" && npm install -g lerna@\"3.16.4\" && npm install -g serverless@1.30.3 && npm install -g rimraf",
+    "prepenv": "bash ./scripts/prepenv.sh -n \"6.9.0\" -l \"3.16.4\" -s \"1.30.3\" -r \"3.0.0\"",
     "clean": "rimraf ./build && rimraf ./coverage && rimraf ./.nyc_output && rimraf node_modules && lerna run clean",
     "rebuild": "npm run clean && npm run build",
     "prebuild": "lerna bootstrap --hoist --no-hoist=@sage/*",

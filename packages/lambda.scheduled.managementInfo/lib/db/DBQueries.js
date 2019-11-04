@@ -2,6 +2,7 @@
 
 // project
 const pipelines = require('./pipelines');
+const { intersection } = require('../utils');
 
 // internal modules
 
@@ -50,19 +51,27 @@ const organisationsCompaniesBankAccountsImpl = Promise.method((self, { organisat
     const func = `${consts.LOG_PREFIX}.organisationsCompaniesBankAccounts`;
     logger.debug({ function: func, log: 'started', params: { all, organisationId, productId, count } });
 
-    const collection = self.db.collection('Organisation');
+    const OrgCollection = self.db.collection('Organisation');
     const pipeline = self.pipelines.organisationsCompaniesBankAccounts({ organisationId, productId, count });
 
-    const promise = collection.aggregate(pipeline, consts.DEFAULT_OPTIONS);
+    const OrgPromise = OrgCollection.aggregate(pipeline, consts.DEFAULT_OPTIONS);
+
+    const OrgExtCollection = self.db.collection('OrganisationExt');
+
+    const OrgExtPromise = OrgExtCollection.aggregate(pipeline, consts.DEFAULT_OPTIONS);
 
     if (!all) {
         logger.debug({ function: func, log: 'ended - all not specified, returning cursor', params: { all } });
-        return promise;
+        return { organisation: OrgPromise, organisationExt: OrgExtPromise };
     }
 
     logger.debug({ function: func, log: 'WARNING: requesting all results without a cursor could present a performance issue', params: { all } });
     logger.debug({ function: func, log: 'ended - all specified; returning entire array', params: { all } });
-    return promise.toArray();
+
+    // Return all Organisation and OrganisationExt results
+    return Promise.all([OrgPromise.toArray(), OrgExtPromise.toArray()])
+        .then(([org, orgExt]) => [...org, ...orgExt])
+        .then((data) => data.sort((a, b) => { return a._id < b._id ? -1 : 1; }));
 });
 
 const transactionSummariesImpl = Promise.method((self, { unresolved = false, bankAccountIds = null, all = false } = {}, { logger }) => {
@@ -89,18 +98,24 @@ const orphanedBankAccountsImpl = Promise.method((self, { all = false }, { logger
     logger.debug({ function: func, log: 'started', params: { all } });
 
     const collection = self.db.collection('BankAccount');
-    const pipeline = self.pipelines.orphanedBankAccounts();
+    const OrgPipeline = self.pipelines.orphanedBankAccounts({ OrgCollection: 'Organisation' });
+    const OrgExtPipeline = self.pipelines.orphanedBankAccounts({ OrgCollection: 'OrganisationExt' });
 
-    const promise = collection.aggregate(pipeline, consts.DEFAULT_OPTIONS);
+    const OrgPromise = collection.aggregate(OrgPipeline, consts.DEFAULT_OPTIONS);
+    const OrgExtPromise = collection.aggregate(OrgExtPipeline, consts.DEFAULT_OPTIONS);
 
     if (!all) {
         logger.debug({ function: func, log: 'ended - all not specified, returning cursor', params: { all } });
-        return promise;
+        return { withOrganisation: OrgPromise, withOrganisationExt: OrgExtPromise };
     }
 
     logger.debug({ function: func, log: 'WARNING: requesting all results without a cursor could present a performance issue', params: { all } });
     logger.debug({ function: func, log: 'ended - all specified; returning entire array', params: { all } });
-    return promise.toArray();
+
+    // We only want to report orhpaned bank accounts if they are reported on both Organisation and OrganisationExt queries
+    return Promise.all([OrgPromise.toArray(), OrgExtPromise.toArray()])
+        .then((res) => intersection('_id', ...res))
+        .then((data) => data.sort((a, b) => { return a._id < b._id ? -1 : 1; }));
 });
 
 // consts
