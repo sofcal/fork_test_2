@@ -35,7 +35,10 @@ class Bank {
             this.proxy = data.proxy || null;
             this.supportiframe = !_.isUndefined(data.supportiframe) ? data.supportiframe : true;
 
-            this.internal = { longURL: data.longURL || false };
+            this.internal = {
+                longURL: access(data, 'internal.longURL') || false,
+                bankUrl: access(data, 'internal.bankUrl') || null
+            };
 
             this.provider = data.provider || null;
 
