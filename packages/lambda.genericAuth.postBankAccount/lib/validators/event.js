@@ -3,11 +3,11 @@
 const ErrorSpecs = require('../ErrorSpecs');
 
 module.exports = (event) => {
-    console.log('AG Test: Into Event');
+    console.log('AG Test: Into Event Validator');
     const valid = true;
 
     if (!valid) {
-        consle.log('AG TEST - Validation Error');
+        console.log('AG TEST - Validation Error');
         throw Error('Something');
     }
 };

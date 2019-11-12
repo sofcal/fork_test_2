@@ -3,7 +3,7 @@
 const { ErrorSpecs } = require('@sage/bc-independent-lambda-handler');
 
 module.exports = (config, { logger }) => {
-    console.log('AG Test: Into Config');
+    console.log('AG Test: Into Config Validator');
     if (!config) {
         logger.error({ function: 'validate.config', msg: 'invalid config', params: { config } });
         throw Error('Something');

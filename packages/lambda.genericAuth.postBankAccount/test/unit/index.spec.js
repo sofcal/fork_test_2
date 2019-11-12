@@ -37,7 +37,7 @@ describe('lambda-genericauth-postbankaccount', function(){
                     },
                     response: {
                         headers: {},
-                        body: {"someKey":"Some Value"}
+                        body: {"requestId":"12345"}
                     }
                 }
             }]
@@ -49,9 +49,12 @@ describe('lambda-genericauth-postbankaccount', function(){
     });
 
     it('should do nothing', (done) => {
-        let something = index.run(event, context, {});
+        should(index.run).be.a.Function();
+        done();
+    });
 
-        //should(index.run).be.a.Function();
+    it('should do something', (done) => {
+        let something = index.run(event, context, () => { console.log('Woot!') });
         done();
     });
 });
