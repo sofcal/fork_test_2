@@ -35,44 +35,38 @@ class GenericAuthPostBankAccountLambda extends Handler{
     }
 
     init(event, {logger}) {
-        // TODO: Check this
         console.log('AG TEST - Init Hit');
         const func = `${GenericAuthPostBankAccountLambda.name}.init`;
         logger.info({function: func, log: 'started'});
         const {Environment: env = 'test', AWS_REGION: region = 'local'} = process.env;
 
-        // DUMMY Response While Building Logic
-        return Promise.resolve(undefined)
-            .then(() => {
-                return { statusCode: 200, body: 'Success' };
-            })
+        console.log(`AG TEST - env:${env} - region:${region}`);
 
-/*
         return Promise.resolve(undefined)
             .then(() => getParams({env, region}, event.logger))
             .then((params) => {
+                console.log('AG TEST: getParams - ', params);
                 populateServices(this.services, {env, region, params}, event.logger);
                 return connectDB(this.services, event.logger)
                     .then(() => false);
             });
- */
     }
 
     impl(event, { logger }) {
         console.log('AG TEST - Impl Hit');
         const func = `${GenericAuthPostBankAccountLambda.name}.impl`;
 
-        // TEST PARAM
-        const { requestId }= event.Records[0].cf.response.body;
-        console.log('AG TEST - Event requestId:', requestId);
-        // END TEST PARAM
+
 
         // get details from event
-        //const { requestId } = event.parsed; // TODO: Update this when event payload is understood
         logger.info({function: func, log: 'started', params: { requestId }});
+        // TODO: TEST PARAM - Verify correct request body
+        let requestId = event.accountKey;
+        console.log('AG TEST - Event requestId:', requestId);
+        let key = requestId += 'postRedirectAction';
 
-        /* TODO: Get record from cache using accountKey
-         This is the set cache code. Consider there may be multiple accounts
+        /* TODO: Get record from cache using requestId/accountKey
+         Consider there may be multiple accounts. This is the set code for reference:
             _.each(authValue.bankAccounts, (account) => { account.accountKey = requestId});
             keyValue = { returnPayload: {accounts: authValue.bankAccounts} };
 
@@ -81,11 +75,14 @@ class GenericAuthPostBankAccountLambda extends Handler{
             const params = { keyPrefix: requestId, keyPostfix: 'postRedirectAction', keyValue };
          */
 
-        let bankAccount = {}; //TODO: Update record based on cache entry
+        let bankAccount = {
+            _id : '7531af69-fcc3-4d7c-937d-8c67aa20b9ef',
+            accountKey: 'b4a8b863-80d9-432f-9c8b-4095ba441581',
+            accountName: 'Test Bank 5',
+            bankIdentifier: '456'
+        }; //TODO: This is a test account; update record based on cache entry
 
         const dbQueries = DBQueries.Create(this.services.db.getConnection());
-
-        // TODO: Update bankAccount record - Do not update all fields (Confirm these)
 
         return dbQueries.updateBankAccount({ bankAccount }, { logger })
             .then((something) => {

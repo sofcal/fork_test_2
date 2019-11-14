@@ -21,9 +21,8 @@ const updateBankAccountImpl = Promise.method((self, { bankAccount }, { logger })
     logger.debug({ function: func, log: 'started', params: { } });
 
     const collection = self.db.collection('BankAccount');
-
     const where = { _id: bankAccount._id };
-    const promise = collection.replaceOne(where, bankAccount); // TODO: Update this (Use an upsert on specific fields)
+    const promise = collection.updateOne(where, {$set: bankAccount});
 
     logger.debug({ function: func, log: 'ended', params: { } });
     return promise;

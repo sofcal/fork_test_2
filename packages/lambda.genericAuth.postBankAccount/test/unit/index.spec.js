@@ -1,4 +1,5 @@
 const index = require('../../lib/index');
+const GenericAuthPostBankAccountLambda = require('../../lib/GenericAuthPostBankAccountLambda');
 const ErrorSpecs = require('../../lib/ErrorSpecs');
 const should = require('should');
 const sinon = require('sinon');
@@ -53,8 +54,10 @@ describe('lambda-genericauth-postbankaccount', function(){
         done();
     });
 
-    it('should do something', (done) => {
-        let something = index.run(event, context, () => { console.log('Woot!') });
-        done();
+    it('should callback on successful execution', (done) => {
+        index.run(event, context, () => { return true })
+            .then(() => {
+                done();
+            });
     });
 });
