@@ -9,6 +9,7 @@ const { StatusCodeError } = require('@sage/bc-statuscodeerror');
 const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
 const DB = require('@sage/bc-services-db');
 const { Handler } = require('@sage/bc-independent-lambda-handler');
+// const { KeyValuePairCache } = require{'@sage/bc-services-keyvaluepaircache'}; TODO: update when service merged
 
 const Promise = require('bluebird');
 
@@ -56,14 +57,41 @@ class GenericAuthPostBankAccountLambda extends Handler{
         console.log('AG TEST - Impl Hit');
         const func = `${GenericAuthPostBankAccountLambda.name}.impl`;
 
-
-
         // get details from event
+        let requestId = event.body.bankAccount.accountKey;
+        let bankId = event.body.bankAccount.accountIdentifier;
         logger.info({function: func, log: 'started', params: { requestId }});
-        // TODO: TEST PARAM - Verify correct request body
-        let requestId = event.accountKey;
+
+        // can be multiple in cache
+        // match on accountIdentifier
+
         console.log('AG TEST - Event requestId:', requestId);
-        let key = requestId += 'postRedirectAction';
+
+        // Skeleton Implementation for Cache
+        const key = requestId += 'postRedirectAction';
+        const keyValuePairService = new KeyValuePairCache({}); // TODO: insert params: env, region, etc.
+        keyValuePairService.connect();
+
+        return keyValuePairService.retrievePair(key)
+            .then((kvp)=> {
+                // let bankAccount = kvp; TODO: do relative extraction - need to iterate through collection
+                let bankAccount = {
+                    _id : bankId,
+                    accountKey: 'b4a8b863-80d9-432f-9c8b-4095ba441581',
+                    accountName: 'Test Bank 5',
+                    bankIdentifier: '456'
+                }; //TODO: This is a test account; update record based on cache entry
+
+                keyValuePairService.disconnect();
+                const dbQueries = DBQueries.Create(this.services.db.getConnection());
+
+                return dbQueries.updateBankAccount({ bankAccount }, { logger })
+                    .then((something) => {
+                        console.log('AG TEST - Update Bank: ', something);
+                        event.logger.info({ function: func, log: 'ended' });
+                        return { statusCode: 200, body: 'Success' };
+                    });
+            });
 
         /* TODO: Get record from cache using requestId/accountKey
          Consider there may be multiple accounts. This is the set code for reference:
@@ -75,21 +103,9 @@ class GenericAuthPostBankAccountLambda extends Handler{
             const params = { keyPrefix: requestId, keyPostfix: 'postRedirectAction', keyValue };
          */
 
-        let bankAccount = {
-            _id : '7531af69-fcc3-4d7c-937d-8c67aa20b9ef',
-            accountKey: 'b4a8b863-80d9-432f-9c8b-4095ba441581',
-            accountName: 'Test Bank 5',
-            bankIdentifier: '456'
-        }; //TODO: This is a test account; update record based on cache entry
 
-        const dbQueries = DBQueries.Create(this.services.db.getConnection());
 
-        return dbQueries.updateBankAccount({ bankAccount }, { logger })
-            .then((something) => {
-                console.log('AG TEST - Update Bank: ', something);
-                event.logger.info({ function: func, log: 'ended' });
-                return { statusCode: 200, body: 'Success' };
-            });
+
     }
 
     dispose({ logger }) { // eslint-disable-line class-methods-use-this

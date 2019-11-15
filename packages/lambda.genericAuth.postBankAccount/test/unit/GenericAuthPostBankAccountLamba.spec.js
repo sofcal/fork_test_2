@@ -1,42 +1,30 @@
 const sinon = require('sinon');
 const GenericAuthPostBankAccountLambda = require('../../lib/GenericAuthPostBankAccountLambda');
+const { RequestLogger } = require('@sage/bc-requestlogger');
+const { logger: loggerGen } = require('@sage/bc-debug-utils');
 const should = require('should');
-
 
 describe('lambda-genericauth-postbankaccount', function(){
     let sandbox;
-
-    const log = (obj) => console.log(`[TEST] ${JSON.stringify(obj)}`);
-    const logger = {debug: log, info: log, warn: log, error: log};
+    const logger = loggerGen(true);
     const config = {config: 'value'};
 
-
-    // EVENT: {"key1":"value1","key2":"value2","key3":"value3","logger":{"request":{"service":"@sage/base-service-id"}}}
-
-    const logFunc = (data) => {console.log(JSON.stringify(data))};
     const event = {
-        logger: {info: "", error: logFunc},
-        Records: [{
-            cf: {
-                request: {
-                    headers: {},
-                    body: {"key":'value'}
-                },
-                response: {
-                    headers: {},
-                    body: {"requestId":"12345"}
-                }
+        logger: logger,
+        body: {
+            "bankAccount": {
+                "accountIdentifier": "7531af69-fcc3-4d7c-937d-8c67aa20b9ef",
+                "accountKey": "12345"
             }
-        }]
+        }
     };
 
     before(() => {
         sandbox = sinon.createSandbox();
-
     });
 
     beforeEach(() => {
-
+        // TODO: Setup generic stubs
     });
 
     afterEach(() => {
@@ -55,6 +43,11 @@ describe('lambda-genericauth-postbankaccount', function(){
 
     it.skip('should test init', () => {
         const postBankLambda = GenericAuthPostBankAccountLambda.Create(config);
+        //sandbox.stub(RequestLogger, 'Create').returns(logger);
+        //sandbox.stub(postBankLambda, 'validate').returns(true);
+        //sandbox.stub(postBankLambda, 'impl').resolves(undefined);
+        //sandbox.stub(postBankLambda, 'buildResponse').resolves([null, { statusCode: 201, body: '201_body' }]);
+
         const expectedRes = { statusCode: 200, body: 'Success'};
 
         return postBankLambda.init({},{logger})

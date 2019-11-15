@@ -20,28 +20,12 @@ describe('lambda-genericauth-postbankaccount', function(){
 
         event = {
             logger: {info: logFunc, error: logFunc},
-            Records: [{
-                cf: {
-                    request: {
-                        origin: {
-                            s3: {
-                                customHeaders: {
-                                    environment: [{
-                                        key: 'Environment',
-                                        value: 'test'
-                                    }]
-                                }
-                            }
-                        },
-                        uri: 'https://www.test.com/banking-cloud/dosomething',
-                        querystring: ''
-                    },
-                    response: {
-                        headers: {},
-                        body: {"requestId":"12345"}
-                    }
+            body: {
+                "bankAccount": {
+                    "accountIdentifier": "7531af69-fcc3-4d7c-937d-8c67aa20b9ef",
+                    "accountKey": "12345"
                 }
-            }]
+            }
         }
     });
 
@@ -49,7 +33,7 @@ describe('lambda-genericauth-postbankaccount', function(){
         sandbox.restore();
     });
 
-    it('should do nothing', (done) => {
+    it('should verify entry point', (done) => {
         should(index.run).be.a.Function();
         done();
     });
@@ -57,6 +41,7 @@ describe('lambda-genericauth-postbankaccount', function(){
     it('should callback on successful execution', (done) => {
         index.run(event, context, () => { return true })
             .then(() => {
+                // TODO: Verify something
                 done();
             });
     });
