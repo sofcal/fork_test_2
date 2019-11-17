@@ -18,35 +18,29 @@ const dbName = 'bank_db';
 
 class GenericAuthPostBankAccountLambda extends Handler{
     constructor({ config }) {
-        console.log('AG TEST: Constructor Hit');
         super({ config });
         this.dbName = dbName;
     }
 
     static Create(...args) {
-        console.log('AG TEST - Create Hit');
         return new GenericAuthPostBankAccountLambda(...args);
     }
 
     validate(event, { logger }) {
-        console.log('AG TEST - Validate Hit');
         validate.event(event, { logger });
         validate.config(this.config, { logger });
         return super.validate(event, logger);
     }
 
     init(event, {logger}) {
-        console.log('AG TEST - Init Hit');
         const func = `${GenericAuthPostBankAccountLambda.name}.init`;
         logger.info({function: func, log: 'started'});
         const {Environment: env = 'test', AWS_REGION: region = 'local'} = process.env;
 
-        console.log(`AG TEST - env:${env} - region:${region}`);
-
         return Promise.resolve(undefined)
             .then(() => getParams({env, region}, event.logger))
             .then((params) => {
-                console.log('AG TEST: getParams - ', params);
+                this.params = params;
                 populateServices(this.services, {env, region, params}, event.logger);
                 return connectDB(this.services, event.logger)
                     .then(() => false);
@@ -54,26 +48,19 @@ class GenericAuthPostBankAccountLambda extends Handler{
     }
 
     impl(event, { logger }) {
-        console.log('AG TEST - Impl Hit');
         const func = `${GenericAuthPostBankAccountLambda.name}.impl`;
 
-        // get details from event
+        // ** get details from event
         let requestId = event.body.bankAccount.accountKey;
         let bankId = event.body.bankAccount.accountIdentifier;
         logger.info({function: func, log: 'started', params: { requestId }});
 
-        // can be multiple in cache
-        // match on accountIdentifier
-
-        console.log('AG TEST - Event requestId:', requestId);
-
-        // TEST SOMETHING
         const {Environment: env = 'test', AWS_REGION: region = 'local'} = process.env;
-        console.log(`AG TEST impl - env:${env} - region:${region}`);
 
-        // Skeleton Implementation for Cache
-        const key = requestId += 'postRedirectAction';
-        const keyValuePairService = new KeyValuePairCache({env, region}); // TODO: update params
+        const key = requestId += '_postRedirectAction';
+        const keyValuePairService = new KeyValuePairCache({env, region, domain: this.params.domain});
+
+        //todo: consider moving connect/disconnect outside of here
         return keyValuePairService.connect()
             .then(() => {
                 return keyValuePairService.retrievePair(key)
@@ -91,11 +78,13 @@ class GenericAuthPostBankAccountLambda extends Handler{
 
                         return dbQueries.updateBankAccount({bankAccount}, {logger})
                             .then((something) => {
-                                console.log('AG TEST - Update Bank: ', something);
                                 event.logger.info({function: func, log: 'ended'});
                                 return {statusCode: 200, body: 'Success'};
                             });
                     });
+            })
+            .finally(() =>{
+                keyValuePairService.disconnect()
             });
     }
 
