@@ -48,7 +48,7 @@ const connectImpl = Promise.method((self) => {
         resolver.resolve(self.redisClient);
     });
 
-    return resolver.promise();
+    return resolver.promise;
 });
 
 const disconnectImpl = Promise.method((self) => {
@@ -57,17 +57,13 @@ const disconnectImpl = Promise.method((self) => {
     }
 });
 
-const getConnectionString = ({ env: awsEnv, region: awsRegion, localhost = false, connectionString }) => {
+const getConnectionString = ({ env: awsEnv, region: awsRegion, domain, connectionString }) => {
     if (connectionString) {
         // if we already have a connection string, we just return
         return connectionString;
     }
 
-    if (localhost) {
-        return 'redis://127.0.0.1:6379';
-    }
-
-    return `redis://elasticache.${awsEnv}.${awsRegion}.sagebanking-dev.cloud:6379`;
+    return `redis://elasticache.${awsEnv}.${awsRegion}.${domain}:6379`;
 };
 
 const storePairImpl = Promise.method((self, kvp, ttl = 300) => {

@@ -14,6 +14,7 @@ describe('@sage/bc-services-keyvaluepaircache', function() {
         sandbox = sinon.createSandbox();
         sandbox.stub(redis, 'createClient')
             .returns(new MockRedis());
+
         service.connect();
     });
 
@@ -49,19 +50,19 @@ describe('@sage/bc-services-keyvaluepaircache', function() {
     });
 
     it('should error when upsert rejects', () => {
-        sandbox.stub(service.redisClient, 'setAsync').returns(Promise.reject());
+        sandbox.stub(service.redisClient, 'setAsync').returns(Promise.reject(new Error('Error details from Redis - problem writing to cache')));
         let kvp = new KeyValuePair({key:'key1_mock',value:'value1_mock'});
         return service.upsertPair(kvp, 300)
             .catch((err) => {
-                should(err).eql(new Error('Problem writing to cache'));
+                should(err).eql(new Error('Error details from Redis - problem writing to cache'));
             })
     });
 
     it('should error when delete rejects', () => {
-        sandbox.stub(service.redisClient, 'delAsync').returns(Promise.reject());
+        sandbox.stub(service.redisClient, 'delAsync').returns(Promise.reject(new Error('Error details from Redis - problem deleting from cache')));
         return service.deletePair('dummyKey')
             .catch((err) => {
-                should(err).eql(new Error('Problem deleting from cache'));
+                should(err).eql(new Error('Error details from Redis - problem deleting from cache'));
             })
     });
 
@@ -86,6 +87,7 @@ class MockRedis{
         this.connected = true;
     }
 
+    on(){};
     setAsync(){};
     getAsync(){};
     delAsync(){};

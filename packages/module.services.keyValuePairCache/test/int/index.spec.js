@@ -6,7 +6,7 @@ describe('@sage/bc-services-keyvaluepaircache', function() {
     let service;
 
     before(() => {
-        service = new KeyValuePairCache({localhost:true});
+        service = new KeyValuePairCache({connectionString: 'redis://127.0.0.1:6379'});
         service.connect();
     });
 
@@ -90,11 +90,12 @@ describe('@sage/bc-services-keyvaluepaircache', function() {
 
     it('should error when connection is lost', () => {
         let kvp = new KeyValuePair({key:'key2',value:'value2'});
+
         return service.disconnect()
             .then(() => {
                 return service.storePair(kvp,300)
                     .catch((err) => {
-                        should(err).eql(new Error('Problem writing to cache'));
+                        should(err.code).eql('NR_CLOSED');
                     })
             })
     });
