@@ -40,8 +40,18 @@ class KeyValuePairCache {
 }
 
 const connectImpl = Promise.method((self) => {
+    const resolver = Promise.defer();
     self.redisClient = redis.createClient(self.connectionString);
-    return self.redisClient;
+
+    self.redisClient.on('error', (err) => {
+        resolver.reject(new Error(err));
+    });
+
+    self.redisClient.on('ready', () => {
+        resolver.resolve(self.redisClient);
+    });
+
+    return resolver.promise();
 });
 
 const disconnectImpl = Promise.method((self) => {
@@ -61,7 +71,7 @@ const getConnectionString = ({ env: awsEnv, region: awsRegion, localhost = false
         return 'redis://127.0.0.1:6379';
     }
 
-    return `redis://elasticache.${awsEnv}.${awsRegion}.sagebanking-dev.cloud:6379$`;
+    return `redis://elasticache.${awsEnv}.${awsRegion}.sagebanking-dev.cloud:6379`;
 };
 
 const storePairImpl = Promise.method((self, kvp, ttl = 300) => {

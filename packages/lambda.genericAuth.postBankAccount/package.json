@@ -55,7 +55,7 @@
     "cover:report": "npm run cover && npm run report",
     "int": "NODE_ENV=test nyc --x test/ mocha -b --colors --reporter spec \"./test/int/**/*.spec.js\"",
     "build": "serverless package",
-    "postbuild": "mkdir -p ../../build/packages && mv ./.serverless/${PWD##*/}.zip ../../build/packages/${PWD##*/}.zip",
+    "postbuild": "mkdir -p ../../build && mv ./.serverless/${PWD##*/}.zip ../../build/${PWD##*/}.zip",
     "unlock": "rimraf package-lock.json",
     "lint": "eslint ./lib/**"
   }
