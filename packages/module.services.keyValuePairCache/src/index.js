@@ -13,9 +13,6 @@ class KeyValuePairCache {
 
     connect(...args) {
         return connectImpl(this, ...args)
-            .catch(() => {
-                throw new Error('Problem connecting to cache');
-            });
     }
 
     disconnect(...args) {
@@ -58,7 +55,6 @@ const disconnectImpl = Promise.method((self) => {
     if (self.redisClient) {
         return self.redisClient.quitAsync();
     }
-    return null;
 });
 
 const getConnectionString = ({ env: awsEnv, region: awsRegion, localhost = false, connectionString }) => {
@@ -85,9 +81,6 @@ const storePairImpl = Promise.method((self, kvp, ttl = 300) => {
                 .then(() => {
                     return kvp;
                 })
-                .catch(() => {
-                    throw new Error('Problem writing to cache');
-                });
         }
     }
     throw new Error('Not connected to cache');
@@ -106,6 +99,7 @@ const retrievePairImpl = Promise.method((self, key) => {
                         const unwrappedValue = unwrapValue(value);
                         return new KeyValuePair({ key, value: unwrappedValue });
                     }
+
                     throw new Error(`KeyValuePair not found: ${key}`);
                 });
         }
@@ -121,9 +115,6 @@ const deletePairImpl = Promise.method((self, key) => {
     if (self.redisClient) {
         if (self.redisClient.connected) {
             return self.redisClient.delAsync(key)
-                .catch(() => {
-                    throw new Error('Problem deleting from cache');
-                });
         }
     }
     throw new Error('Not connected to cache');
