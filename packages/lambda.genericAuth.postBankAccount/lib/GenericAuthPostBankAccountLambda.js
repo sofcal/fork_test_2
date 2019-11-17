@@ -3,7 +3,6 @@
 const validate = require('./validators');
 const ErrorSpecs = require('./ErrorSpecs');
 const keys = require('./params');
-const { DBQueries } = require('./db');
 
 const { StatusCodeError } = require('@sage/bc-statuscodeerror');
 const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
@@ -11,10 +10,14 @@ const DB = require('@sage/bc-services-db');
 const { Handler } = require('@sage/bc-independent-lambda-handler');
 const KeyValuePairCache = require('@sage/bc-services-keyvaluepaircache');
 
-const Promise = require('bluebird');
-
+const { DBQueries } = require('./db');
 const serviceImpls = { DB };
 const dbName = 'bank_db';
+
+const access = require('safe-access');
+const Promise = require('bluebird');
+const _ = require('underscore');
+
 
 class GenericAuthPostBankAccountLambda extends Handler{
     constructor({ config }) {
@@ -50,14 +53,12 @@ class GenericAuthPostBankAccountLambda extends Handler{
     impl(event, { logger }) {
         const func = `${GenericAuthPostBankAccountLambda.name}.impl`;
 
-        // ** get details from event
-        let requestId = event.body.bankAccount.accountKey;
-        let bankId = event.body.bankAccount.accountIdentifier;
-        logger.info({function: func, log: 'started', params: { requestId }});
+        let { uuid: bankAccountId, accountKey, accountIdentifier } = event.body.bankAccount;
+        logger.info({function: func, log: 'started', params: { bankAccountId, accountKey, accountIdentifier }});
 
         const {Environment: env = 'test', AWS_REGION: region = 'local'} = process.env;
 
-        const key = requestId += '_postRedirectAction';
+        const key = `${accountKey}_postRedirectAction`;
         const keyValuePairService = new KeyValuePairCache({env, region, domain: this.params.domain});
 
         //todo: consider moving connect/disconnect outside of here
@@ -65,19 +66,26 @@ class GenericAuthPostBankAccountLambda extends Handler{
             .then(() => {
                 return keyValuePairService.retrievePair(key)
                     .then((kvp) => {
-                        // let bankAccount = kvp; TODO: do relative extraction - need to iterate through collection
+                        const authAccounts = access(kvp,'value.returnPayload.accounts');
+                        const postedAccDetails = _.find(authAccounts, (accDetail) => (accDetail.accountIdentifier === accountIdentifier))
+
+                        if (!postedAccDetails) {
+                            throw new Error('Failed to find authorisation details for account');
+                        }
+
                         let bankAccount = {
-                            _id: bankId,
-                            accountKey: 'b4a8b863-80d9-432f-9c8b-4095ba441581',
-                            accountName: 'Test Bank 5',
-                            bankIdentifier: '456'
-                        }; //TODO: This is a test account; update record based on cache entry
+                            _id: bankAccountId,
+                            accountKey: postedAccDetails.accountKey,
+                            accountName: postedAccDetails.accountName,
+                            aggregatorId: postedAccDetails.bankAccountExternalId,
+                            bankIdentifier: postedAccDetails.bankIdentifier,
+                            accountIdentifier: postedAccDetails.accountIdentifier,
+                            branchIdentifier: postedAccDetails.branchIdentifier
+                        };
 
-                        keyValuePairService.disconnect();
                         const dbQueries = DBQueries.Create(this.services.db.getConnection());
-
-                        return dbQueries.updateBankAccount({bankAccount}, {logger})
-                            .then((something) => {
+                        return dbQueries.updateBankAccount({ bankAccount },  {logger })
+                            .then(() => {
                                 event.logger.info({function: func, log: 'ended'});
                                 return {statusCode: 200, body: 'Success'};
                             });

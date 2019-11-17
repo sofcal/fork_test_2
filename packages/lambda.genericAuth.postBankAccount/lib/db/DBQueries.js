@@ -18,14 +18,14 @@ class DBQueries {
 
 const updateBankAccountImpl = Promise.method((self, { bankAccount }, { logger }) => {
     const func = `${consts.LOG_PREFIX}.updateBankAccount`;
-    logger.debug({ function: func, log: 'started', params: { } });
+    logger.info({ function: func, log: 'started', params: { } });
 
     const collection = self.db.collection('BankAccount');
     const where = { _id: bankAccount._id };
-    const promise = collection.updateOne(where, {$set: bankAccount});
-
-    logger.debug({ function: func, log: 'ended', params: { } });
-    return promise;
+    return collection.updateOne(where, {$set: bankAccount})
+        .then((updateResult) => {
+            logger.info({ function: func, log: 'ended', params: { updateResult } });
+        });
 });
 
 const consts = {
