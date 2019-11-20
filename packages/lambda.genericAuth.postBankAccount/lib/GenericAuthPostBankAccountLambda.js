@@ -1,5 +1,6 @@
 'use strict';
 
+const AWS = require('aws-sdk');
 const validate = require('./validators');
 const ErrorSpecs = require('./ErrorSpecs');
 const keys = require('./params');
@@ -53,8 +54,8 @@ class GenericAuthPostBankAccountLambda extends Handler{
     impl(event, { logger }) {
         const func = `${GenericAuthPostBankAccountLambda.name}.impl`;
 
-        let { uuid: bankAccountId, accountKey, accountIdentifier } = event.body.bankAccount;
-        logger.info({function: func, log: 'started', params: { bankAccountId, accountKey, accountIdentifier }});
+        let { body: { providerId, bankAccount: { uuid: bankAccountId, accountKey, accountIdentifier }}} = event;
+        logger.info({function: func, log: 'started', params: { providerId, bankAccountId, accountKey, accountIdentifier }});
 
         const {Environment: env = 'test', AWS_REGION: region = 'local'} = process.env;
 
@@ -85,15 +86,60 @@ class GenericAuthPostBankAccountLambda extends Handler{
 
                         const dbQueries = DBQueries.Create(this.services.db.getConnection());
                         return dbQueries.updateBankAccount({ bankAccount },  {logger })
-                            .then(() => {
-                                event.logger.info({function: func, log: 'ended'});
-                                return {statusCode: 200, body: 'Success'};
-                            });
+                            .then(() => bankAccount)
                     });
+            })
+            .then((ba) => this.invokeWebhook({logger, providerId, bankAccountId: ba._id, externalId: ba.aggregatorId,  env , region }))
+            .then(() => {
+                event.logger.info({function: func, log: 'ended'});
+                return {statusCode: 200, body: 'Success'};
             })
             .finally(() =>{
                 keyValuePairService.disconnect()
             });
+    }
+
+    invokeWebhook({logger, providerId, bankAccountId, externalId, env, region}) {
+        const func = `${GenericAuthPostBankAccountLambda.name}.invokeWebhook`;
+        logger.info({function: func, log: 'started', params: { bankAccountId, externalId, providerId}});
+
+        return Promise.resolve()
+            .then(() =>{
+                const lambda = new AWS.Lambda({ apiVersion: '2015-03-31', region: process.env.AWS_REGION });
+                const lambdaName = `papi-${env}-${region}-WebhooksOutbound`;
+
+                const payload = {
+                    body: {
+                        providerId,
+                        resourceId: bankAccountId,
+                        eventType: 'resourceCreated',
+                        resourceType: 'bankAccount',
+                        resourceUrl: 'NA',
+                        additionalData: { externalId }
+                    }
+                };
+
+                let params = {
+                    FunctionName: lambdaName,
+                    InvocationType: 'Event',    // async
+                    Payload: JSON.stringify(payload)
+                };
+
+                logger.info({function: func, log: 'invoking lambda', params: { lambdaFunctionName: lambdaName }});
+
+
+                return lambda.invoke(params).promise()
+                    .then((data) => {
+                        if (!((data.StatusCode >= 200) && (data.StatusCode < 300))) {
+                            const msg = `failed to invoke Lambda status code ${data.StatusCode}`;
+                            throw new Error(msg);
+                        }
+                    })
+                    .catch((err) => {
+                        logger.error({ function: func, msg: 'error caught sending notification', params: { error: err.message || err } });
+                        throw err;
+                    });
+                });
     }
 
     dispose({ logger }) { // eslint-disable-line class-methods-use-this
