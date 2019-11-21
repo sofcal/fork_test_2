@@ -58,7 +58,6 @@ class GenericAuthPostBankAccountLambda extends Handler{
         logger.info({function: func, log: 'started', params: { providerId, bankAccountId, accountKey, accountIdentifier }});
 
         const {Environment: env = 'test', AWS_REGION: region = 'local'} = process.env;
-
         const key = `${accountKey}_postRedirectAction`;
         const keyValuePairService = new KeyValuePairCache({env, region, domain: this.params.domain});
 
@@ -68,7 +67,7 @@ class GenericAuthPostBankAccountLambda extends Handler{
                 return keyValuePairService.retrievePair(key)
                     .then((kvp) => {
                         const authAccounts = access(kvp,'value.returnPayload.accounts');
-                        const postedAccDetails = _.find(authAccounts, (accDetail) => (accDetail.accountIdentifier === accountIdentifier))
+                        const postedAccDetails = _.find(authAccounts, (accDetail) => (accDetail.accountIdentifier === accountIdentifier));
 
                         if (!postedAccDetails) {
                             throw new Error('Failed to find authorisation details for account');
@@ -155,7 +154,6 @@ const getParams = ({ env, region }, logger) => {
     const params = {};
 
     logger.info({ function: func, log: 'retrieving keys', keys, paramPrefix });
-
     const loader = ParameterStoreStaticLoader.Create({ keys, paramPrefix, env: { region } });
     return loader.load(params)
         .then((updated) => {

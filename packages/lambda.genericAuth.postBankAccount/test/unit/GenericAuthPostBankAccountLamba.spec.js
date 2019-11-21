@@ -1,13 +1,22 @@
-const sinon = require('sinon');
 const GenericAuthPostBankAccountLambda = require('../../lib/GenericAuthPostBankAccountLambda');
+const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
 const { RequestLogger } = require('@sage/bc-requestlogger');
 const { logger: loggerGen } = require('@sage/bc-debug-utils');
+const KeyValuePairCache = require('@sage/bc-services-keyvaluepaircache');
 const should = require('should');
+const sinon = require('sinon');
+
+const DB = require('@sage/bc-services-db');
+const { DBQueries } = require('../../lib/db');
 
 describe('lambda-genericauth-postbankaccount', function(){
     let sandbox;
     const logger = loggerGen(true);
     const config = {config: 'value'};
+
+    const errFunc = () => { throw new Error('should be stubbed') };
+    const dummyLoader = { load: errFunc };
+    const db = { connect: errFunc, disconnect: errFunc, getConnection: errFunc };
 
     const event = {
         logger: logger,
@@ -19,12 +28,24 @@ describe('lambda-genericauth-postbankaccount', function(){
         }
     };
 
+    const params = {
+        test: 'test',
+        env: 'testEnv',
+        region: 'testRegion',
+        domain: 'testDomain'
+    };
+
     before(() => {
         sandbox = sinon.createSandbox();
     });
 
     beforeEach(() => {
-        // TODO: Setup generic stubs
+        sandbox.stub(dummyLoader, 'load').resolves(params);
+        sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
+        sandbox.stub(KeyValuePairCache.prototype, 'connect').returns(Promise.resolve(true));
+        sandbox.stub(DB, 'Create').returns(db);
+        sandbox.stub(db, 'connect').resolves();
+        sandbox.stub(db, 'disconnect').resolves();
     });
 
     afterEach(() => {
@@ -38,32 +59,73 @@ describe('lambda-genericauth-postbankaccount', function(){
 
     it('should validate event and config', () => {
         const postBankLambda = GenericAuthPostBankAccountLambda.Create(config);
-        should(postBankLambda.validate({},{logger})).equal(config.config);
+        should(postBankLambda.validate(event, {logger})).equal(config.config);
     });
 
-    it.skip('should test init', () => {
+    it('should fail validation with no event', () => {
+        try{
+            const postBankLambda = GenericAuthPostBankAccountLambda.Create({config});
+            postBankLambda.validate(null, {logger});
+        } catch (err){
+            should(err.message).equal('Invalid Event');
+        }
+    });
+
+    it('should fail validation with no config', () => {
+        try{
+            const postBankLambda = GenericAuthPostBankAccountLambda.Create({});
+            postBankLambda.validate(event, {logger});
+        } catch (err){
+            should(err.message).equal('Invalid Config');
+        }
+    });
+
+    it('should exercise database connection', () => {
         const postBankLambda = GenericAuthPostBankAccountLambda.Create(config);
-        //sandbox.stub(RequestLogger, 'Create').returns(logger);
-        //sandbox.stub(postBankLambda, 'validate').returns(true);
-        //sandbox.stub(postBankLambda, 'impl').resolves(undefined);
-        //sandbox.stub(postBankLambda, 'buildResponse').resolves([null, { statusCode: 201, body: '201_body' }]);
 
-        const expectedRes = { statusCode: 200, body: 'Success'};
-
-        return postBankLambda.init({},{logger})
+        return postBankLambda.init(event,{logger})
             .then((actual) => {
-                should(actual).eql(expectedRes);
+                should(actual).eql(false);
             })
     });
 
-    it.skip('should test impl', () => {
+    it('should process lambda successfully', () => {
+        const responseKey = {
+            returnPayload : {
+                accounts: [{
+                    "accountIdentifier": "7531af69-fcc3-4d7c-937d-8c67aa20b9ef",
+                    "accountKey": "12345"
+                }]
+            }
+        };
+        sandbox.stub(KeyValuePairCache.prototype, 'retrievePair').returns(Promise.resolve({key:'someKey', value: responseKey}));
+        sandbox.stub(db, 'getConnection').resolves();
+        sandbox.createStubInstance(DBQueries);
+        sandbox.stub(DBQueries.prototype, 'updateBankAccount').returns(Promise.resolve());
+
         const postBankLambda = GenericAuthPostBankAccountLambda.Create(config);
         const expectedRes = { statusCode: 200, body: 'Success'};
 
-        //TODO: Stubbing bonanza
-        return postBankLambda.impl(event,{logger})
-            .then((actual) => {
-                should(actual).eql(expectedRes);
+        return postBankLambda.init(event,{logger})
+            .then (() => {
+                return postBankLambda.impl(event,{logger})
+                    .then((actual) => {
+                        should(actual).eql(expectedRes);
+                    })
+            })
+    });
+
+    it('should test missing account', () => {
+        sandbox.stub(KeyValuePairCache.prototype, 'retrievePair').returns(Promise.resolve(true));
+
+        const postBankLambda = GenericAuthPostBankAccountLambda.Create(config);
+
+        return postBankLambda.init(event,{logger})
+            .then (() => {
+                return postBankLambda.impl(event,{logger})
+                    .catch((err) =>{
+                        should(err.message).eql('Failed to find authorisation details for account');
+                    })
             })
     });
 });

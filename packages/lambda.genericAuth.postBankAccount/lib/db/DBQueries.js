@@ -12,6 +12,7 @@ class DBQueries {
     }
 
     updateBankAccount(...args) {
+        console.log('AG TEST - Hit Updated Bank');
         return updateBankAccountImpl(this, ...args);
     }
 }
