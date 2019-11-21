@@ -29,14 +29,13 @@ describe('lambda-genericauth-postbankaccount-DBQueries', function(){
         should(DBQueries.Create.calledWithExactly(db)).eql(true);
     });
 
-    it.skip('should exercise update', () => {
+    it('should exercise update', () => {
+        sandbox.stub(DBQueries.prototype, 'updateBankAccount').returns(Promise.resolve());
         let bankAccount = {};
-        const queries = DBQueries.Create(db);
-
-        sandbox.stub(queries, 'db').value({"collection": ""});
-
-        const response = queries.updateBankAccount(bankAccount,{logger});
-        should(response).equal('Something');
+        let queries = DBQueries.Create(db);
+        queries.updateBankAccount(bankAccount,{logger});
+        should(queries.updateBankAccount.callCount).eql(1);
+        should(queries.updateBankAccount.calledWithExactly(bankAccount,{logger})).eql(true);
     });
 
 });

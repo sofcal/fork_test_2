@@ -41,7 +41,6 @@ describe('lambda-genericauth-postbankaccount', function(){
     it('should callback on successful execution', (done) => {
         index.run(event, context, () => { return true })
             .then(() => {
-                // TODO: Verify something
                 done();
             });
     });

@@ -12,7 +12,7 @@ const { DBQueries } = require('../../lib/db');
 describe('lambda-genericauth-postbankaccount', function(){
     let sandbox;
     const logger = loggerGen(true);
-    const config = {config: 'value'};
+    const config = {config: 'value', region: 'region'};
 
     const errFunc = () => { throw new Error('should be stubbed') };
     const dummyLoader = { load: errFunc };
@@ -99,6 +99,7 @@ describe('lambda-genericauth-postbankaccount', function(){
             }
         };
         sandbox.stub(KeyValuePairCache.prototype, 'retrievePair').returns(Promise.resolve({key:'someKey', value: responseKey}));
+        sandbox.stub(GenericAuthPostBankAccountLambda.prototype,'invokeWebhook').returns(Promise.resolve());
         sandbox.stub(db, 'getConnection').resolves();
         sandbox.createStubInstance(DBQueries);
         sandbox.stub(DBQueries.prototype, 'updateBankAccount').returns(Promise.resolve());
