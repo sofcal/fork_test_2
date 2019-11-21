@@ -25,6 +25,7 @@ const updateBankAccountImpl = Promise.method((self, { bankAccount }, { logger })
     return collection.updateOne(where, {$set: bankAccount})
         .then((updateResult) => {
             logger.info({ function: func, log: 'ended', params: { updateResult } });
+            return updateResult;
         });
 });
 

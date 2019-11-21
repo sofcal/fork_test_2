@@ -38,4 +38,30 @@ describe('lambda-genericauth-postbankaccount-DBQueries', function(){
         should(queries.updateBankAccount.calledWithExactly(bankAccount,{logger})).eql(true);
     });
 
+    it('should error where no data', () => {
+        let bankAccount = {
+            _id : '12345'
+        };
+
+        let dbEntry = {
+            _id : '12345',
+            updateOne: () => {
+                return Promise.resolve(true);
+            }
+        };
+
+        let tempdb = {
+            connect: errFunc,
+            disconnect: errFunc,
+            collection: () => {
+                return dbEntry;
+            },
+        };
+
+        let queries = DBQueries.Create(tempdb);
+        queries.updateBankAccount({bankAccount},{logger})
+            .then((response)=> {
+                should(response).equal(true);
+            })
+    });
 });
