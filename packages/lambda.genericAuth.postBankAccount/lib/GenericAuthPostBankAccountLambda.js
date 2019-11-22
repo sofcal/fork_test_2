@@ -61,7 +61,7 @@ class GenericAuthPostBankAccountLambda extends Handler{
         const key = `${accountKey}_postRedirectAction`;
         const keyValuePairService = new KeyValuePairCache({env, region, domain: this.params.domain});
 
-        //todo: consider moving connect/disconnect outside of here
+        //todo: consider moving connect/disconnect outside of here into populate services
         return keyValuePairService.connect()
             .then(() => {
                 return keyValuePairService.retrievePair(key)

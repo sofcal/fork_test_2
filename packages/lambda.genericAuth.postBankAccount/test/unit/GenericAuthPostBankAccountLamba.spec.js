@@ -1,13 +1,18 @@
+const AWS = require('aws-sdk');
+const uuidGen = require('uuid');
+const Promise = require('bluebird');
+const should = require('should');
+const sinon = require('sinon');
+
 const GenericAuthPostBankAccountLambda = require('../../lib/GenericAuthPostBankAccountLambda');
 const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
 const { RequestLogger } = require('@sage/bc-requestlogger');
 const { logger: loggerGen } = require('@sage/bc-debug-utils');
 const KeyValuePairCache = require('@sage/bc-services-keyvaluepaircache');
-const should = require('should');
-const sinon = require('sinon');
 
 const DB = require('@sage/bc-services-db');
 const { DBQueries } = require('../../lib/db');
+
 
 describe('lambda-genericauth-postbankaccount', function(){
     let sandbox;
@@ -128,5 +133,77 @@ describe('lambda-genericauth-postbankaccount', function(){
                         should(err.message).eql('Failed to find authorisation details for account');
                     })
             })
+    });
+
+    describe('InvokeWebHookAuthNotification', () => {
+        it('Should invoke outbound webhook lambda', () => {
+            const postBankLambda = GenericAuthPostBankAccountLambda.Create(config);
+            const mockResponse = { StatusCode:  200 };
+
+            const invokeStub = sandbox.stub().returns({ promise: () => Promise.resolve(mockResponse) });
+            sandbox.stub(AWS, 'Lambda').returns({
+                invoke: invokeStub
+            });
+
+            const providerId = uuidGen.v4();
+            const bankAccountId = uuidGen.v4();
+            const externalId = uuidGen.v4();
+
+            const expectedPayload = {
+                body: {
+                    providerId,
+                    resourceId: bankAccountId,
+                    eventType: 'resourceCreated',
+                    resourceType: 'bankAccount',
+                    resourceUrl: 'NA',
+                    additionalData: { externalId }
+                }
+            };
+
+            return postBankLambda.invokeWebhook({logger, providerId, bankAccountId, externalId, env: 'dev03', region: 'eu-west-1'} )
+                .then(() => {
+                    should(invokeStub.callCount).eql(1);
+                    const lambdaPayload = JSON.parse(invokeStub.getCall(0).args[0].Payload);
+                    should(lambdaPayload).eql(expectedPayload);
+                });
+        });
+
+        it('Should throw should a non 200 status code be returned', () => {
+            const postBankLambda = GenericAuthPostBankAccountLambda.Create(config);
+            const mockResponse = { StatusCode:  500 };
+
+            const invokeStub = sandbox.stub().returns({ promise: () => Promise.resolve(mockResponse) });
+            sandbox.stub(AWS, 'Lambda').returns({
+                invoke: invokeStub
+            });
+
+            const providerId = uuidGen.v4();
+            const bankAccountId = uuidGen.v4();
+            const externalId = uuidGen.v4();
+
+            const expectedPayload = {
+                body: {
+                    providerId,
+                    resourceId: bankAccountId,
+                    eventType: 'resourceCreated',
+                    resourceType: 'bankAccount',
+                    resourceUrl: 'NA',
+                    additionalData: { externalId }
+                }
+            };
+
+            return postBankLambda.invokeWebhook({logger, providerId, bankAccountId, externalId, env: 'dev03', region: 'eu-west-1'} )
+                .then(() => {
+                    should(invokeStub.callCount).eql(1);
+                    const lambdaPayload = JSON.parse(invokeStub.getCall(0).args[0].Payload);
+                    should(lambdaPayload).eql(expectedPayload);
+                })
+                .then(() => {
+                    throw new Error('should have thrown');
+                })
+                .catch((err) => {
+                    should(err.message).eql('failed to invoke Lambda status code 500');
+                })
+        })
     });
 });
