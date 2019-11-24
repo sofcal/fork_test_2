@@ -20,8 +20,8 @@ function TransactionBucket(data) {
     }
 }
 
-TransactionBucket.validate = function (transactionBucket) {
-    const validateTransactions = function(transactions){
+TransactionBucket.validate = function(transactionBucket) {
+    const validateTransactions = function(transactions) {
         let items = [];
 
         _.each(transactions, (transaction) => {
@@ -32,29 +32,49 @@ TransactionBucket.validate = function (transactionBucket) {
     };
 
     const properties = [
-        {path: 'uuid', regex: resources.regex.uuid},
-        {path: 'bankAccountId', regex: resources.regex.uuid},
-        {path: 'region', regex: resources.regex.transactionBucket.region},
-        {path: 'startIncrementedId', custom: _.isNumber},
-        {path: 'endIncrementedId', custom: _.isNumber},
-        {path: 'numberOfTransactions', custom: _.isNumber},
-        {path: 'transactions', arrayCustom: validateTransactions, optional: true},
+        { path: 'uuid', regex: resources.regex.uuid },
+        { path: 'bankAccountId', regex: resources.regex.uuid },
+        { path: 'region', regex: resources.regex.transactionBucket.region },
+        { path: 'startIncrementedId', custom: _.isNumber },
+        { path: 'endIncrementedId', custom: _.isNumber },
+        { path: 'numberOfTransactions', custom: _.isNumber },
+        { path: 'transactions', arrayCustom: validateTransactions, optional: true },
 
         // startDate and endDate are optional, only present on the main transaction collection
-        {path: 'startDate', custom: _.isDate, optional: false, allowNull: false },
-        {path: 'endDate', custom: _.isDate, optional: false, allowNull: false }
+        { path: 'startDate', custom: _.isDate, optional: false, allowNull: false },
+        { path: 'endDate', custom: _.isDate, optional: false, allowNull: false }
     ];
 
     utils.validateContractObject(transactionBucket, TransactionBucket, properties);
 };
 
-let p = TransactionBucket.prototype;
+const p = TransactionBucket.prototype;
 
-p.validate = function () {
+p.validate = function() {
     TransactionBucket.validate(this);
 };
 
+p.isFull = function() {
+    return this.transactions.length >= TransactionBucket.MAX_BUCKET_SIZE;
+};
+
+p.calculateRanges = function() {
+    const dateRange = TransactionBucket.getDatePostedRange(this.transactions);
+
+    this.startDate = dateRange.startDate || new Date(null);
+    this.endDate = dateRange.endDate || new Date(null);
+
+    this.startIncrementedId = (_.first(this.transactions) || {}).incrementedId;
+    this.endIncrementedId = (_.last(this.transactions) || {}).incrementedId;
+
+    this.numberOfTransactions = this.transactions.length;
+};
+
 module.exports = TransactionBucket;
+
+TransactionBucket.Create = (...args) => {
+    return new TransactionBucket(...args);
+};
 
 TransactionBucket.MAX_BUCKET_SIZE = resources.api.pageSize;
 
