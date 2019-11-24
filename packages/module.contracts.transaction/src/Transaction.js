@@ -10,6 +10,7 @@ const util = require('util');
 
 const Big = require('bignumber.js');
 const _ = require('underscore');
+const uuid = require('uuid');
 
 const { format } = util;
 const httpMethod = require('@sage/bc-framework-httpmethod');
