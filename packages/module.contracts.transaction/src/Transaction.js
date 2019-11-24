@@ -37,7 +37,11 @@ const DEFAULT_CATEGORY = {
 
 function Transaction(data) {
     if (data) {
-        this.uuid = data.uuid;
+        if (_idField === Transaction.ID_FIELDS.legacy) {
+            this.uuid = data.uuid || uuid.v4();
+        } else {
+            this._id = data._id || uuid.v4();
+        }
         this.transactionType = data.transactionType;
         this.transactionStatus = data.transactionStatus;
         this.datePosted = data.datePosted;
@@ -500,3 +504,9 @@ Transaction.feedSources = Object.freeze({
     auto: 'auto',
     manual: 'manual'
 });
+
+Transaction.SetIdField = (idField) => {
+    _idField = idField;
+};
+Transaction.ID_FIELDS = Object.freeze({ legacy: 'uuid', mongoDB: '_id' });
+let _idField = Transaction.ID_FIELDS.legacy;

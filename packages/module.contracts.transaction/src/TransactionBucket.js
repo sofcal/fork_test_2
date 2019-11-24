@@ -9,7 +9,11 @@ const _ = require('underscore');
 
 function TransactionBucket(data) {
     if (data) {
-        this.uuid = data.uuid || uuid.v4();
+        if (_idField === TransactionBucket.ID_FIELDS.legacy) {
+            this.uuid = data.uuid || uuid.v4();
+        } else {
+            this._id = data._id || uuid.v4();
+        }
 
         this.region = data.region;
         this.bankAccountId = data.bankAccountId;
@@ -41,8 +45,10 @@ TransactionBucket.validate = TransactionBucket.Validate = function(transactionBu
         return items;
     };
 
+    const legacy = _idField === TransactionBucket.ID_FIELDS.legacy;
+
     const properties = [
-        { path: 'uuid', regex: resources.regex.uuid },
+        { path: (legacy ? 'uuid' : '_id'), regex: resources.regex.uuid },
         { path: 'bankAccountId', regex: resources.regex.uuid },
         { path: 'region', regex: resources.regex.transactionBucket.region },
         { path: 'startIncrementedId', custom: _.isNumber },
@@ -120,3 +126,9 @@ TransactionBucket.getDatePostedRange = (transactions, checkInitiatedDate = false
 
     return response;
 };
+
+TransactionBucket.SetIdField = (idField) => {
+    _idField = idField;
+};
+TransactionBucket.ID_FIELDS = Object.freeze({ legacy: 'uuid', mongoDB: '_id' });
+let _idField = TransactionBucket.ID_FIELDS.legacy;
