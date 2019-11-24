@@ -86,7 +86,7 @@ Transaction.Create = (...args) => {
     return new Transaction(...args);
 };
 
-Transaction.validate = function(transaction, noThrow, sm) {
+Transaction.validate = Transaction.Validate = function(transaction, noThrow, sm) {
     let skipModes = sm;
     if (transaction) {
         skipModes = skipModes || transaction.skipModes;

@@ -24,7 +24,7 @@ function TransactionBucket(data) {
     }
 }
 
-TransactionBucket.validate = function(transactionBucket) {
+TransactionBucket.validate = TransactionBucket.Validate = function(transactionBucket) {
     if (!this.source) {
         this.source = 'client';         // TODO forces source: client onto existing documents even if they didn't go through constructor
     }
