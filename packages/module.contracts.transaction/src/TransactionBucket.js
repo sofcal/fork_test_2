@@ -78,6 +78,14 @@ p.calculateRanges = function() {
     this.numberOfTransactions = this.transactions.length;
 };
 
+p.addTransaction = function(transaction) {
+    this.transactions.push(transaction);
+};
+
+p.addTransactions = function(transactions) {
+    this.transactions.push(transactions);
+};
+
 module.exports = TransactionBucket;
 
 TransactionBucket.Create = (...args) => {

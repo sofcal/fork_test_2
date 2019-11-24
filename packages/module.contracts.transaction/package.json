@@ -23,6 +23,7 @@
     "@sage/bc-contracts-util": "^1.1.102",
     "@sage/bc-framework-httpmethod": "^1.1.96",
     "@sage/bc-services-validators": "^1.1.102",
+    "bignumber.js": "^4.0.0",
     "underscore": "^1.9.0",
     "uuid": "^3.3.2"
   },

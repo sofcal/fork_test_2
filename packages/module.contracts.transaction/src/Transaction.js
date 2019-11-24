@@ -5,8 +5,12 @@ const { Rule } = require('@sage/bc-contracts-rule');
 const { StatusCodeErrorItem, StatusCodeError } = require('@sage/bc-common-statuscodeerror');
 const utils = require('@sage/bc-services-validators');
 const { PredictedAction } = require('@sage/bc-contracts-predictedaction');
+
 const util = require('util');
+
+const Big = require('bignumber.js');
 const _ = require('underscore');
+
 const { format } = util;
 const httpMethod = require('@sage/bc-framework-httpmethod');
 const { extend } = require('@sage/bc-contracts-util');
@@ -305,6 +309,16 @@ Transaction.validate = function(transaction, noThrow, sm) {
         return utils.validateContractObjectNoThrow(transaction, Transaction, properties);
     }
     return utils.validateContractObject(transaction, Transaction, properties);
+};
+
+p.convertToMajorUnits = function() {
+    const minor = new Big(this.transactionAmount);
+    this.transactionAmount = minor.div(100).round(2).toNumber();
+};
+
+p.convertToMinorUnits = function() {
+    const minor = new Big(this.transactionAmount);
+    this.transactionAmount = minor.mul(100).round(0).toNumber();
 };
 
 Transaction.getStringForHashing = (transaction, bankAccountNum, bankIdentifier) => {
