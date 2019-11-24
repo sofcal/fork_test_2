@@ -65,7 +65,7 @@ class GenericAuthCancelBankAccountLambda extends Handler{
 
         const dbQueries = DBQueries.Create(this.services.db.getConnection());
 
-        // todo: use new contracts.   What about things like statusHistory.
+        // use new contracts.  Status -  was actually maintained by BC anayway.
         return dbQueries.updateBankAccount({ bankAccount },  {logger })
             .then((ba) => this.invokeWebhook({logger, providerId, bankAccountId,  env , region }))
             .then(() => {
@@ -192,4 +192,4 @@ const disconnectDB = Promise.method((services, logger) => {
         });
 });
 
-module.exports = GenericAuthPostBankAccountLambda;
+module.exports = GenericAuthCancelBankAccountLambda;

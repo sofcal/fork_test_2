@@ -4,17 +4,15 @@ const Promise = require('bluebird');
 const should = require('should');
 const sinon = require('sinon');
 
-const GenericAuthPostBankAccountLambda = require('../../lib/GenericAuthCancelBankAccountLambda');
+const GenericAuthCancelBankAccountLambda = require('../../lib/GenericAuthCancelBankAccountLambda');
 const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
-const { RequestLogger } = require('@sage/bc-requestlogger');
 const { logger: loggerGen } = require('@sage/bc-debug-utils');
-const KeyValuePairCache = require('@sage/bc-services-keyvaluepaircache');
 
 const DB = require('@sage/bc-services-db');
 const { DBQueries } = require('../../lib/db');
 
 
-describe('lambda-genericauth-postbankaccount', function(){
+describe('lambda-genericauth-cancelbankaccount', function(){
     let sandbox;
     const logger = loggerGen(true);
     const config = {config: 'value', region: 'region'};
@@ -26,10 +24,8 @@ describe('lambda-genericauth-postbankaccount', function(){
     const event = {
         logger: logger,
         body: {
-            "bankAccount": {
-                "accountIdentifier": "7531af69-fcc3-4d7c-937d-8c67aa20b9ef",
-                "accountKey": "12345"
-            }
+            bankAccountId: '7531af69-fcc3-4d7c-937d-8c67aa20b9ef',
+            providerId: '7531af69-fcc3-4d7c-937d-8c67aa20b9ef'
         }
     };
 
@@ -47,7 +43,6 @@ describe('lambda-genericauth-postbankaccount', function(){
     beforeEach(() => {
         sandbox.stub(dummyLoader, 'load').resolves(params);
         sandbox.stub(ParameterStoreStaticLoader, 'Create').returns(dummyLoader);
-        sandbox.stub(KeyValuePairCache.prototype, 'connect').returns(Promise.resolve(true));
         sandbox.stub(DB, 'Create').returns(db);
         sandbox.stub(db, 'connect').resolves();
         sandbox.stub(db, 'disconnect').resolves();
@@ -58,19 +53,19 @@ describe('lambda-genericauth-postbankaccount', function(){
     });
 
     it('should create post bank account lambda correctly', () => {
-        const postBankLambda = GenericAuthPostBankAccountLambda.Create({});
-        should(postBankLambda.dbName).equal('bank_db');
+        const cancelBankAccLambda = GenericAuthCancelBankAccountLambda.Create({});
+        should(cancelBankAccLambda.dbName).equal('bank_db');
     });
 
     it('should validate event and config', () => {
-        const postBankLambda = GenericAuthPostBankAccountLambda.Create(config);
-        should(postBankLambda.validate(event, {logger})).equal(config.config);
+        const cancelBankAccLambda = GenericAuthCancelBankAccountLambda.Create(config);
+        should(cancelBankAccLambda.validate(event, {logger})).equal(config.config);
     });
 
     it('should fail validation with no event', () => {
         try{
-            const postBankLambda = GenericAuthPostBankAccountLambda.Create({config});
-            postBankLambda.validate(null, {logger});
+            const cancelBankAccLambda = GenericAuthCancelBankAccountLambda.Create({config});
+            cancelBankAccLambda.validate(null, {logger});
         } catch (err){
             should(err.message).equal('Invalid Event');
         }
@@ -78,66 +73,43 @@ describe('lambda-genericauth-postbankaccount', function(){
 
     it('should fail validation with no config', () => {
         try{
-            const postBankLambda = GenericAuthPostBankAccountLambda.Create({});
-            postBankLambda.validate(event, {logger});
+            const cancelBankAccLambda = GenericAuthCancelBankAccountLambda.Create({});
+            cancelBankAccLambda.validate(event, {logger});
         } catch (err){
             should(err.message).equal('Invalid Config');
         }
     });
 
     it('should exercise database connection', () => {
-        const postBankLambda = GenericAuthPostBankAccountLambda.Create(config);
+        const cancelBankAccLambda = GenericAuthCancelBankAccountLambda.Create(config);
 
-        return postBankLambda.init(event,{logger})
+        return cancelBankAccLambda.init(event,{logger})
             .then((actual) => {
                 should(actual).eql(false);
             })
     });
 
     it('should process lambda successfully', () => {
-        const responseKey = {
-            returnPayload : {
-                accounts: [{
-                    "accountIdentifier": "7531af69-fcc3-4d7c-937d-8c67aa20b9ef",
-                    "accountKey": "12345"
-                }]
-            }
-        };
-        sandbox.stub(KeyValuePairCache.prototype, 'retrievePair').returns(Promise.resolve({key:'someKey', value: responseKey}));
-        sandbox.stub(GenericAuthPostBankAccountLambda.prototype,'invokeWebhook').returns(Promise.resolve());
+        sandbox.stub(GenericAuthCancelBankAccountLambda.prototype,'invokeWebhook').returns(Promise.resolve());
         sandbox.stub(db, 'getConnection').resolves();
         sandbox.createStubInstance(DBQueries);
         sandbox.stub(DBQueries.prototype, 'updateBankAccount').returns(Promise.resolve());
 
-        const postBankLambda = GenericAuthPostBankAccountLambda.Create(config);
+        const cancelBankAccLambda = GenericAuthCancelBankAccountLambda.Create(config);
         const expectedRes = { statusCode: 200, body: 'Success'};
 
-        return postBankLambda.init(event,{logger})
+        return cancelBankAccLambda.init(event,{logger})
             .then (() => {
-                return postBankLambda.impl(event,{logger})
+                return cancelBankAccLambda.impl(event,{logger})
                     .then((actual) => {
                         should(actual).eql(expectedRes);
                     })
             })
     });
 
-    it('should test missing account', () => {
-        sandbox.stub(KeyValuePairCache.prototype, 'retrievePair').returns(Promise.resolve(true));
-
-        const postBankLambda = GenericAuthPostBankAccountLambda.Create(config);
-
-        return postBankLambda.init(event,{logger})
-            .then (() => {
-                return postBankLambda.impl(event,{logger})
-                    .catch((err) =>{
-                        should(err.message).eql('Failed to find authorisation details for account');
-                    })
-            })
-    });
-
     describe('InvokeWebHookAuthNotification', () => {
         it('Should invoke outbound webhook lambda', () => {
-            const postBankLambda = GenericAuthPostBankAccountLambda.Create(config);
+            const cancelBankAccLambda = GenericAuthCancelBankAccountLambda.Create(config);
             const mockResponse = { StatusCode:  200 };
 
             const invokeStub = sandbox.stub().returns({ promise: () => Promise.resolve(mockResponse) });
@@ -153,14 +125,13 @@ describe('lambda-genericauth-postbankaccount', function(){
                 body: {
                     providerId,
                     resourceId: bankAccountId,
-                    eventType: 'resourceCreated',
+                    eventType: 'resourceDeleted',
                     resourceType: 'bankAccount',
-                    resourceUrl: 'NA',
-                    additionalData: { externalId }
+                    resourceUrl: 'NA'
                 }
             };
 
-            return postBankLambda.invokeWebhook({logger, providerId, bankAccountId, externalId, env: 'dev03', region: 'eu-west-1'} )
+            return cancelBankAccLambda.invokeWebhook({logger, providerId, bankAccountId, externalId, env: 'dev03', region: 'eu-west-1'} )
                 .then(() => {
                     should(invokeStub.callCount).eql(1);
                     const lambdaPayload = JSON.parse(invokeStub.getCall(0).args[0].Payload);
@@ -169,7 +140,7 @@ describe('lambda-genericauth-postbankaccount', function(){
         });
 
         it('Should throw should a non 200 status code be returned', () => {
-            const postBankLambda = GenericAuthPostBankAccountLambda.Create(config);
+            const cancelBankAccLambda = GenericAuthCancelBankAccountLambda.Create(config);
             const mockResponse = { StatusCode:  500 };
 
             const invokeStub = sandbox.stub().returns({ promise: () => Promise.resolve(mockResponse) });
@@ -192,7 +163,7 @@ describe('lambda-genericauth-postbankaccount', function(){
                 }
             };
 
-            return postBankLambda.invokeWebhook({logger, providerId, bankAccountId, externalId, env: 'dev03', region: 'eu-west-1'} )
+            return cancelBankAccLambda.invokeWebhook({logger, providerId, bankAccountId, externalId, env: 'dev03', region: 'eu-west-1'} )
                 .then(() => {
                     should(invokeStub.callCount).eql(1);
                     const lambdaPayload = JSON.parse(invokeStub.getCall(0).args[0].Payload);
