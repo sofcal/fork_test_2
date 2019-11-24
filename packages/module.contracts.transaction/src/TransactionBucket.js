@@ -45,10 +45,8 @@ TransactionBucket.validate = TransactionBucket.Validate = function(transactionBu
         return items;
     };
 
-    const legacy = _idField === TransactionBucket.ID_FIELDS.legacy;
-
     const properties = [
-        { path: (legacy ? 'uuid' : '_id'), regex: resources.regex.uuid },
+        { path: (TransactionBucket.IsLegacy() ? 'uuid' : '_id'), regex: resources.regex.uuid },
         { path: 'bankAccountId', regex: resources.regex.uuid },
         { path: 'region', regex: resources.regex.transactionBucket.region },
         { path: 'startIncrementedId', custom: _.isNumber },
@@ -127,8 +125,7 @@ TransactionBucket.getDatePostedRange = (transactions, checkInitiatedDate = false
     return response;
 };
 
-TransactionBucket.SetIdField = (idField) => {
-    _idField = idField;
-};
+TransactionBucket.SetIdField = (idField) => { _idField = idField; };
+TransactionBucket.IsLegacy = () => _idField === TransactionBucket.ID_FIELDS.legacy;
 TransactionBucket.ID_FIELDS = Object.freeze({ legacy: 'uuid', mongoDB: '_id' });
 let _idField = TransactionBucket.ID_FIELDS.legacy;

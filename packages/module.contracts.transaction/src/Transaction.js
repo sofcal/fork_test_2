@@ -37,7 +37,7 @@ const DEFAULT_CATEGORY = {
 
 function Transaction(data) {
     if (data) {
-        if (_idField === Transaction.ID_FIELDS.legacy) {
+        if (Transaction.IsLegacy()) {
             this.uuid = data.uuid || uuid.v4();
         } else {
             this._id = data._id || uuid.v4();
@@ -268,7 +268,7 @@ Transaction.validate = Transaction.Validate = function(transaction, noThrow, sm)
     };
 
     const properties = [
-        { path: 'uuid', regex: resources.regex.uuid, optional: true, allowNull: true },
+        { path: (Transaction.IsLegacy() ? 'uuid' : '_id'), regex: resources.regex.uuid, optional: true, allowNull: true },
         { path: 'transactionType', regex: resources.regex.transaction.transactionType },
         { path: 'transactionStatus', regex: resources.regex.transaction.transactionStatus },
         { path: 'datePosted', custom: _.isDate, optional: true, allowNull: true },
@@ -505,8 +505,7 @@ Transaction.feedSources = Object.freeze({
     manual: 'manual'
 });
 
-Transaction.SetIdField = (idField) => {
-    _idField = idField;
-};
+Transaction.SetIdField = (idField) => { _idField = idField; };
+Transaction.IsLegacy = () => _idField === Transaction.ID_FIELDS.legacy;
 Transaction.ID_FIELDS = Object.freeze({ legacy: 'uuid', mongoDB: '_id' });
 let _idField = Transaction.ID_FIELDS.legacy;
