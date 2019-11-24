@@ -71,7 +71,10 @@ function Transaction(data) {
         if (data.aggregatorTransactionId !== undefined) {
             this.aggregatorTransactionId = data.aggregatorTransactionId;
         }
-        this.created = data.created || new Date();      // represents field creation datetime, it differs of the automatically created my the framework.
+
+        this.source = data.source || 'client';          // TODO should move source out of providerAPI and into shared
+        this.created = data.created || new Date();      // represents field creation datetime
+        this.updated = data.updated || new Date();      // represents field updated datetime
     }
 }
 
@@ -83,6 +86,10 @@ Transaction.validate = function(transaction, noThrow, sm) {
     let skipModes = sm;
     if (transaction) {
         skipModes = skipModes || transaction.skipModes;
+    }
+
+    if (!this.source) {
+        this.source = 'client';         // TODO forces source: client onto existing documents even if they didn't go through constructor
     }
 
     const validateNumber = (value) => _.isNumber(value) && !_.isNaN(value);

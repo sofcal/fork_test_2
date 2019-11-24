@@ -17,10 +17,18 @@ function TransactionBucket(data) {
         this.endDate = data.endDate;
         this.numberOfTransactions = data.numberOfTransactions;
         this.transactions = _.map(data.transactions || [], (t) => (new Transaction(t)));
+
+        this.source = data.source || 'client';      // TODO should move source out of providerAPI and into shared
+        this.created = data.created || new Date();
+        this.updated = data.updated || new Date();
     }
 }
 
 TransactionBucket.validate = function(transactionBucket) {
+    if (!this.source) {
+        this.source = 'client';         // TODO forces source: client onto existing documents even if they didn't go through constructor
+    }
+
     const validateTransactions = function(transactions) {
         let items = [];
 
