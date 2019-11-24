@@ -311,16 +311,6 @@ Transaction.validate = function(transaction, noThrow, sm) {
     return utils.validateContractObject(transaction, Transaction, properties);
 };
 
-p.convertToMajorUnits = function() {
-    const minor = new Big(this.transactionAmount);
-    this.transactionAmount = minor.div(100).round(2).toNumber();
-};
-
-p.convertToMinorUnits = function() {
-    const minor = new Big(this.transactionAmount);
-    this.transactionAmount = minor.mul(100).round(0).toNumber();
-};
-
 Transaction.getStringForHashing = (transaction, bankAccountNum, bankIdentifier) => {
     const checkField = (fieldName, fieldValue) => {
         if (_.isUndefined(fieldValue)) {
@@ -365,6 +355,16 @@ const p = Transaction.prototype;
 
 p.validate = function() {
     Transaction.validate(this);
+};
+
+p.convertToMajorUnits = function() {
+    const minor = new Big(this.transactionAmount);
+    this.transactionAmount = minor.div(100).round(2).toNumber();
+};
+
+p.convertToMinorUnits = function() {
+    const minor = new Big(this.transactionAmount);
+    this.transactionAmount = minor.mul(100).round(0).toNumber();
 };
 
 Transaction.filter = (d) => {
