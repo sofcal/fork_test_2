@@ -3,11 +3,13 @@
 const resources = require('@sage/bc-common-resources');
 const Transaction = require('./Transaction');
 const utils = require('@sage/bc-services-validators');
+
+const uuid = require('uuid');
 const _ = require('underscore');
 
 function TransactionBucket(data) {
     if (data) {
-        this.uuid = data.uuid;
+        this.uuid = data.uuid || uuid.v4();
 
         this.region = data.region;
         this.bankAccountId = data.bankAccountId;

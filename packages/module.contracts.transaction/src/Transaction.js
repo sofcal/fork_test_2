@@ -367,6 +367,10 @@ p.convertToMinorUnits = function() {
     this.transactionAmount = minor.mul(100).round(0).toNumber();
 };
 
+p.setIncrementedId = function(id) {
+    this.incrementedId = id;
+};
+
 Transaction.filter = (d) => {
     const data = d;
 
