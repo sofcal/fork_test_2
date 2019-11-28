@@ -51,12 +51,21 @@ class Bank {
         }
     }
 
+    static Create(...args) {
+        return new Bank(...args);
+    }
+
     validate() {
         Bank.validate(this);
     }
 
     recentFileDescriptors() {
         return new FileDescriptors(this);
+    }
+
+    // simple passthrough, providerAPI expects capital starting CamelCase
+    static Validate(...args) {
+        return Bank.validate(...args);
     }
 
     static validate(bank) {
