@@ -33,6 +33,12 @@ class RuleBucket {
         return RuleBucket.validate(this, noThrow);
     }
 
+    // upper cased naming to support ProviderAPI
+    static Validate(...args) {
+        return validateImpl(...args);
+    }
+
+    // lower cased naming for legacy Banking Cloud
     static validate(...args) {
         return validateImpl(...args);
     }

@@ -43,6 +43,12 @@ class Rule {
         return Rule.validate(this, noThrow);
     }
 
+    // upper cased naming to support ProviderAPI
+    static Validate(...args) {
+        return Rule.validate(...args);
+    }
+
+    // lower cased naming for legacy Banking Cloud
     static validate(rule, noThrow) {
         const typeItem = validateType({ obj: rule, Type: Rule, noThrow });
         if (typeItem) {
