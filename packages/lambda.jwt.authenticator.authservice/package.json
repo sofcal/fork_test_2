@@ -1,6 +1,6 @@
 {
   "name": "lambda-jwt-authenticator-authservice",
-  "version": "1.1.102",
+  "version": "1.1.112",
   "author": "",
   "license": "ISC",
   "description": "",
@@ -8,9 +8,9 @@
   "private": true,
   "dependencies": {
     "@sage/bc-common-statuscodeerror": "^1.1.102",
-    "@sage/bc-independent-lambda-handler": "^1.1.102",
+    "@sage/bc-independent-lambda-handler": "^1.1.112",
     "@sage/bc-services-parameter": "^1.1.102",
-    "@sage/sfab-s2s-jwt-authenticator-lambda": "^1.1.102",
+    "@sage/sfab-s2s-jwt-authenticator-lambda": "^1.1.112",
     "@sage/sfab-s2s-jwt-cache": "^1.1.102",
     "aws-sdk": "^2.220.1",
     "bluebird": "^3.5.1",
