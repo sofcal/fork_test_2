@@ -77,7 +77,7 @@ class GenericAuthPostBankAccountLambda extends Handler{
                             _id: bankAccountId,
                             accountKey: postedAccDetails.accountKey,
                             accountName: postedAccDetails.accountName,
-                            aggregatorId: postedAccDetails.bankAccountExternalId,
+                            externalId: postedAccDetails.bankAccountExternalId,
                             bankIdentifier: postedAccDetails.bankIdentifier,
                             accountIdentifier: postedAccDetails.accountIdentifier,
                             branchIdentifier: postedAccDetails.branchIdentifier
@@ -88,7 +88,7 @@ class GenericAuthPostBankAccountLambda extends Handler{
                             .then(() => bankAccount)
                     });
             })
-            .then((ba) => this.invokeWebhook({logger, providerId, bankAccountId: ba._id, externalId: ba.aggregatorId,  env , region }))
+            .then((ba) => this.invokeWebhook({logger, providerId, bankAccountId: ba._id, externalId: ba.externalId,  env , region }))
             .then(() => {
                 event.logger.info({function: func, log: 'ended'});
                 return {statusCode: 200, body: 'Success'};
