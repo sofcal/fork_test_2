@@ -1,0 +1,33 @@
+# We use serverless only for building, not deployment. Using Serverless gives us access to some simple lambda packaging
+#  mechanisms, rather than rolling our own.
+
+# service MUST match the folder name for this package
+service: lambda.genericAuth.postBankAccount
+
+# we're packaging for AWS - the node version doesn't actually matter, it's set by our CFN
+provider:
+  name: aws
+  runtime: nodejs6.10
+
+# exclude directories that we don't care about
+package:
+  exclude:
+    - test/**
+    - .idea/**
+
+# use the serverless-webpack plugin to generate the output. See ../../webpack.config.js for details on what it does
+plugins:
+  - serverless-webpack
+
+# specifies the webpack config, and importantly, excludes the AWS module from the output. This isn't needed as it's always
+# available on Lambda, and excluding it reduce the output size dramatically
+custom:
+  webpack: ../../webpack.config.js
+  webpackIncludeModules:
+    forceExclude:
+      - aws-sdk
+
+# our entry point
+functions:
+  run:
+    handler: lib/index.run

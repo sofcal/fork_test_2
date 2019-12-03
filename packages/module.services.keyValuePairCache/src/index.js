@@ -13,9 +13,6 @@ class KeyValuePairCache {
 
     connect(...args) {
         return connectImpl(this, ...args)
-            .catch(() => {
-                throw new Error('Problem connecting to cache');
-            });
     }
 
     disconnect(...args) {
@@ -40,28 +37,33 @@ class KeyValuePairCache {
 }
 
 const connectImpl = Promise.method((self) => {
+    const resolver = Promise.defer();
     self.redisClient = redis.createClient(self.connectionString);
-    return self.redisClient;
+
+    self.redisClient.on('error', (err) => {
+        resolver.reject(new Error(err));
+    });
+
+    self.redisClient.on('ready', () => {
+        resolver.resolve(self.redisClient);
+    });
+
+    return resolver.promise;
 });
 
 const disconnectImpl = Promise.method((self) => {
     if (self.redisClient) {
         return self.redisClient.quitAsync();
     }
-    return null;
 });
 
-const getConnectionString = ({ env: awsEnv, region: awsRegion, localhost = false, connectionString }) => {
+const getConnectionString = ({ env: awsEnv, region: awsRegion, domain, connectionString }) => {
     if (connectionString) {
         // if we already have a connection string, we just return
         return connectionString;
     }
 
-    if (localhost) {
-        return 'redis://127.0.0.1:6379';
-    }
-
-    return `redis://elasticache.${awsEnv}.${awsRegion}.sagebanking-dev.cloud:6379$`;
+    return `redis://elasticache.${awsEnv}.${awsRegion}.${domain}:6379`;
 };
 
 const storePairImpl = Promise.method((self, kvp, ttl = 300) => {
@@ -75,9 +77,6 @@ const storePairImpl = Promise.method((self, kvp, ttl = 300) => {
                 .then(() => {
                     return kvp;
                 })
-                .catch(() => {
-                    throw new Error('Problem writing to cache');
-                });
         }
     }
     throw new Error('Not connected to cache');
@@ -96,6 +95,7 @@ const retrievePairImpl = Promise.method((self, key) => {
                         const unwrappedValue = unwrapValue(value);
                         return new KeyValuePair({ key, value: unwrappedValue });
                     }
+
                     throw new Error(`KeyValuePair not found: ${key}`);
                 });
         }
@@ -111,9 +111,6 @@ const deletePairImpl = Promise.method((self, key) => {
     if (self.redisClient) {
         if (self.redisClient.connected) {
             return self.redisClient.delAsync(key)
-                .catch(() => {
-                    throw new Error('Problem deleting from cache');
-                });
         }
     }
     throw new Error('Not connected to cache');
