@@ -1,6 +1,6 @@
 {
   "name": "lambda-genericauth-postbankaccount",
-  "version": "1.0.00",
+  "version": "1.0.01",
   "description": "Lambda function to retrieve bank account data from cache and update records",
   "main": "lib/index.js",
   "directories":{

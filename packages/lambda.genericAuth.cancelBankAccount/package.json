@@ -1,6 +1,6 @@
 {
   "name": "lambda-genericauth-cancelbankaccount",
-  "version": "1.0.00",
+  "version": "1.0.01",
   "description": "Lambda function to cancel bank account and inform provider with a notification",
   "main": "lib/index.js",
   "directories":{
