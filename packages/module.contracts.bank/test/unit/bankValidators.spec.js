@@ -526,8 +526,8 @@ describe('@sage/bc-contracts-bank.bankValidators', () => {
             const value = {};
             const props1 = { path: 'provider', prefix: 'Bank' };
             const props2 = [
-                { path: 'providerId', regex: Resources.regex.uuid, optional: false, allowNull: false },
-                { path: 'authUrl', custom: _.isString, optional: false, allowNull: false },
+                { path: 'providerId', regex: Resources.regex.uuid, optional: true, allowNull: true },
+                { path: 'authUrl', custom: _.isString, optional: true, allowNull: true },
             ];
 
             should(val.validateProvider(value)).eql(valError);
