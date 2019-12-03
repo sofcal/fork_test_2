@@ -1948,12 +1948,14 @@ describe('@sage/bc-Transaction.Transaction', function(){
                     'predictedActions',
                     'providerAdditionalFields',
                     'referenceNumber',
+                    'source',
                     'transactionAmount',
                     'transactionHash',
                     'transactionId',
                     'transactionNarrative',
                     'transactionStatus',
                     'transactionType',
+                    'updated',
                     'uuid'
                 ]);
 

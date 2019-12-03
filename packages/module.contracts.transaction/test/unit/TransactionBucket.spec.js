@@ -22,7 +22,7 @@ describe('@sage/bc-Transaction.TransactionBucket', function(){
     beforeEach(function(){
         sandbox = sinon.createSandbox();
 
-        data = {
+        data = new TransactionBucket({
             uuid: 'dc8c78bc-cff2-43ea-9f5f-f0cc0f4df1dc',
             region: 'region',
             bankAccountId: 'bankAccountID',
@@ -31,8 +31,11 @@ describe('@sage/bc-Transaction.TransactionBucket', function(){
             startDate: '2019-01-01T00:01:00',
             endDate: '2019-01-02T23:59:59',
             numberOfTransactions: 2,
-            transactions: []
-        };
+            transactions: [],
+            source: 'client',
+            created: new Date('2019-12-03T11:46:58.810Z'),
+            updated: new Date('2019-12-03T11:46:58.810Z')
+        });
     });
 
     afterEach(function(){
@@ -52,10 +55,12 @@ describe('@sage/bc-Transaction.TransactionBucket', function(){
         });
 
         it('should assign properties', function (done) {
+            const now = new Date('2019-12-03T11:46:58.810Z');
+            sandbox.useFakeTimers(now);
             try {
                 let transactionBucket = new TransactionBucket(data);
-                should(JSON.parse(JSON.stringify(transactionBucket))).eql(data);
 
+                should(transactionBucket).eql(data);
                 done();
             } catch (err) {
                 done(err instanceof Error ? err : new Error(err));
