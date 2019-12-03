@@ -1,0 +1,33 @@
+db.Organisation.aggregate([
+{$match:{'products.lastAccessedTimestamp': {$gte : ISODate("2018-10-01 00:00:00.0100")}}},
+{ $unwind: { path: '$products', preserveNullAndEmptyArrays: false } },
+{ $lookup: { from: 'Product', localField: 'products.productId', foreignField: '_id', as: 'prod'}},
+
+{
+        $project: {
+            _id: '$products.productId',
+            productName: '$prod.name',
+            numberOfOrg: '$_id',
+            numberOfBankAccounts: '$transLookup.bankAccountId',
+            numberOfTrans: '$transLookup.transactions.uuid'
+        }
+    }, {
+        $group: {
+            _id: '$_id',
+            productName: { $first: '$productName' },
+            numberOfOrg: { $addToSet: '$numberOfOrg' },
+        }
+    },
+{ $unwind: { path: '$productName', preserveNullAndEmptyArrays: false } },
+{$sort:{'productName':1}},
+{
+        $project: {
+            _id: 1,
+            productName: 1,
+            numberOfOrg: { $cond: [{ $not: ['$numberOfOrg'] }, 0, { $size: '$numberOfOrg'}] },
+        }
+    }
+],
+{
+allowDiskUse: true
+})

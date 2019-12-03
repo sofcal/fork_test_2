@@ -1,0 +1,8 @@
+db.Organisation.update(
+{_id: "9697641e-2704-420f-96f5-aea0cac5ab71"},
+{ $set:
+{
+adminEmail: "farrukhmoeed@hotmail.co.uk"
+}
+}
+)

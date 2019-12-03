@@ -1,0 +1,4 @@
+db.BankAccount.aggregate([{$match:{region:"AUS", status:{$nin:["pending","cancelled"]}}},
+{ $lookup: { from: 'Transaction', localField: '_id', foreignField: 'bankAccountId', as: 'transLookup'}},
+{ $unwind: { path: '$transLookup', preserveNullAndEmptyArrays: false } }
+])

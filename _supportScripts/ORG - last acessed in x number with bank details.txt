@@ -1,0 +1,17 @@
+DBQuery.shellBatchSize = 120000;
+db.Organisation.aggregate([
+{$match:{'products.lastAccessedTimestamp': {$lt : ISODate("2018-10-01 00:00:00.0100")}}},
+{ $unwind: { path: '$products', preserveNullAndEmptyArrays: false } },
+{ $lookup: { from: 'Product', localField: 'products.productId', foreignField: '_id', as: 'prod'}},
+{ $unwind: '$prod'},
+{ $unwind: { path: '$bankAccounts', preserveNullAndEmptyArrays: false } },
+{ $lookup: { from: 'BankAccount', localField: 'bankAccounts.bankAccountId', foreignField: '_id', as: 'ba'}},
+{ $unwind: '$ba'},
+{ $lookup: { from: 'Bank', localField: 'ba.bankId', foreignField: '_id', as: 'bank'}},
+{ $unwind: '$bank'},
+{$project:{'adminEmail':'$adminEmail','prodName':'$prod.name', 'lastAccessedTimestamp':'$products.lastAccessedTimestamp','ba':'$ba._id','bank':'$bank.name', 'status':'$ba.status',
+    'accountIdentifier':'$ba.accountIdentifier'}},
+],
+{
+allowDiskUse: true
+})

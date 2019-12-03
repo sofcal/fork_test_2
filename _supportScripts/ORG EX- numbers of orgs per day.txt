@@ -1,0 +1,11 @@
+DBQuery.shellBatchSize = 3000
+db.getCollection('OrganisationExt').aggregate([
+{$project: {yearMonthDayUTC: { $dateToString: { format: "%Y-%m-%d", date: "$created" } }}},
+{
+                $group:{
+                    _id: {'created':'$yearMonthDayUTC'},
+                   orgCount: {'$sum':1}
+                    }
+             },
+  { $sort: {created: -1} },           
+])

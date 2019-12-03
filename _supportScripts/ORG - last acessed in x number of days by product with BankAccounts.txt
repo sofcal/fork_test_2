@@ -1,0 +1,26 @@
+db.Organisation.aggregate([
+{$match:{'products.lastAccessedTimestamp': {$lte : ISODate("2018-10-21 00:00:00.0100")}}},
+{ $unwind: { path: '$products', preserveNullAndEmptyArrays: false } },
+{ $lookup: { from: 'Product', localField: 'products.productId', foreignField: '_id', as: 'prod'}},
+{ $unwind: { path: '$prod', preserveNullAndEmptyArrays: false } },
+{ $unwind: { path: '$bankAccounts', preserveNullAndEmptyArrays: false } },
+{ $lookup: { from: 'BankAccount', localField: 'bankAccounts.bankAccountId', foreignField: '_id', as: 'ba'}},
+{ $unwind: { path: '$ba', preserveNullAndEmptyArrays: false } },
+{ $lookup: { from: 'Bank', localField: 'ba.bankId', foreignField: '_id', as: 'bank'}},
+{ $unwind: { path: '$bank', preserveNullAndEmptyArrays: false } },
+{$project: {
+            _id: '$_id',
+            adminEmail: '$adminEmail',
+            lastAccessedTimestamp: '$products.lastAccessedTimestamp',
+            productName: '$prod.name',
+            dataProvider: '$ba.dataProvider',
+            bankName: '$bank.name',
+            baStatus: '$ba.status',
+            accountIdentifier: '$ba.accountIdentifier'
+    
+}}   
+    
+],
+{
+allowDiskUse: true
+})

@@ -1,0 +1,5 @@
+DBQuery.shellBatchSize = 500;
+db.BankAccount.aggregate([{$match:{organisationId:""}},
+{$project:{'accountName':'$accountName', 'status':'$status','account_id':'$accountIdentifier','item_id':'$bankIdentifier',
+    'institution_id':'$aggregatorId','lastTransactionsReceived':'$lastTransactionsReceived'}},
+    {$sort:{institution_id:1, lastTransactionsReceived:1}}])

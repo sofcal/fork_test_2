@@ -1,0 +1,23 @@
+DBQuery.shellBatchSize = 120000;
+db.BankAccount.aggregate([{$match:{bankId:"453e8bd6-958a-49a4-8b4d-0dc571b98ba3",status:"cancelled", accountIdentifier:{$not: /\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/i}}},{
+        $lookup: {
+            from: 'Bank',
+            localField: 'bankId',
+            foreignField: '_id',
+            as: 'bnkDetail'}
+    }, { $unwind: '$bnkDetail' },
+    {$lookup:{
+        from:'Company',
+        localField: 'company.companyId',
+        foreignField: '_id',
+            as: 'compDetail'}
+    }, { $unwind: '$compDetail' },   
+    { $lookup: { from: 'Organisation', localField: 'organisationId', foreignField: '_id', as: 'org'}},
+{ $unwind: '$org' },
+{ $unwind: { path: '$org.products', preserveNullAndEmptyArrays: false } },
+{ $lookup: { from: 'Product', localField: 'org.products.productId', foreignField: '_id', as: 'prod'}},
+{ $unwind: '$prod' },
+    {$project:{'adminEmail':'$org.adminEmail','product':'$prod.name','bankName':'$bnkDetail.name','bankIdentifier':'$bankIdentifier','accountIdentifier':'$accountIdentifier','status':'$status', 
+'lastTransactionsReceived':'$lastTransactionsReceived','lastTransactionsGet':'$lastTransactionsGet','lastTransactionId':'$lastTransactionId','cancellationDate':'$cancellationDate',
+    'baCompanyName':'$company.companyName', 'companyNme':'$compDetail.name','cancellationReason':'$internal.cancellationReason.description'}}
+])

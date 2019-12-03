@@ -1,0 +1,12 @@
+DBQuery.shellBatchSize = 500;
+db.getCollection('BankAccount').aggregate([{$match:{'aggregatorName': 'yodlee', 'internal.yodleeContainerType': { $exists: true }}},
+{
+        $lookup: {
+            from: 'Bank',
+            localField: 'bankId',
+            foreignField: '_id',
+            as: 'bnkDetail'}
+    }, { $unwind: '$bnkDetail' },
+{$project:{'bankName':'$bnkDetail.name','providerId':'$bnkDetail.aggregatorId','bankIdentifier':'$bankIdentifier','accountIdentifier':'$accountIdentifier',
+    'status':'$status', 'requestedStartDate':'$requestedStartDate','lastTransactionsReceived':'$lastTransactionsReceived','lastTransactionsGet':'$lastTransactionsGet',
+    'lastTransactionId':'$lastTransactionId','created':'$created','yodleeContainerType':'$internal.yodleeContainerType','accountName':'$accountName'}}])

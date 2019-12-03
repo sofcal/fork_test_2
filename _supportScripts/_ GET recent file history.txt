@@ -1,0 +1,3 @@
+db.Bank.aggregate([{$match:{dataProvider:"direct"}},
+{$project:{name:1, recentFileHistory: {$slice: ['$recentFileHistory', -5]}}}
+])

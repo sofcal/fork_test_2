@@ -1,0 +1,10 @@
+DBQuery.shellBatchSize = 3000
+db.Transaction.aggregate([
+{$match : {"bankAccountId": "e14c6e7e-0941-46da-81a2-4bca6013415e"}},
+{$unwind : "$transactions"},
+{$match : { "transactions.datePosted" : {$gte : ISODate("2019-10-01 00:00:00.000Z"),$lte : ISODate("2019-10-01 23:59:00.000Z")}}},
+{$project: {'datePosted':'$transactions.datePosted', 'transactionAmount':'$transactions.transactionAmount','transactionId':"$transactions.incrementedId",
+    'transactionNarrative':'$transactions.transactionNarrative', 'created':'$transactions.created', 'aggregatorId':'$transactions.aggregatorTransactionId'}},
+
+{ $sort : { transactionId : 1 }}
+])

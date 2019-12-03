@@ -1,0 +1,17 @@
+db.BankAccount.aggregate([{$match:{aggregatorName:'plaid',status:{$ne:'cancelled'}}},
+{$lookup: {
+            from: 'Bank',
+            localField: 'bankId',
+            foreignField: '_id',
+            as: 'bnkDetail'}
+            }, 
+            { $unwind: '$bnkDetail' },
+            {
+                $group:{
+                    _id: {'bankName':'$bnkDetail.name'},
+                    bankCount: {'$sum':1}
+                    }
+             },
+             { $sort: {bankCount: -1} },
+             {$limit: 30}
+])

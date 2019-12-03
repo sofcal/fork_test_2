@@ -1,0 +1,9 @@
+DBQuery.shellBatchSize = 500000;
+db.BankAccount.aggregate([{$match:{aggregatorApplicationAccount:"sageUK", status:{$ne:"cancelled"}, 'lastTransactionsGet':null}},
+{ $lookup: { from: 'Bank', localField: 'bankId', foreignField: '_id', as: 'bnkDetail'}}, 
+{ $unwind: '$bnkDetail' },
+{$project: {'status':'$status','lastTransactionsReceived':'$lastTransactionsReceived', 'lastTransactionsGet':'$lastTransactionsGet','region':'$region', 'Bank':'$bnkDetail.name','created':'$created' }},
+{ $sort: {lastTransactionsGet: 1, created:1} },
+],{
+allowDiskUse: true
+})

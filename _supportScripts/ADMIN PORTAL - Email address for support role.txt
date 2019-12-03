@@ -1,0 +1,6 @@
+DBQuery.shellBatchSize = 3000
+db.getCollection('users').aggregate([
+{ $unwind: { path: '$roles', preserveNullAndEmptyArrays: true } },
+{$match:{'roles':'Support'}},
+{$project:{'email':'$email'}}
+])

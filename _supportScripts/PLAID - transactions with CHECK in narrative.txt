@@ -1,0 +1,16 @@
+DBQuery.shellBatchSize = 3000
+db.getCollection('BankAccount').aggregate([
+{$match:{'aggregatorName':'plaid'}},
+{ $lookup: { from: 'Bank', localField: 'aggregatorId', foreignField: 'aggregatorId', as: 'bankLookup'}},
+{ $unwind: { path: '$bankLookup', preserveNullAndEmptyArrays: false } },
+{ $lookup: { from: 'Transaction', localField: '_id', foreignField: 'bankAccountId', as: 'transLookup'}},
+{ $unwind: { path: '$transLookup', preserveNullAndEmptyArrays: false } },
+{ $unwind: { path: '$transLookup.transactions', preserveNullAndEmptyArrays: false } },
+{$match:{'transLookup.transactions.transactionType':'CHECK', 'transLookup.transactions.transactionNarrative':{$not:/[0-9]/i}}},
+{$project:{'aggregatorId':'$aggregatorId','BankName':'$bankLookup.name','amount':'$transLookup.transactions.transactionAmount',
+    'transactionType':'$transLookup.transactions.transactionType','transactionNarrative':'$transLookup.transactions.transactionNarrative',
+    'aggregatorTransId':'$transLookup.transactions.aggregatorTransactionId'}},
+    {$limit:1}
+],{
+allowDiskUse: true
+})
