@@ -40,7 +40,9 @@ class Bank {
                 bankUrl: access(data, 'internal.bankUrl') || null
             };
 
-            this.provider = data.provider || null;
+            self.provider = {};
+            self.provider.authUrl = access(data, 'provider.authUrl') || null;
+            self.provider.providerId = access(data, 'provider.providerId') || null;
 
             /* aggregator feature */
             if (plaidFeatureEnabled) {
@@ -91,7 +93,7 @@ class Bank {
             { path: 'supportiframe', custom: _.isBoolean },
             { path: 'recentFileHistory', nested: val.validateRecentFileHistory, optional: true, allowNull: true },
             { path: 'internal', nested: val.validateInternal, optional: true, allowNull: true },
-            { path: 'provider', nested: val.validateProvider, optional: true, allowNull: true }
+            { path: 'provider', nested: val.validateProvider, optional: false, allowNull: false }
         ];
 
         /* aggregator feature */
