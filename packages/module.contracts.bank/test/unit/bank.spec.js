@@ -208,7 +208,7 @@ describe('@sage/bc-contracts-bank.Bank', () => {
                     should(bank.proxy).be.null();
                     should(bank.supportiframe).eql(true);
                     should(bank.dataProvider).eql(Bank.dataProviders.direct);
-                    should(bank.provider).eql(null);
+                    should(bank.provider).eql({ authUrl: null, providerId: null });
 
                     done();
                 } catch (err) {

@@ -40,9 +40,9 @@ class Bank {
                 bankUrl: access(data, 'internal.bankUrl') || null
             };
 
-            self.provider = {};
-            self.provider.authUrl = access(data, 'provider.authUrl') || null;
-            self.provider.providerId = access(data, 'provider.providerId') || null;
+            this.provider = {};
+            this.provider.authUrl = access(data, 'provider.authUrl') || null;
+            this.provider.providerId = access(data, 'provider.providerId') || null;
 
             /* aggregator feature */
             if (plaidFeatureEnabled) {
