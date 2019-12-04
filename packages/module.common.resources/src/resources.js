@@ -137,8 +137,17 @@ module.exports = (function() {
 
     ns.fixedLengthString = {
         // These are strings of a particular length used in validation, the actual values are meaningless
+        len3: '4e8',
+        len4: '4e8T',
+        len59: '4e8Tf0Vi3Gft83kJTrmg0xe4S1Y1f5ExPgG9t5kangY1cezbnK8SM54p0me',
+        len64: '4e8Tf0Vi3Gft83kJTrmg0xe4S1Y1f5ExPgG9t5kangY1cezbnK8SM54p0meHJNgJ',
+        len65: '4e8Tf0Vi3Gft83kJTrmg0xe4S1Y1f5ExPgG9t5kangY1cezbnK8SM54p0meHJNgJx',
         len129: '4e8Tf0Vi3Gft83kJTrmg0xe4S1Y1f5ExPgG9t5kangY1cezbnK8SM54p0meHJNgJIUSOzbGnFTpea04p6P8H4AGzevMqwTTxczsymYsDFegfCYSbYZ0QUf12xqan4YaZj',
+        len255: 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstu',
+        len256: 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuv'
     };
+
+    ns.fixedLengthString.len254email = `${ns.fixedLengthString.len64}@${ns.fixedLengthString.len129}.${ns.fixedLengthString.len59}`;
 
     ns.regex = {
         uuid: /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/,
