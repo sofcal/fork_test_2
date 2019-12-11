@@ -23,10 +23,11 @@ const updateBankAccountImpl = Promise.method((self, { bankAccount }, { logger })
     const collection = self.db.collection('BankAccount');
     const where = { _id: bankAccount._id };
     return collection.updateOne(where, {$set: bankAccount})
-        .then((updateResult) => {
-            logger.info({ function: func, log: 'ended', params: { updateResult } });
-            return updateResult;
-        });
+        .then((updateResult) => collection.findOne(where))
+        .then((result) => {
+            logger.info({ function: func, log: 'ended'});
+            return result;
+        })
 });
 
 const consts = {

@@ -85,10 +85,9 @@ class GenericAuthPostBankAccountLambda extends Handler{
 
                         const dbQueries = DBQueries.Create(this.services.db.getConnection());
                         return dbQueries.updateBankAccount({ bankAccount },  {logger })
-                            .then(() => bankAccount)
                     });
             })
-            .then((ba) => this.invokeWebhook({logger, providerId, bankAccountId: ba._id, externalId: ba.externalId, requestedStartDate: ba.requestedStartDate,  env , region }))
+            .then((ba) => this.invokeWebhook({logger, providerId, bankAccountId: ba._id, externalId: ba.externalId, requestedStartDate: ba.requestedStartDate, env, region}))
             .then(() => {
                 event.logger.info({function: func, log: 'ended'});
                 return {statusCode: 200, body: 'Success'};
@@ -98,7 +97,7 @@ class GenericAuthPostBankAccountLambda extends Handler{
             });
     }
 
-    invokeWebhook({logger, providerId, bankAccountId, externalId, env, region}) {
+    invokeWebhook({logger, providerId, bankAccountId, requestedStartDate,externalId, env, region}) {
         const func = `${GenericAuthPostBankAccountLambda.name}.invokeWebhook`;
         logger.info({function: func, log: 'started', params: { bankAccountId, externalId, providerId}});
 
@@ -114,7 +113,7 @@ class GenericAuthPostBankAccountLambda extends Handler{
                         eventType: 'resourceCreated',
                         resourceType: 'bankAccount',
                         resourceUrl: 'NA',
-                        additionalData: { externalId }
+                        additionalData: { externalId, requestedStartDate }
                     }
                 };
 
