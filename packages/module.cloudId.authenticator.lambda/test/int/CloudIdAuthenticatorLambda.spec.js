@@ -67,7 +67,7 @@ describe('lambda-CloudIdAuthentication.Lambda', function () {
         sandbox.restore();
     });
 
-    it('should return properties from a token', () => {
+    it('should return properties from a token when provide validClients', () => {
         return request.postAsync('https://id-shadow.sage.com/oauth/token', authBody)
             .then((response) => {
                 return response.body.access_token;
@@ -94,14 +94,48 @@ describe('lambda-CloudIdAuthentication.Lambda', function () {
                 should(context.aud).eql('a6e78e2/paymentsOut');
                 should(context.azp).eql('uou47P8CM1tQXhUIWj3RKpremgGCormq');
                 should(context.iss).eql('https://id-shadow.sage.com/');
-                should(context.scope).eql('read:batch update:batch');
-                should(statements.length).eql(2);
-                should(statements[0].Action).eql('read');
+                should(context.scope).eql('webhook');
+                should(statements.length).eql(1);
+                should(statements[0].Action).eql('*');
                 should(statements[0].Effect).eql('Allow');
-                should(statements[0].Resource).eql('batch');
-                should(statements[1].Action).eql('update');
-                should(statements[1].Effect).eql('Allow');
-                should(statements[1].Resource).eql('batch');
+                should(statements[0].Resource).eql('*');
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    });
+
+    it('should return properties from a token when not provide validClients', () => {
+        return request.postAsync('https://id-shadow.sage.com/oauth/token', authBody)
+            .then((response) => {
+                return response.body.access_token;
+            })
+            .then((token) => {
+                config = {
+                    Environment: env,
+                    AWS_REGION: region,
+                    validIssuer: ['https://id-shadow.sage.com/'],
+                    validAudiences: ['a6e78e2/paymentsOut', 'test3'],
+                    jwksCache: true,
+                    jwksRateLimit: true,
+                    jwksRequestsPerMinute: 10
+                };
+                event = {AWS_REGION: region, env, headers: {Authorization: 'Bearer ' + token}};
+                cloudIdAuthenticatorLambda = cloudIdAuthenticatorLambdaSpec.Create({config});
+                return cloudIdAuthenticatorLambda.run(event, context, callback)
+            })
+            .then(() => {
+                should(callback.callCount).eql(1);
+                const context = callback.args[0][1].context;
+                const statements = callback.args[0][1].policyDocument.Statement;
+                should(context.aud).eql('a6e78e2/paymentsOut');
+                should(context.azp).eql('uou47P8CM1tQXhUIWj3RKpremgGCormq');
+                should(context.iss).eql('https://id-shadow.sage.com/');
+                should(context.scope).eql('webhook');
+                should(statements.length).eql(1);
+                should(statements[0].Action).eql('*');
+                should(statements[0].Effect).eql('Allow');
+                should(statements[0].Resource).eql('*');
             })
             .catch((err) => {
                 console.log(err);
