@@ -6,7 +6,7 @@ const should = require('should');
 const sinon = require('sinon');
 
 const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
-const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-status-code-error');
+const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-common-statuscodeerror');
 
 describe('cloudFront.securityHeaders.handler', function() {
     let sandbox;

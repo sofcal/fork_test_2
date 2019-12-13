@@ -1,14 +1,14 @@
 {
   "name": "runonce-incident-checkuniquetransactions",
-  "version": "1.1.102",
+  "version": "1.1.125",
   "author": "",
   "license": "ISC",
   "description": "",
   "main": "lib/handler.js",
   "private": true,
   "dependencies": {
-    "@sage/bc-parameterstore-static-loader": "^1.1.102",
-    "@sage/bc-services-db": "^1.1.102",
+    "@sage/bc-parameterstore-static-loader": "^1.1.125",
+    "@sage/bc-services-db": "^1.1.125",
     "aws-sdk": "^2.220.1",
     "bluebird": "^3.5.1",
     "mongodb": "3.0.5",
