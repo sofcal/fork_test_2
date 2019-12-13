@@ -1,6 +1,6 @@
 {
   "name": "@sage/bc-forks-clamscan",
-  "version": "1.1.71",
+  "version": "1.1.72",
   "author": "Kyle Farris <kfarris@chomponllc.com> (http://chomponllc.com)",
   "description": "Transpiled version of clamscan to remove async/await. Use Node JS to scan files on your server with ClamAV's clamscan/clamdscan binary or via TCP to a remote server or local UNIX Domain socket. This is especially useful for scanning uploaded files provided by un-trusted sources.",
   "main": "lib/index.js",
