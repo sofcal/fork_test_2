@@ -2,19 +2,14 @@
 
 const resources = require('@sage/bc-common-resources');
 const { Rule } = require('@sage/bc-contracts-rule');
-const { StatusCodeErrorItem, StatusCodeError } = require('@sage/bc-common-statuscodeerror');
-const utils = require('@sage/bc-services-validators');
-const { PredictedAction } = require('@sage/bc-contracts-predictedaction');
-
+const { StatusCodeErrorItem, StatusCodeError } = require('@sage/bc-statuscodeerror');
+const utils = require('@sage/bc-validators');
+const serviceUtils = require('@sage/bc-services-utils');
+const PredictedAction = require('@sage/bc-contracts-predictedaction');
 const util = require('util');
-
-const Big = require('bignumber.js');
 const _ = require('underscore');
-const uuid = require('uuid');
-
 const { format } = util;
 const httpMethod = require('@sage/bc-framework-httpmethod');
-const { extend } = require('@sage/bc-contracts-util');
 
 const DEFAULT_PAYEE = {
     payeeId: null,
@@ -38,11 +33,7 @@ const DEFAULT_CATEGORY = {
 
 function Transaction(data) {
     if (data) {
-        if (Transaction.IsLegacy()) {
-            this.uuid = data.uuid || uuid.v4();
-        } else {
-            this._id = data._id || uuid.v4();
-        }
+        this.uuid = data.uuid;
         this.transactionType = data.transactionType;
         this.transactionStatus = data.transactionStatus;
         this.datePosted = data.datePosted;
@@ -80,10 +71,7 @@ function Transaction(data) {
         if (data.aggregatorTransactionId !== undefined) {
             this.aggregatorTransactionId = data.aggregatorTransactionId;
         }
-
-        this.source = data.source || 'client';          // TODO should move source out of providerAPI and into shared
-        this.created = data.created || new Date();      // represents field creation datetime
-        this.updated = data.updated || new Date();      // represents field updated datetime
+        this.created = data.created || new Date();      // represents field creation datetime, it differs of the automatically created my the framework.
     }
 }
 
@@ -91,14 +79,10 @@ Transaction.Create = (...args) => {
     return new Transaction(...args);
 };
 
-Transaction.validate = Transaction.Validate = function(transaction, noThrow, sm) {
+Transaction.validate = function(transaction, noThrow, sm) {
     let skipModes = sm;
     if (transaction) {
         skipModes = skipModes || transaction.skipModes;
-    }
-
-    if (!this.source) {
-        this.source = 'client';         // TODO forces source: client onto existing documents even if they didn't go through constructor
     }
 
     const validateNumber = (value) => _.isNumber(value) && !_.isNaN(value);
@@ -164,7 +148,7 @@ Transaction.validate = Transaction.Validate = function(transaction, noThrow, sm)
             { path: 'netAmount', custom: validateNumber, optional: true },
             { path: 'taxAmount', custom: validateNumber, optional: true },
             { path: 'accountantNarrative', custom: _.isString, optional: true, allowNull: true },
-            { path: 'postingInstructions', nested: validatePostingsInstructions, optional: true }
+            { path: 'postingInstructions', arrayCustom: validateActualActionPostingsInstructions, optional: true, allowNull: true }
         ];
 
         const valType = utils.validateTypeNoThrow(value, Object, { path: 'accountsPostings', prefix: Transaction.name });
@@ -269,7 +253,7 @@ Transaction.validate = Transaction.Validate = function(transaction, noThrow, sm)
     };
 
     const properties = [
-        { path: (Transaction.IsLegacy() ? 'uuid' : '_id'), regex: resources.regex.uuid, optional: true, allowNull: true },
+        { path: 'uuid', regex: resources.regex.uuid, optional: true, allowNull: true },
         { path: 'transactionType', regex: resources.regex.transaction.transactionType },
         { path: 'transactionStatus', regex: resources.regex.transaction.transactionStatus },
         { path: 'datePosted', custom: _.isDate, optional: true, allowNull: true },
@@ -362,20 +346,6 @@ p.validate = function() {
     Transaction.validate(this);
 };
 
-p.convertToMajorUnits = function() {
-    const minor = new Big(this.transactionAmount);
-    this.transactionAmount = minor.div(100).round(2).toNumber();
-};
-
-p.convertToMinorUnits = function() {
-    const minor = new Big(this.transactionAmount);
-    this.transactionAmount = minor.mul(100).round(0).toNumber();
-};
-
-p.setIncrementedId = function(id) {
-    this.incrementedId = id;
-};
-
 Transaction.filter = (d) => {
     const data = d;
 
@@ -389,6 +359,8 @@ Transaction.filter = (d) => {
     delete data.validationStatus;
     delete data.actualAction;
     delete data.internalProcessingStatus;
+    delete data.updated;
+    delete data.source;
 
     data.transactionId = data.incrementedId;
 
@@ -444,12 +416,7 @@ Transaction.allowableRuleFields = [
 
 module.exports = Transaction;
 
-Transaction.extend = (destination, source, method) => {
-    const sourceWhitelist = httpMethod.isPost(method) ? postKeys : updateKeys;
-    const destinationWhitelist = httpMethod.isPut(method) ? readOnlyKeys : null;
-
-    return extend({ destination, source, sourceWhitelist, destinationWhitelist });
-};
+Transaction.extend = (destination, source, method) => serviceUtils.extend(destination, source, method, (method === httpMethod.post ? postKeys : updateKeys), readOnlyKeys);
 
 const _Keys = [
     // these fields can neither be created nor modified by the API client
@@ -505,8 +472,3 @@ Transaction.feedSources = Object.freeze({
     auto: 'auto',
     manual: 'manual'
 });
-
-Transaction.SetIdField = (idField) => { _idField = idField; };
-Transaction.IsLegacy = () => _idField === Transaction.ID_FIELDS.legacy;
-Transaction.ID_FIELDS = Object.freeze({ legacy: 'uuid', mongoDB: '_id' });
-let _idField = Transaction.ID_FIELDS.legacy;
