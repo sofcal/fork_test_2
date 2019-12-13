@@ -41,8 +41,8 @@ utils.validateToken = ({ payload: { exp, iss, aud, azp } = {}, header: { alg = '
         throw new Error('authTokenAudienceInvalid');
     }
     // check if client recognised
-    if (utils.clientInvalid(azp, validClients)) {
-        throw new Error('authTokenClientInvalid');
+    if (validClients && utils.clientInvalid(azp, validClients)) {
+            throw new Error('authTokenClientInvalid');
     }
     return true;
 };

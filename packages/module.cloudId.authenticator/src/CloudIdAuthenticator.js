@@ -30,9 +30,6 @@ class Authenticate {
         if (!this.audiences) {
             throw new Error('Invalid argument passed: audiences');
         }
-        if (!this.clientIds) {
-            throw new Error('Invalid argument passed: clientIds');
-        }
         if (!this.jwksClient) {
             throw new Error('Invalid argument passed: jwksClient');
         }
