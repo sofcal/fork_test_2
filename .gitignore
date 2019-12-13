@@ -12,6 +12,8 @@ lerna-debug.json
 lerna-debug.log
 coverage
 
+package-lock.json
+
 packages/**/npm-debug*
 packages/**/module.*/lib
 
