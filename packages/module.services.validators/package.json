@@ -17,7 +17,7 @@
     "@babel/core": "^7.2.2",
     "@babel/preset-env": "^7.0.0-beta.47",
     "@sage/bc-common-resources": "^1.1.23",
-    "@sage/bc-statuscodeerror": "^1.2.0",
+    "@sage/bc-common-statuscodeerror": "^1.2.0",
     "safe-access": "^0.1.0",
     "underscore": "^1.9.0"
   },

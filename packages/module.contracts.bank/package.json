@@ -18,7 +18,7 @@
     "@babel/preset-env": "^7.0.0-beta.47",
     "@sage/bc-common-helpers": "^1.2.0",
     "@sage/bc-common-resources": "^1.1.23",
-    "@sage/bc-statuscodeerror": "^1.2.0",
+    "@sage/bc-common-statuscodeerror": "^1.2.0",
     "@sage/bc-uncappedquery": "^1.1.50",
     "@sage/bc-validators": "^1.2.0",
     "bluebird": "^3.5.5",

@@ -1,5 +1,5 @@
 {
-  "name": "@sage/bc-statuscodeerror",
+  "name": "@sage/bc-common-statuscodeerror",
   "version": "1.2.0",
   "author": "Sage UK",
   "license": "ISC",

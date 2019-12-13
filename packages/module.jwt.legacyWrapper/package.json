@@ -20,7 +20,7 @@
     "@sage/bc-processing-rules": "^1.2.0",
     "@sage/bc-services-parameter": "^1.2.0",
     "@sage/bc-services-step": "^1.2.0",
-    "@sage/bc-statuscodeerror": "^1.2.0",
+    "@sage/bc-common-statuscodeerror": "^1.2.0",
     "@sage/sfab-s2s-jwt-authenticator": "^1.2.0",
     "@sage/sfab-s2s-jwt-cache": "^1.2.0",
     "@sage/sfab-s2s-jwt-endpoint-store": "^1.2.0",

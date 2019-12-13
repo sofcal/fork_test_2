@@ -2,7 +2,7 @@
 
 const resources = require('@sage/bc-common-resources');
 const { Rule } = require('@sage/bc-contracts-rule');
-const { StatusCodeErrorItem, StatusCodeError } = require('@sage/bc-statuscodeerror');
+const { StatusCodeErrorItem, StatusCodeError } = require('@sage/bc-common-statuscodeerror');
 const utils = require('@sage/bc-validators');
 const serviceUtils = require('@sage/bc-services-utils');
 const PredictedAction = require('@sage/bc-contracts-predictedaction');

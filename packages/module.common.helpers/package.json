@@ -20,7 +20,7 @@
     "@sage/bc-common-resources": "^1.1.23",
     "@sage/bc-productids": "^1.1.23",
     "@sage/bc-servicenames": "^1.1.23",
-    "@sage/bc-statuscodeerror": "^1.2.0",
+    "@sage/bc-common-statuscodeerror": "^1.2.0",
     "bluebird": "^3.5.5",
     "safe-access": "^0.1.0"
   },

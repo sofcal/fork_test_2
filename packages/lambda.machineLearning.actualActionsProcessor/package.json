@@ -12,7 +12,7 @@
     "@sage/bc-parameterstore-static-loader": "^1.2.0",
     "@sage/bc-requestlogger": "^1.2.0",
     "@sage/bc-services-db": "^1.2.0",
-    "@sage/bc-statuscodeerror": "^1.2.0",
+    "@sage/bc-common-statuscodeerror": "^1.2.0",
     "aws-sdk": "^2.220.1",
     "bluebird": "^3.5.1",
     "moment": "^2.10.2",

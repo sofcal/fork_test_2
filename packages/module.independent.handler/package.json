@@ -18,7 +18,7 @@
     "@babel/preset-env": "^7.5.4",
     "@sage/bc-infrastructure-cloudwatchsubscription": "^1.2.0",
     "@sage/bc-requestlogger": "^1.2.0",
-    "@sage/bc-statuscodeerror": "^1.2.0",
+    "@sage/bc-common-statuscodeerror": "^1.2.0",
     "aws-sdk": "^2.220.1",
     "bluebird": "^3.5.1",
     "mongodb": "3.0.5",
