@@ -1,13 +1,13 @@
 {
   "name": "lambda-jwt-jwks",
-  "version": "1.1.126",
+  "version": "1.1.127",
   "author": "",
   "license": "ISC",
   "description": "",
   "private": true,
   "main": "lib/index.js",
   "dependencies": {
-    "@sage/sfab-s2s-jwt-jwks-lambda": "^1.1.126"
+    "@sage/sfab-s2s-jwt-jwks-lambda": "^1.1.127"
   },
   "devDependencies": {
     "@babel/cli": "^7.5.0",
@@ -16,7 +16,7 @@
     "@babel/preset-env": "^7.5.4",
     "@babel/preset-flow": "^7.0.0",
     "@babel/register": "^7.4.4",
-    "@sage/bc-debug-utils": "^1.1.126",
+    "@sage/bc-debug-utils": "^1.1.127",
     "babel-eslint": "^10.0.2",
     "babel-plugin-istanbul": "^5.1.4",
     "babel-plugin-transform-async-to-promises": "^0.8.12",
