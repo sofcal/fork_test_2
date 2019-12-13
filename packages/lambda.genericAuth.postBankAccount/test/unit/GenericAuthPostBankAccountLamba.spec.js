@@ -26,9 +26,10 @@ describe('lambda-genericauth-postbankaccount', function(){
     const event = {
         logger: logger,
         body: {
-            "bankAccount": {
-                "accountIdentifier": "7531af69-fcc3-4d7c-937d-8c67aa20b9ef",
-                "accountKey": "12345"
+            bankAccount: {
+                uuid: 'bankAccountId',
+                accountIdentifier: '7531af69-fcc3-4d7c-937d-8c67aa20b9ef',
+                accountKey: '12345'
             }
         }
     };
@@ -107,7 +108,7 @@ describe('lambda-genericauth-postbankaccount', function(){
         sandbox.stub(GenericAuthPostBankAccountLambda.prototype,'invokeWebhook').returns(Promise.resolve());
         sandbox.stub(db, 'getConnection').resolves();
         sandbox.createStubInstance(DBQueries);
-        sandbox.stub(DBQueries.prototype, 'updateBankAccount').returns(Promise.resolve());
+        sandbox.stub(DBQueries.prototype, 'updateBankAccount').returns(Promise.resolve({_id:'123', externalId:'123', requestedStartDate: '2019-12-11T09:42:23.271Z'}));
 
         const postBankLambda = GenericAuthPostBankAccountLambda.Create(config);
         const expectedRes = { statusCode: 200, body: 'Success'};

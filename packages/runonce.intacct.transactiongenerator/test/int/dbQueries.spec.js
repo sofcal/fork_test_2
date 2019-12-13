@@ -52,7 +52,7 @@ describe('runonce-intacct-transactiongenerator.DbQueries',()=>{
     });
 
     describe('getBankAccount', () =>{
-        it.only('Should return the bankAccount', () =>{
+        it('Should return the bankAccount', () =>{
             return queries.getBankAccountsById({ bankAccountId, all: true }, { logger })
                 .then((result)=>{
                     should(result.length).eql(1);
