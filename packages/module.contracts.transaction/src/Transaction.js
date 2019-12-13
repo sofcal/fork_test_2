@@ -359,6 +359,8 @@ Transaction.filter = (d) => {
     delete data.validationStatus;
     delete data.actualAction;
     delete data.internalProcessingStatus;
+    delete data.updated;
+    delete data.source;
 
     data.transactionId = data.incrementedId;
 
