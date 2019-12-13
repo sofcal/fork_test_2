@@ -3,6 +3,7 @@
   "version": "1.1.114",
   "description": "Lambda function to retrieve bank account data from cache and update records",
   "main": "lib/index.js",
+  "private": true,
   "directories": {
     "lib": "lib"
   },

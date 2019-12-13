@@ -5,6 +5,7 @@
   "license": "ISC",
   "description": "",
   "main": "lib/handler.js",
+  "private": true,
   "dependencies": {
     "@sage/bc-parameterstore-static-loader": "^1.1.102",
     "@sage/bc-request-logger": "^1.0.0",

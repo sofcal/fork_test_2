@@ -3,6 +3,7 @@
   "version": "1.1.114",
   "description": "Lambda function to cancel bank account and inform provider with a notification",
   "main": "lib/index.js",
+  "private": true,
   "directories": {
     "lib": "lib"
   },
