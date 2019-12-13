@@ -1,6 +1,6 @@
 {
   "name": "@sage/bc-common-helpers",
-  "version": "1.1.72",
+  "version": "1.1.73",
   "author": "Sage UK",
   "license": "ISC",
   "description": "lib/common/helpers",
@@ -20,7 +20,7 @@
     "@sage/bc-common-resources": "^1.1.23",
     "@sage/bc-productids": "^1.1.23",
     "@sage/bc-servicenames": "^1.1.23",
-    "@sage/bc-statuscodeerror": "^1.1.72",
+    "@sage/bc-statuscodeerror": "^1.1.73",
     "bluebird": "^3.5.5",
     "safe-access": "^0.1.0"
   },
