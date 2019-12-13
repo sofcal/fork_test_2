@@ -7,21 +7,31 @@ variables:
   outputPath: build/
 
 trigger:
-- contracts_fixed
+- "*"
 
 pool:
   vmImage: 'Ubuntu-16.04'
 
 steps:
+# installs node version 8.
 - task: NodeTool@0
   inputs:
     versionSpec: '8.x'
   displayName: 'Install Node.js'
 
+# This task is implicit in build pipelines, but by making it explicit we can ensure we persist the git credentials for
+#  the remainder of the job
+- checkout: self
+  clean: true # in case this build machine is being reused
+  submodules: true
+  persistCredentials: true # store the credentials for the rest of this job
+
+# The checkout task ensures we have credentials, but it also checks us out at a specific commit, which leaves us in a
+#  detached head state
 - task: CmdLine@2
   inputs:
-    script: 'git checkout contracts'
-  displayName: 'branch checkout (why?)'
+    script: 'git fetch && git checkout $(Build.SourceBranchName)'
+  displayName: 'Update and pull branch: $(Build.SourceBranchName)'
 
 - task: Npm@1
   inputs:
