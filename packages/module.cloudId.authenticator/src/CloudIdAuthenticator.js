@@ -76,7 +76,7 @@ class Authenticate {
     verifyToken = (token, signingKey) => {
         return new Promise((resolve, reject) => {
             jwt.verify(token, signingKey, {
-                audience: this.audiences,
+                audience: this.audiences.split(','),
                 issuer: this.issuer,
                 algorithms: ['RS256']
             }, (err, decoded) => {
