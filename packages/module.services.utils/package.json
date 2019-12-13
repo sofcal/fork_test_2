@@ -1,6 +1,6 @@
 {
   "name": "@sage/bc-services-utils",
-  "version": "1.2.0",
+  "version": "1.1.119",
   "author": "Sage UK",
   "license": "ISC",
   "description": "lib/service/utils",
@@ -17,8 +17,8 @@
     "@babel/core": "^7.2.2",
     "@babel/preset-env": "^7.0.0-beta.47",
     "@sage/bc-common-resources": "^1.1.23",
+    "@sage/bc-common-statuscodeerror": "^1.1.119",
     "@sage/bc-framework-httpmethod": "^1.1.22",
-    "@sage/bc-common-statuscodeerror": "^1.2.0",
     "bluebird": "^3.5.5",
     "underscore": "^1.9.0"
   },
