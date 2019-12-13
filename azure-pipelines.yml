@@ -7,7 +7,7 @@ variables:
   outputPath: build/
 
 trigger:
-- contracts
+- contracts_fixed
 
 pool:
   vmImage: 'Ubuntu-16.04'
