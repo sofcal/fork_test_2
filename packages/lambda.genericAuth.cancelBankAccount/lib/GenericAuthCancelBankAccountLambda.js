@@ -5,7 +5,7 @@ const validate = require('./validators');
 const ErrorSpecs = require('./ErrorSpecs');
 const keys = require('./params');
 
-const { StatusCodeError } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError } = require('@sage/bc-common-statuscodeerror');
 const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
 const DB = require('@sage/bc-services-db');
 const { Handler } = require('@sage/bc-independent-lambda-handler');

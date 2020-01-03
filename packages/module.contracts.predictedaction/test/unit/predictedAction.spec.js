@@ -1,6 +1,6 @@
 'use strict';
 
-const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-common-statuscodeerror');
 const PredictedAction = require('../../lib/PredictedAction');
 
 const uuid = require('uuid');

@@ -1,13 +1,13 @@
 {
   "name": "lambda-jwt-certificaterotation",
-  "version": "1.1.101",
+  "version": "1.1.127",
   "author": "",
   "license": "ISC",
   "description": "",
   "private": true,
   "main": "lib/handler.js",
   "dependencies": {
-    "@sage/sfab-s2s-jwt-certificaterotation-lambda": "^1.1.101",
+    "@sage/sfab-s2s-jwt-certificaterotation-lambda": "^1.1.127",
     "aws-sdk": "^2.220.1"
   },
   "devDependencies": {

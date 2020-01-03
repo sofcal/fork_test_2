@@ -3,7 +3,7 @@
 const Rule = require('./Rule');
 const ruleBucketSchema = require('./schemas/ruleBucketSchema');
 
-const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-common-statuscodeerror');
 const { Mapper: StatusCodeErrorMapper } = require('@sage/bc-jsonschema-to-statuscodeerror');
 const { validateType } = require('@sage/bc-contracts-util');
 
@@ -33,6 +33,12 @@ class RuleBucket {
         return RuleBucket.validate(this, noThrow);
     }
 
+    // upper cased naming to support ProviderAPI
+    static Validate(...args) {
+        return validateImpl(...args);
+    }
+
+    // lower cased naming for legacy Banking Cloud
     static validate(...args) {
         return validateImpl(...args);
     }

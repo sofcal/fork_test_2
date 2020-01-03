@@ -2,7 +2,7 @@ const should = require('should');
 const sinon = require('sinon');
 const _ = require('underscore');
 const Rule = require('../../lib/Rule');
-const { StatusCodeError } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError } = require('@sage/bc-common-statuscodeerror');
 
 describe ('@sage/bc-contracts-rule.Rule', () => {
 

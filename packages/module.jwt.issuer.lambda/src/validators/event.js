@@ -1,7 +1,7 @@
 'use strict';
 
 const { ErrorSpecs } = require('@sage/bc-independent-lambda-handler');
-const { StatusCodeError } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError } = require('@sage/bc-common-statuscodeerror');
 
 module.exports = () => {
     const valid = true;

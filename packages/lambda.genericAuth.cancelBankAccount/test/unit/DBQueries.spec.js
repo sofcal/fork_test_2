@@ -4,7 +4,7 @@ const DB =  require('@sage/bc-services-db');
 const { DBQueries } = require('../../lib/db');
 const { logger: loggerGen } = require('@sage/bc-debug-utils');
 
-describe('lambda-genericauth-postbankaccount-DBQueries', function(){
+describe('lambda-genericauth-cancelbankaccount-DBQueries', function(){
     let sandbox;
     const logger = loggerGen(true);
     const errFunc = () => { throw new Error('should be stubbed') };

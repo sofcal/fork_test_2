@@ -9,7 +9,7 @@ const AWS = require('aws-sdk');
 
 const { ParameterStoreStaticLoader } = require('@sage/bc-parameterstore-static-loader');
 const DB = require('@sage/bc-services-db');
-const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-common-statuscodeerror');
 
 describe('lambda-scheduled-managementinfo.handler', function() {
     let sandbox;

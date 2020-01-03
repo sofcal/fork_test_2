@@ -3,7 +3,7 @@
 const RuleBucket = require('../../lib/RuleBucket');
 const Rule = require('../../lib/Rule');
 
-const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-common-statuscodeerror');
 
 const should = require('should');
 const sinon = require('sinon');

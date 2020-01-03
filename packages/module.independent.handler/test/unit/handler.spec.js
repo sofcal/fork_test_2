@@ -1,6 +1,6 @@
 const Handler = require('../../lib/Handler');
 const ErrorSpecs = require('../../lib/ErrorSpecs');
-const { StatusCodeError } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError } = require('@sage/bc-common-statuscodeerror');
 const { CloudWatchSubscription } = require('@sage/bc-infrastructure-cloudwatchsubscription');
 const { RequestLogger } = require('@sage/bc-requestlogger');
 const { logger: loggerGen } = require('@sage/bc-debug-utils');
@@ -145,7 +145,7 @@ describe('@sage/bc-independent-lambda-handler.Handler', function(){
                 .then(() => {
                     should(uut.init.callCount).eql(1);
                     should(uut.init.calledWithExactly(
-                        event, { logger }
+                        event, { logger }, context
                     )).eql(true);
                 });
         });
@@ -166,7 +166,7 @@ describe('@sage/bc-independent-lambda-handler.Handler', function(){
                 });
         });
 
-        it('should not call the impl function', () => {
+        it('should call the impl function', () => {
             const uut = new Derived({ environment: 'env', AWS_REGION: 'region', SumoLogicLambdaARN: 'arn'});
             sandbox.stub(RequestLogger, 'Create').returns(logger);
             sandbox.stub(uut, 'validate').returns(undefined);
@@ -178,7 +178,7 @@ describe('@sage/bc-independent-lambda-handler.Handler', function(){
                 .then(() => {
                     should(uut.impl.callCount).eql(1);
                     should(uut.impl.calledWithExactly(
-                        event, { logger }
+                        event, { logger }, context
                     )).eql(true);
                 });
         });

@@ -3,7 +3,7 @@
 const Promise = require('bluebird');
 
 const { RequestLogger } = require('@sage/bc-requestlogger');
-const { StatusCodeError } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError } = require('@sage/bc-common-statuscodeerror');
 const { CloudWatchSubscription } = require('@sage/bc-infrastructure-cloudwatchsubscription');
 const ErrorSpecs = require('./ErrorSpecs');
 
@@ -62,7 +62,7 @@ class Handler {
                     })
                     .then((ret) => {
                         // if we get a valid response, give the derived class the opportunity to modify the response before we send it
-                        return this.buildResponse(ret, { logger: event.logger })
+                        return this.buildResponse(ret, { logger: event.logger }, event, context)
                             .then((response) => {
                                 event.logger.info({ function: func, log: 'sending success response' });
                                 event.logger.info({ function: func, log: 'ended' });
@@ -80,7 +80,7 @@ class Handler {
                     error: err.message || err
                 });
 
-                return this.buildErrorResponse(err, { logger: event.logger })
+                return this.buildErrorResponse(err, { logger: event.logger }, event, context)
                     .then((response) => {
                         event.logger.info({ function: func, log: 'sending failure response' });
                         // for the most part, we still invoke the callback without an error; however, if we want the lambda to

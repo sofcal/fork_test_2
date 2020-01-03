@@ -1,7 +1,7 @@
 'use strict';
 
 const ErrorSpecs = require('../ErrorSpecs');
-const { StatusCodeError } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError } = require('@sage/bc-common-statuscodeerror');
 const _ = require('underscore');
 
 module.exports = (env) => {

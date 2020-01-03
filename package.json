@@ -20,9 +20,8 @@
     "lint/byFolder": "eslint ./packages/** --format ./node_modules/eslint-stats/byFolder.js",
     "release:ci": "lerna publish from-git --registry=https://sage.myget.org/F/npm/npm/ --yes",
     "release:local": "lerna publish from-git --registry=https://sage.myget.org/F/npm/npm/",
-    "template": "./templates/generate.sh",
-    "version": "lerna version",
-    "version:force": "lerna version --force-publish"
+    "versionX": "lerna version",
+    "versionX:force": "lerna version --force-publish"
   },
   "author": "",
   "license": "ISC",

@@ -1,6 +1,6 @@
 const Mapper = require('../../lib/Mapper');
 
-const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError, StatusCodeErrorItem } = require('@sage/bc-common-statuscodeerror');
 
 const jsonschema = require('jsonschema');
 const should = require('should');

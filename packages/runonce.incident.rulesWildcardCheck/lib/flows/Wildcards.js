@@ -2,7 +2,7 @@
 const ErrorSpecs = require('../ErrorSpecs');
 
 // internal modules
-const { StatusCodeError } = require('@sage/bc-statuscodeerror');
+const { StatusCodeError } = require('@sage/bc-common-statuscodeerror');
 
 // external modules
 const Promise = require('bluebird');

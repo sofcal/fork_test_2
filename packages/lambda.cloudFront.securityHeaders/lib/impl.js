@@ -2,7 +2,7 @@
 
 const Promise = require('bluebird');
 const ErrorSpecs = require('./ErrorSpecs');
-const { StatusCodeError } = require('@sage/bc-status-code-error');
+const { StatusCodeError } = require('@sage/bc-common-statuscodeerror');
 const querystring = require('querystring');
 const _ = require('underscore');
 
