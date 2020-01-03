@@ -40,7 +40,6 @@ describe('@sage/bc-contracts-bank.Bank', () => {
 
     beforeEach(() => {
         sandbox = sinon.createSandbox();
-        sandbox.stub(validators);
 
         uuid = 'd73ebc4a-654b-4e87-ae35-b37fc562de06';
         bankProviderId = 'f686f71a-ad34-4056-8e49-5e368ac4a6a7';
@@ -175,7 +174,11 @@ describe('@sage/bc-contracts-bank.Bank', () => {
                     should(bank.offBoardingMechanism).eql(offBoarding);
                     should(bank.proxy).eql(proxy);
                     should(bank.supportiframe).eql(false);
-                    bank.provider.should.eql({
+                    should(bank.internal).eql({
+                        "longURL": false,
+                        "bankUrl": null
+                    });
+                    should(bank.provider).eql({
                         providerId: bankProviderId,
                         authUrl: 'authUrl'
                     });
@@ -205,6 +208,10 @@ describe('@sage/bc-contracts-bank.Bank', () => {
                     should(bank.internalStatuses).eql([]);
                     should(bank.quarantine).eql({ forceQuarantine: false, transactionTypes: [] });
                     should(bank.offBoardingMechanism).eql({ type: Bank.offBoardingTypes.none, instructions: '' });
+                    should(bank.internal).eql({
+                        "longURL": false,
+                        "bankUrl": null
+                    });
                     should(bank.proxy).be.null();
                     should(bank.supportiframe).eql(true);
                     should(bank.dataProvider).eql(Bank.dataProviders.direct);
@@ -301,6 +308,10 @@ describe('@sage/bc-contracts-bank.Bank', () => {
             const len128 = 'x'.repeat(128);
             const len129 = 'x'.repeat(129);
             const validUuid = 'd73ebc4a-654b-4e87-ae35-b37fc562de06';
+
+            beforeEach(() => {
+                bank = new Bank(data);
+            });
 
             const tests = [
                 {
@@ -478,6 +489,11 @@ describe('@sage/bc-contracts-bank.Bank', () => {
                         { it: 'should throw if supportiframe is a string', value: 'true', error: true },
                         { it: 'should throw if supportiframe is a number', value: 0, error: true },
                         { it: 'should throw if supportiframe is an object', value: {}, error: true }
+                    ]
+                }, {
+                    target: 'internal.longURL', tests: [
+                        { it: 'should not throw if internal.longURL is boolean true', value: true, error: false },
+                        { it: 'should not throw if internal.longURL is boolean false', value: false, error: false }
                     ]
                 }, {
                     target: 'quarantine',
@@ -1015,27 +1031,28 @@ describe('@sage/bc-contracts-bank.Bank', () => {
                     ]
                 }, {
                     target: 'provider', tests: [
-                        { it: 'should not throw if provider is null', value: null },
+                        { it: 'should throw if provider is null', value: null, error: true, skipParamAssert: true },
                         { it: 'should not throw if provider is a valid object', value: { providerId: 'f686f71a-ad34-4056-8e49-5e368ac4a6a7', authUrl: 'authUrl' } },
                         { it: 'should throw if provider is a string', value: 'string', error: true },
                         { it: 'should throw if provider is a number', value: 9, error: true },
                         { it: 'should throw if provider is a boolean', value: true, error: true },
 
-                        { it: 'should throw if provider.providerId is null', value: { providerId: null, authUrl: 'authUrl' }, error: true, skipParamAssert: true },
+                        { it: 'should not throw if provider.providerId is null', value: { providerId: null, authUrl: 'authUrl' }},
                         { it: 'should throw if provider.providerId is an empty string', value: { providerId: '', authUrl: 'authUrl' }, error: true, skipParamAssert: true },
                         { it: 'should throw if provider.providerId is not a valid uuid', value: { providerId: 'not_a_uuid', authUrl: 'authUrl' }, error: true, skipParamAssert: true },
                         { it: 'should throw if provider.providerId is a number', value: { providerId: 9, authUrl: 'authUrl' }, error: true, skipParamAssert: true },
                         { it: 'should throw if provider.providerId is an object', value: { providerId: {}, authUrl: 'authUrl' }, error: true, skipParamAssert: true },
                         { it: 'should throw if provider.providerId is a boolean', value: { providerId: true, authUrl: 'authUrl' }, error: true, skipParamAssert: true },
 
-                        { it: 'should not throw if provider.authUrl is 255 characters', value: { providerId: bankProviderId, authUrl: Resources.fixedLengthString.len255 }, error: true, skipParamAssert: true },
-                        { it: 'should throw if provider.authUrl is null', value: { providerId: bankProviderId, authUrl: null }, error: true, skipParamAssert: true },
-                        { it: 'should throw if provider.authUrl is a zero length string', value: { providerId: bankProviderId, authUrl: '' }, error: true, skipParamAssert: true },
-                        { it: 'should throw if provider.authUrl is greater than 255 characters', value: { providerId: bankProviderId, authUrl: Resources.fixedLengthString.len256 }, error: true, skipParamAssert: true },
+                        { it: 'should not throw if provider.authUrl is 255 characters', value: { providerId: bankProviderId, authUrl: Resources.fixedLengthString.len255 }},
+                        { it: 'should not throw if provider.authUrl is null', value: { providerId: bankProviderId, authUrl: null }},
+                        { it: 'should not throw if provider.authUrl is a zero length string', value: { providerId: bankProviderId, authUrl: '' }},
+                        { it: 'should not throw if provider.authUrl is greater than 255 characters', value: { providerId: bankProviderId, authUrl: Resources.fixedLengthString.len256 }},
                         { it: 'should throw if provider.authUrl is a number', value: { providerId: bankProviderId, authUrl: 3 }, error: true, skipParamAssert: true },
                         { it: 'should throw if provider.authUrl is an object', value: { providerId: bankProviderId, authUrl: {} }, error: true, skipParamAssert: true }
                     ]
-                }];
+                }
+            ];
 
             const accountTypesTests = [
                 {
@@ -1127,129 +1144,115 @@ describe('@sage/bc-contracts-bank.Bank', () => {
                 }
             ];
 
-            const runTest = (target, targetTests) => {
-                describe(target, () => {
-                    targetTests.forEach((test, index) => {
-                        it(test.it, (done) => {
-                            if (test.error) {
-                                validators.validateContractObject.throws(dummyError);
-                            } else {
-                                validators.validateContractObject.returns(undefined);
-                            }
-
+            const runTest = function(target, tests) {
+                describe(target, function() {
+                    _.each(tests, function(test, index) {
+                        it(test.it, function(done) {
                             try {
                                 bank[target] = test.value;
-                                const result = test.error ? new Error(`${target} test ${index}: should have thrown`) : undefined;
+                                let result = test.error ? new Error(target + ' test ' + index + ': should have thrown') : undefined;
 
                                 Bank.validate(bank);
 
                                 done(result);
-                            } catch (err) {
-                                if (!test.error) {
+                            } catch(err) {
+                                if(!test.error) {
                                     done((err instanceof Error) ? err : new Error());
                                 } else {
                                     err.should.be.instanceOf(StatusCodeError);
                                     err.statusCode.should.eql(400);
-                                    should(validators.validateContractObject.calledOnceWith(bank, Bank)).be.true();
+                                    err.items[0].applicationCode.should.eql(Resources.services.common.InvalidProperties);
+
+                                    if(!test.skipParamAssert) {
+                                        should(err.items[0].params[target]).eql(_.isArray(test.value) ? test.value[0] : test.value);
+                                    }
 
                                     done();
                                 }
                             }
-                        });
-                    });
-                });
+                        })
+                    })
+                })
             };
 
-            const runMandatoryCustomerBankDetailsTests = (target, targetTests) => {
-                describe(target, () => {
-                    _.each(targetTests, (test, index) => {
-                        it(test.it, (done) => {
-                            if (test.error) {
-                                validators.validateContractObject.throws(dummyError);
-                            } else {
-                                validators.validateContractObject.returns(undefined);
-                            }
-
+            const runMandatoryCustomerBankDetailsTests = function(target, tests) {
+                describe(target, function() {
+                    _.each(tests, function(test, index) {
+                        it(test.it, function(done) {
                             try {
-                                _.each(bank.accountTypes, (at) => {
-                                    _.each(at.mandatoryCustomerBankDetails, (md) => {
-                                        md[target] = test.value; // eslint-disable-line no-param-reassign
+                                _.each(bank.accountTypes, function(at) {
+                                    _.each(at.mandatoryCustomerBankDetails, function(md) {
+                                        md[target] = test.value;
                                     });
                                 });
 
-                                const result = test.error ? new Error(`${target} test ${index}: should have thrown`) : undefined;
+                                let result = test.error ? new Error(target + ' test ' + index + ': should have thrown') : undefined;
 
                                 Bank.validate(bank);
 
                                 done(result);
-                            } catch (err) {
-                                if (!test.error) {
+                            } catch(err) {
+                                if(!test.error) {
                                     done((err instanceof Error) ? err : new Error());
                                 } else {
                                     err.should.be.instanceOf(StatusCodeError);
                                     err.statusCode.should.eql(400);
-                                    should(validators.validateContractObject.calledOnceWith(bank, Bank)).be.true();
+                                    err.items[0].applicationCode.should.eql(Resources.services.common.InvalidProperties);
+                                    should(err.items[0].params[target]).eql(_.isArray(test.value) ? test.value[0] : test.value);
 
                                     done();
                                 }
                             }
-                        });
-                    });
-                });
+                        })
+                    })
+                })
             };
 
-            const runAccountTypesTests = (target, targetTests) => {
-                describe(target, () => {
-                    targetTests.forEach((test, index) => {
-                        it(test.it, (done) => {
-                            if (test.error) {
-                                validators.validateContractObject.throws(dummyError);
-                            } else {
-                                validators.validateContractObject.returns(undefined);
-                            }
-
+            const runAccountTypesTests = function(target, tests) {
+                describe(target, function() {
+                    _.each(tests, function(test, index) {
+                        it(test.it, function(done) {
                             try {
-                                bank.accountTypes.forEach((at) => {
-                                    at[target] = test.value; // eslint-disable-line no-param-reassign
+                                _.each(bank.accountTypes, function(at) {
+                                    at[target] = test.value;
                                 });
-                                const result = test.error ? new Error(`${target} test ${index}: should have thrown`) : undefined;
+                                let result = test.error ? new Error(target + ' test ' + index + ': should have thrown') : undefined;
 
                                 Bank.validate(bank);
 
                                 done(result);
-                            } catch (err) {
-                                if (!test.error) {
+                            } catch(err) {
+                                if(!test.error) {
                                     done((err instanceof Error) ? err : new Error());
                                 } else {
                                     err.should.be.instanceOf(StatusCodeError);
                                     err.statusCode.should.eql(400);
-                                    should(validators.validateContractObject.calledOnceWith(bank, Bank)).be.true();
+                                    err.items[0].applicationCode.should.eql(Resources.services.common.InvalidProperties);
+                                    should(err.items[0].params[target]).eql(_.isArray(test.value) ? test.value[0] : test.value);
 
                                     done();
                                 }
                             }
-                        });
-                    });
-                });
+                        })
+                    })
+                })
             };
 
-            beforeEach(() => {
-                bank = new Bank(data);
-            });
-
-            tests.forEach((test) => {
+            _.each(tests, function(test) {
                 runTest(test.target, test.tests);
             });
 
-            accountTypesTests.forEach((test) => {
+            _.each(accountTypesTests, function(test) {
                 runAccountTypesTests(test.target, test.tests);
             });
 
-            mandatoryCustomerBankDetailsTests.forEach((test) => {
+            _.each(mandatoryCustomerBankDetailsTests, function(test) {
                 runMandatoryCustomerBankDetailsTests(test.target, test.tests);
             });
 
             it('should not throw for valid data', (done) => {
+                sandbox.stub(validators);
+
                 try {
                     Bank.validate(bank);
                     should(validators.validateContractObject.calledOnceWith(bank, Bank)).be.true();
@@ -1260,6 +1263,7 @@ describe('@sage/bc-contracts-bank.Bank', () => {
             });
 
             it('should throw if bank is undefined', (done) => {
+                sandbox.stub(validators);
                 validators.validateContractObject.throws(dummyError);
 
                 try {
@@ -1277,6 +1281,7 @@ describe('@sage/bc-contracts-bank.Bank', () => {
             });
 
             it('should throw if bank is null', (done) => {
+                sandbox.stub(validators);
                 validators.validateContractObject.throws(dummyError);
 
                 try {
@@ -1293,6 +1298,7 @@ describe('@sage/bc-contracts-bank.Bank', () => {
             });
 
             it('should throw if bank is not an instance of Bank', (done) => {
+                sandbox.stub(validators);
                 validators.validateContractObject.throws(dummyError);
 
                 try {
@@ -1310,6 +1316,7 @@ describe('@sage/bc-contracts-bank.Bank', () => {
             });
 
             it('should throw multiple error items if all fields are invalid', (done) => {
+                sandbox.stub(validators);
                 validators.validateContractObject.throws(dummyError);
 
                 try {
@@ -1423,37 +1430,35 @@ describe('@sage/bc-contracts-bank.Bank', () => {
                 }
             ];
 
-            const runTest = (target, targetTests) => {
-                describe(target, () => {
-                    _.each(targetTests, (test, index) => {
-                        it(test.it, (done) => {
-                            if (test.error) {
-                                validators.validateContractObject.throws(dummyError);
-                            } else {
-                                validators.validateContractObject.returns(undefined);
-                            }
-
+            const runTest = function(target, tests) {
+                describe(target, function() {
+                    _.each(tests, function(test, index) {
+                        it(test.it, function(done) {
                             try {
                                 bank[target] = test.value;
-                                const result = test.error ? new Error(`${target} test ${index}: should have thrown`) : undefined;
+                                let result = test.error ? new Error(target + ' test ' + index + ': should have thrown') : undefined;
 
                                 Bank.validate(bank);
 
                                 done(result);
-                            } catch (err) {
-                                if (!test.error) {
+                            } catch(err) {
+                                if(!test.error) {
                                     done((err instanceof Error) ? err : new Error());
                                 } else {
                                     err.should.be.instanceOf(StatusCodeError);
                                     err.statusCode.should.eql(400);
-                                    should(validators.validateContractObject.calledOnceWith(bank, Bank)).be.true();
+                                    err.items[0].applicationCode.should.eql(Resources.services.common.InvalidProperties);
+
+                                    if(!test.skipParamAssert) {
+                                        should(err.items[0].params[target]).eql(_.isArray(test.value) ? test.value[0] : test.value);
+                                    }
 
                                     done();
                                 }
                             }
-                        });
-                    });
-                });
+                        })
+                    })
+                })
             };
 
             tests.forEach((test) => {
@@ -1479,6 +1484,7 @@ describe('@sage/bc-contracts-bank.Bank', () => {
                     should.not.exists(bank.offBoardingMechanism.emailTitle);
                     should.not.exists(bank.proxy);
                     should.not.exists(bank.internalStatuses);
+                    should.not.exists(bank.internal);
                     should.not.exists(bank.provider);
 
                     done();
