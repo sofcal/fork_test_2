@@ -12,11 +12,21 @@ const noopLogger = { error: noop, warn: noop, info: noop, };
 const ClaimsToFilter = ['sub', 'exp', 'iat'];
 
 class Authenticate {
-    constructor(validIssuer, validAudiences, validClients, validScopes, jwksClient, { logger = noopLogger } = {}) {
+    constructor({ validIssuer, validAudiences, validClients, validScopes }, jwksClient, { logger = noopLogger } = {}) {
         this.issuer = validIssuer;
-        this.audiences = validAudiences;
-        this.clientIds = validClients;
-        this.scopes = validScopes;
+
+        if (validAudiences) {
+            this.audiences = validAudiences.split(',');
+        }
+
+        if (validClients) {
+            this.clientIds = validClients.split(',');
+        }
+
+        if (validScopes) {
+            this.scopes = validScopes.split(',');
+        }
+
         this.logger = logger;
         this.jwksClient = jwksClient;
 
@@ -77,7 +87,7 @@ class Authenticate {
     verifyToken = (token, signingKey) => {
         return new Promise((resolve, reject) => {
             jwt.verify(token, signingKey, {
-                audience: this.audiences.split(','),
+                audience: this.audiences,
                 issuer: this.issuer,
                 algorithms: ['RS256']
             }, (err, decoded) => {

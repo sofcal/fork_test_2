@@ -21,7 +21,7 @@ utils.audienceInvalid = (aud, validAudiences) => !validAudiences.includes(aud);
 // returns boolean
 utils.clientInvalid = (azp, validClientIds) => !validClientIds.includes(azp);
 
-utils.scopeInvalid = (scope, validScopes) => !validScopes.includes();
+utils.scopeInvalid = (scope, validScopes) => !validScopes.includes(scope);
 
 // Validate token header and payload
 // returns boolean

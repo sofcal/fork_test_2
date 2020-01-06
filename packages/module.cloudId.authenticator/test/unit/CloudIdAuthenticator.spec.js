@@ -51,8 +51,7 @@ describe('@sage/sfab-s2s-cloudId-authenticator.cloudIdAuthenticator', function()
         it('should be able to create new authenticate object', () => {
 
             const test = new Authenticate(
-                'a', ['a'], ['a'], ['a']
-            , {logger});
+                {validIssuer: 'a', validAudiences: 'a', validClients: 'a', validScopes: 'a'}, {logger});
 
             test.should.be.Object();
             test.should.be.instanceof(Authenticate);
@@ -60,7 +59,7 @@ describe('@sage/sfab-s2s-cloudId-authenticator.cloudIdAuthenticator', function()
 
         it('should default logger when not passed in', () => {
             const test = new Authenticate(
-                'a', ['a'], ['a'], ['a'], {}
+                {validIssuer: 'a', validAudiences: 'a', validClients: 'a', validScopes: 'a'}, {}
             );
 
             (test.logger).should.be.a.Object();
@@ -70,7 +69,7 @@ describe('@sage/sfab-s2s-cloudId-authenticator.cloudIdAuthenticator', function()
 
         it('should be able to create new authenticate object using Authenticate.create', () => {
             const test = Authenticate.Create(
-                'a', ['a'], ['a'],['a']
+                {validIssuer: 'a', validAudiences: 'a', validClients: 'a', validScopes: 'a'}
             , {logger});
 
             test.should.be.Object();
@@ -79,30 +78,22 @@ describe('@sage/sfab-s2s-cloudId-authenticator.cloudIdAuthenticator', function()
 
         it('should fail is a valid issuer is not passed in', () => {
            try {
-               Authenticate.Create(null, ['a'], ['a']
+               Authenticate.Create({validAudiences: 'a', validClients: 'a', validScopes: 'a'}
                    , {logger});
            } catch (e) {
                e.message.should.eql('Invalid argument passed: issuer');
            }
         });
 
-        it('should fail is a valid audience is not passed in', () => {
+        it('should fail if a valid audience is not passed in', () => {
             try {
-                Authenticate.Create('a', null, ['a']
+                Authenticate.Create({validIssuer: 'a', validClients: 'a', validScopes: 'a'}
                     , {logger});
             } catch (e) {
                 e.message.should.eql('Invalid argument passed: audiences');
             }
         });
 
-        it('should fail is a valid client is not passed in', () => {
-            try {
-                Authenticate.Create('a', ['a'], ['a'], null
-                    , {logger});
-            } catch (e) {
-                e.message.should.eql('Invalid argument passed: clientIds');
-            }
-        });
     });
 
     describe('Authenticate.validateToken', () => {
@@ -110,7 +101,7 @@ describe('@sage/sfab-s2s-cloudId-authenticator.cloudIdAuthenticator', function()
         it('should throw an error for an invalid token', () => {
             jwtDecodeStub.returns(null);
 
-            const test = new Authenticate('a', ['a'], ['a'], ['a'], {});
+            const test = new Authenticate({validIssuer: 'a', validAudiences: 'a', validClients: 'a', validScopes: 'a'}, {});
 
             should.throws(() => test.validateToken('invalid'), /invalidAuthToken/);
         });
@@ -123,7 +114,7 @@ describe('@sage/sfab-s2s-cloudId-authenticator.cloudIdAuthenticator', function()
             jwtDecodeStub.returns(dummy);
             validateTokenUtilsStub.throws('invalidAuthToken');
 
-            const test = new Authenticate('a', ['a'], ['a'], ['a'], {});
+            const test = new Authenticate({validIssuer: 'a', validAudiences: 'a', validClients: 'a', validScopes: 'a'}, {});
 
             should.throws(() => test.validateToken('invalid'), /invalidAuthToken/);
         });
@@ -143,8 +134,7 @@ describe('@sage/sfab-s2s-cloudId-authenticator.cloudIdAuthenticator', function()
             };
             jwtDecodeStub.returns(dummy);
 
-            const testValidate = new Authenticate('iaa', ['aud'], ['azp'], ['scope'],  {});
-
+            const testValidate = new Authenticate({validIssuer: 'iaa', validAudiences: 'aud', validClients: 'azp', validScopes: 'scope'},  {});
             const decoded = testValidate.validateToken('token');
             const { payload: {testClaim, exp, kid, iss, aud, azp }} = decoded;
 
@@ -159,14 +149,14 @@ describe('@sage/sfab-s2s-cloudId-authenticator.cloudIdAuthenticator', function()
 
     describe('Authenticate.validate', () => {
         it('should return true if validate passes ', () => {
-            const test = new Authenticate('a', ['a'], ['a'], ['a'], {logger});
+            const test = new Authenticate({validIssuer: 'a', validAudiences: 'a', validClients: 'a', validScopes: 'a'}, {}, {logger});
 
             should.doesNotThrow(() => test.validate());
         });
 
         it('should throw error if validate fails ', () => {
             should.throws(() => new Authenticate(
-                null, ['a'], ['a'], {logger}), /^Error: Invalid argument passed: issuer$/);
+                { validAudiences: 'a', validClients: 'a', validScopes: 'a' }, {}, {logger}), /^Error: Invalid argument passed: issuer$/);
         });
     });
 
@@ -184,7 +174,7 @@ describe('@sage/sfab-s2s-cloudId-authenticator.cloudIdAuthenticator', function()
             jwtDecodeStub.returns('test');
             const jwksStub = { getSigningKey: sinon.stub() };
             jwksStub.getSigningKey.returns('123');
-            test = new Authenticate('a', ['a'], ['a'], jwksStub, {logger});
+            test = new Authenticate('a', 'a', 'a', jwksStub, {logger});
         });
 
         it('should return Signing Keys', () => {
@@ -195,7 +185,7 @@ describe('@sage/sfab-s2s-cloudId-authenticator.cloudIdAuthenticator', function()
         });
 
         it('should reject promise if error thrown', () => {
-            const testErr = new Authenticate('a', ['a'], ['a'],  {logger});
+            const testErr = new Authenticate('a', 'a', 'a',  {logger});
 
             const result = testErr.getCertKeys(true);
             return result.should.be.rejectedWith('getCertListError');
@@ -230,7 +220,7 @@ describe('@sage/sfab-s2s-cloudId-authenticator.cloudIdAuthenticator', function()
 
         it('should return store cert keys', () => {
 
-            const test = new Authenticate('a', ['b'], ['c'], {logger});
+            const test = new Authenticate('a', 'b', 'c', {logger});
             return test.verifyToken(payload, 'signature')
                 .then((res) => {
                     res.should.eql(certs[kid])
@@ -239,7 +229,7 @@ describe('@sage/sfab-s2s-cloudId-authenticator.cloudIdAuthenticator', function()
 
         it('should reject promise if error thrown', () => {
 
-            const test = new Authenticate('a', ['b'], ['c'], {logger});
+            const test = new Authenticate('a', 'b', 'c', {logger});
             const result = test.verifyToken(payload, 'signature');
             return result.should.be.rejectedWith('getCertListError');
         });
@@ -265,7 +255,7 @@ describe('@sage/sfab-s2s-cloudId-authenticator.cloudIdAuthenticator', function()
                 'cert1',
                 'cert2',
             ]);
-            test = new Authenticate('a', ['b'], ['c'], {logger});
+            test = new Authenticate('a', 'b', 'c', {logger});
         });
 
         it('should call validateTokenStub method', () => {
