@@ -16,7 +16,7 @@ describe('@sage/sfab-s2s-cloudId-authenticator.utils', () => {
             'validateToken',
             'audienceInvalid',
             'clientInvalid',
-            'audienceInvalid'
+            'scopeInvalid'
         );
         done();
     });
