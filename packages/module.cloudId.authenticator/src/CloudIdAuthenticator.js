@@ -12,10 +12,11 @@ const noopLogger = { error: noop, warn: noop, info: noop, };
 const ClaimsToFilter = ['sub', 'exp', 'iat'];
 
 class Authenticate {
-    constructor(validIssuer, validAudiences, validClients, jwksClient, { logger = noopLogger } = {}) {
+    constructor(validIssuer, validAudiences, validClients, validScopes, jwksClient, { logger = noopLogger } = {}) {
         this.issuer = validIssuer;
         this.audiences = validAudiences;
         this.clientIds = validClients;
+        this.scopes = validScopes;
         this.logger = logger;
         this.jwksClient = jwksClient;
 
@@ -52,7 +53,7 @@ class Authenticate {
         }
 
         try {
-            utils.validateToken(decoded, this.issuer, this.audiences, this.clientIds);
+            utils.validateToken(decoded, this.issuer, this.audiences, this.clientIds, this.scopes);
         } catch (err) {
             this.logger.error({ function: func, log: 'Token failed validation', params: { error: err.message } });
             throw err;
