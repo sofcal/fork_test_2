@@ -58,8 +58,13 @@ describe('@sage/bc-Transaction.Transaction', function(){
             },
             validationStatus: Transaction.validationStatus.notValidated,
             providerAdditionalFields: [{
-                name: 'Extra 1',
-                value: '00001234'
+                name: 'receipt',
+                object: {
+                    currency: 'GBR',
+                    total: 1499,
+                    receiptDate: new Date('2020-01-09T16:56:35.178Z'),
+                    merchantName: 'Dominos Pizza'
+                }
             }],
             category: freshTransactionCategory(),
             payee: freshTransactionPayee(),
@@ -68,6 +73,8 @@ describe('@sage/bc-Transaction.Transaction', function(){
             actualAction: freshTransactionAction()
         };
     }
+
+
 
     function freshTransactionCategoryAccountsPostings() {
         return [
@@ -1459,27 +1466,81 @@ describe('@sage/bc-Transaction.Transaction', function(){
                 let additionalFieldsTests = [
                     {
                         target: 'name', tests: [
-                            { it: 'should not throw if name is a 1-char string', value: 'x', error: false },
-                            { it: 'should not throw if name is a 50-char string', value: a50CharacterString, error: false },
-                            { it: 'should throw if name is a 51-char string', value: a51CharacterString, error: true },
-                            { it: 'should throw if name is an empty string', value: '', error: true },
-                            { it: 'should throw if name is undefined', value: undefined, error: true },
-                            { it: 'should throw if name is null', value: null, error: true },
-                            { it: 'should throw if name is an object', value: { name: 'x' }, error: true },
-                            { it: 'should throw if name is a number', value: 1, error: true },
-                            { it: 'should throw if name is a boolean', value: true, error: true },
-                        ]
+                        { it: 'should not throw if name is a valid string', value: 'receipt', error: false },
+                        { it: 'should throw if name is a invalid string', value: 'not a receipt', error: true },
+                        { it: 'should throw if name is an empty string', value: '', error: true },
+                        { it: 'should throw if name is undefined', value: undefined, error: true },
+                        { it: 'should throw if name is null', value: null, error: true },
+                        { it: 'should throw if name is an object', value: { name: 'x' }, error: true },
+                        { it: 'should throw if name is a number', value: 1, error: true },
+                        { it: 'should throw if name is a boolean', value: true, error: true },
+                    ]
                     }, {
                         target: 'value', tests: [
                             { it: 'should not throw if value is a 1-char string', value: 'x', error: false },
                             { it: 'should not throw if value is a 50-char string', value: a50CharacterString, error: false },
                             { it: 'should throw if value is a 51-char string', value: a51CharacterString, error: true },
                             { it: 'should throw if value is an empty string', value: '', error: true },
-                            { it: 'should throw if value is undefined', value: undefined, error: true },
-                            { it: 'should throw if value is null', value: null, error: true },
+                            { it: 'should not throw if value is undefined', value: undefined, error: false },
+                            { it: 'should not throw if value is null', value: null, error: false },
                             { it: 'should throw if value is an object', value: { value: 'x' }, error: true },
                             { it: 'should throw if value is a number', value: 1, error: true },
                             { it: 'should throw if value is a boolean', value: true, error: true },
+                        ]
+                    }, {
+                        target: 'object', tests: [
+                        { it: 'should not throw if value is undefined', value: undefined, error: false },
+                        { it: 'should not throw if value is null', value: null, error: false },
+                        { it: 'should throw if value is a number', value: 1, error: true },
+                        { it: 'should throw if value is a boolean', value: true, error: true }
+                        ]
+                    }
+                ];
+
+                let receiptObjectTests = [
+                    {
+                        target: 'currency', tests: [
+                        { it: 'should not throw if currency is a valid string', value: 'GBR', error: false },
+                        { it: 'should throw if currency is a invalid string', value: 'not a currency', error: true },
+                        { it: 'should throw if currency is an empty string', value: '', error: true },
+                        { it: 'should throw if currency is undefined', value: undefined, error: true },
+                        { it: 'should throw if currency is null', value: null, error: true },
+                        { it: 'should throw if currency is an object', value: { name: 'x' }, error: true },
+                        { it: 'should throw if currency is a number', value: 1, error: true },
+                        { it: 'should throw if currency is a boolean', value: true, error: true },
+                    ]}
+                    , {
+                        target: 'total', tests: [
+                            { it: 'should throw if total is undefined', value: undefined, error: true },
+                            { it: 'should throw if total is null', value: null, error: true },
+                            { it: 'should throw if total is boolean true', value: true, error: true },
+                            { it: 'should throw if total is boolean false', value: false, error: true },
+                            { it: 'should throw if total is a zero length string', value: '', error: true },
+                            { it: 'should throw if total is NaN', value: NaN, error: true },
+                            { it: 'should not throw if total is a valid number', value: 100, error: false },
+                            { it: 'should throw if total is a string', value: 'WrongNumber', error: true },
+                            { it: 'should throw if total is an object', value: {}, error: true }
+                        ]
+                    }, {
+                        target: 'receiptDate', tests: [
+                            {it: 'should throw if receiptDate is undefined', value: undefined, error: true},
+                            {it: 'should throw if receiptDate is null', value: null, error: true},
+                            {it: 'should throw if receiptDate is boolean true', value: true, error: true},
+                            {it: 'should throw if receiptDate is boolean false', value: false, error: true},
+                            {it: 'should throw if receiptDate is a zero length string', value: '', error: true},
+                            {it: 'should not throw if receiptDate is a valid date', value: new Date(), error: false},
+                            {it: 'should throw if receiptDate is a string', value: 'WrongDate', error: true},
+                            {it: 'should throw if receiptDate is a number', value: 6, error: true},
+                            {it: 'should throw if receiptDate is an object', value: {}, error: true}
+                        ]
+                    }, {
+                        target: 'merchantName', tests: [
+
+                            { it: 'should not throw if value is a 50-char string', value: a50CharacterString, error: false },
+                            { it: 'should throw if value is undefined', value: undefined, error: true },
+                            { it: 'should throw if value is null', value: null, error: true },
+                            { it: 'should throw if value is a number', value: 1, error: true },
+                            { it: 'should throw if value is a boolean', value: true, error: true }
                         ]
                     }
                 ];
@@ -1810,6 +1871,35 @@ describe('@sage/bc-Transaction.Transaction', function(){
                     })
                 };
 
+                let runReceiptObjectTest = function(target, tests) {
+                    describe.only(`providerAdditionalFields.object.${target}`, function () {
+                        _.each(tests, (test, index) => {
+                            it(test.it, (done) => {
+                                try {
+                                    newTransaction.providerAdditionalFields[0].object[target] = test.value;
+                                    console.log('*** here', JSON.stringify(newTransaction,1));
+
+                                    Transaction.validate(newTransaction);
+
+                                    const result = test.error ? new Error(`${target} test ${index + 1}: should have thrown`) : undefined;
+                                    done(result);
+                                } catch (err) {
+                                    if (!test.error) {
+
+                                        done((err instanceof Error) ? err : new Error());
+                                    } else {
+                                        should(err).be.instanceOf(StatusCodeError);
+                                        should(err.statusCode).eql(400);
+                                        should(err.items[0].applicationCode).eql(common.services.common.InvalidProperties);
+                                        should(err.items[0].params.providerAdditionalFields.object[target]).eql(_.isArray(test.value) ? test.value[0] : test.value);
+                                        done();
+                                    }
+                                }
+                            })
+                        })
+                    })
+                };
+
                 _.each(tests, function(test){
                     runTest(test.target, test.tests, test.errorCode, test.errorNumber);
                 });
@@ -1852,7 +1942,15 @@ describe('@sage/bc-Transaction.Transaction', function(){
 
                 _.each(additionalFieldsTests, (test) => {
                     runAdditionalFieldsTest(test.target, test.tests);
-            });
+                });
+
+                _.each(additionalFieldsTests, (test) => {
+                    runAdditionalFieldsTest(test.target, test.tests);
+                });
+
+                _.each(receiptObjectTests, (test) => {
+                    runReceiptObjectTest(test.target, test.tests);
+                });
 
                 // it('should not throw if a valid transactionType is used', function (done){
                 //     try {
