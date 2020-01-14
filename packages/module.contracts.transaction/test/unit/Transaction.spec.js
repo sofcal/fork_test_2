@@ -74,8 +74,6 @@ describe('@sage/bc-Transaction.Transaction', function(){
         };
     }
 
-
-
     function freshTransactionCategoryAccountsPostings() {
         return [
             {
