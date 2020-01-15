@@ -8,11 +8,15 @@ var pipeline = (skip, limit) => {
             $project: {
                 _id: 1,
                 organisationId: 1,
+                companyId: '$company.companyId',
                 lastTransactionsGet: { $dateToString: { format: '%Y-%m-%dT%H:%M:%S:%LZ', date: '$lastTransactionsGet' } },
                 lastTransactionsGetDate: { $dateToString: { format: '%Y-%m-%d', date: '$lastTransactionsGet' } },
                 lastTransactionsReceived: { $dateToString: { format: '%Y-%m-%dT%H:%M:%S:%LZ', date: '$lastTransactionsReceived' } },
                 lastTransactionsReceivedDate: { $dateToString: { format: '%Y-%m-%d', date: '$lastTransactionsReceived' } },
                 lastTransactionId: 1,
+                lastUnresolvedId: 1,
+                accountantManaged: '$accountant.accountantManaged',
+                accountType: 1,
                 status: 1,
                 statusReason: 1,
                 region: 1,
@@ -37,6 +41,7 @@ var pipeline = (skip, limit) => {
                     $addToSet: {
                         bankAccountId: '$_id',
                         organisationId: '$organisationId',
+                        companyId: '$companyId',
                         lastTransactionsGet: '$lastTransactionsGet',
                         lastTransactionsGetDate: '$lastTransactionsGetDate',
                         lastTransactionsReceived: '$lastTransactionsReceived',
@@ -64,12 +69,18 @@ var pipeline = (skip, limit) => {
 };
 
 var options = { allowDiskUse: true };
-db.getCollection('BankAccount').aggregate(pipeline(0, 25000), options);
-db.getCollection('BankAccount').aggregate(pipeline(25000, 25000), options);
-db.getCollection('BankAccount').aggregate(pipeline(50000, 25000), options);
-db.getCollection('BankAccount').aggregate(pipeline(75000, 25000), options);
-db.getCollection('BankAccount').aggregate(pipeline(100000, 25000), options);
-db.getCollection('BankAccount').aggregate(pipeline(125000, 25000), options);
-db.getCollection('BankAccount').aggregate(pipeline(150000, 25000), options);
-db.getCollection('BankAccount').aggregate(pipeline(175000, 25000), options);
-db.getCollection('BankAccount').aggregate(pipeline(200000, 25000), options);
+
+var pageSize = 25000;
+
+var baCount = db.getCollection('BankAccount').count();
+var baPages = Math.ceil(baCount / pageSize);
+
+print('BA COUNT/BA_PAGES:', baCount, baPages);
+
+var allBankAccounts = [];
+for(let i = 0; i < baPages; ++i) {
+    var result = db.getCollection('BankAccount').aggregate(pipeline(i * pageSize, pageSize), options).toArray();
+    allBankAccounts.push(...result[0].accounts);
+}
+
+printjson({ accounts: allBankAccounts });
