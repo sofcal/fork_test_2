@@ -1845,32 +1845,32 @@ describe('@sage/bc-Transaction.Transaction', function(){
                     describe(`providerAdditionalFields.${target}`, function () {
                         _.each(tests, (test, index) => {
                             it(test.it, (done) => {
-                            try {
-                                newTransaction.providerAdditionalFields[0][target] = test.value;
+                                try {
+                                    newTransaction.providerAdditionalFields[0][target] = test.value;
 
-                                Transaction.validate(newTransaction);
+                                    Transaction.validate(newTransaction);
 
-                                const result = test.error ? new Error(`${target} test ${index + 1}: should have thrown`) : undefined;
-                                done(result);
-                            } catch (err) {
-                                if (!test.error) {
-                                    done((err instanceof Error) ? err : new Error());
-                                } else {
-                                    should(err).be.instanceOf(StatusCodeError);
-                                    should(err.statusCode).eql(400);
-                                    should(err.items[0].applicationCode).eql(common.services.common.InvalidProperties);
-                                    should(err.items[0].params.providerAdditionalFields[target]).eql(_.isArray(test.value) ? test.value[0] : test.value);
+                                    const result = test.error ? new Error(`${target} test ${index + 1}: should have thrown`) : undefined;
+                                    done(result);
+                                } catch (err) {
+                                    if (!test.error) {
+                                        done((err instanceof Error) ? err : new Error());
+                                    } else {
+                                        should(err).be.instanceOf(StatusCodeError);
+                                        should(err.statusCode).eql(400);
+                                        should(err.items[0].applicationCode).eql(common.services.common.InvalidProperties);
+                                        should(err.items[0].params.providerAdditionalFields[target]).eql(_.isArray(test.value) ? test.value[0] : test.value);
 
-                                    done();
+                                        done();
+                                    }
                                 }
-                            }
-                        })
-                    })
-                    })
+                            });
+                        });
+                    });
                 };
 
                 let runReceiptObjectTest = function(target, tests) {
-                    describe.only(`providerAdditionalFields.object.${target}`, function () {
+                    describe(`providerAdditionalFields.object.${target}`, function () {
                         _.each(tests, (test, index) => {
                             it(test.it, (done) => {
                                 try {
@@ -1893,9 +1893,9 @@ describe('@sage/bc-Transaction.Transaction', function(){
                                         done();
                                     }
                                 }
-                            })
-                        })
-                    })
+                            });
+                        });
+                    });
                 };
 
                 _.each(tests, function(test){
@@ -1936,10 +1936,6 @@ describe('@sage/bc-Transaction.Transaction', function(){
 
                 _.each(actionPostingInstructionsTests, function (test) {
                     runActionPostingInstructionsTests(test.target, test.tests, test.errorCode, test.errorNumber);
-                });
-
-                _.each(additionalFieldsTests, (test) => {
-                    runAdditionalFieldsTest(test.target, test.tests);
                 });
 
                 _.each(additionalFieldsTests, (test) => {
