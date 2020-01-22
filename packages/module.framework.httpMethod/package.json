@@ -1,6 +1,6 @@
 {
   "name": "@sage/bc-framework-httpmethod",
-  "version": "1.1.129",
+  "version": "1.1.131",
   "author": "Sage UK",
   "license": "ISC",
   "description": "Banking Cloud framework/lib/common/httpMethod module",
