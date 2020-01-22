@@ -21,9 +21,11 @@ utils.audienceInvalid = (aud, validAudiences) => !validAudiences.includes(aud);
 // returns boolean
 utils.clientInvalid = (azp, validClientIds) => !validClientIds.includes(azp);
 
+utils.scopeInvalid = (scope, validScopes) => !validScopes.includes(scope);
+
 // Validate token header and payload
 // returns boolean
-utils.validateToken = ({ payload: { exp, iss, aud, azp } = {}, header: { alg = 'none' } = {} } = {}, validIssuers, validAudiences, validClients) => {
+utils.validateToken = ({ payload: { exp, iss, aud, azp, scope } = {}, header: { alg = 'none' } = {} } = {}, validIssuers, validAudiences, validClients, validScopes) => {
     // check for expired token
     if (utils.expired(exp)) {
         throw new Error('authTokenExpired');
@@ -42,8 +44,13 @@ utils.validateToken = ({ payload: { exp, iss, aud, azp } = {}, header: { alg = '
     }
     // check if client recognised
     if (validClients && utils.clientInvalid(azp, validClients)) {
-            throw new Error('authTokenClientInvalid');
+        throw new Error('authTokenClientInvalid');
     }
+    // check if scope is appropriate
+    if (validScopes && utils.scopeInvalid(scope, validScopes)) {
+        throw new Error('authTokenScopeInvalid');
+    }
+
     return true;
 };
 
