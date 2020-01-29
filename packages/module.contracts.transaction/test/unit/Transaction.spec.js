@@ -170,7 +170,7 @@ describe('@sage/bc-Transaction.Transaction', function(){
                 }
             }
         }
-    };
+    }
 
     function ConfirmError(error, errorCode, applicationCode) {
         error.should.be.an.instanceOf(StatusCodeError);

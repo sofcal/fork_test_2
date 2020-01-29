@@ -18,7 +18,7 @@
     "@babel/preset-env": "^7.5.4",
     "@sage/sfab-s2s-jwt-cache": "^1.1.131",
     "@sage/sfab-s2s-jwt-jwks": "^1.1.131",
-    "bluebird": "^3.5.1",
+    "bluebird": "3.5.5",
     "needle": "^2.2.4"
   },
   "devDependencies": {
