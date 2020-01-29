@@ -18,7 +18,7 @@ class ResultsSummary {
     }
 
     updateCSV() {
-        const initial = 'Product,Organisations,Companies,BankAccounts,ActiveBankAccounts,Transactions,TotalCredit,TotalDebit,TotalAbsolute';
+        const initial = 'Product,Organisations,Companies,BankAccounts,ActiveBankAccounts,Transactions,TotalCredit,TotalDebit,TotalAbsolute,SiteNotSupported,Direct,SISS,Plaid,Yodlee,PM_ACI,PB_Success,PM_Failed,PM_Delayed';
         this.csv = _.reduce(this.products, (memo, product) => {
             return `${memo}\n${product.toCSV()}`;
         }, initial);

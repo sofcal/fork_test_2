@@ -21,7 +21,7 @@
     "@sage/bc-jsonschema-to-statuscodeerror": "^1.1.127",
     "@sage/bc-util-httpmethod": "^1.1.127",
     "bignumber.js": "^4.0.0",
-    "bluebird": "^3.5.1",
+    "bluebird": "3.5.5",
     "jsonschema": "^1.2.4",
     "safe-access": "^0.1.0",
     "underscore": "^1.9.0"

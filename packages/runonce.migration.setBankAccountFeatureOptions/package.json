@@ -14,7 +14,7 @@
     "@sage/bc-services-s3": "^1.1.127",
     "aws-sdk": "^2.220.1",
     "bignumber.js": "^4.0.0",
-    "bluebird": "^3.5.1",
+    "bluebird": "3.5.5",
     "moment": "^2.10.2",
     "mongodb": "3.0.5",
     "underscore": "^1.9.0"

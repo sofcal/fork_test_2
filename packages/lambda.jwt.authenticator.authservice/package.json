@@ -13,7 +13,7 @@
     "@sage/sfab-s2s-jwt-authenticator-lambda": "^1.1.127",
     "@sage/sfab-s2s-jwt-cache": "^1.1.127",
     "aws-sdk": "^2.220.1",
-    "bluebird": "^3.5.1",
+    "bluebird": "3.5.5",
     "jsonwebtoken": "^8.5.0",
     "node-cache": "^4.2.0",
     "node-jose": "^1.1.3",

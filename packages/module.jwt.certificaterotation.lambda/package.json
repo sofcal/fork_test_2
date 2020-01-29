@@ -21,7 +21,7 @@
     "@sage/bc-requestlogger": "^1.1.127",
     "@sage/bc-services-parameter": "^1.1.127",
     "@sage/bc-util-fuzzyaccess": "^1.1.127",
-    "bluebird": "^3.5.1",
+    "bluebird": "3.5.5",
     "keypair": "^1.0.1",
     "underscore": "^1.9.0"
   },
