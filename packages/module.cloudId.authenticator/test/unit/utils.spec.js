@@ -15,7 +15,8 @@ describe('@sage/sfab-s2s-cloudId-authenticator.utils', () => {
             'issuerInvalid',
             'validateToken',
             'audienceInvalid',
-            'audienceInvalid'
+            'clientInvalid',
+            'scopeInvalid'
         );
         done();
     });
@@ -47,16 +48,35 @@ describe('@sage/sfab-s2s-cloudId-authenticator.utils', () => {
 
     describe('issuerInvalid', () => {
         it('Should return false when issuer in list', () => {
-            const list = ['a', 'b', 'c'];
+            const list = 'a,b,c';
             const issuer = 'a';
             should.strictEqual(issuerInvalid(issuer, list), false);
         });
         it('Should return true when issuer not in list', () => {
-            const list = ['a', 'b', 'c'];
+            const list = 'a,b,c';
             const issuer = 'd';
             should.strictEqual(issuerInvalid(issuer, list), true);
         });
         it('Should return true when no valid issuers', () => {
+            const list = [];
+            const issuer = 'a';
+            should.strictEqual(issuerInvalid(issuer, list), true);
+        });
+    });
+
+
+    describe('scopeInvalid', () => {
+        it('Should return false when scope in list', () => {
+            const list = 'a,b,c';
+            const issuer = 'a';
+            should.strictEqual(issuerInvalid(issuer, list), false);
+        });
+        it('Should return true when scope not in list', () => {
+            const list = 'a,b,c';
+            const issuer = 'd';
+            should.strictEqual(issuerInvalid(issuer, list), true);
+        });
+        it('Should return true when no valid scope', () => {
             const list = [];
             const issuer = 'a';
             should.strictEqual(issuerInvalid(issuer, list), true);
@@ -75,10 +95,10 @@ describe('@sage/sfab-s2s-cloudId-authenticator.utils', () => {
                 azp: 'testa',
                 exp: 0,
             }
-        }
-        const validIssuers = ['testa', 'testb', 'testc'];
-        const validAudiences = ['testa', 'testb', 'testc'];
-        const validClients = ['testa', 'testb', 'testc'];
+        };
+        const validIssuers = 'testa,testb,testc';
+        const validAudiences = 'testa,testb,testc';
+        const validClients = 'testa,testb,testc';
 
         before(() => {
             expiredStub = sinon.stub(utils, 'expired');
@@ -117,7 +137,7 @@ describe('@sage/sfab-s2s-cloudId-authenticator.utils', () => {
                         azp: 'testa'
                     }
                 }
-            )
+            );
 
             should.throws(() => validateToken(unsignedToken, validIssuers, validAudiences, validClients), /^Error: invalidAuthToken$/);
         });
@@ -128,7 +148,7 @@ describe('@sage/sfab-s2s-cloudId-authenticator.utils', () => {
             issuerInvalidStub.returns(false);
 
             should.throws(() => validateToken(undefined, validIssuers, validAudiences, validClients), /^Error: invalidAuthToken$/);
-        })
+        });
 
         it('Returns true when auth token valid', () => {
             expiredStub.returns(false);

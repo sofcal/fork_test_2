@@ -199,8 +199,13 @@ module.exports = (function() {
             fileIdentificationNumber: /^.{0,255}$/,
             internalProcessingStatus: /^releasing$/,
             providerAdditionalFields: {
-                name: /^.{1,50}$/,
+                name: /^receipt$/,
                 value: /^.{1,50}$/,
+                object: {
+                    currency: /^[A-Z]{3}$/,
+                    receiptDate: /^[2][0|1][0-9]{2}-(?:[0][1-9]|[1][0-2])-(?:[0-2][0-9]|3[0-1])T(?:[0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$/,
+                    merchantName: /^.{0,128}$/
+                }
             },
             transactionNarrative: /^.{0,738}$/ // 732 = 32 (narrative1) + 32 (narrative2) + 512 (name) + 32 (referenceNumber) + 100 (extendedName) + 12 (payeeId) + 12 (checkNum) = 6 (padding between individual fields)
         },

@@ -255,13 +255,27 @@ Transaction.validate = Transaction.Validate = function(transaction, noThrow, sm)
         _.each(fields, (field) => {
             const properties = [
                 { path: 'name', regex: resources.regex.transaction.providerAdditionalFields.name },
-                { path: 'value', regex: resources.regex.transaction.providerAdditionalFields.value }
+                { path: 'value', regex: resources.regex.transaction.providerAdditionalFields.value, optional: true, allowNull: true},
+                { path: 'object', nested: validateProviderAdditionalObject , optional: true, allowNull: true},
             ];
 
-        items.push(...utils.validateContractObjectNoThrow(field, Object, properties, 'providerAdditionalFields'));
-    });
+            items.push(...utils.validateContractObjectNoThrow(field, Object, properties, 'providerAdditionalFields'));
+        });
 
         return items;
+    };
+
+    const validateProviderAdditionalObject = (value) => {
+        // only possibility is a receipt right now
+        const properties = [
+            { path: 'currency', regex: resources.regex.transaction.providerAdditionalFields.object.currency, optional: false, allowNull: false },
+            { path: 'total', custom: validateNumber, optional: false, allowNull: false },
+            { path: 'receiptDate', custom: _.isDate, optional: false, allowNull: false },
+            { path: 'merchantName', regex: resources.regex.transaction.providerAdditionalFields.object.merchantName, optional: false, allowNull: false }
+        ];
+
+        const valType = utils.validateTypeNoThrow(value, Object, { path: 'object', prefix: Transaction.name });
+        return valType ? [valType] : utils.validateContractObjectNoThrow(value, Object, properties);
     };
 
     const validatePredictedActions = (predictedAction) => {

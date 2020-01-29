@@ -35,7 +35,7 @@ class CloudIdAuthenticatorLambda extends Handler {
                 // one time instantiation - we'll re-use these
                 logger.info({ function: func, log: 'started' });
 
-                const { validClients, validIssuer, validAudiences, jwksCache, jwksRateLimit, jwksRequestsPerMinute } = this.config;
+                const { validClients, validIssuer, validAudiences, jwksCache, jwksRateLimit, validScopes, jwksRequestsPerMinute } = this.config;
 
                 const jwksClient = jwksRsa({
                     cache: jwksCache || true,
@@ -46,7 +46,7 @@ class CloudIdAuthenticatorLambda extends Handler {
                 });
 
                 logger.info({ function: func, log: 'creating auth service' });
-                this.auth = CloudIdAuthenticator.Create(validIssuer, validAudiences, validClients, jwksClient, { logger });
+                this.auth = CloudIdAuthenticator.Create({ validIssuer, validAudiences, validClients, validScopes }, jwksClient, { logger });
 
                 logger.info({ function: func, log: 'ended' });
                 return true;
