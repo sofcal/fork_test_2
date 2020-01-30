@@ -94,8 +94,7 @@ class Bank {
             { path: 'supportiframe', custom: _.isBoolean },
             { path: 'recentFileHistory', nested: val.validateRecentFileHistory, optional: true, allowNull: true },
             { path: 'internal', nested: val.validateInternal, optional: true, allowNull: true },
-            { path: 'provider', nested: val.validateProvider, optional: false, allowNull: false },
-            { path: 'minRequestedStartDate', custom: _.isDate, optional: true, allowNull: true }
+            { path: 'provider', nested: val.validateProvider, optional: false, allowNull: false }
         ];
 
         /* aggregator feature */
