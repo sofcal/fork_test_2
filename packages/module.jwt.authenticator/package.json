@@ -17,7 +17,7 @@
     "@babel/core": "^7.5.4",
     "@babel/preset-env": "^7.5.4",
     "@sage/sfab-s2s-jwt-endpoint-store": "^1.1.131",
-    "bluebird": "^3.5.1",
+    "bluebird": "3.5.5",
     "jsonwebtoken": "^8.5.0",
     "underscore": "^1.9.0"
   },

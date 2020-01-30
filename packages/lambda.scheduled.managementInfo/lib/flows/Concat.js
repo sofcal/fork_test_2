@@ -114,7 +114,7 @@ const mergeProductAndOrphans = Promise.method((results, reducedProduct, groupedO
      * NOTE: This is a tight loop, and so logging is kept to a minimum for performance reasons
      */
 
-    const product = new ProductSummary({ productId, productName });
+    const product = new ProductSummary({ productId, productName, logger });
 
     // the goal here is to match up any 'missing' bankAccounts on any organisation, with the actual bank account found in
     // in the other region. Some of these missing accounts may not exist, and likewise, once we've finished all products,
@@ -144,12 +144,8 @@ const mergeProductAndOrphans = Promise.method((results, reducedProduct, groupedO
             }
 
             // update the bank account properties on the org for when we're doing our summaries a little later.
+            _.extend(foundOnOrg, orphan);
             foundOnOrg.missing = false;
-            foundOnOrg.status = orphan.status;
-            foundOnOrg.bankId = orphan.bankId;
-            foundOnOrg.bankName = orphan.bankName;
-            foundOnOrg.aggregatorName = orphan.aggregatorName;
-            foundOnOrg.accountantManaged = orphan.accountantManaged;
 
             if (!orphan.transactionSummary) {
                 // the bank account exists, but there are no transactions. So we can skip the next part
@@ -182,7 +178,7 @@ const mergeProductAndOrphans = Promise.method((results, reducedProduct, groupedO
 });
 
 const summariseRemainingOrphans = (results, groupedOrphans, logger) => {
-    const func = `${consts.LOG_PREFIX}.mergeProductAndOrphans`;
+    const func = `${consts.LOG_PREFIX}.summariseRemainingOrphans`;
     logger.info({ function: func, log: 'started', params: { } });
 
     // now that each orphan has been checked against all the organisations, groupedOrphans should only contain

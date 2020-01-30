@@ -17,6 +17,20 @@ const consts = {
     all: 'ALL'
 };
 
+// events
+// firstRegion
+// {
+//   "products": "ALL",
+//   "orphans": true
+// }
+//
+// otherRegion
+// {
+//   "products": "ALL",
+//   "orphans": true,
+//   "concat": "ALL"
+// }
+
 module.exports.run = Promise.method((event, params, services) => {
     const func = 'impl.run';
     event.logger.info({ function: func, log: 'started' });
@@ -98,6 +112,8 @@ module.exports.run = Promise.method((event, params, services) => {
                 }); // eslint-disable-line function-paren-newline
         })
         .then(() => {
+            event.logger.info({ function: func, log: 'concatenation started', params: { concat } });
+
             if (!concat) {
                 event.logger.info({ function: func, log: 'concat flag not specified on event. Skipping data concatenation.', params: { } });
                 return undefined;
