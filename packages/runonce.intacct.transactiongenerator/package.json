@@ -1,6 +1,6 @@
 {
   "name": "runonce-intacct-transactiongenerator",
-  "version": "1.1.131",
+  "version": "1.1.133",
   "author": "Sage UK",
   "license": "ISC",
   "description": "",
@@ -11,11 +11,11 @@
   },
   "dependencies": {
     "@sage/bc-common-statuscodeerror": "^1.1.131",
-    "@sage/bc-independent-lambda-handler": "^1.1.131",
+    "@sage/bc-independent-lambda-handler": "^1.1.133",
     "@sage/bc-infrastructure-cloudwatch-subscription": "^1.1.3",
-    "@sage/bc-parameterstore-static-loader": "^1.1.131",
+    "@sage/bc-parameterstore-static-loader": "^1.1.133",
     "@sage/bc-requestlogger": "^1.1.131",
-    "@sage/bc-services-db": "^1.1.131",
+    "@sage/bc-services-db": "^1.1.133",
     "aws-sdk": "^2.220.1",
     "bignumber.js": "^4.0.0",
     "bluebird": "3.5.5",

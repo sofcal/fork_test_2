@@ -37,7 +37,8 @@ class Bank {
 
             this.internal = {
                 longURL: access(data, 'internal.longURL') || false,
-                bankUrl: access(data, 'internal.bankUrl') || null
+                bankUrl: access(data, 'internal.bankUrl') || null,
+                minRequestedStartDate: access(data, 'internal.minRequestedStartDate') || null
             };
 
             this.provider = {};

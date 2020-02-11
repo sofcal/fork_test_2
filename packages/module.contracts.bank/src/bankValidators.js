@@ -100,7 +100,8 @@ const bankValidators = (bank) => {
 
         validateInternal: (internal) => {
             const properties = [
-                { path: 'longURL', custom: _.isBoolean, optional: true, allowNull: true }
+                { path: 'longURL', custom: _.isBoolean, optional: true, allowNull: true },
+                { path: 'minRequestedStartDate', custom: _.isDate, optional: true, allowNull: true }
             ];
 
             const valType = validators.validateTypeNoThrow(internal, Object, { path: 'internal', prefix: 'Bank' });

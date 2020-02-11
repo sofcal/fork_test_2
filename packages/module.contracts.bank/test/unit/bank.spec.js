@@ -176,7 +176,8 @@ describe('@sage/bc-contracts-bank.Bank', () => {
                     should(bank.supportiframe).eql(false);
                     should(bank.internal).eql({
                         "longURL": false,
-                        "bankUrl": null
+                        "bankUrl": null,
+                        "minRequestedStartDate": null
                     });
                     should(bank.provider).eql({
                         providerId: bankProviderId,
@@ -210,7 +211,8 @@ describe('@sage/bc-contracts-bank.Bank', () => {
                     should(bank.offBoardingMechanism).eql({ type: Bank.offBoardingTypes.none, instructions: '' });
                     should(bank.internal).eql({
                         "longURL": false,
-                        "bankUrl": null
+                        "bankUrl": null,
+                        "minRequestedStartDate": null
                     });
                     should(bank.proxy).be.null();
                     should(bank.supportiframe).eql(true);
@@ -489,11 +491,6 @@ describe('@sage/bc-contracts-bank.Bank', () => {
                         { it: 'should throw if supportiframe is a string', value: 'true', error: true },
                         { it: 'should throw if supportiframe is a number', value: 0, error: true },
                         { it: 'should throw if supportiframe is an object', value: {}, error: true }
-                    ]
-                }, {
-                    target: 'internal.longURL', tests: [
-                        { it: 'should not throw if internal.longURL is boolean true', value: true, error: false },
-                        { it: 'should not throw if internal.longURL is boolean false', value: false, error: false }
                     ]
                 }, {
                     target: 'quarantine',
@@ -1144,6 +1141,29 @@ describe('@sage/bc-contracts-bank.Bank', () => {
                 }
             ];
 
+            const bankInternalTests = [
+                {
+                    target: 'longURL',
+                    tests: [
+                        { it: 'should not throw if internal.longURL is boolean true', value: true, error: false },
+                        { it: 'should not throw if internal.longURL is boolean false', value: false, error: false }
+                    ]
+                }, {
+                    target: 'minRequestedStartDate',
+                    tests: [
+                        { it: 'should not throw if internal.minRequestedStartDate is undefined', value: undefined, error: false },
+                        { it: 'should not throw if internal.minRequestedStartDate is null', value: null, error: false },
+                        { it: 'should throw if internal.minRequestedStartDate is boolean true', value: true, error: true },
+                        { it: 'should throw if internal.minRequestedStartDate is boolean false', value: false, error: true },
+                        { it: 'should throw if internal.minRequestedStartDate is a zero length string', value: '', error: true },
+                        { it: 'should not throw if internal.minRequestedStartDate is a valid date', value: new Date(), error: false },
+                        { it: 'should throw if internal.minRequestedStartDate is a string', value: 'WrongDate', error: true },
+                        { it: 'should throw if internal.minRequestedStartDate is a number', value: 6, error: true },
+                        { it: 'should throw if internal.minRequestedStartDate is an object', value: {}, error: true }
+                    ]
+                }
+            ];
+
             const runTest = function(target, tests) {
                 describe(target, function() {
                     _.each(tests, function(test, index) {
@@ -1208,6 +1228,35 @@ describe('@sage/bc-contracts-bank.Bank', () => {
                 })
             };
 
+            const runInternalTests = function(target, tests) {
+                describe(target, function() {
+                    _.each(tests, function(test, index) {
+                        it(test.it, function(done) {
+                            try {
+                                bank.internal[target] = test.value;
+
+                                let result = test.error ? new Error(target + ' test ' + index + ': should have thrown') : undefined;
+
+                                Bank.validate(bank);
+
+                                done(result);
+                            } catch(err) {
+                                if(!test.error) {
+                                    done((err instanceof Error) ? err : new Error());
+                                } else {
+                                    err.should.be.instanceOf(StatusCodeError);
+                                    err.statusCode.should.eql(400);
+                                    err.items[0].applicationCode.should.eql(Resources.services.common.InvalidProperties);
+                                    should(err.items[0].params[target]).eql(_.isArray(test.value) ? test.value[0] : test.value);
+
+                                    done();
+                                }
+                            }
+                        })
+                    })
+                })
+            };
+
             const runAccountTypesTests = function(target, tests) {
                 describe(target, function() {
                     _.each(tests, function(test, index) {
@@ -1248,6 +1297,10 @@ describe('@sage/bc-contracts-bank.Bank', () => {
 
             _.each(mandatoryCustomerBankDetailsTests, function(test) {
                 runMandatoryCustomerBankDetailsTests(test.target, test.tests);
+            });
+
+            _.each(bankInternalTests, function(test) {
+                runInternalTests(test.target, test.tests);
             });
 
             it('should not throw for valid data', (done) => {
