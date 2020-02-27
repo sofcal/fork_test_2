@@ -1048,6 +1048,17 @@ describe('@sage/bc-contracts-bank.Bank', () => {
                         { it: 'should throw if provider.authUrl is a number', value: { providerId: bankProviderId, authUrl: 3 }, error: true, skipParamAssert: true },
                         { it: 'should throw if provider.authUrl is an object', value: { providerId: bankProviderId, authUrl: {} }, error: true, skipParamAssert: true }
                     ]
+                }, {
+                    target: 'popularBank',
+                    tests: [
+                        { it: 'should not throw if popularBank is a boolean', value: true, error: false },
+                        { it: 'should throw if popularBank is undefined', value: undefined, error: true },
+                        { it: 'should throw if popularBank is null', value: null, error: true },
+                        { it: 'should throw if popularBank is an empty string', value: '', error: true },
+                        { it: 'should throw if popularBank is not a boolean', value: 'not-a-uuid', error: true },
+                        { it: 'should throw if popularBank is a number', value: 9, error: true },
+                        { it: 'should throw if popularBank is an object', value: {}, error: true }
+                    ]
                 }
             ];
 

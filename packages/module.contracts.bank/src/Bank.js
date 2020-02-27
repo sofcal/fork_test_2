@@ -34,6 +34,7 @@ class Bank {
             this.quarantine = data.quarantine || { forceQuarantine: false, transactionTypes: [] };
             this.proxy = data.proxy || null;
             this.supportiframe = !_.isUndefined(data.supportiframe) ? data.supportiframe : true;
+            this.popularBank = data.popularBank || false;
 
             this.internal = {
                 longURL: access(data, 'internal.longURL') || false,
@@ -94,7 +95,8 @@ class Bank {
             { path: 'supportiframe', custom: _.isBoolean },
             { path: 'recentFileHistory', nested: val.validateRecentFileHistory, optional: true, allowNull: true },
             { path: 'internal', nested: val.validateInternal, optional: true, allowNull: true },
-            { path: 'provider', nested: val.validateProvider, optional: false, allowNull: false }
+            { path: 'provider', nested: val.validateProvider, optional: false, allowNull: false },
+            { path: 'popularBank', custom: _.isBoolean, optional: false, allowNull: false }
         ];
 
         /* aggregator feature */
