@@ -361,6 +361,8 @@ describe('@sage/bc-contracts-bank.Bank', () => {
                     tests: [
                         { it: 'should not throw if authorisationMechanism is web', value: 'web', error: false },
                         { it: 'should not throw if authorisationMechanism is form', value: 'form', error: false },
+                        { it: 'should not throw if authorisationMechanism is direct', value: 'direct', error: false },
+                        { it: 'should not throw if authorisationMechanism is oauth', value: 'oauth', error: false },
                         { it: 'should throw if authorisationMechanism is undefined', value: undefined, error: true },
                         { it: 'should throw if authorisationMechanism is null', value: null, error: true },
                         { it: 'should throw if authorisationMechanism is a zero length string', value: '', error: true },

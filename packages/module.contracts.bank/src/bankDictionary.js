@@ -5,6 +5,7 @@ const dictionary = {
         web: 'web',
         form: 'form',
         direct: 'direct',
+        oauth: 'oauth'
     },
 
     accountTypes: {

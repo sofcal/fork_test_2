@@ -155,7 +155,7 @@ module.exports = (function() {
             name: /^.{1,128}$/,
             primaryCountry: /^[A-Z]{3}$/,
             primaryCountry2CharIso: /^[A-Z]{2}$/,
-            authorisationMechanism: /^web|form|direct$/,
+            authorisationMechanism: /^web|form|direct|oauth$/,
             authorisationData: /^[\s\S]{1,1024}$/, // match whitespace & non whitespace for multi-line matching
             topicName: /^.{1,255}$/,
             path: /^.{1,255}$/,
