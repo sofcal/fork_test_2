@@ -1,6 +1,6 @@
 {
   "name": "lambda-antivirus",
-  "version": "1.1.134",
+  "version": "1.1.135",
   "author": "",
   "license": "ISC",
   "description": "",
@@ -8,9 +8,9 @@
   "main": "lib/handler.js",
   "dependencies": {
     "@sage/bc-common-statuscodeerror": "^1.1.131",
-    "@sage/bc-parameterstore-static-loader": "^1.1.134",
+    "@sage/bc-parameterstore-static-loader": "^1.1.135",
     "@sage/bc-requestlogger": "^1.1.131",
-    "@sage/bc-services-db": "^1.1.134",
+    "@sage/bc-services-db": "^1.1.135",
     "@sage/rtx.services.antivirus": "^0.0.1",
     "aws-sdk": "^2.220.1",
     "bluebird": "3.5.5",
