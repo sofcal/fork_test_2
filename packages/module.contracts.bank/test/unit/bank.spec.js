@@ -176,13 +176,13 @@ describe('@sage/bc-contracts-bank.Bank', () => {
                     should(bank.supportiframe).eql(false);
                     should(bank.internal).eql({
                         "longURL": false,
-                        "bankUrl": null,
                         "minRequestedStartDate": null
                     });
                     should(bank.provider).eql({
                         providerId: bankProviderId,
                         authUrl: 'authUrl'
                     });
+                    should(bank.bankURL).eql(null);
 
                     done();
                 } catch (err) {
@@ -211,13 +211,13 @@ describe('@sage/bc-contracts-bank.Bank', () => {
                     should(bank.offBoardingMechanism).eql({ type: Bank.offBoardingTypes.none, instructions: '' });
                     should(bank.internal).eql({
                         "longURL": false,
-                        "bankUrl": null,
                         "minRequestedStartDate": null
                     });
                     should(bank.proxy).be.null();
                     should(bank.supportiframe).eql(true);
                     should(bank.dataProvider).eql(Bank.dataProviders.direct);
                     should(bank.provider).eql({ authUrl: null, providerId: null });
+                    should(bank.bankURL).eql(null);
 
                     done();
                 } catch (err) {

@@ -38,13 +38,13 @@ class Bank {
 
             this.internal = {
                 longURL: access(data, 'internal.longURL') || false,
-                bankUrl: access(data, 'internal.bankUrl') || null,
                 minRequestedStartDate: access(data, 'internal.minRequestedStartDate') || null
             };
 
             this.provider = {};
             this.provider.authUrl = access(data, 'provider.authUrl') || null;
             this.provider.providerId = access(data, 'provider.providerId') || null;
+            this.bankURL = access(data, 'bankURL') || null;
 
             /* aggregator feature */
             if (plaidFeatureEnabled) {
