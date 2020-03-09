@@ -1,6 +1,6 @@
 {
   "name": "@sage/sfab-s2s-jwt-legacy-wrapper",
-  "version": "1.1.138",
+  "version": "1.1.139",
   "author": "Sage UK",
   "license": "ISC",
   "description": "Legacy Wrapper for components used within Banking Cloud. These modules are installed locally using npm > 6 and then copied into the Banking Cloud solution to reduce dependency overhead (due to BC's use of npm 2.15.1)",
