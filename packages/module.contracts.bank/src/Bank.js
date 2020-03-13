@@ -96,7 +96,8 @@ class Bank {
             { path: 'recentFileHistory', nested: val.validateRecentFileHistory, optional: true, allowNull: true },
             { path: 'internal', nested: val.validateInternal, optional: true, allowNull: true },
             { path: 'provider', nested: val.validateProvider, optional: false, allowNull: false },
-            { path: 'popularBank', custom: _.isBoolean, optional: false, allowNull: false }
+            { path: 'popularBank', custom: _.isBoolean, optional: false, allowNull: false },
+            { path: 'bankURL', custom: _.isString, optional: true, allowNull: true }
         ];
 
         /* aggregator feature */
