@@ -1,6 +1,6 @@
 {
   "name": "@sage/sfab-s2s-jwt-cache",
-  "version": "1.1.134",
+  "version": "1.1.138",
   "author": "Sage UK",
   "license": "ISC",
   "description": "Banking Cloud data cache module",
@@ -24,7 +24,7 @@
     "@babel/preset-env": "^7.5.4",
     "@babel/preset-flow": "^7.0.0",
     "@babel/register": "^7.4.4",
-    "@sage/bc-debug-utils": "^1.1.131",
+    "@sage/bc-debug-utils": "^1.1.138",
     "babel-eslint": "^10.0.2",
     "babel-plugin-istanbul": "^5.1.4",
     "babel-plugin-transform-async-to-promises": "^0.8.12",

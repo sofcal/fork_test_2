@@ -38,13 +38,13 @@ class Bank {
 
             this.internal = {
                 longURL: access(data, 'internal.longURL') || false,
-                bankUrl: access(data, 'internal.bankUrl') || null,
                 minRequestedStartDate: access(data, 'internal.minRequestedStartDate') || null
             };
 
             this.provider = {};
             this.provider.authUrl = access(data, 'provider.authUrl') || null;
             this.provider.providerId = access(data, 'provider.providerId') || null;
+            this.bankURL = access(data, 'bankURL') || null;
 
             /* aggregator feature */
             if (plaidFeatureEnabled) {
@@ -96,7 +96,8 @@ class Bank {
             { path: 'recentFileHistory', nested: val.validateRecentFileHistory, optional: true, allowNull: true },
             { path: 'internal', nested: val.validateInternal, optional: true, allowNull: true },
             { path: 'provider', nested: val.validateProvider, optional: false, allowNull: false },
-            { path: 'popularBank', custom: _.isBoolean, optional: false, allowNull: false }
+            { path: 'popularBank', custom: _.isBoolean, optional: false, allowNull: false },
+            { path: 'bankURL', custom: _.isString, optional: true, allowNull: true }
         ];
 
         /* aggregator feature */
