@@ -1008,7 +1008,7 @@ describe('@sage/bc-contracts-bank.Bank', () => {
                     target: 'bankURL',
                     tests: [
                         { it: 'should throw if bankURL is undefined', value: undefined, error: true },
-                        { it: 'should throw if bankURL is null', value: null, error: false },
+                        { it: 'should not throw if bankURL is null', value: null, error: false },
                         { it: 'should not throw if bankURL is string', value: 'https://someurl.com/', error: false },
                         { it: 'should throw if bankURL is number', value: 8008135, error: true },
                         { it: 'should throw if bankURL is object', value: {}, error: true }
