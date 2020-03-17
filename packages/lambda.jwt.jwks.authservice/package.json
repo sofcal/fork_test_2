@@ -1,6 +1,6 @@
 {
   "name": "lambda-jwt-jwks-authservice",
-  "version": "1.1.138",
+  "version": "1.1.139",
   "author": "",
   "license": "ISC",
   "description": "",
@@ -8,8 +8,8 @@
   "main": "lib/index.js",
   "dependencies": {
     "@sage/bc-common-statuscodeerror": "^1.1.131",
-    "@sage/sfab-s2s-jwt-jwks": "^1.1.138",
-    "@sage/sfab-s2s-jwt-jwks-lambda": "^1.1.138",
+    "@sage/sfab-s2s-jwt-jwks": "^1.1.139",
+    "@sage/sfab-s2s-jwt-jwks-lambda": "^1.1.139",
     "aws-sdk": "^2.220.1",
     "bluebird": "3.5.5",
     "underscore": "^1.9.0"
