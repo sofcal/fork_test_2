@@ -1,1 +1,1 @@
-module.exports = require('@sage/parameter-cache');
+module.exports = require('@sage/bc-framework-parametercache');
