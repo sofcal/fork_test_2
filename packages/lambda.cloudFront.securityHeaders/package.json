@@ -1,6 +1,6 @@
 {
   "name": "cloudFront-securityHeaders",
-  "version": "1.1.137",
+  "version": "1.1.138",
   "author": "",
   "license": "ISC",
   "description": "",
@@ -8,7 +8,7 @@
   "private": true,
   "dependencies": {
     "@sage/bc-common-statuscodeerror": "^1.1.131",
-    "@sage/bc-parameterstore-static-loader": "^1.1.137",
+    "@sage/bc-parameterstore-static-loader": "^1.1.138",
     "@sage/bc-requestlogger": "^1.1.131",
     "aws-sdk": "^2.220.1",
     "bluebird": "3.5.5",
