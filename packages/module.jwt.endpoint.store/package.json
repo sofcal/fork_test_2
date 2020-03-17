@@ -1,6 +1,6 @@
 {
   "name": "@sage/sfab-s2s-jwt-endpoint-store",
-  "version": "1.1.135",
+  "version": "1.1.136",
   "author": "Sage UK",
   "license": "ISC",
   "description": "Banking Cloud endpoints store module",
@@ -16,8 +16,8 @@
     "@babel/code-frame": "^7.0.0",
     "@babel/core": "^7.5.4",
     "@babel/preset-env": "^7.5.4",
-    "@sage/sfab-s2s-jwt-cache": "^1.1.135",
-    "@sage/sfab-s2s-jwt-jwks": "^1.1.135",
+    "@sage/sfab-s2s-jwt-cache": "^1.1.136",
+    "@sage/sfab-s2s-jwt-jwks": "^1.1.136",
     "bluebird": "3.5.5",
     "needle": "^2.2.4"
   },

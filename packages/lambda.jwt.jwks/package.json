@@ -1,13 +1,13 @@
 {
   "name": "lambda-jwt-jwks",
-  "version": "1.1.135",
+  "version": "1.1.136",
   "author": "",
   "license": "ISC",
   "description": "",
   "private": true,
   "main": "lib/index.js",
   "dependencies": {
-    "@sage/sfab-s2s-jwt-jwks-lambda": "^1.1.135"
+    "@sage/sfab-s2s-jwt-jwks-lambda": "^1.1.136"
   },
   "devDependencies": {
     "@babel/cli": "^7.5.0",
