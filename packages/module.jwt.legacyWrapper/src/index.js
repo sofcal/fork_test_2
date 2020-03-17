@@ -29,10 +29,8 @@ const Kid = require('@sage/sfab-s2s-jwt-kid');
 const Parameter = require('@sage/bc-services-parameter');
 const Step = require('@sage/bc-services-step');
 const ClamAVWorkers = require('@sage/sfab-workers-clam-av');
-
 const FrameworkConfiguration = require("@sage/bc-framework-configuration");
 const ParameterCache = require("@sage/bc-framework-parametercache");
-const ParameterCacheConfigLoader = require("@sage/bc-framework-parametercache-configloader");
 
 module.exports = {
     common: { StatusCodeErrorItem, StatusCodeError, StatusCodeErrorMapper, resources },
