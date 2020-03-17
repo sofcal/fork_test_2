@@ -1,6 +1,6 @@
 {
   "name": "runonce.incident.bankAccountsByProduct",
-  "version": "1.1.139",
+  "version": "1.1.140",
   "author": "",
   "license": "ISC",
   "description": "",
@@ -8,10 +8,10 @@
   "private": true,
   "dependencies": {
     "@sage/bc-common-statuscodeerror": "^1.1.131",
-    "@sage/bc-parameterstore-static-loader": "^1.1.139",
+    "@sage/bc-parameterstore-static-loader": "^1.1.140",
     "@sage/bc-requestlogger": "^1.1.131",
-    "@sage/bc-services-db": "^1.1.139",
-    "@sage/bc-services-s3": "^1.1.139",
+    "@sage/bc-services-db": "^1.1.140",
+    "@sage/bc-services-s3": "^1.1.140",
     "aws-sdk": "^2.220.1",
     "bluebird": "3.5.5",
     "moment": "^2.10.2",
