@@ -7,13 +7,13 @@ const {
     ParameterCache: { instance: ParameterCacheInstance },
     ParameterLoaders: { ParameterStoreStaticLoader, ParameterStoreDynamicLoader, EnvironmentLoader },
     mocks: ParameterCacheMocks
-} = require('@sage/parameter-cache');
+} = require('@sage/bc-framework-parametercache');
 
 const {
     ConfigLoader, SecretConfigLoader, ConfigMergeLoader,
     mocks: ParameterCacheConfigMocks,
     util: { merge }
-} = require('@sage/parameter-cache-config-loaders');
+} = require('@sage/bc-framework-parametercache-configloaders');
 
 let config = null;
 let actualHash = null;

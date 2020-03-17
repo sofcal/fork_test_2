@@ -1,9 +1,9 @@
 {
-  "name": "@sage/bc-framework-configuration",
+  "name": "@sage/bc-framework-parametercache-configloaders",
   "version": "1.1.142",
   "author": "Sage UK",
   "license": "ISC",
-  "description": "Banking Cloud framework/node_modules/@sage/framework.configuration module",
+  "description": "Banking Cloud framework/node_modules/@sage/framework.configuration/node_modules/@sage/parameter-cache-config-loaders module",
   "main": "lib/index.js",
   "publishConfig": {
     "registry": "https://sage.myget.org/F/npm/npm/",
@@ -16,7 +16,6 @@
     "@babel/code-frame": "^7.0.0-beta.48",
     "@babel/core": "^7.2.2",
     "@babel/preset-env": "^7.0.0-beta.47",
-    "@sage/bc-framework-parametercache": "^1.1.142",
     "aws-sdk": "^2.639.0",
     "bluebird": "^3.5.1",
     "object-hash": "^1.2.0",
