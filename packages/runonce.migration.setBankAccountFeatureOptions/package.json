@@ -1,6 +1,6 @@
 {
   "name": "runonce-migration-setBankAccountFeatureOptions",
-  "version": "1.1.141",
+  "version": "1.1.142",
   "author": "",
   "license": "ISC",
   "description": "",
@@ -8,10 +8,10 @@
   "private": true,
   "dependencies": {
     "@sage/bc-common-statuscodeerror": "^1.1.131",
-    "@sage/bc-parameterstore-static-loader": "^1.1.141",
+    "@sage/bc-parameterstore-static-loader": "^1.1.142",
     "@sage/bc-requestlogger": "^1.1.131",
-    "@sage/bc-services-db": "^1.1.141",
-    "@sage/bc-services-s3": "^1.1.141",
+    "@sage/bc-services-db": "^1.1.142",
+    "@sage/bc-services-s3": "^1.1.142",
     "aws-sdk": "^2.220.1",
     "bignumber.js": "^4.0.0",
     "bluebird": "3.5.5",
