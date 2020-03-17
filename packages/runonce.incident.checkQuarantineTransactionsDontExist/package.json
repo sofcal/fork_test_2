@@ -1,14 +1,14 @@
 {
   "name": "runonce.incident.checkquarantinetransactionsdontexist",
-  "version": "1.1.140",
+  "version": "1.1.141",
   "author": "",
   "license": "ISC",
   "description": "",
   "main": "lib/handler.js",
   "private": true,
   "dependencies": {
-    "@sage/bc-parameterstore-static-loader": "^1.1.140",
-    "@sage/bc-services-db": "^1.1.140",
+    "@sage/bc-parameterstore-static-loader": "^1.1.141",
+    "@sage/bc-services-db": "^1.1.141",
     "aws-sdk": "^2.220.1",
     "bluebird": "3.5.5",
     "mongodb": "3.0.5",
