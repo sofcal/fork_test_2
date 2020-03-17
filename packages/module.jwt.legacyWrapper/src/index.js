@@ -30,6 +30,10 @@ const Parameter = require('@sage/bc-services-parameter');
 const Step = require('@sage/bc-services-step');
 const ClamAVWorkers = require('@sage/sfab-workers-clam-av');
 
+const FrameworkConfiguration = require("@sage/bc-framework-configuration");
+const ParameterCache = require("@sage/bc-framework-parametercache");
+const ParameterCacheConfigLoader = require("@sage/bc-framework-parametercache-configloader");
+
 module.exports = {
     common: { StatusCodeErrorItem, StatusCodeError, StatusCodeErrorMapper, resources },
     contracts: { PredictedAction, Rule, RuleBucket, Transaction, TransactionBucket, Lock, QuarantineBucket, Bank },
@@ -43,5 +47,8 @@ module.exports = {
     Kid,
     Parameter,
     Step,
-    ClamAVWorkers
+    ClamAVWorkers,
+    FrameworkConfiguration,
+    ParameterCache,
+    ParameterCacheConfigLoader
 };
