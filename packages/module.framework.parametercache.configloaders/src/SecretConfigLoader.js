@@ -33,7 +33,6 @@ const loadImpl = Promise.method((self, params) => {
         throw new Error(`[SecretConfigLoader] invalid property - ${pathMessage}${configPropertyMessage}${overridesPropertyMessage}`);
     } else if (invalidParams) {
         const configParamsMessage = !params[configPropertyName] ? `params[${configPropertyName}]: ${params[configPropertyName]}` : '';
-
         throw new Error(`[SecretConfigLoader] invalid params - ${configParamsMessage}`);
     }
 
