@@ -1,6 +1,6 @@
 {
   "name": "lambda-scheduled-keyrotation",
-  "version": "1.1.142",
+  "version": "1.1.148",
   "author": "",
   "license": "ISC",
   "description": "",
@@ -8,7 +8,7 @@
   "private": true,
   "dependencies": {
     "@sage/bc-parameterstore-static-loader": "^1.1.142",
-    "@sage/bc-requestlogger": "^1.1.142",
+    "@sage/bc-requestlogger": "^1.1.148",
     "@sage/bc-services-db": "^1.1.142",
     "aws-sdk": "^2.220.1",
     "bluebird": "3.5.5",
