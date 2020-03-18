@@ -16,7 +16,7 @@
   "dependencies": {
     "@sage/bc-common-resources": "^1.1.141",
     "@sage/bc-common-statuscodeerror": "^1.1.141",
-    "@sage/bc-contracts-bank": "^1.1.141",
+    "@sage/bc-contracts-bank": "^1.1.142",
     "@sage/bc-contracts-lock": "^1.1.141",
     "@sage/bc-contracts-predictedaction": "^1.1.141",
     "@sage/bc-contracts-quarantine": "^1.1.141",
