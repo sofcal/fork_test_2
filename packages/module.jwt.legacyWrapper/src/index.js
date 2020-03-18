@@ -22,6 +22,7 @@ const { RulesEngine } = require('@sage/bc-processing-rules');
 // Other
 const Authenticator = require('@sage/sfab-s2s-jwt-authenticator');
 const Cache = require('@sage/sfab-s2s-jwt-cache');
+const CloudIdAuthenticator = require('@sage/sfab-s2s-cloudid-authenticator');
 const EndpointStore = require('@sage/sfab-s2s-jwt-endpoint-store');
 const Issuer = require('@sage/sfab-s2s-jwt-issuer');
 const Jwks = require('@sage/sfab-s2s-jwt-jwks');
@@ -37,6 +38,7 @@ module.exports = {
     services: { validators },
     processing: { RulesEngine },
     Authenticator,
+    CloudIdAuthenticator,
     Cache,
     EndpointStore,
     Issuer,

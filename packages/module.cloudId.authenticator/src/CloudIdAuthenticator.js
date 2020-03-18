@@ -76,10 +76,10 @@ class Authenticate {
         return new Promise((resolve, reject) => {
             this.jwksClient.getSigningKey(kid, (err, key) => {
                 if (err) {
-                    reject(err);
+                    return reject(err);
                 }
                 const signingKey = key.publicKey || key.rsaPublicKey;
-                resolve(signingKey);
+                return resolve(signingKey);
             });
         });
     };
@@ -92,9 +92,9 @@ class Authenticate {
                 algorithms: ['RS256']
             }, (err, decoded) => {
                 if (err) {
-                    reject(err);
+                    return reject(err);
                 }
-                resolve(decoded);
+                return resolve(decoded);
             });
         });
     };

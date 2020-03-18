@@ -176,13 +176,13 @@ describe('@sage/bc-contracts-bank.Bank', () => {
                     should(bank.supportiframe).eql(false);
                     should(bank.internal).eql({
                         "longURL": false,
-                        "bankUrl": null,
                         "minRequestedStartDate": null
                     });
                     should(bank.provider).eql({
                         providerId: bankProviderId,
                         authUrl: 'authUrl'
                     });
+                    should(bank.bankURL).eql(null);
 
                     done();
                 } catch (err) {
@@ -211,13 +211,13 @@ describe('@sage/bc-contracts-bank.Bank', () => {
                     should(bank.offBoardingMechanism).eql({ type: Bank.offBoardingTypes.none, instructions: '' });
                     should(bank.internal).eql({
                         "longURL": false,
-                        "bankUrl": null,
                         "minRequestedStartDate": null
                     });
                     should(bank.proxy).be.null();
                     should(bank.supportiframe).eql(true);
                     should(bank.dataProvider).eql(Bank.dataProviders.direct);
                     should(bank.provider).eql({ authUrl: null, providerId: null });
+                    should(bank.bankURL).eql(null);
 
                     done();
                 } catch (err) {
@@ -361,6 +361,8 @@ describe('@sage/bc-contracts-bank.Bank', () => {
                     tests: [
                         { it: 'should not throw if authorisationMechanism is web', value: 'web', error: false },
                         { it: 'should not throw if authorisationMechanism is form', value: 'form', error: false },
+                        { it: 'should not throw if authorisationMechanism is direct', value: 'direct', error: false },
+                        { it: 'should not throw if authorisationMechanism is oauth', value: 'oauth', error: false },
                         { it: 'should throw if authorisationMechanism is undefined', value: undefined, error: true },
                         { it: 'should throw if authorisationMechanism is null', value: null, error: true },
                         { it: 'should throw if authorisationMechanism is a zero length string', value: '', error: true },
@@ -1058,6 +1060,17 @@ describe('@sage/bc-contracts-bank.Bank', () => {
                         { it: 'should throw if popularBank is not a boolean', value: 'not-a-uuid', error: true },
                         { it: 'should throw if popularBank is a number', value: 9, error: true },
                         { it: 'should throw if popularBank is an object', value: {}, error: true }
+                    ]
+                }, {
+                    target: 'bankURL',
+                    tests: [
+                        { it: 'should not throw if bankURL is a string', value: 'bob', error: false },
+                        { it: 'should not throw if bankURL is undefined', value: undefined, error: false },
+                        { it: 'should not throw if bankURL is null', value: null, error: false },
+                        { it: 'should throw if bankURL is an empty string', value: '', error: false },
+                        { it: 'should throw if bankURL is a boolean', value: true, error: true },
+                        { it: 'should throw if bankURL is a number', value: 9, error: true },
+                        { it: 'should throw if bankURL is an object', value: {}, error: true }
                     ]
                 }
             ];
