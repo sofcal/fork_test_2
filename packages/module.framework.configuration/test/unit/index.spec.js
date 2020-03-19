@@ -1,10 +1,9 @@
 const index = require('../../lib/index');
-const httpMethod = require('../../lib/httpMethod');
+const Configuration = require('../../lib/Configuration');
 const should = require('should');
 
-describe('@sage/bc-framework-httpmethod.index', function(){
-    it('should export the correct modules', (done) => {
-        should(index).eql(httpMethod);
-        done();
+describe('@sage/bc-framework-parametercache.configloaders', () => {
+    it('should export relevant exports', () => {
+        should(index).eql(Configuration);
     });
 });

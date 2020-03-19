@@ -1,10 +1,15 @@
 const index = require('../../lib/index');
-const httpMethod = require('../../lib/httpMethod');
+const ParameterCache = require('../../lib/ParameterCache');
+const ParameterLoaders = require('../../lib/loaders');
+const mocks = require('../../lib/mocks');
 const should = require('should');
 
-describe('@sage/bc-framework-httpmethod.index', function(){
-    it('should export the correct modules', (done) => {
-        should(index).eql(httpMethod);
-        done();
+describe('@sage/bc-framework-parametercache', () => {
+    it('should export relevant exports', () => {
+        should(index).eql({
+            ParameterCache,
+            ParameterLoaders,
+            mocks
+        });
     });
 });
