@@ -4,8 +4,8 @@ const Promise = require('bluebird');
 const AWS = require('aws-sdk');
 
 class ParameterStoreStaticLoader {
-    constructor({keys=null, paramPrefix=null, env: { region } = {}, ssm}){
-        if(!region) {
+    constructor({ keys = null, paramPrefix = null, env: { region } = {}, ssm }) {
+        if (!region) {
             throw new Error('[ParameterStoreStaticLoader] invalid region');
         }
 
@@ -23,32 +23,32 @@ class ParameterStoreStaticLoader {
 ParameterStoreStaticLoader.MaxResults = 10;
 
 const loadImpl = Promise.method((self, params) => {
-    const keys = self.keys;
-    
-    if(!keys) {
+    const { keys } = self;
+
+    if (!keys) {
         throw new Error('[ParameterStoreStaticLoader] keys array missing');
     }
 
     const prefix = self.paramPrefix;
     const list = self.keys;
-    const MaxResults = ParameterStoreStaticLoader.MaxResults;
+    const { MaxResults } = ParameterStoreStaticLoader;
 
     // we're still limited to 10 results at a
-    const getPage = Promise.method((keys, params) => {
+    const getPage = async() => {
         const req = { Names: keys, WithDecryption: true };
 
-        return self.ssm.getParametersAsync(req)
-            .then((response) => mapResponse(params, response, prefix));
-    });
+        const response = await self.ssm.getParametersAsync(req);
+        return mapResponse(params, response, prefix);
+    };
 
     // parameters might be hierarchical in AWS. We add a prefix to the keys so they can be provided without environment specific
     //  prefixes (eg, prefix /dev/ key name key1 = /dev/key1)
 
     const groups = [];
     for (let i = 0; i < list.length; ++i) {
-        const div = Math.floor(i/MaxResults);
-        const mod = i%MaxResults;
-        if(!(mod)){
+        const div = Math.floor(i / MaxResults);
+        const mod = i % MaxResults;
+        if (!(mod)) {
             groups[div] = [];
         }
 
