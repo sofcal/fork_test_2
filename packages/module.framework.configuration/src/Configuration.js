@@ -45,13 +45,13 @@ class Configuration {
     }
 
     static snapshot(obj) {
-        if(obj == null || typeof(obj) !== 'object') {
+        if (obj == null || typeof (obj) !== 'object') {
             return obj;
         }
 
         const temp = new obj.constructor();
 
-        for(const key in obj) {
+        for (const key in obj) {
             if (obj.hasOwnProperty(key)) {
                 temp[key] = Configuration.snapshot(obj[key]);
             }
@@ -64,13 +64,13 @@ class Configuration {
         return actualHash;
     }
 
-    static load(...args){
+    static load(...args) {
         return loadImpl(...args);
     }
 }
 
 const loadImpl = Promise.method((defaultsCallback) => {
-    if (config){
+    if (config) {
         return config;
     }
 
@@ -89,7 +89,7 @@ const loadImpl = Promise.method((defaultsCallback) => {
     /* eslint-enable no-multi-spaces */
 
     if (!region) {
-        console.log('WARNING: DEFAULTING AWS REGION TO US-EAST-1');
+        console.log('WARNING: DEFAULTING AWS REGION TO US-EAST-1'); // eslint-disable-line no-console
     }
 
     const ssm = useAWSMocks ? new ParameterCacheMocks.SSM({ region, path: localParamPath }) : null;
@@ -105,7 +105,7 @@ const loadImpl = Promise.method((defaultsCallback) => {
     } else if (useParamStoreDynamic) {
         loaders.push(new ParameterStoreDynamicLoader({ env: { region }, paramPrefix, ssm }));
     } else if (configSecretPath) {
-        loaders.push(new SecretConfigLoader({ path: configSecretPath }, kms));
+        loaders.push(new SecretConfigLoader({ path: configSecretPath, kms }));
     }
 
     if (configUseAppConfig) {
@@ -121,7 +121,7 @@ const loadImpl = Promise.method((defaultsCallback) => {
     ParameterCacheInstance.init({ cacheTTL: -1 }, loaders);
 
     return ParameterCacheInstance.load()
-        .then(function(params) {
+        .then((params) => {
             config = defaultsCallback ? defaultsCallback(params[configPropertyName]) : params[configPropertyName];
 
             return config;
