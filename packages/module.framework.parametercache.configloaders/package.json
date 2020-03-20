@@ -1,6 +1,6 @@
 {
   "name": "@sage/bc-framework-parametercache-configloaders",
-  "version": "1.1.146",
+  "version": "1.1.149",
   "author": "Sage UK",
   "license": "ISC",
   "description": "Banking Cloud framework/node_modules/@sage/framework.configuration/node_modules/@sage/parameter-cache-config-loaders module",
