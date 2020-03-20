@@ -112,7 +112,7 @@ const loadImpl = Promise.method((defaultsCallback) => {
     }
 
     if (appConfigApplication) {
-        loaders.push(new AppConfigLoader({ appConfigApplication, env: { region }, appConfig }));
+        loaders.push(new AppConfigLoader({ appConfigApplication, paramPrefix, env: { region }, appConfig }));
     }
 
     // the framework loader expects a base config file. So we always add that loader. It comes after the param-store loaders
