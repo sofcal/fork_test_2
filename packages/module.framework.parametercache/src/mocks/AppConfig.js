@@ -4,12 +4,8 @@ const Promise = require('bluebird');
 const fs = Promise.promisifyAll(require('fs'));
 
 class AppConfig {
-    constructor({ appConfigApplication, paramPrefix, region = 'us-east-1', path }) {
-        this.application = appConfigApplication;
-        this.environment = paramPrefix;
-        this.region = region;
+    constructor({ path }) {
         this.path = path;
-
         this.parsed = null;
     }
 

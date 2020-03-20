@@ -83,7 +83,8 @@ const loadImpl = Promise.method((defaultsCallback) => {
     const paramPrefix           = process.env.PARAM_STORE_PREFIX;               // prefix for use in param-store loaders
     const localParamPath        = process.env.LOCAL_PARAMS_PATH;                // json file representing param-store values for use in mock
     const useAWSMocks           = process.env.USE_AWS_MOCKS;                    // should we use the mock implementations of AWS features
-    const configUseAppConfig    = process.env.USE_APP_CONFIG === 'true';        // should we use AWS AppConfig to retrieve additional settings?
+    const appConfigApplication  = process.env.APP_CONFIG_APPLICATION;           // the AWS AppConfig Application (i.e. 'BankingService') to use
+    const localAppConfigPath    = process.env.LOCAL_APP_CONFIG_PATH;           // the AWS AppConfig Application (i.e. 'BankingService') to use
 
     const region                = process.env.AWS_REGION;                       // aws region we're working on (not needed if only using CONFIGPATH)
     /* eslint-enable no-multi-spaces */
@@ -92,6 +93,8 @@ const loadImpl = Promise.method((defaultsCallback) => {
         console.log('WARNING: DEFAULTING AWS REGION TO US-EAST-1'); // eslint-disable-line no-console
     }
 
+    // TODO update this with correct args once mock complete
+    const appConfig = useAWSMocks ? new ParameterCacheMocks.AppConfig({ path: localAppConfigPath }) : null;
     const ssm = useAWSMocks ? new ParameterCacheMocks.SSM({ region, path: localParamPath }) : null;
     const kms = useAWSMocks ? new ParameterCacheConfigMocks.KMS({ region }) : null;
 
@@ -108,8 +111,8 @@ const loadImpl = Promise.method((defaultsCallback) => {
         loaders.push(new SecretConfigLoader({ path: configSecretPath, kms }));
     }
 
-    if (configUseAppConfig) {
-        loaders.push(new AppConfigLoader({ env: { region } }));
+    if (appConfigApplication) {
+        loaders.push(new AppConfigLoader({ appConfigApplication, env: { region }, appConfig }));
     }
 
     // the framework loader expects a base config file. So we always add that loader. It comes after the param-store loaders
