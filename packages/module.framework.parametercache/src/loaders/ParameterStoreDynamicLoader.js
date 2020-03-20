@@ -27,7 +27,7 @@ const loadImpl = Promise.method((self, params) => {
 
     // aws sdk limits to page size of 10, so need a recursive function
     // WARNING: recursive promise calls are only suitable for low recursion values
-    const pageAll = async(next = null) => { // eslint-disable-line consistent-return
+    const pageAll = Promise.method((params, next = null) => {
         const options = {
             Path: prefix,
             MaxResults: ParameterStoreDynamicLoader.MaxResults,
@@ -35,18 +35,15 @@ const loadImpl = Promise.method((self, params) => {
             WithDecryption: true,
             NextToken: next
         };
+        return self.ssm.getParametersByPathAsync(options).then(response => {
+            mapResponse(params, response, prefix); // a NextToken is provided if there are more results to retrieve, we use it for paging
 
-        const response = await self.ssm.getParametersByPathAsync(options);
+            if (response.NextToken) {
+                return pageAll(params, response.NextToken);
+            }
+        });
+    }); // kick off the recursion
 
-        mapResponse(params, response, prefix);
-
-        // a NextToken is provided if there are more results to retrieve, we use it for paging
-        if (response.NextToken) {
-            return pageAll(params, response.NextToken);
-        }
-    };
-
-    // kick off the recursion
     return pageAll(params);
 });
 
