@@ -3,7 +3,7 @@
 const AWS = require('aws-sdk');
 const uuidGen = require('uuid');
 
-AWS.config.setPromiseDependency(require('bluebird'));
+AWS.config.setPromisesDependency(require('bluebird'));
 
 const jsonMime = 'application/json';
 

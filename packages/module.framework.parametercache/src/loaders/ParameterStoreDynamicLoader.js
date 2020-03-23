@@ -3,7 +3,7 @@
 const Promise = require('bluebird');
 const AWS = require('aws-sdk');
 
-AWS.config.setPromiseDependency(require('bluebird'));
+AWS.config.setPromisesDependency(require('bluebird'));
 
 class ParameterStoreDynamicLoader {
     constructor({ paramPrefix = null, env: { region } = {}, ssm }) {
