@@ -9,12 +9,12 @@ class AppConfig {
         this.parsed = null;
     }
 
-    getConfigurationAsync(...args) {
-        return getConfigurationAsyncImpl(this, ...args);
+    getConfiguration(...args) {
+        return getConfigurationImpl(this, ...args);
     }
 }
 
-const getConfigurationAsyncImpl = Promise.method((self) => {
+const getConfigurationImpl = Promise.method((self) => {
     if (self.parsed) {
         return self.parsed;
     }

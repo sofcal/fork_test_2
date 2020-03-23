@@ -3,13 +3,15 @@
 const Promise = require('bluebird');
 const AWS = require('aws-sdk');
 
+AWS.config.setPromiseDependency(require('bluebird'));
+
 class ParameterStoreDynamicLoader {
     constructor({ paramPrefix = null, env: { region } = {}, ssm }) {
         if (!region) {
             throw new Error('[ParameterStoreDynamicLoader] invalid region');
         }
 
-        this.ssm = ssm || Promise.promisifyAll(new AWS.SSM({ region }));
+        this.ssm = ssm || new AWS.SSM({ region });
 
         this.paramPrefix = paramPrefix;
     }
@@ -35,7 +37,7 @@ const loadImpl = Promise.method((self, params) => {
             WithDecryption: true,
             NextToken: next
         };
-        return self.ssm.getParametersByPathAsync(options).then(response => {
+        return self.ssm.getParametersByPath(options).promise().then((response) => {
             mapResponse(params, response, prefix); // a NextToken is provided if there are more results to retrieve, we use it for paging
 
             if (response.NextToken) {

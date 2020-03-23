@@ -1,8 +1,9 @@
 'use strict';
 
-const Promise = require('bluebird');
 const AWS = require('aws-sdk');
 const uuidGen = require('uuid');
+
+AWS.config.setPromiseDependency(require('bluebird'));
 
 const jsonMime = 'application/json';
 
@@ -18,7 +19,7 @@ class AppConfigLoader {
 
         this.clientId = uuidGen.v4();
 
-        this.appConfig = appConfig || Promise.promisifyAll(new AWS.AppConfig({ apiVersion: '2019-10-09' }));
+        this.appConfig = appConfig || new AWS.AppConfig({ apiVersion: '2019-10-09' });
 
         this.application = appConfigApplication;
         this.environment = paramPrefix;
@@ -51,7 +52,7 @@ const loadImpl = async(self, params) => {
     let content, contentType;
 
     try {
-        ({ Content: content, ContentType: contentType } = await self.appConfig.getConfigurationAsync(req));
+        ({ Content: content, ContentType: contentType } = await self.appConfig.getConfiguration(req));
 
         if (contentType !== jsonMime) {
             console.error(`[AppConfigLoader] Invalid content type returned by AWS AppConfig (expected ${jsonMime}, received ${ContentType}, returning last known good configuration.`);
