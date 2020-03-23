@@ -3,13 +3,15 @@
 const Promise = require('bluebird');
 const AWS = require('aws-sdk');
 
+AWS.config.setPromiseDependency(require('bluebird'));
+
 class ParameterStoreStaticLoader {
     constructor({ keys = null, paramPrefix = null, env: { region } = {}, ssm }) {
         if (!region) {
             throw new Error('[ParameterStoreStaticLoader] invalid region');
         }
 
-        this.ssm = ssm || Promise.promisifyAll(new AWS.SSM({ region }));
+        this.ssm = ssm || new AWS.SSM({ region });
 
         this.keys = keys;
         this.paramPrefix = paramPrefix;
@@ -37,7 +39,7 @@ const loadImpl = Promise.method((self, params) => {
     const getPage = async() => {
         const req = { Names: keys, WithDecryption: true };
 
-        const response = await self.ssm.getParametersAsync(req);
+        const response = await self.ssm.getParameters(req);
         return mapResponse(params, response, prefix);
     };
 
