@@ -22,7 +22,7 @@ class AppConfigLoader {
         this.appConfig = appConfig || new AWS.AppConfig({ apiVersion: '2019-10-09' });
 
         this.application = appConfigApplication;
-        this.environment = paramPrefix;
+        this.environment = paramPrefix.split('/')[1];
         this.region = region;
 
         this.configuration = {};
@@ -49,15 +49,15 @@ const loadImpl = async(self, params) => {
         Environment: `${environment}-${region}`
     };
 
-    let content, contentType;
+    let Content, ContentType;
 
     try {
-        ({ Content: content, ContentType: contentType } = await self.appConfig.getConfiguration(req));
+        ({ Content, ContentType } = await self.appConfig.getConfiguration(req).promise());
 
-        if (contentType !== jsonMime) {
+        if (ContentType !== jsonMime) {
             console.error(`[AppConfigLoader] Invalid content type returned by AWS AppConfig (expected ${jsonMime}, received ${ContentType}, returning last known good configuration.`);
         } else {
-            self.configuration = content;
+            self.configuration = Content;
         }
     } catch {
         console.error(`[AppConfigLoader] Failed to retrieve configuration file from AppConfig, returning last known good configuration.`);

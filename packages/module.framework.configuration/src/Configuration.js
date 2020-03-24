@@ -70,8 +70,14 @@ class Configuration {
 }
 
 const loadImpl = Promise.method((defaultsCallback) => {
+    // If we've already loaded config at least once, we don't need to do all the setup
+    // Just call load() again to refresh the cache and return the updated config
     if (config) {
-        return config;
+        return ParameterCacheInstance.load()
+            .then(params => {
+                config = defaultsCallback ? defaultsCallback(params[configPropertyName]) : params[configPropertyName];
+                return config;
+        });
     }
 
     /* eslint-disable no-multi-spaces */
@@ -121,7 +127,8 @@ const loadImpl = Promise.method((defaultsCallback) => {
     loaders.push(new ConfigMergeLoader({ overridesPropertyName }));
 
     // no refresh on the cache, as we can't support that yet.
-    ParameterCacheInstance.init({ cacheTTL: -1 }, loaders);
+    // TODO test refresh. Make configurable if it works (60s for now).
+    ParameterCacheInstance.init({ cacheTTL: 60000 }, loaders);
 
     return ParameterCacheInstance.load()
         .then((params) => {
