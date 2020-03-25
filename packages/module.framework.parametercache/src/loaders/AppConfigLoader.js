@@ -5,7 +5,7 @@ const uuidGen = require('uuid');
 
 AWS.config.setPromisesDependency(require('bluebird'));
 
-const jsonMime = 'application/json';
+const jsonMime = 'application/octet-stream';
 
 class AppConfigLoader {
     constructor({ appConfigApplication, paramPrefix, env: { region } = {}, appConfig }) {
@@ -57,7 +57,7 @@ const loadImpl = async(self, params) => {
         if (ContentType !== jsonMime) {
             console.error(`[AppConfigLoader] Invalid content type returned by AWS AppConfig (expected ${jsonMime}, received ${ContentType}, returning last known good configuration.`);
         } else {
-            self.configuration = Content;
+            self.configuration = json.parse(Content.toString());
         }
     } catch {
         console.error(`[AppConfigLoader] Failed to retrieve configuration file from AppConfig, returning last known good configuration.`);
