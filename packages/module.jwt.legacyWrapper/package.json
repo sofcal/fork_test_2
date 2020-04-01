@@ -44,8 +44,9 @@
     "eslint-stats": "^1.0.0"
   },
   "scripts": {
-    "buildwrapper": "npm i && babel src -d lib --copy-files && npm run clean && npm i --production",
+    "buildwrapper": "npm i && babel src -d lib --copy-files && npm run clean && npm i --production && npm run strip",
     "clean": "rimraf ./coverage/ && rimraf ./.nyc_output/ && rimraf ./node_modules/",
+    "strip": "rimraf ./node_modules/@sage/**/src && rimraf ./node_modules/@sage/**/test",
     "test": "NODE_ENV=test nyc --cache false --x test/ mocha -b --colors \"./test/unit/**/*.spec.js\"",
     "testwatchunit": "NODE_ENV=test mocha -b -w --colors \"./test/unit/**/*.spec.js\"",
     "testwatchuint": "NODE_ENV=test mocha -b -w --colors \"./test/int/**/*.spec.js\"",
