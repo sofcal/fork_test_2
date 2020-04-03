@@ -119,7 +119,7 @@ module.exports.run = Promise.method((event, params, services) => {
                 return undefined;
             }
 
-            const keyPostfix = `${BlobStorage.Postfixes.concatenated}_${moment.utc().format('hh:mm:ss.SSS')}`;
+            const keyPostfix = `${BlobStorage.Postfixes.concatenated}_${moment.utc().format('hh_mm_ss_SSS')}`;
             return flows.concat.run({ regions: [thisRegion, otherRegion], productInfos: concat }, debug)
                 .then((results) => {
                     results.orphaned.bankAccounts = results.orphaned.bankAccounts.sort((a, b) => { return a._id < b._id ? -1 : 1; }); // eslint-disable-line no-param-reassign
