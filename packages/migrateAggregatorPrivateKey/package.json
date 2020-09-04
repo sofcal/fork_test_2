@@ -19,7 +19,7 @@
   "dependencies": {
     "aws-sdk": "^2.220.1",
     "bluebird": "^3.5.1",
-    "mongodb": "^3.0.5",
+    "mongodb": "^3.1.13",
     "internal-parameterstorestaticloader": "file:../internal.parameterStoreStaticLoader",
     "internal-services-db": "file:../internal.services.db",
     "internal-services-encryption": "file:../internal.services.encryption",
