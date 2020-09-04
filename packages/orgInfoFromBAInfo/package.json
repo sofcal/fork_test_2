@@ -25,6 +25,6 @@
     "internal-services-encryption": "file:../internal.services.encryption",
     "internal-services-key": "file:../internal.services.key",
     "internal-services-s3": "file:../internal.services.s3",
-    "mongodb": "^3.0.5"
+    "mongodb": "^3.1.13"
   }
 }
