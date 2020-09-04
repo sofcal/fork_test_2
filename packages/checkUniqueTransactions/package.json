@@ -19,7 +19,7 @@
     "bluebird": "^3.5.1",
     "internal-parameterstorestaticloader": "file:../internal.parameterStoreStaticLoader",
     "internal-services-db": "file:../internal.services.db",
-    "mongodb": "^3.0.5",
+    "mongodb": "^3.1.13",
     "underscore": "^1.9.0"
   },
   "devDependencies": {
