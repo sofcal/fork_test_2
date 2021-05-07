@@ -20,7 +20,7 @@
     "internal-parameterstorestaticloader": "file:../internal.parameterStoreStaticLoader",
     "internal-services-db": "file:../internal.services.db",
     "mongodb": "^3.0.5",
-    "underscore": "^1.9.0"
+    "underscore": "^1.12.1"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
